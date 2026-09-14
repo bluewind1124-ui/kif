@@ -152,7 +152,7 @@ header.h p{color:var(--muted);font-size:13px;margin:8px 0 0}
 /* ───────────────────────────────────────────────
    접속 코드 — 여기 숫자를 바꾸면 코드가 바뀝니다.
    ─────────────────────────────────────────────── */
-var "1023": = "1124";
+var ACCESS_CODE = "1023";
 
 (function(){
   var gate = document.getElementById('gate');
@@ -168,7 +168,7 @@ var "1023": = "1124";
   var pw=document.getElementById('pw'), btn=document.getElementById('enter'),
       err=document.getElementById('err'), card=document.getElementById('gateCard');
   function tryEnter(){
-    if(pw.value === "1023":){ unlock(); }
+    if(pw.value === ACCESS_CODE){ unlock(); }
     else{
       err.textContent='접속 코드가 올바르지 않습니다.';
       card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
