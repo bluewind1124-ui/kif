@@ -61,5 +61,44 @@
     open.addEventListener('click',function(){side_(false);});
     sync();
   }
-  if(document.body)build();else document.addEventListener('DOMContentLoaded',build);
+
+  /* ── 업데이트 기준일 표시 · 새 버전 자동 반영 (version.json 한 곳에서 관리) ── */
+  function fmt(d){return String(d||'').replace(/-/g,'.');}
+  function applyVer(v){
+    window.KIF_VER=v;
+    var who=document.querySelector('.kif-top .who');
+    if(who)who.innerHTML='기준일 <b>'+fmt(v.updated)+'</b> 업데이트';
+    var u=document.querySelectorAll('.kif-upd');
+    for(var i=0;i<u.length;i++)u[i].textContent=fmt(v.updated);
+    var hdr=document.querySelector('header.app');
+    if(hdr&&!hdr.querySelector('.kif-upd-badge')){
+      var b=document.createElement('div');b.className='kif-upd-badge';
+      b.innerHTML='최종 업데이트 <b>'+fmt(v.updated)+'</b>';hdr.appendChild(b);
+    }
+    var hs=document.getElementById('kifHistory');
+    if(hs&&v.history&&v.history.length){
+      var h='<b>업데이트 내역</b>';
+      for(var j=0;j<v.history.length&&j<5;j++)h+='<div><span>'+fmt(v.history[j].date)+'</span>'+String(v.history[j].text).replace(/</g,'&lt;')+'</div>';
+      hs.innerHTML=h;
+    }
+    try{document.dispatchEvent(new CustomEvent('kifver',{detail:v}));}catch(e){}
+  }
+  function checkVer(){
+    if(!window.fetch)return;
+    try{var saved=get('kif_ver_obj');if(saved)applyVer(JSON.parse(saved));}catch(e){}
+    fetch('version.json?_='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(v){
+      if(!v)return;
+      applyVer(v);
+      var key=v.updated+'|'+(v.build||''), old=get('kif_ver');
+      set('kif_ver',key);set('kif_ver_obj',JSON.stringify(v));
+      var done=null;try{done=sessionStorage.getItem('kif_reloaded');}catch(e){}
+      if(old&&old!==key&&done!==key){
+        try{sessionStorage.setItem('kif_reloaded',key);}catch(e){}
+        var here=location.pathname.split('/').pop()||'index.html';
+        Promise.all(['kif.js','kif.css',here].map(function(u){return fetch(u,{cache:'reload'});})).then(function(){location.reload();},function(){location.reload();});
+      }
+    }).catch(function(){});
+  }
+  function start(){build();checkVer();}
+  if(document.body)start();else document.addEventListener('DOMContentLoaded',start);
 })();

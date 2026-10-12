@@ -490,7 +490,7 @@ var CATS = [
   function byId(id){for(var i=0;i<CATS.length;i++)if(CATS[i].id===id)return CATS[i];return null;}
   function home(){
     var o='<div class="ph"><div class="kicker">2026.10 · BEST PICK UP</div><h1>이번 달의 원픽</h1>'+
-      '<p>이번 달에 뭐 팔지? 상품군을 선택하면 선정 상품의 타사 비교표와 선정 이유를 보여줍니다. 26년 10월 베스트 픽업 상품 비교 분석 가이드 기준.</p></div>';
+      '<p>이번 달에 뭐 팔지? 상품군을 선택하면 선정 상품의 타사 비교표와 선정 이유를 보여줍니다. 26년 10월 베스트 픽업 상품 비교 분석 가이드 기준 · 최종 업데이트 <b class="kif-upd">2026.10.12</b></p></div>';
     ['life','nonlife'].forEach(function(t){
       var best=CATS.filter(function(c){return c.type===t&&c.kind==='best';}), val=CATS.filter(function(c){return c.type===t&&c.kind==='value';});
       o+='<div class="sec-t">'+TYPES[t]+' <i>BEST CHOICE</i></div><div class="cards">';
@@ -545,8 +545,11 @@ var CATS = [
     main.style.display='block';
     main.innerHTML=c?detail(c):home();
     document.title=(c?c.name+' · ':'')+'이번 달의 원픽 · 한국보험금융';
+    fillUpd();
     window.scrollTo(0,0);
   }
+  function fillUpd(){var v=window.KIF_VER;if(!v)return;var u=main.querySelectorAll('.kif-upd');for(var i=0;i<u.length;i++)u[i].textContent=String(v.updated).replace(/-/g,'.');}
+  document.addEventListener('kifver',fillUpd);
   main.addEventListener('click',function(e){
     var b=e.target.closest&&e.target.closest('[data-id]');
     if(!b)return;

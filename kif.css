@@ -91,3 +91,12 @@ table th,table.cmp thead th{letter-spacing:0}
   body.kif .kif-side{top:62px}
 }
 @media print{.kif-top,.kif-side,.kif-open{display:none}body.kif{padding:0}}
+
+/* ===== 업데이트 기준일 ===== */
+.kif-upd-badge{display:inline-block;margin-top:10px;font-size:11.5px;color:var(--muted);border:1px solid var(--line-strong);border-radius:20px;padding:3px 11px;background:var(--surface)}
+.kif-upd-badge b{color:var(--gold);font-weight:700}
+.kif-top .who b{color:var(--kgold-2)}
+.hist{margin-top:22px;border:1px solid var(--line);border-radius:4px;background:var(--surface);padding:12px 16px;font-size:12px;color:var(--muted);line-height:1.8}
+.hist:empty{display:none}
+.hist b{display:block;color:var(--ink);margin-bottom:2px}
+.hist div span{display:inline-block;min-width:78px;color:var(--gold);font-weight:700}
