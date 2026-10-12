@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><script>try{if(sessionStorage.getItem("mjfs_ok")!=="1")location.replace("index.html");}catch(e){}</script></head><body>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><script>try{var k=localStorage.getItem("kif_keep");if(sessionStorage.getItem("kif_ok")!=="1"&&!(k&&+k>Date.now()))location.replace("index.html");}catch(e){}</script></head><body>
 <title>3대질병진단비 비교</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -205,7 +205,7 @@ table.cmp thead th{position:static}
 .fchip.all[aria-pressed="true"]{color:#fff}
 </style>
 <header class="app">
-  <div class="kicker">미래전략금융서비스 · 3대질병진단비 보험료 비교</div>
+  <div class="kicker">한국보험금융 · 3대질병진단비 보험료 비교</div>
   <h1>3대질병진단비 비교</h1>
   <p>보종·심사·성별·연령을 고르고 <b>필요한 담보를 선택</b>하면, 선택한 담보 구성의 <b>합산 월 보험료가 가장 낮은 상품 3가지</b>를 보여줍니다. · 20년납 · 100세만기 · 납입면제형</p>
 </header>
@@ -215,7 +215,7 @@ table.cmp thead th{position:static}
   <div class="result" id="result"></div>
   <div class="step" id="s3"><div class="step-head"><span class="step-num">3</span><h2>전체 상품 비교</h2><span class="hint" id="s3hint"></span></div><div class="fbar" id="s3filter"></div><div id="s3body"></div></div>
 </div>
-<p class="foot-note">미래전략금융서비스 「3대질병진단비 보험료(26.09.04)」 자료. 암·뇌혈관·허혈성 각 1,000만원, 유사암(소액암) 200만원 가입 기준의 담보별 월 보험료입니다. 「선택 합산」은 체크한 담보의 월 보험료 합계이며, 회사가 특정 담보를 제공하지 않으면 그 회사는 합산 비교에서 제외됩니다. 유병자는 회사별 간편유형(305·315·325·335·355 등)에 따라 같은 연령에 여러 행이 나올 수 있고, 순위는 회사별 최저 상품 기준입니다.</p>
+<p class="foot-note">한국보험금융 「3대질병진단비 보험료(26.09.04)」 자료. 암·뇌혈관·허혈성 각 1,000만원, 유사암(소액암) 200만원 가입 기준의 담보별 월 보험료입니다. 「선택 합산」은 체크한 담보의 월 보험료 합계이며, 회사가 특정 담보를 제공하지 않으면 그 회사는 합산 비교에서 제외됩니다. 유병자는 회사별 간편유형(305·315·325·335·355 등)에 따라 같은 연령에 여러 행이 나올 수 있고, 순위는 회사별 최저 상품 기준입니다.</p>
 <script>
 const DATA = {
  "meta": {
@@ -11418,4 +11418,6 @@ function refresh(){ renderConds(); renderDambo(); renderSort(); renderFilter(); 
 fixAge(); refresh();
 </script>
 
-<a href="index.html" style="position:fixed;top:10px;left:10px;z-index:99;background:var(--surface,#fff);border:1px solid var(--line,#d6dce3);border-radius:8px;padding:6px 11px;font:700 12px/1 -apple-system,'Noto Sans KR',sans-serif;color:var(--accent,#1f5c9e);text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.12)">← 목록</a></body></html>
+<link rel="stylesheet" href="kif.css">
+<script src="kif.js"></script>
+</body></html>

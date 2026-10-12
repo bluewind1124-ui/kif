@@ -1,0 +1,93 @@
+/* 한국보험금융(주) 신채널 영업지원 — 공통 템플릿 (디자인 시안 반영)
+   네이비 #0f2240 · 골드 #cb9c3a · 표 헤더 #1d3557 · 배경 #eef1f6 */
+html:root{
+  --bg:#eef1f6; --surface:#ffffff; --surface-2:#f8f9fc; --ink:#14213a; --muted:#5d6b82;
+  --line:#dbe1ea; --line-strong:#b9c3d3;
+  --accent:#0f2240; --accent-ink:#0f2240; --accent-soft:#e8edf5;
+  --good:#0f7a48; --good-soft:#e2f2e9;
+  --gold:#8f6510; --gold-soft:#f8efd9;
+  --rank1:#b07f1c; --rank2:#1d3557; --rank3:#7a8595;
+  --navy:#0f2240; --navy-2:#1d3557; --kgold:#cb9c3a; --kgold-2:#e0b862;
+  --shadow:0 1px 2px rgba(15,34,64,.06), 0 6px 20px -12px rgba(15,34,64,.28);
+  --radius:6px;
+}
+html:root[data-theme="dark"]{
+  --bg:#0a1429; --surface:#112140; --surface-2:#16294d; --ink:#e8edf5; --muted:#9fb0c8;
+  --line:#243a60; --line-strong:#34507e;
+  --accent:#4f86c6; --accent-ink:#c9dcf3; --accent-soft:#18305a;
+  --good:#48c78e; --good-soft:#16302a;
+  --gold:#e0b862; --gold-soft:#3a2f17;
+  --rank1:#e0b862; --rank2:#6f9fd6; --rank3:#8b97a6;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.6);
+}
+html{color-scheme:light}
+html[data-theme="dark"]{color-scheme:dark}
+
+/* ===== 상단 바 ===== */
+body.kif{padding-top:59px;padding-left:214px;transition:padding-left .15s}
+body.kif.side-off{padding-left:0}
+.kif-top{position:fixed;top:0;left:0;right:0;height:59px;z-index:60;background:var(--navy);
+  border-bottom:3px solid var(--kgold);display:flex;align-items:center;gap:12px;padding:0 24px 0 22px;color:#fff}
+.kif-top .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;min-width:0}
+.kif-top .brand img{width:34px;height:34px;border-radius:50%;flex:none;display:block}
+.kif-top .brand .tt{font-size:16px;font-weight:700;letter-spacing:-.01em;line-height:1.2;white-space:nowrap}
+.kif-top .brand .tt em{font-style:normal;color:var(--kgold-2)}
+.kif-top .brand .sub{display:none;font-size:11.5px;color:#b8c4d8;font-weight:400}
+.kif-top .sp{flex:1}
+.kif-top .who{font-size:12px;color:#b8c4d8;white-space:nowrap}
+.kif-top .who b{color:#fff}
+.kif-seg{display:flex;border:1px solid #6b7c96;border-radius:3px;overflow:hidden}
+.kif-seg button{border:0;background:transparent;color:#fff;font-size:12px;padding:7px 12px}
+.kif-seg button[aria-pressed="true"]{background:var(--kgold);color:#0f2240;font-weight:700}
+.kif-out{border:1px solid #6b7c96;background:transparent;color:#fff;border-radius:3px;font-size:12px;padding:7px 12px}
+.kif-out:hover{background:rgba(255,255,255,.1)}
+.kif-moon{display:none;border:1px solid #6b7c96;background:transparent;color:#fff;border-radius:4px;width:36px;height:36px;align-items:center;justify-content:center}
+
+/* ===== 사이드 메뉴 ===== */
+.kif-side{position:fixed;top:59px;left:0;bottom:0;width:214px;z-index:50;background:var(--surface);
+  border-right:1px solid var(--line);padding:12px 10px;overflow-y:auto;transition:transform .15s}
+body.side-off .kif-side{transform:translateX(-100%)}
+.kif-fold{display:flex;align-items:center;gap:10px;width:100%;border:1px solid var(--line);background:var(--surface-2);
+  color:var(--muted);font-size:12.5px;padding:9px 12px;border-radius:4px;margin-bottom:10px}
+.kif-side a.nv{display:flex;align-items:center;gap:11px;padding:10px 12px;margin:2px 0;border-radius:3px;
+  color:var(--ink);text-decoration:none;font-size:13.5px;border-left:3px solid transparent}
+.kif-side a.nv svg{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+.kif-side a.nv:hover{background:var(--accent-soft)}
+.kif-side a.nv.on{background:var(--navy);color:#fff;font-weight:700;border-left-color:var(--kgold)}
+html[data-theme="dark"] .kif-side a.nv.on{background:#1d3557}
+.kif-side hr{border:0;border-top:1px solid var(--line);margin:10px 8px}
+.kif-open{display:none;position:fixed;top:70px;left:0;z-index:49;border:1px solid var(--line);border-left:0;background:var(--surface);
+  color:var(--muted);font-size:12px;padding:8px 10px;border-radius:0 4px 4px 0}
+body.side-off .kif-open{display:block}
+
+/* ===== 기존 도구 페이지 헤더 → 템플릿 페이지 제목 ===== */
+header.app{background:transparent !important;border-bottom:1px solid var(--line-strong) !important;padding:22px 24px 14px !important;max-width:1180px;margin:0 auto}
+header.app .kicker{color:var(--gold) !important;letter-spacing:.12em !important}
+header.app h1{font-size:22px;border-left:4px solid var(--kgold);padding-left:11px}
+.wrap{max-width:1180px}
+.step-num{background:var(--navy) !important;color:#fff !important}
+html[data-theme="dark"] .step-num{background:var(--kgold) !important;color:#0f2240 !important}
+.rank,.result .card,.cat,.sortbtn{border-radius:var(--radius)}
+table th,table.cmp thead th{letter-spacing:0}
+.tbl-wrap table thead th,table.cmp thead th{background:var(--navy-2) !important;color:#fff !important}
+.foot-note{color:var(--muted)}
+
+/* ===== 모바일: 상단 탭 ===== */
+@media (max-width:860px){
+  body.kif,body.kif.side-off{padding-left:0;padding-top:108px}
+  .kif-top{height:auto;min-height:59px;padding:8px 14px}
+  .kif-top .brand .tt{font-size:14.5px}
+  .kif-top .brand .sub{display:block}
+  .kif-top .who,.kif-seg,.kif-out{display:none}
+  .kif-moon{display:flex}
+  .kif-side,body.side-off .kif-side{position:fixed;top:auto;left:0;right:0;bottom:auto;width:auto;transform:none;border-right:0;
+    border-bottom:1px solid var(--line);padding:0;display:flex;overflow-x:auto;white-space:nowrap;margin-top:0;z-index:55}
+  .kif-fold,.kif-side hr,.kif-open,body.side-off .kif-open{display:none}
+  .kif-side a.nv{border-left:0;border-bottom:3px solid transparent;border-radius:0;margin:0;padding:12px 14px;font-size:13px}
+  .kif-side a.nv svg{display:none}
+  .kif-side a.nv.on{background:transparent;color:var(--ink);border-bottom-color:var(--kgold)}
+  html[data-theme="dark"] .kif-side a.nv.on{background:transparent;color:#fff}
+  .kif-top{--tabs:1}
+  body.kif .kif-side{top:62px}
+}
+@media print{.kif-top,.kif-side,.kif-open{display:none}body.kif{padding:0}}

@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><script>try{if(sessionStorage.getItem("mjfs_ok")!=="1")location.replace("index.html");}catch(e){}</script></head><body>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><script>try{var k=localStorage.getItem("kif_keep");if(sessionStorage.getItem("kif_ok")!=="1"&&!(k&&+k>Date.now()))location.replace("index.html");}catch(e){}</script></head><body>
 <title>단기납 종신보험 비교</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -200,7 +200,7 @@ table.cmp thead th{position:static}
 .fchip.all[aria-pressed="true"]{color:#fff}
 </style>
 <header class="app">
-  <div class="kicker">미래전략금융서비스 · 단기납 종신보험 환급률 비교</div>
+  <div class="kicker">한국보험금융 · 단기납 종신보험 환급률 비교</div>
   <h1>단기납 종신보험 비교</h1>
   <p>가입금액·납입기간·심사방식을 고르고, <b>정렬 기준(보험료·환급률·보장금액·환급금)</b>을 누르면 가장 유리한 상품 3가지를 보여줍니다. · 40세 남자 · U/W 기준일 2026.09.04</p>
   <p id="fxline" style="margin-top:4px;font-size:11.5px;color:var(--accent-ink)"></p>
@@ -222,7 +222,7 @@ table.cmp thead th{position:static}
     <div id="s3body"></div>
   </div>
 </div>
-<p class="foot-note">미래전략금융서비스 「단기납 종신보험 환급률(26.09.04)」 자료를 옮긴 것입니다. 각 보험사 대표 상품으로 설계했으며, 환급금(률)은 연령·성별·보험료·가입금액에 따라 달라지므로 상품 비교 이해용 참고자료입니다. 종신보험은 보장이 주목적인 보장성 보험으로 초기 해지 시 환급금이 적거나 없을 수 있습니다.</p>
+<p class="foot-note">한국보험금융 「단기납 종신보험 환급률(26.09.04)」 자료를 옮긴 것입니다. 각 보험사 대표 상품으로 설계했으며, 환급금(률)은 연령·성별·보험료·가입금액에 따라 달라지므로 상품 비교 이해용 참고자료입니다. 종신보험은 보장이 주목적인 보장성 보험으로 초기 해지 시 환급금이 적거나 없을 수 있습니다.</p>
 
 <script>
 const DATA = {
@@ -3524,4 +3524,6 @@ document.getElementById("fxline").textContent =
 fixYear(); refresh();
 </script>
 
-<a href="index.html" style="position:fixed;top:10px;left:10px;z-index:99;background:var(--surface,#fff);border:1px solid var(--line,#d6dce3);border-radius:8px;padding:6px 11px;font:700 12px/1 -apple-system,'Noto Sans KR',sans-serif;color:var(--accent,#1f5c9e);text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.12)">← 목록</a></body></html>
+<link rel="stylesheet" href="kif.css">
+<script src="kif.js"></script>
+</body></html>

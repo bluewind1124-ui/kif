@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><script>try{if(sessionStorage.getItem("mjfs_ok")!=="1")location.replace("index.html");}catch(e){}</script></head><body>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><script>try{var k=localStorage.getItem("kif_keep");if(sessionStorage.getItem("kif_ok")!=="1"&&!(k&&+k>Date.now()))location.replace("index.html");}catch(e){}</script></head><body>
 <title>생명보험 상품 비교</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -256,7 +256,7 @@ table.cmp-info td{white-space:normal;vertical-align:top}
 .fchip.all[aria-pressed="true"]{color:#fff}
 </style>
 <header class="app">
-  <div class="kicker">미래전략금융서비스 · 생명보험 비교 가이드북 (26.09)</div>
+  <div class="kicker">한국보험금융 · 생명보험 비교 가이드북 (26.09)</div>
   <h1>생명보험 상품 비교</h1>
   <p>상품 구분을 고르고 세부 조건·정렬 기준을 누르면 가장 유리한 상품 3가지를 보여줍니다. · 40세 남/여 · 주계약 1억원(별도 표기 제외) · 20년납 · U/W 2026.09.04</p>
   <p id="fxline" style="margin-top:4px;font-size:11.5px;color:var(--accent-ink)"></p>
@@ -267,7 +267,7 @@ table.cmp-info td{white-space:normal;vertical-align:top}
   <div class="result" id="result"></div>
   <div class="step" id="s3" hidden><div class="step-head"><span class="step-num">3</span><h2>전체 상품 비교</h2><span class="hint" id="s3hint"></span></div><div class="fbar" id="s3filter"></div><div id="s3body"></div></div>
 </div>
-<p class="foot-note">미래전략금융서비스 「생명보험 비교 가이드북 09.04」 자료. 각 보험사 대표 상품·기본형/보증형 기준으로 설계했으며, 환급금(률)은 조건에 따라 달라지므로 상품 비교 이해용 참고자료입니다. 가이드북의 종신보험(공시이율·저해약 환급형·중장기납·상속·납면강화·간편심사·변액유니버셜·CI(GI)) · 정기보험 · 연금(즉시연금·환급률(공시이율형·변액형)·공시이율 금리·주요특징·변액연금 특징) · 참고 가입나이표를 모두 반영했습니다. 「(상세)」 표시 구분은 회사·항목 비교표입니다. 각 표 위의 「전체 / 회사명」 필터로 볼 상품을 좁힐 수 있고, 필요한 상품만 화면에 맞춰 표시됩니다. 달러 상품은 현재 환율로 환산해 함께 비교합니다.</p>
+<p class="foot-note">한국보험금융 「생명보험 비교 가이드북 09.04」 자료. 각 보험사 대표 상품·기본형/보증형 기준으로 설계했으며, 환급금(률)은 조건에 따라 달라지므로 상품 비교 이해용 참고자료입니다. 가이드북의 종신보험(공시이율·저해약 환급형·중장기납·상속·납면강화·간편심사·변액유니버셜·CI(GI)) · 정기보험 · 연금(즉시연금·환급률(공시이율형·변액형)·공시이율 금리·주요특징·변액연금 특징) · 참고 가입나이표를 모두 반영했습니다. 「(상세)」 표시 구분은 회사·항목 비교표입니다. 각 표 위의 「전체 / 회사명」 필터로 볼 상품을 좁힐 수 있고, 필요한 상품만 화면에 맞춰 표시됩니다. 달러 상품은 현재 환율로 환산해 함께 비교합니다.</p>
 <script>
 const DATA = {
  "meta": {
@@ -7497,4 +7497,6 @@ document.getElementById("fxline").textContent = `※ 달러 상품 환율 적용
 renderCats();
 </script>
 
-<a href="index.html" style="position:fixed;top:10px;left:10px;z-index:99;background:var(--surface,#fff);border:1px solid var(--line,#d6dce3);border-radius:8px;padding:6px 11px;font:700 12px/1 -apple-system,'Noto Sans KR',sans-serif;color:var(--accent,#1f5c9e);text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.12)">← 목록</a></body></html>
+<link rel="stylesheet" href="kif.css">
+<script src="kif.js"></script>
+</body></html>

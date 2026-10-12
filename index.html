@@ -4,23 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>미래전략금융서비스 · 보험상품 비교 도구</title>
+<meta name="theme-color" content="#0f2240">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="한국보험금융">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<title>한국보험금융 · 신채널 영업지원 보험상품 비교 도구</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="kif.css">
 <style>
-:root{
-  --bg:#eef1f4; --surface:#ffffff; --surface-2:#f6f8fa; --ink:#182231; --muted:#5c6a7c;
-  --line:#d6dce3; --line-strong:#b9c3ce;
-  --accent:#1f5c9e; --accent-ink:#173f6b; --accent-soft:#e6eff8;
-  --radius:14px;
-  --shadow:0 1px 2px rgba(20,32,48,.06), 0 10px 30px -14px rgba(20,32,48,.35);
-}
-@media (prefers-color-scheme:dark){:root{
-  --bg:#0f151d; --surface:#171f2a; --surface-2:#1e2733; --ink:#e7ecf2; --muted:#9aa7b6;
-  --line:#2b3543; --line-strong:#3a4655; --accent:#5aa0e0; --accent-ink:#a9cdf0; --accent-soft:#1b2c3e;
-  --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 34px -16px rgba(0,0,0,.7);
-}}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,-apple-system,sans-serif;
@@ -29,154 +24,174 @@ h1,h2{margin:0;font-weight:900;letter-spacing:-.01em}
 a{color:inherit;text-decoration:none}
 button{font-family:inherit;cursor:pointer}
 
-/* ===== 잠금 화면 ===== */
-#gate{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:24px;
-  background:var(--bg)}
-#gate .card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);
-  border-radius:var(--radius);box-shadow:var(--shadow);padding:30px 26px;text-align:center}
-#gate .kicker{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
-#gate h1{font-size:19px;margin-bottom:6px}
-#gate p{color:var(--muted);font-size:12.5px;margin:0 0 20px}
-#gate .menu{text-align:left;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;
-  padding:12px 14px;margin:0 0 18px}
-#gate .menu ol{margin:0;padding-left:20px;color:var(--ink);font-size:12px;line-height:1.9}
-#gate .menu li::marker{color:var(--accent);font-weight:700}
-#gate input{width:100%;padding:12px 14px;border:1px solid var(--line-strong);border-radius:10px;
-  background:var(--surface-2);color:var(--ink);font-size:15px;text-align:center;letter-spacing:.15em;font-family:inherit}
-#gate input:focus{outline:2px solid var(--accent);outline-offset:1px}
-#gate button{width:100%;margin-top:12px;padding:12px;border:0;border-radius:10px;background:var(--accent);
-  color:#fff;font-size:14.5px;font-weight:700}
-#gate .err{color:#c0392b;font-size:12px;margin-top:10px;min-height:16px}
-@media (prefers-color-scheme:dark){#gate .err{color:#ff8a7a}}
+/* ===== 로그인 (좌: 브랜드 / 우: 접속코드) ===== */
+#gate{position:fixed;inset:0;z-index:100;display:grid;grid-template-columns:1fr 1fr;background:#eef1f6}
+html[data-theme="dark"] #gate{background:#0a1429}
+#gate .l{background:#0f2240;color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:60px 62px 48px}
+#gate .l::after{content:"";position:absolute;right:-220px;bottom:-200px;width:620px;height:620px;border-radius:50%;
+  border:42px solid rgba(255,255,255,.035);pointer-events:none}
+#gate .eyebrow{font-size:12px;font-weight:700;letter-spacing:.28em;color:#cb9c3a;display:flex;align-items:center;gap:12px}
+#gate .eyebrow::before{content:"";width:26px;border-top:1px solid #cb9c3a}
+#gate .logo{width:min(430px,100%);display:block;margin-bottom:34px}
+#gate .l h2{font-size:25px;font-weight:700;margin-bottom:14px}
+#gate .l p{margin:0;color:#b8c4d8;font-size:14px;line-height:1.85}
+#gate .tools{font-size:11.5px;color:#8c9bb3;display:flex;flex-wrap:wrap;gap:8px 18px}
+#gate .r{display:grid;place-items:center;padding:30px}
+#gate .box{width:100%;max-width:390px}
+#gate .box h1{font-size:24px;margin-bottom:6px}
+#gate .box .sub{color:var(--muted);font-size:13.5px;margin:0 0 26px}
+#gate label.f{display:block;font-size:12.5px;font-weight:700;margin-bottom:7px}
+#gate input[type=password]{width:100%;padding:14px;border:1px solid var(--line-strong);border-radius:3px;background:var(--surface);
+  color:var(--ink);font-size:17px;text-align:center;letter-spacing:.3em;font-family:inherit}
+#gate input[type=password]:focus{outline:2px solid #cb9c3a;outline-offset:0}
+#gate .keep{display:flex;align-items:center;gap:8px;margin:14px 0;font-size:13px;color:var(--ink)}
+#gate .keep input{width:16px;height:16px;accent-color:#0f2240}
+#gate .go{width:100%;padding:14px;border:0;border-radius:3px;background:#0f2240;color:#fff;font-size:14.5px;font-weight:700}
+#gate .go:hover{background:#1d3557}
+html[data-theme="dark"] #gate .go{background:#cb9c3a;color:#0f2240}
+#gate .err{color:#b3261e;font-size:12.5px;margin-top:10px;min-height:18px}
+html[data-theme="dark"] #gate .err{color:#ff8a7a}
+#gate .guide{border:1px solid var(--line);background:var(--surface);padding:15px 17px;margin-top:20px;font-size:12.5px}
+#gate .guide b{display:block;margin-bottom:6px}
+#gate .guide span{display:block;color:var(--muted);margin-top:3px}
+#gate .legal{margin-top:20px;color:var(--muted);font-size:11.5px;line-height:1.7}
 .shake{animation:sh .35s}
 @keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (max-width:860px){
+  #gate{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  #gate .l{padding:26px 24px}
+  #gate .logo{width:230px;margin-bottom:0}
+  #gate .l h2,#gate .l p,#gate .tools,#gate .eyebrow{display:none}
+}
 
 /* ===== 홈 ===== */
-#home{display:none;max-width:960px;margin:0 auto;padding:34px 22px 70px}
-header.h{margin-bottom:26px}
-header.h .kicker{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
-header.h h1{font-size:23px}
-header.h p{color:var(--muted);font-size:13px;margin:8px 0 0}
+#home{display:none;max-width:1000px;margin:0 auto;padding:30px 24px 70px}
+.ph{margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--line-strong)}
+.ph .kicker{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--gold);margin-bottom:6px}
+.ph h1{font-size:23px;border-left:4px solid #cb9c3a;padding-left:12px}
+.ph p{color:var(--muted);font-size:13px;margin:10px 0 0}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-@media (max-width:640px){.grid{grid-template-columns:1fr}}
-.tool{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);
-  border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 18px 16px;transition:transform .12s,border-color .12s}
-.tool:hover{transform:translateY(-2px);border-color:var(--accent)}
-.tool .ico{font-size:22px;margin-bottom:8px}
-.tool h2{font-size:15.5px;margin-bottom:5px}
-.tool .desc{color:var(--muted);font-size:12px;flex:1;line-height:1.55}
-.tool .go{margin-top:12px;align-self:flex-start;font-size:12.5px;font-weight:700;color:var(--accent);
-  border:1px solid var(--accent);border-radius:8px;padding:6px 13px}
-.tool:hover .go{background:var(--accent);color:#fff}
-.foot{margin-top:24px;color:var(--muted);font-size:11px;line-height:1.7}
-.foot .logout{color:var(--accent);font-weight:700;background:none;border:0;padding:0;font-size:11px}
+@media (max-width:700px){.grid{grid-template-columns:1fr}#home{padding:22px 16px 60px}}
+.tool{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-top:3px solid #0f2240;
+  border-radius:4px;box-shadow:var(--shadow);padding:18px 20px 16px;transition:transform .12s,border-color .12s}
+html[data-theme="dark"] .tool{border-top-color:#cb9c3a}
+.tool:hover{transform:translateY(-2px);border-color:#cb9c3a;border-top-color:#cb9c3a}
+.tool .no{font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--gold);margin-bottom:6px}
+.tool h2{font-size:15.5px;margin-bottom:6px}
+.tool .desc{color:var(--muted);font-size:12.5px;flex:1;line-height:1.6}
+.tool .go{margin-top:14px;align-self:flex-start;font-size:12.5px;font-weight:700;color:var(--ink);
+  background:var(--surface);border:1px solid var(--line-strong);border-radius:3px;padding:6px 14px}
+.tool:hover .go{background:#0f2240;color:#fff;border-color:#0f2240}
+.foot{margin-top:26px;color:var(--muted);font-size:11.5px;line-height:1.75;border-top:1px solid var(--line);padding-top:14px}
 </style>
 </head>
 <body>
 
 <div id="gate">
-  <div class="card" id="gateCard">
-    <div class="kicker">미래전략금융서비스</div>
-    <h1>전략채널본부</h1>
-    <p>접속 코드를 입력하세요.</p>
-    <div class="menu">
-      <ol>
-        <li>생명보험 가이드북 비교</li>
-        <li>생명·손해보험 담보별 비교견적</li>
-        <li>단기납 종신보험 비교</li>
-        <li>3대질병진단비 비교</li>
-        <li>경영인 정기보험 비교</li>
-        <li>미래전략 상생시상 조회</li>
-      </ol>
+  <div class="l">
+    <div class="eyebrow">NEW CHANNEL SALES SUPPORT</div>
+    <div>
+      <img class="logo" src="logo-full.png" alt="한국보험금융 KOREA INSURANCE &amp; FINANCE">
+      <h2>신채널 영업지원시스템</h2>
+      <p>보험상품 구분과 조건만 고르면<br>유리한 상품 3가지와 전체 비교표를 한곳에서 확인합니다.</p>
     </div>
-    <input id="pw" type="password" inputmode="numeric" autocomplete="off" placeholder="접속 코드" aria-label="접속 코드">
-    <button id="enter">들어가기</button>
-    <div class="err" id="err"></div>
+    <div class="tools"><span>이번 달의 원픽</span><span>생명보험 가이드북</span><span>담보별 비교견적</span><span>단기납 종신</span><span>3대질병진단비</span><span>경영인 정기보험</span></div>
+  </div>
+  <div class="r">
+    <div class="box" id="gateCard">
+      <h1>로그인</h1>
+      <p class="sub">본사 신채널에서 발급한 접속코드를 입력하세요.</p>
+      <label class="f" for="pw">접속코드</label>
+      <input id="pw" type="password" inputmode="numeric" autocomplete="off" placeholder="접속코드 입력">
+      <label class="keep"><input type="checkbox" id="keep"> 이 기기에서 로그인 유지 (12시간)</label>
+      <button class="go" id="enter">로그인</button>
+      <div class="err" id="err"></div>
+      <div class="guide"><b>이용 안내</b>접속코드 분실·유출 시 즉시 본사 신채널에 알려 주세요.<span>상품 비교 이해용 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</span></div>
+      <div class="legal">본 시스템은 한국보험금융(주) 임직원 및 소속 지사 전용입니다. 허가 없이 접속하거나 화면을 외부로 반출하는 행위는 금지됩니다.</div>
+    </div>
   </div>
 </div>
 
 <div id="home">
-  <header class="h">
-    <div class="kicker">미래전략금융서비스</div>
+  <div class="ph">
+    <div class="kicker">NEW CHANNEL SALES SUPPORT</div>
     <h1>보험상품 비교 도구</h1>
     <p>가이드북(26.09.04) 기준 · 상품 구분·조건을 고르면 유리한 상품 3가지와 전체 비교표를 보여줍니다. 상품 비교 이해용 참고자료입니다.</p>
-  </header>
-
+  </div>
   <div class="grid">
+    <a class="tool" href="onepick.html">
+      <div class="no">01 · NEW</div><h2>이번 달의 원픽</h2>
+      <div class="desc">이번 달에 뭐 팔지? 생명·손해보험 상품군(순환계 통합치료, 암 복합치료, 관절 및 재해, 보증형 변액연금, 수술비, 간병인 사용일당, 가성비 상품)을 고르면 선정 상품의 타사 비교표와 선정 이유를 보여줍니다. 2026.10 기준.</div>
+      <span class="go">열기 →</span>
+    </a>
     <a class="tool" href="life.html">
-      <div class="ico">📗</div>
-      <h2>생명보험 가이드북 비교</h2>
+      <div class="no">02</div><h2>생명보험 가이드북 비교</h2>
       <div class="desc">공시이율·저해약 환급형 종신, 정기보험, 즉시연금, 연금 환급률(공시이율형·변액형), CI(GI)·변액 등 18개 구분.</div>
       <span class="go">열기 →</span>
     </a>
     <a class="tool" href="nonlife.html">
-      <div class="ico">📊</div>
-      <h2>생명·손해보험 담보별 비교견적</h2>
+      <div class="no">03</div><h2>생명·손해보험 담보별 비교견적</h2>
       <div class="desc">담보를 선택하면 총납입보험료 저렴한 순 3개사 + 담보 보장내용. 장기종합·실손·암·태아어린이·건강(생보)·간편심사(생보/손보)·치매간병·운전자·치아·반려동물.</div>
       <span class="go">열기 →</span>
     </a>
     <a class="tool" href="wholelife.html">
-      <div class="ico">📈</div>
-      <h2>단기납 종신보험 비교</h2>
+      <div class="no">04</div><h2>단기납 종신보험 비교</h2>
       <div class="desc">보험료·환급률·사망보장·환급금 기준으로 가장 유리한 3개 상품. 달러 상품은 현재 환율 환산.</div>
       <span class="go">열기 →</span>
     </a>
     <a class="tool" href="critical3.html">
-      <div class="ico">🩺</div>
-      <h2>3대질병진단비 비교</h2>
+      <div class="no">05</div><h2>3대질병진단비 비교</h2>
       <div class="desc">암·뇌혈관·허혈성·유사암 담보를 선택하면 합산 월 보험료가 가장 낮은 3개 상품. 손보/생보 · 일반/건강고지/유병자.</div>
       <span class="go">열기 →</span>
     </a>
     <a class="tool" href="ceoterm.html">
-      <div class="ico">🏢</div>
-      <h2>경영인 정기보험 비교</h2>
+      <div class="no">06</div><h2>경영인 정기보험 비교</h2>
       <div class="desc">보험료·환급률 기준으로 유리한 3개 상품. 1억/3억원 · 일반/간편심사 · 연령/성별. 달러 상품 환율 환산.</div>
       <span class="go">열기 →</span>
     </a>
-    <a class="tool" href="sangsaeng.html">
-      <div class="ico">💸</div>
-      <h2>미래전략 상생시상 조회</h2>
-      <div class="desc">보험사별·상품별 익월/13차월 시상률과 주차별 가동·주력상품 추가시상 세부내역. 주차시책 운용사 17개사 + 미운용사 19개사. <b>Ver. 2026-09-11</b> 기준.</div>
-      <span class="go">열기 →</span>
-    </a>
   </div>
-
   <div class="foot">
-    미래전략금융서비스 「생명·손해보험 비교 가이드북(26.09)」 자료 기반. 각 보험사 대표 상품 기준으로 설계했으며, 환급금(률)은 연령·성별·보험료·가입금액에 따라 달라집니다.
+    한국보험금융 「생명·손해보험 비교 가이드북(26.09)」 자료 기반. 각 보험사 대표 상품 기준으로 설계했으며, 환급금(률)은 연령·성별·보험료·가입금액에 따라 달라집니다.
     <br>달러 상품은 조회 시점 환율로 원화 환산해 함께 비교합니다. 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.
-    <br><br><button class="logout" onclick="sessionStorage.removeItem('mjfs_ok');location.reload()">접속 잠그기</button>
   </div>
 </div>
 
+<script src="kif.js"></script>
 <script>
-/* ───────────────────────────────────────────────
+/* ─────────────────────────────────────
    접속 코드 — 여기 숫자를 바꾸면 코드가 바뀝니다.
-   ─────────────────────────────────────────────── */
+   ───────────────────────────────────── */
 var ACCESS_CODE = "1023";
 
 (function(){
-  var gate = document.getElementById('gate');
-  var home = document.getElementById('home');
-  function unlock(){
-    try{ sessionStorage.setItem('mjfs_ok','1'); }catch(e){}
-    gate.style.display='none'; home.style.display='block';
+  var gate=document.getElementById('gate'), home=document.getElementById('home');
+  var shell=document.querySelectorAll('.kif-top,.kif-side,.kif-open');
+  function showShell(on){for(var i=0;i<shell.length;i++)shell[i].style.visibility=on?'':'hidden';}
+  function unlock(keep){
+    try{sessionStorage.setItem('kif_ok','1');}catch(e){}
+    if(keep){try{localStorage.setItem('kif_keep',String(Date.now()+12*3600*1000));}catch(e){}}
+    gate.style.display='none';home.style.display='block';showShell(true);
   }
+  showShell(false);
   var already=false;
-  try{ already = sessionStorage.getItem('mjfs_ok')==='1'; }catch(e){}
-  if(already){ unlock(); return; }
+  try{
+    var k=localStorage.getItem('kif_keep');
+    already=sessionStorage.getItem('kif_ok')==='1'||(k&&+k>Date.now());
+  }catch(e){}
+  if(already){unlock(false);return;}
 
-  var pw=document.getElementById('pw'), btn=document.getElementById('enter'),
-      err=document.getElementById('err'), card=document.getElementById('gateCard');
+  var pw=document.getElementById('pw'),btn=document.getElementById('enter'),
+      err=document.getElementById('err'),card=document.getElementById('gateCard'),keep=document.getElementById('keep');
   function tryEnter(){
-    if(pw.value === ACCESS_CODE){ unlock(); }
+    if(pw.value===ACCESS_CODE){unlock(keep.checked);}
     else{
       err.textContent='접속 코드가 올바르지 않습니다.';
-      card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+      card.classList.remove('shake');void card.offsetWidth;card.classList.add('shake');
       pw.select();
     }
   }
-  btn.addEventListener('click', tryEnter);
-  pw.addEventListener('keydown', function(e){ if(e.key==='Enter') tryEnter(); });
+  btn.addEventListener('click',tryEnter);
+  pw.addEventListener('keydown',function(e){if(e.key==='Enter')tryEnter();});
   pw.focus();
 })();
 </script>
