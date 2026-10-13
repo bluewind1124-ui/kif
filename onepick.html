@@ -489,11 +489,11 @@ var CATS = [
   /* ── 화면 ── */
   function byId(id){for(var i=0;i<CATS.length;i++)if(CATS[i].id===id)return CATS[i];return null;}
   function home(){
-    var o='<div class="ph"><div class="kicker">2026.10 · BEST PICK UP</div><h1>이번 달의 원픽</h1>'+
+    var o='<div class="ph"><div class="kicker">2026.10 · 베스트 픽업</div><h1>이번 달의 원픽</h1>'+
       '<p>이번 달에 뭐 팔지? 상품군을 선택하면 선정 상품의 타사 비교표와 선정 이유를 보여줍니다. 26년 10월 베스트 픽업 상품 비교 분석 가이드 기준 · 최종 업데이트 <b class="kif-upd">2026.10.12</b></p></div>';
     ['life','nonlife'].forEach(function(t){
       var best=CATS.filter(function(c){return c.type===t&&c.kind==='best';}), val=CATS.filter(function(c){return c.type===t&&c.kind==='value';});
-      o+='<div class="sec-t">'+TYPES[t]+' <i>BEST CHOICE</i></div><div class="cards">';
+      o+='<div class="sec-t">'+TYPES[t]+' <i>베스트 초이스</i></div><div class="cards">';
       best.forEach(function(c){o+=card(c);});
       o+='</div>';
       o+='<div class="sec-t">'+TYPES[t]+' 가성비 상품 <i>'+(t==='nonlife'?'유병자 ':'')+'3사 비교</i></div><div class="cards">';
@@ -505,7 +505,7 @@ var CATS = [
   }
   function card(c){
     var li='';c.cols.forEach(function(k){li+='<li><b>'+esc(k.co)+'</b>'+esc(k.prod)+'</li>';});
-    return '<button class="cd" data-id="'+c.id+'"><div class="tg">'+(c.kind==='best'?'BEST CHOICE':'가성비 상품')+'</div><h3>'+esc(c.name)+'</h3><ul>'+li+'</ul><span class="go">상세 보기 →</span></button>';
+    return '<button class="cd" data-id="'+c.id+'"><div class="tg">'+(c.kind==='best'?'베스트 초이스':'가성비 상품')+'</div><h3>'+esc(c.name)+'</h3><ul>'+li+'</ul><span class="go">상세 보기 →</span></button>';
   }
   function disc(){
     return '<div class="disc">더 자세한 상품내용은 GA 소식지와 지점장님 상품조회 자료를 참고해 주세요.<br>본 자료는 설계사 교육을 위해 만든 자료입니다. 고객에게 배포할 수 없으며 이 자료를 광고나 다른 용도로 사용 시 생기는 문제에 법적 책임을 지지 않습니다.</div>';
@@ -513,7 +513,7 @@ var CATS = [
   function detail(c){
     var idx=CATS.indexOf(c), prev=CATS[idx-1], next=CATS[idx+1];
     var o='<button class="back" data-id="">← 원픽 전체</button>'+
-      '<div class="ph"><div class="row"><div><div class="kicker">'+(c.kind==='best'?'BEST CHOICE':'가성비 상품')+' · 2026.10</div><h1>'+esc(c.name)+'</h1></div>'+
+      '<div class="ph"><div class="row"><div><div class="kicker">'+(c.kind==='best'?'베스트 초이스':'가성비 상품')+' · 2026.10</div><h1>'+esc(c.name)+'</h1></div>'+
       '<span class="badge'+(c.type==='life'?'':' g')+'">'+TYPES[c.type]+'</span></div>'+
       (c.lead?'<p>'+esc(c.lead)+'</p>':'')+'</div>';
     var hasBest=c.best>=0;

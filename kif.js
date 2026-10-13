@@ -1,4 +1,4 @@
-/* 한국보험금융(주) 신채널 영업지원 — 공통 헤더 · 메뉴 · 테마 */
+/* 한국보험금융(주) 신채널 교육지원시스템 — 공통 헤더 · 메뉴 · 테마 */
 (function(){
   var KEY_THEME='kif_theme', KEY_SIDE='kif_side';
   function get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
@@ -35,7 +35,7 @@
     var top=document.createElement('div');top.className='kif-top';
     top.innerHTML=
       '<a class="brand" href="index.html"><img src="emblem.png" alt="">'+
-      '<span><span class="tt">한국보험금융(주) <em>신채널 영업지원</em></span><span class="sub">보험상품 비교 도구</span></span></a>'+
+      '<span><span class="tt">한국보험금융(주) <em>신채널 교육지원시스템</em></span><span class="sub">보험상품 비교 도구</span></span></a>'+
       '<span class="sp"></span><span class="who">전략채널본부 · <b>보험상품 비교 도구</b></span>'+
       '<div class="kif-seg"><button data-t="light">라이트</button><button data-t="dark">다크</button></div>'+
       '<button class="kif-out">로그아웃</button>'+
@@ -67,7 +67,7 @@
   function applyVer(v){
     window.KIF_VER=v;
     var who=document.querySelector('.kif-top .who');
-    if(who)who.innerHTML='기준일 <b>'+fmt(v.updated)+'</b> 업데이트';
+    if(who)who.innerHTML='기준일 <b>'+fmt(v.updated)+'</b> 업데이트'+(v.version?' · '+v.version:'');
     var u=document.querySelectorAll('.kif-upd');
     for(var i=0;i<u.length;i++)u[i].textContent=fmt(v.updated);
     var hdr=document.querySelector('header.app');
