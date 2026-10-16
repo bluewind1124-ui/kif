@@ -14,7 +14,9 @@
     ['nonlife.html','담보별 비교견적','<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>'],
     ['wholelife.html','단기납 종신보험 비교','<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>'],
     ['critical3.html','3대질병진단비 비교','<path d="M3 12h4l2-6 4 12 2-6h6"/>'],
-    ['ceoterm.html','경영인 정기보험 비교','<path d="M4 21V5l8-3v19M12 9h8v12M7 8h2M7 12h2M7 16h2"/>']
+    ['ceoterm.html','경영인 정기보험 비교','<path d="M4 21V5l8-3v19M12 9h8v12M7 8h2M7 12h2M7 16h2"/>'],
+    /* 바깥 링크(새 창): FC 영업지원 포털 — Claude 로그인 필요 */
+    ['https://claude.ai/artifact/C5Ly7BGwLm8EjwPaELqWZa','FC 영업지원 포털 ↗','<path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/>',1]
   ];
   var page=(location.pathname.split('/').pop()||'index.html');
 
@@ -43,7 +45,7 @@
     var side=document.createElement('nav');side.className='kif-side';
     var h='<button class="kif-fold"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>메뉴 접기</button>';
     for(var i=0;i<NAV.length;i++){
-      h+='<a class="nv'+(NAV[i][0]===page?' on':'')+'" href="'+NAV[i][0]+'"><svg viewBox="0 0 24 24">'+NAV[i][2]+'</svg>'+NAV[i][1]+'</a>';
+      h+='<a class="nv'+(NAV[i][0]===page?' on':'')+'" href="'+NAV[i][0]+'"'+(NAV[i][3]?' target="_blank" rel="noopener"':'')+'><svg viewBox="0 0 24 24">'+NAV[i][2]+'</svg>'+NAV[i][1]+'</a>';
       if(i===0)h+='<hr>';
     }
     side.innerHTML=h;
