@@ -1,7 +1,7 @@
 {
   "name": "신채널 교육지원시스템",
   "short_name": "신채널 교육지원",
-  "description": "한국보험금융(주) 신채널 교육지원시스템 · 보험상품 비교 도구",
+  "description": "한국보험금융(주) FC 영업지원 포털 바로가기",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
