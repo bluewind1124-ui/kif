@@ -1,6 +1,6 @@
 {
-  "name": "신채널 교육지원시스템",
-  "short_name": "신채널 교육지원",
+  "name": "한국보험금융 교육지원 포털",
+  "short_name": "교육지원 포털",
   "description": "한국보험금융(주) FC 영업지원 포털 바로가기",
   "start_url": "./index.html",
   "scope": "./",
