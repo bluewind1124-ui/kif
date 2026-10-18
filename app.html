@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0f2240">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="한국보험금융 교육지원 포털">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-180.png">
+<title>한국보험금융 교육지원 포털 · 아이콘 설치</title>
+<!-- 휴대폰·PC에 포털 아이콘을 추가하는 안내 페이지 (자동 이동 없음) -->
+<style>
+*{box-sizing:border-box}
+body{margin:0;word-break:keep-all;background:#0f2240;color:#fff;font-family:'Noto Sans KR','Malgun Gothic',sans-serif;padding:24px 16px 40px}
+.wrap{max-width:460px;margin:0 auto}
+.top{text-align:center}
+.top img{width:84px;height:84px;border-radius:20px}
+h1{font-size:21px;margin:12px 0 4px}
+h1 em{font-style:normal;color:#cb9c3a}
+.sub{color:#c9d3e3;font-size:14px;margin:0 0 20px}
+.card{background:#fff;color:#1d2a3d;border-radius:10px;padding:16px 18px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 10px;color:#0f2240;border-bottom:2px solid #cb9c3a;padding-bottom:6px}
+ol{margin:0;padding-left:20px;line-height:1.75;font-size:14.5px}
+b{color:#0f2240}
+.btn{display:block;text-align:center;background:#cb9c3a;color:#0f2240;font-weight:700;text-decoration:none;padding:13px;border-radius:8px;margin:10px 0 0;border:0;width:100%;font-size:15px;font-family:inherit;cursor:pointer}
+.btn.line{background:transparent;color:#fff;border:1px solid #cb9c3a}
+.hi{background:#fff6e2;border-radius:6px;padding:8px 10px;font-size:13px;margin-top:10px;color:#6b4d10}
+#inst{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <img src="icon-180.png" alt="">
+    <h1>한국보험금융 <em>교육지원 포털</em></h1>
+    <p class="sub">이 화면에서 휴대폰·PC에 포털 아이콘을 만들 수 있습니다.</p>
+  </div>
+
+  <button class="btn" id="inst">📲 홈 화면에 아이콘 추가</button>
+
+  <div class="card" id="ios">
+    <h2>아이폰 (사파리)</h2>
+    <ol>
+      <li>이 페이지를 <b>사파리</b>로 엽니다. (카카오톡에서 열었다면 오른쪽 아래 ⋯ → <b>다른 브라우저로 열기</b>)</li>
+      <li>아래쪽 <b>공유 버튼(□↑)</b>을 누릅니다.</li>
+      <li><b>홈 화면에 추가</b>를 누르고, 오른쪽 위 <b>추가</b>를 누릅니다.</li>
+    </ol>
+  </div>
+
+  <div class="card" id="and">
+    <h2>안드로이드 (크롬·삼성 인터넷)</h2>
+    <ol>
+      <li>이 페이지를 <b>크롬</b> 또는 <b>삼성 인터넷</b>으로 엽니다. (카카오톡에서 열었다면 ⋮ → <b>다른 브라우저로 열기</b>)</li>
+      <li>위의 금색 <b>홈 화면에 아이콘 추가</b> 버튼이 보이면 누릅니다.</li>
+      <li>버튼이 없으면 메뉴(⋮ 또는 ≡) → <b>홈 화면에 추가</b>(또는 <b>앱 설치</b>)를 누릅니다.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>PC (윈도우)</h2>
+    <ol>
+      <li>아래 버튼으로 설치 파일을 내려받습니다.</li>
+      <li>받은 파일을 오른쪽 클릭 → <b>모두 압축 풀기</b>.</li>
+      <li>풀린 폴더에서 <b>install-icon.bat</b>을 더블클릭합니다. 파란 경고창이 뜨면 <b>추가 정보 → 실행</b>.</li>
+    </ol>
+    <a class="btn" href="desktop-icon.zip" download="한국보험금융_교육지원포털_아이콘.zip">PC 아이콘 설치 파일 받기</a>
+  </div>
+
+  <div class="hi" style="background:transparent;color:#c9d3e3;text-align:center">아이콘을 누르면 포털로 바로 이동합니다. 처음 한 번은 Claude 로그인이 필요할 수 있습니다.</div>
+  <a class="btn line" href="./">지금 포털 열기</a>
+</div>
+<script>
+var ua=navigator.userAgent, isIOS=/iPhone|iPad|iPod/.test(ua), isAnd=/Android/.test(ua);
+if(isIOS) document.getElementById('and').style.display='none';
+if(isAnd) document.getElementById('ios').style.display='none';
+var dp=null, b=document.getElementById('inst');
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;b.style.display='block';});
+b.addEventListener('click',function(){if(!dp)return;dp.prompt();dp.userChoice.then(function(){dp=null;b.style.display='none';});});
+</script>
+</body>
+</html>
