@@ -535,6 +535,8 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .sa{list-style:none;margin:0;padding:0;display:grid;gap:3px;font-size:.82rem}.sa li{display:flex;justify-content:space-between;gap:8px}.sa li em{font-style:normal;font-variant-numeric:tabular-nums}.sa li.z em{color:#c0392b;font-weight:700}
 .newsm{display:grid;gap:2px;font-size:.8rem;border-top:1px dashed var(--line);padding-top:6px;color:var(--ink);text-decoration:none}.newsm span{color:var(--muted);font-size:.74rem}
 .nwf{border-top:1px dashed var(--line);padding-top:8px}.nwf .wide{grid-column:1/-1}
+.aibar .optc{text-align:left;font:inherit;color:var(--ink)}.aicfg{margin-top:10px;border-top:1px dashed var(--line);padding-top:6px}
+.cms textarea.in{font-size:.85rem}.cms .cols{align-items:start}
 .outs{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);flex-wrap:wrap}
 /* 제안서 (발표자료 형식) */
 .rpt{display:grid;gap:14px}
@@ -750,6 +752,18 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     ['book','생명보험 가이드북','18개 구분 비교',V1+'life.html'],
     ['bld','경영인 정기보험','법인 대표 상담용',V1+'ceoterm.html']
   ];
+  /* 관리자가 '콘텐츠 관리'에서 바꾸는 항목 (사이트의 content.json이 있으면 그 내용으로 덮어씀) */
+  var CONCEPT={month:'2026.10',title:'진단비는 한 번, 치료비는 매년',target:'암 진단비만 가입한 40~50대',product:'암 주요치료비(매년 반복 지급)',
+    desc:'암 진단비만 가입한 40~50대에게 반복 지급되는 치료비 담보로 기존 계약 보완을 제안합니다.',
+    steps:['기존 증권으로 AI 보장분석','진단 이후 치료비 공백 설명','원픽 상품 비교표 제시'],
+    mats:[['PPT','보험비교분석 발표자료 (항암 강화·동시지급)'],['PDF','간편건강보험 담보 비교'],['PDF','실손종합 설계 2안 비교']]};
+  var BANNER={title:'11월 1일 간편건강 고지 개정 외 3건',sub:'보험사 소식지에서 일정을 확인하세요.'};
+  var HYPO=[['30대 맞벌이 · 자녀 1','태아·어린이 종합 + 부부 3대질병','"아이 보험 보실 때 부모님 진단비도 같이 점검해 볼까요?"'],
+    ['50대 · 고혈압 약 복용','간편건강보험(3.5.5)','"약 드시는 분도 고지 3가지만 확인하면 가입됩니다."'],
+    ['법인 대표','경영인 정기보험','"대표님 유고 시 회사 운영자금 대비, 보험료 비용처리 여부부터 보시죠."'],
+    ['60대 은퇴 준비','단기납 종신 · 연금','"납입 기간이 짧고 환급률이 높은 상품부터 비교해 드릴게요."']];
+  var NOTICES=[['2026.10.15','11월 교육 일정: 신상품 설명회 11/5(수) 14시'],['2026.10.12','신채널 교육지원시스템 v1.0 오픈']];
+  var SITE=null; /* 불러온 content.json */
   var LECT=[['주간생생정보','[10월 2주] 이달의 건강플러스 - 사망원인 3위의 현실','00:07:14'],['주간생생정보','[10월 1주] 10월 경제이슈와 자산관리','00:11:49']];
   function link(href,inner,cls){return /^https?:/.test(href)?'<a class="'+cls+'" target="_blank" rel="noopener" href="'+href+'">'+inner+'</a>':'<button class="'+cls+'" data-go="'+href+'">'+inner+'</button>';}
   function srchBox(big){
@@ -761,7 +775,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       '<p class="hello"><b>'+me.name+'님</b> <span>('+me.org+' · '+me.no+')</span> 반갑습니다</p>'+
       '<p class="lead">오늘 상담 준비는 <em>신채널 FC 영업지원</em>에서 시작하세요.</p>'+
       srchBox(true)+
-      '<button class="updbar" data-go="news"><span class="ib">'+ic('cal')+'</span><span class="ut"><b>이달의 보험상품 개정 일정</b><span>11월 1일 간편건강 고지 개정 외 3건 · 눌러서 일정을 확인하세요.</span></span><span class="ub">일정 보기 ▸</span></button>'+
+      '<button class="updbar" data-go="news"><span class="ib">'+ic('cal')+'</span><span class="ut"><b>이달의 보험상품 개정 일정</b><span>'+esc(BANNER.title)+' · '+esc(BANNER.sub)+'</span></span><span class="ub">일정 보기 ▸</span></button>'+
       '</div><div class="ph-r">'+
       '<div class="vcard"><span class="num">01</span><span class="vk">영업이 처음이라면?</span><h3><em>신입 FC</em>를 위한 영상</h3><p>포털 기본 사용법부터<br>상품 비교·보장분석까지</p><span class="pl">'+ic('play','pls')+'</span><span class="soon">영상 준비 중</span></div>'+
       '<div class="vcard alt"><span class="num">02</span><span class="vk">더 전문적으로 쓰려면?</span><h3><em>상담 고수</em>를 위한 영상</h3><p>원픽 비교표와 보장분석을<br>제안서로 묶는 흐름</p><span class="pl">'+ic('play','pls')+'</span><span class="soon">영상 준비 중</span></div>'+
@@ -772,8 +786,8 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       h+='<div class="tcell">'+link(t[3],(t[4]?'<span class="rib">'+t[4]+'</span>':'')+ic(t[0],'tic')+'<span class="cap">'+t[2]+'</span><b>'+t[1]+'</b>','tbox')+
         '<button class="guide" type="button" data-guide="'+t[1]+'">'+ic('book','gdi')+'사용가이드 보기</button></div>';
     });
-    h+='</div><aside class="cpt"><div class="k">이달의 컨셉 · 2026.10</div><h3>"진단비는 한 번,<br>치료비는 매년"</h3><p>암 진단비만 가입한 40~50대에게 반복 지급되는 치료비 담보로 기존 계약 보완을 제안합니다.</p>'+
-      '<ol><li>기존 증권으로 AI 보장분석</li><li>진단 이후 치료비 공백 설명</li><li>원픽 상품 비교표 제시</li></ol><button class="btn gold" data-go="concept">컨셉 자세히 보기 ▸</button></aside></section>';
+    h+='</div><aside class="cpt"><div class="k">이달의 컨셉 · '+esc(CONCEPT.month)+'</div><h3>"'+esc(CONCEPT.title)+'"</h3><p>'+esc(CONCEPT.desc)+'</p>'+
+      '<ol>'+CONCEPT.steps.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol><button class="btn gold" data-go="concept">컨셉 자세히 보기 ▸</button></aside></section>';
     /* 4칸 분류 (보케어 고객등록·고객터치·고객상담·보상관리 구성 참고) */
     var cols=[['상품 비교','bars',BLOCKS[0][1]],['보장분석 · 교육','scan',BLOCKS[1][1].concat(BLOCKS[2][1])],['공지 · 시상','cup',BLOCKS[3][1]]];
     h+='<section class="cat4"><div class="cc me"><h3>'+ic('user','hi2')+'내 영업 현황</h3>'+
@@ -809,8 +823,8 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   var PAGES={
     home:function(){
       var h='<div class="mo"><div class="greet"><div class="panel gbox"><div class="hi"><b>'+me.name+'</b>님 반갑습니다 <span class="code">'+me.org+' · 사번 '+me.no+'</span></div>'+srchBox(false)+'</div>'+
-        '<div class="upd"><div><div class="k">이달의 상품 개정 일정</div><b>11월 1일 간편건강 고지 개정 외 3건</b><span>보험사 소식지에서 일정을 확인하세요.</span></div><button class="btn sm gold" data-go="news">일정 보기 ›</button></div></div>';
-      h+='<div class="hero"><div class="k">이달의 컨셉 · 2026년 10월</div><h2>"진단비는 한 번, 치료비는 매년"</h2><p>암 진단 이후 반복되는 치료비 보장을 중심으로 기존 계약 보완을 제안하는 달입니다.</p></div>';
+        '<div class="upd"><div><div class="k">이달의 상품 개정 일정</div><b>'+esc(BANNER.title)+'</b><span>'+esc(BANNER.sub)+'</span></div><button class="btn sm gold" data-go="news">일정 보기 ›</button></div></div>';
+      h+='<div class="hero"><div class="k">이달의 컨셉 · '+esc(CONCEPT.month)+'</div><h2>"'+esc(CONCEPT.title)+'"</h2><p>'+esc(CONCEPT.desc)+'</p></div>';
       h+='<div class="blocks">';
       BLOCKS.forEach(function(b){
         h+='<div class="blk"><h3>'+b[0]+'</h3><ul>';
@@ -848,18 +862,15 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     hypo:function(){
       var h=head('영업 도구','대표 상품 가설','고객 유형별로 "이 고객에게는 이 상품부터"라는 가설과 첫 화법을 정리합니다. 관리자가 매달 바꿀 수 있습니다.');
       h+='<div class="tbl"><table><thead><tr><th>고객 유형</th><th>대표 상품 가설</th><th>첫 화법</th></tr></thead><tbody>'+
-        '<tr><td>30대 맞벌이 · 자녀 1</td><td>태아·어린이 종합 + 부부 3대질병</td><td>"아이 보험 보실 때 부모님 진단비도 같이 점검해 볼까요?"</td></tr>'+
-        '<tr><td>50대 · 고혈압 약 복용</td><td>간편건강보험(3.5.5)</td><td>"약 드시는 분도 고지 3가지만 확인하면 가입됩니다."</td></tr>'+
-        '<tr><td>법인 대표</td><td>경영인 정기보험</td><td>"대표님 유고 시 회사 운영자금 대비, 보험료 비용처리 여부부터 보시죠."</td></tr>'+
-        '<tr><td>60대 은퇴 준비</td><td>단기납 종신 · 연금</td><td>"납입 기간이 짧고 환급률이 높은 상품부터 비교해 드릴게요."</td></tr>'+
-        '</tbody></table></div><p class="note">예시 문구입니다. 실제 내용은 관리자 페이지에서 입력합니다.</p>';
+        HYPO.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td></tr>';}).join('')+
+        '</tbody></table></div><p class="note">관리자가 콘텐츠 관리에서 바꾼 내용이 모든 FC에게 보입니다.</p>';
       return h;
     },
     concept:function(){
       var h=head('영업 도구','이달의 컨셉','한 달 동안 전 FC가 같은 메시지로 상담하도록 컨셉·대상·자료를 한곳에 모읍니다.');
-      h+='<div class="hero"><div class="k">2026년 10월</div><h2>"진단비는 한 번, 치료비는 매년"</h2><p>대상: 암 진단비만 가입한 40~50대 · 핵심 상품: 암 주요치료비(매년 반복 지급)</p></div>';
-      h+='<div class="cols"><div class="panel"><h3>상담 순서</h3><ul class="list"><li><span class="pill">1</span><span class="t">기존 증권으로 AI 보장분석</span></li><li><span class="pill">2</span><span class="t">진단 이후 치료비 공백 설명</span></li><li><span class="pill">3</span><span class="t">원픽 상품 비교표 제시</span></li></ul></div>'+
-        '<div class="panel"><h3>교육 자료</h3><ul class="list"><li><span class="pill new">PPT</span><span class="t">보험비교분석 발표자료 (항암 강화·동시지급)</span></li><li><span class="pill new">PDF</span><span class="t">간편건강보험 담보 비교</span></li><li><span class="pill new">PDF</span><span class="t">실손종합 설계 2안 비교</span></li></ul></div></div>';
+      h+='<div class="hero"><div class="k">'+esc(CONCEPT.month)+'</div><h2>"'+esc(CONCEPT.title)+'"</h2><p>대상: '+esc(CONCEPT.target)+' · 핵심 상품: '+esc(CONCEPT.product)+'</p></div>';
+      h+='<div class="cols"><div class="panel"><h3>상담 순서</h3><ul class="list">'+CONCEPT.steps.map(function(x,k){return '<li><span class="pill">'+(k+1)+'</span><span class="t">'+esc(x)+'</span></li>';}).join('')+'</ul></div>'+
+        '<div class="panel"><h3>교육 자료</h3><ul class="list">'+CONCEPT.mats.map(function(m){return '<li><span class="pill new">'+esc(m[0])+'</span><span class="t">'+esc(m[1])+'</span></li>';}).join('')+'</ul></div></div>';
       return h;
     },
     car:function(){return extPage('자동차 비교견적','다이렉트·설계사 채널 비교','차량 번호와 운전자 정보를 입력해 여러 보험사 견적을 한 번에 받는 서비스로 연결합니다.','車');},
@@ -896,8 +907,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
         '<tr><td>fc1002</td><td>이서연</td><td>분당지사</td><td><span class="pill ok">사용</span></td><td>2026.10.15 18:40</td></tr>'+
         '<tr><td>fc1003</td><td>박지훈</td><td>일산지사</td><td><span class="pill warn">정지</span></td><td>2026.09.28 11:05</td></tr>'+
         '</tbody></table></div><div class="row" style="margin-top:10px"><button class="btn sm" id="fakeAdd">FC 계정 추가</button><button class="btn sm ghost" id="fakeReset">비밀번호 초기화</button></div><p class="note" id="admMsg"></p></div>'+
-        '<form class="panel form" id="noticeForm"><h3>본사 공지 등록</h3><label class="f">제목<input class="in" id="nTitle" placeholder="예: 11월 시상 기준 안내"></label><button class="btn" type="submit">공지 올리기</button><p class="note">시제품에서는 이 브라우저에만 저장됩니다. 홈 화면 "본사 공지"에 바로 나타납니다.</p></form></div>'+
-        '<div class="panel"><h3>메뉴별 수정 항목</h3><ul class="list"><li><span class="pill">컨셉</span><span class="t">이달의 컨셉 문구·대상·교육자료 교체</span></li><li><span class="pill">가설</span><span class="t">대표 상품 가설 표 수정</span></li><li><span class="pill">공지</span><span class="t">소식지·시상 등록, 게시 기간 설정</span></li><li><span class="pill">연계</span><span class="t">자동차·상조·교육센터 링크 주소 변경</span></li><li><span class="pill">기록</span><span class="t">FC별 접속 일시·메뉴 이용 횟수, 수정 이력 보관</span></li></ul></div>';
+        '</div>'+cmsHtml();
       return h;
     }
   };
@@ -938,9 +948,79 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
     window.scrollTo(0,0);
   }
+  /* ---------- 관리자 콘텐츠: content.json 불러오기 · 편집 · 사이트 반영 ----------
+     FC 화면은 열릴 때마다 사이트의 content.json을 읽어 공지·소식지·시상·컨셉 등을 바꿔 보여준다.
+     관리자는 여기서 고친 내용을 복사해 GitHub의 content.json 편집 화면에 붙여넣고 저장(Commit)하면 반영된다. */
+  var GH={owner:'bluewind1124-ui',repo:'mirae-bohum',path:'content.json',branch:'main'};
+  var GH_EDIT='https://github.com/'+GH.owner+'/'+GH.repo+'/edit/'+GH.branch+'/'+GH.path;
+  var CONTENT_URLS=['content.json','https://'+GH.owner+'.github.io/'+GH.repo+'/content.json'];
+  function applyContent(c,redraw){
+    if(!c||typeof c!=='object')return;SITE=c;
+    if(Array.isArray(c.news))NEWS=c.news;if(Array.isArray(c.awards))AWARDS=c.awards;if(Array.isArray(c.mats))MATS=c.mats;
+    if(Array.isArray(c.lect))LECT=c.lect;if(Array.isArray(c.hypo))HYPO=c.hypo;if(Array.isArray(c.notices))NOTICES=c.notices;
+    if(c.concept)CONCEPT=Object.assign({},CONCEPT,c.concept);if(c.banner)BANNER=Object.assign({},BANNER,c.banner);
+    if(window.AIMOD&&AIMOD.content)AIMOD.content(c);
+    if(redraw!==false&&me&&cur!=='ai'&&cur!=='admin')go(cur);
+  }
+  (function loadContent(i){
+    if(i>=CONTENT_URLS.length)return;
+    fetch(CONTENT_URLS[i]+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(c){applyContent(c);}).catch(function(){loadContent(i+1);});
+  })(0);
+  function lines(a){return (a||[]).map(function(r){return Array.isArray(r)?r.join(' | '):String(r);}).join('\n');}
+  function rows(t,n){return String(t||'').split('\n').map(function(x){return x.trim();}).filter(Boolean).map(function(x){var p=x.split('|').map(function(y){return y.trim();});while(p.length<n)p.push('');return p.slice(0,n);});}
+  function cmsHtml(){
+    var ta=function(id,lab,help,val,h){return '<label class="f">'+lab+' <span class="note">'+help+'</span><textarea class="in" id="'+id+'" rows="'+(h||4)+'">'+esc(val)+'</textarea></label>';};
+    var inp=function(id,lab,val,ph){return '<label class="f">'+lab+'<input class="in" id="'+id+'" value="'+esc(val||'')+'" placeholder="'+esc(ph||'')+'"></label>';};
+    var md=(SITE&&SITE.aiModels)||{};
+    return '<div class="panel form cms" id="cms"><h3>콘텐츠 관리 <span class="pill new">모든 FC에게 반영</span></h3>'+
+      '<p class="note">한 줄에 한 건씩, 칸은 <b>|</b> 로 나눕니다. '+(SITE&&SITE.updated?'마지막 반영: '+esc(SITE.updated):'아직 사이트에 반영한 내용이 없어 기본 예시가 보입니다.')+'</p>'+
+      '<div class="cols">'+
+      ta('cNotice','본사 공지','날짜 | 내용',lines(NOTICES))+
+      ta('cNews','보험사 소식지','날짜 | 보험사 | 내용',lines(NEWS))+
+      ta('cAward','시상 공지','제목 | 기간 | 내용 | 상태(진행 중/발표)',lines(AWARDS))+
+      ta('cHypo','대표 상품 가설','고객 유형 | 대표 상품 | 첫 화법',lines(HYPO))+
+      ta('cMats','교육 자료','종류(PPT/PDF) | 제목 | 분류 | 설명',lines(MATS))+
+      ta('cLect','교육센터 강의','분류 | 제목 | 길이(00:07:14)',lines(LECT),3)+
+      '</div><div class="panel"><h3>이달의 컨셉</h3><div class="fgrid">'+
+      inp('kMonth','달',CONCEPT.month,'2026.11')+inp('kTitle','제목',CONCEPT.title)+inp('kTarget','대상',CONCEPT.target)+inp('kProduct','핵심 상품',CONCEPT.product)+
+      '</div>'+inp('kDesc','한 줄 설명',CONCEPT.desc)+'<div class="cols">'+ta('kSteps','상담 순서','한 줄에 하나',CONCEPT.steps.join('\n'),3)+ta('kMats','컨셉 교육 자료','종류 | 제목',lines(CONCEPT.mats),3)+'</div></div>'+
+      '<div class="panel"><h3>상품 개정 일정 배너</h3><div class="fgrid">'+inp('bTitle','제목',BANNER.title)+inp('bSub','설명',BANNER.sub)+'</div></div>'+
+      '<div class="panel"><h3>AI 기본 모델 <span class="note">FC가 따로 바꾸지 않으면 이 모델을 씁니다. 새 모델이 나오면 이름만 바꾸세요.</span></h3><div class="fgrid">'+
+      inp('mClaude','Claude API',md.claude,'claude-opus-5-5')+inp('mOpenai','ChatGPT',md.openai,'gpt-4.1')+inp('mGemini','Gemini',md.gemini,'gemini-2.5-flash')+'</div>'+
+      '<label class="row"><input type="checkbox" id="cOpts"> 이 기기의 <b>분석 옵션</b>(AI 보장분석 › 옵션 관리)을 모든 FC에게 배포</label></div>'+
+      '<div class="panel"><h3>사이트에 반영하는 방법</h3><ol class="note" style="margin:0;padding-left:1.2em;line-height:1.9">'+
+      '<li><b>① 반영할 내용 복사</b>를 누릅니다.</li><li><b>② GitHub 편집 화면 열기</b>를 누르고(GitHub 로그인), 글 상자 안을 클릭해 <b>Ctrl+A</b> 후 <b>Ctrl+V</b>로 붙여넣습니다.</li>'+
+      '<li>오른쪽 위 초록 <b>Commit changes</b> → 다시 <b>Commit changes</b>를 누르면 1~2분 뒤 모든 FC 화면에 나타납니다.</li></ol></div>'+
+      '<div class="row"><button class="btn" type="button" id="cmsCopy">① 반영할 내용 복사</button><a class="btn" style="text-decoration:none" target="_blank" rel="noopener" href="'+GH_EDIT+'">② GitHub 편집 화면 열기 ↗</a>'+
+      '<button class="btn ghost" type="button" id="cmsPrev">이 기기에서 미리보기</button><button class="btn ghost" type="button" id="cmsDl">content.json 받기</button></div>'+
+      '<textarea class="in" id="cmsOut" rows="3" readonly hidden></textarea><p class="note" id="cmsMsg" role="status"></p></div>';
+  }
+  function cmsCollect(){
+    var v=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
+    var c={ver:Date.now(),updated:new Date().toLocaleString('ko-KR'),
+      notices:rows(v('cNotice'),2),news:rows(v('cNews'),3),awards:rows(v('cAward'),4),hypo:rows(v('cHypo'),3),mats:rows(v('cMats'),4),lect:rows(v('cLect'),3),
+      concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),2)},
+      banner:{title:v('bTitle'),sub:v('bSub')},
+      aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
+    var ck=document.getElementById('cOpts');
+    if(ck&&ck.checked&&window.AIMOD&&AIMOD.getOpts){c.opts=AIMOD.getOpts();c.optsVer=c.ver;}
+    else if(SITE&&SITE.opts){c.opts=SITE.opts;c.optsVer=SITE.optsVer||SITE.ver;}
+    return c;
+  }
+  function bindCms(){
+    var msg=document.getElementById('cmsMsg');if(!msg)return;
+    document.getElementById('cmsPrev').onclick=function(){applyContent(cmsCollect(),false);msg.textContent='이 기기에서만 바뀌었습니다. 다른 FC에게 보이려면 ①②로 사이트에 반영하세요.';};
+    document.getElementById('cmsDl').onclick=function(){var c=cmsCollect(),b=new Blob([JSON.stringify(c,null,1)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='content.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);};
+    document.getElementById('cmsCopy').onclick=function(){
+      var txt=JSON.stringify(cmsCollect(),null,1),out=document.getElementById('cmsOut');
+      var done=function(){msg.textContent='복사했습니다. 이제 ② GitHub 편집 화면에 붙여넣으세요.';};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(done,function(){out.hidden=false;out.value=txt;out.select();msg.textContent='자동 복사가 막혀 아래 상자에 내용을 띄웠습니다. Ctrl+C로 복사하세요.';});
+      else{out.hidden=false;out.value=txt;out.select();msg.textContent='아래 상자의 내용을 Ctrl+C로 복사하세요.';}
+    };
+  }
   function notices(){var s=store('fc_notices');try{return s?JSON.parse(s):null;}catch(e){return null;}}
   function renderNotices(){
-    var l=notices()||[['2026.10.15','11월 교육 일정: 신상품 설명회 11/5(수) 14시'],['2026.10.12','신채널 교육지원시스템 v1.0 오픈']];
+    var l=(SITE&&Array.isArray(SITE.notices))?NOTICES:(notices()||NOTICES);
     var html=l.map(function(n){return '<li><span class="dt">'+n[0]+'</span><span class="t">'+esc(n[1])+'</span></li>';}).join('');
     Array.prototype.forEach.call(document.querySelectorAll('.noticeList'),function(el){el.innerHTML=html;});
   }
@@ -971,12 +1051,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       Array.prototype.forEach.call(document.querySelectorAll('.guide'),function(b){b.addEventListener('click',function(){toast('"'+b.getAttribute('data-guide')+'" 사용가이드는 관리자가 등록하면 여기서 열립니다.');});});
     }
     if(id==='admin'&&me.role==='admin'){
-      var f=document.getElementById('noticeForm');
-      f.addEventListener('submit',function(e){e.preventDefault();var t=document.getElementById('nTitle').value.trim();if(!t)return;
-        var d=new Date(),ds=d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0');
-        var l=notices()||[['2026.10.15','11월 교육 일정: 신상품 설명회 11/5(수) 14시'],['2026.10.12','신채널 교육지원시스템 v1.0 오픈']];
-        l.unshift([ds,t]);store('fc_notices',JSON.stringify(l.slice(0,6)));document.getElementById('nTitle').value='';
-        f.querySelector('.note').textContent='등록했습니다. 홈 화면에서 확인할 수 있습니다.';});
+      bindCms();
       document.getElementById('fakeAdd').onclick=function(){document.getElementById('admMsg').textContent='실제 운영 버전에서는 아이디·이름·소속을 입력하면 계정과 임시 비밀번호가 만들어집니다.';};
       document.getElementById('fakeReset').onclick=function(){document.getElementById('admMsg').textContent='실제 운영 버전에서는 선택한 FC에게 임시 비밀번호를 새로 발급합니다.';};
     }
@@ -1289,7 +1364,96 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   var root,me,toast,cap={sample:null,dl:null};
   /* 회사 사이트에서 혼자 열렸을 때 AI 기능은 Claude 화면으로 연결 */
   var CLAUDE_URL='https://claude.ai/artifact/C5Ly7BGwLm8EjwPaELqWZa',HAS_AI=!!(window.claude&&claude.use);
-  var capMsg=HAS_AI?'':'AI 판독·AI 문구는 <a href="'+CLAUDE_URL+'" target="_blank" rel="noopener"><b>Claude에서 열기</b></a>로 쓸 수 있습니다. 여기서는 직접 입력·엑셀 양식으로 분석합니다.';
+  var capMsg='';
+  /* ---------- AI 연결 설정 (기기별 저장): AI 없이 쓰기 / Claude 화면 / Claude API / ChatGPT / Gemini ---------- */
+  var AIP={
+    claudeapp:{name:'Claude (Claude 화면)',key:false,help:'Claude에 로그인해서 포털을 열면 키 없이 씁니다.'},
+    claude:{name:'Claude API',key:true,model:'claude-opus-5-5',url:'https://console.anthropic.com/settings/keys',help:'Anthropic 콘솔에서 만든 API 키'},
+    openai:{name:'ChatGPT (OpenAI)',key:true,model:'gpt-4.1',url:'https://platform.openai.com/api-keys',help:'OpenAI 플랫폼에서 만든 API 키'},
+    gemini:{name:'Gemini (Google)',key:true,model:'gemini-2.5-flash',url:'https://aistudio.google.com/apikey',help:'Google AI Studio에서 만든 API 키'}
+  };
+  var AI_ADMIN_MODELS={};
+  var KEY_AI='fc_ai_cfg';
+  function aiCfg(){var c=load(KEY_AI,null)||{};return {mode:c.mode||(HAS_AI?'ai':'manual'),prov:c.prov||(HAS_AI?'claudeapp':'openai'),keys:c.keys||{},models:c.models||{}};}
+  function aiModel(c,p){return (c.models[p]||AI_ADMIN_MODELS[p]||AIP[p].model||'').trim();}
+  function blobB64(b){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){var u=String(r.result),i=u.indexOf(',');res({mime:b.type||'image/png',data:u.slice(i+1)});};r.onerror=rej;r.readAsDataURL(b);});}
+  function pickJson(t){t=String(t||'').replace(/```(json)?/g,'');var i=t.indexOf('{'),j=t.lastIndexOf('}');if(i<0||j<i)throw {code:'bad_json'};try{return JSON.parse(t.slice(i,j+1));}catch(e){throw {code:'bad_json'};}}
+  async function apiCall(p,key,model,prompt,imgs){
+    var r,j;
+    try{
+      if(p==='claude'){
+        var body={model:model,max_tokens:16000,messages:[{role:'user',content:imgs.map(function(i){return {type:'image',source:{type:'base64',media_type:i.mime,data:i.data}};}).concat([{type:'text',text:prompt}])}]};
+        var hd={'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'};
+        if(/^claude-(opus-5|fable-5-1|sonnet-5-5)/.test(model)){hd['anthropic-beta']='server-side-fallback-2026-07-01';body.fallbacks='default';}
+        r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:hd,body:JSON.stringify(body)});
+      }else if(p==='openai'){
+        r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+key},
+          body:JSON.stringify({model:model,response_format:{type:'json_object'},messages:[{role:'user',content:[{type:'text',text:prompt}].concat(imgs.map(function(i){return {type:'image_url',image_url:{url:'data:'+i.mime+';base64,'+i.data}};}))}]})});
+      }else{
+        r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent',{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':key},
+          body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}].concat(imgs.map(function(i){return {inline_data:{mime_type:i.mime,data:i.data}};}))}],generationConfig:{responseMimeType:'application/json'}})});
+      }
+    }catch(e){throw {code:'network'};}
+    if(r.status===401||r.status===403)throw {code:'bad_key'};
+    if(r.status===429)throw {code:'rate_limited'};
+    if(r.status===404)throw {code:'bad_model'};
+    if(!r.ok){var et='';try{et=(await r.json()).error;et=et&&(et.message||et);}catch(e){}throw {code:'api_error',message:String(et||r.status)};}
+    j=await r.json();
+    if(p==='claude'){if(j.stop_reason==='refusal')throw {code:'refused'};return (j.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');}
+    if(p==='openai')return j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content||'';
+    var cd=j.candidates&&j.candidates[0];return cd&&cd.content&&(cd.content.parts||[]).map(function(x){return x.text||'';}).join('')||'';
+  }
+  function apiAdapter(c){
+    var p=c.prov,key=c.keys[p],model=aiModel(c,p);
+    return {json:async function(prompt,o){var imgs=await Promise.all(((o&&o.images)||[]).map(blobB64));return pickJson(await apiCall(p,key,model,prompt,imgs));},
+      limits:async function(){return {images:{maxCount:4}};}};
+  }
+  function applyAiCfg(){
+    var c=aiCfg();cap.sample=null;cap.sampleP=null;cap.why='unavailable';
+    if(c.mode!=='ai'){cap.why='ai_off';capMsg='<b>AI 없이 쓰기</b>로 되어 있습니다. 자료는 직접 입력하거나 엑셀 양식으로 올립니다.';return;}
+    if(c.prov==='claudeapp'){
+      if(HAS_AI){capMsg='연결된 AI: <b>Claude</b> (Claude 화면)';cap.sampleP=claude.use('sample').then(function(s){cap.sample=s;if(!s){capMsg='이 화면에서는 Claude AI를 쓸 수 없습니다.';var nt=document.getElementById('aiCapNote');if(nt)nt.innerHTML=capMsg;}});}
+      else{cap.why='need_claude';capMsg='Claude 화면 연결은 <a href="'+CLAUDE_URL+'" target="_blank" rel="noopener"><b>Claude에서 열기</b></a>로 엽니다. 이 사이트에서 바로 쓰려면 AI 연결 설정에서 ChatGPT·Gemini·Claude API 키를 넣으세요.';}
+      return;
+    }
+    if(!c.keys[c.prov]){cap.why='no_key';capMsg=AIP[c.prov].name+' 키가 없습니다. <b>AI 연결 설정</b>에서 키를 넣어 주세요.';return;}
+    cap.sample=apiAdapter(c);capMsg='연결된 AI: <b>'+AIP[c.prov].name+'</b> ('+esc(aiModel(c,c.prov))+')';
+  }
+  function aiBar(){
+    var c=aiCfg(),on=c.mode==='ai';
+    var h='<div class="panel aibar"><div class="row"><b>보장분석 방식</b><div class="seg"><button data-a="aimode" data-v="ai" class="'+(on?'on':'')+'">AI 연결해서 분석</button><button data-a="aimode" data-v="manual" class="'+(on?'':'on')+'">AI 없이 쓰기</button></div>'+
+      '<span class="sp"></span><button class="btn sm ghost" data-a="aicfg">AI 연결 설정 '+(st.aiOpen?'▴':'▾')+'</button></div><p class="note" style="margin:6px 0 0">'+capMsg+'</p>';
+    if(st.aiOpen){
+      var p=st.aiProv||c.prov;
+      h+='<div class="aicfg"><div class="optg">'+Object.keys(AIP).map(function(k){var x=AIP[k];return '<button class="optc'+(k===p?' on':'')+'" data-a="aiprov" data-v="'+k+'"><span class="ck">'+(k===p?'✓':'')+'</span><b>'+x.name+'</b><span class="d">'+x.help+'</span></button>';}).join('')+'</div>';
+      if(AIP[p].key){
+        h+='<div class="fgrid" style="margin-top:10px"><label class="f">'+AIP[p].name+' API 키<input class="in" id="aiKey" type="password" autocomplete="off" value="'+esc(c.keys[p]||'')+'" placeholder="키를 붙여넣기"></label>'+
+          '<label class="f">모델 <span class="note">비워 두면 관리자 기본값</span><input class="in" id="aiModelIn" value="'+esc(c.models[p]||'')+'" placeholder="'+esc(AI_ADMIN_MODELS[p]||AIP[p].model)+'"></label></div>'+
+          '<p class="note">키 만드는 곳: <a href="'+AIP[p].url+'" target="_blank" rel="noopener">'+AIP[p].url+'</a> · 키는 이 기기 브라우저에만 저장되고, AI를 부를 때 해당 회사로만 보내집니다. 사용량에 따라 그 회사에서 요금이 나옵니다.</p>';
+      }else h+='<p class="note" style="margin-top:10px">'+(HAS_AI?'지금 Claude 화면에서 열려 있어 키 없이 바로 씁니다.':'Claude 로그인 후 <a href="'+CLAUDE_URL+'" target="_blank" rel="noopener">Claude에서 열기</a>로 열었을 때 씁니다. 이 사이트에 저장한 고객은 Claude 화면과 따로 보관됩니다.')+'</p>';
+      h+='<p class="note">고객 증권·병력 자료가 선택한 AI 회사로 전송됩니다. 개인정보 동의를 받은 고객만 AI로 분석하세요.</p>'+
+        '<div class="row"><button class="btn sm" data-a="aisave">저장</button>'+(AIP[p].key?'<button class="btn sm ghost" data-a="aitest">연결 시험</button><button class="btn sm ghost danger" data-a="aidel">이 키 지우기</button>':'')+'<span class="note" id="aiTestMsg"></span></div></div>';
+    }
+    return h+'</div>';
+  }
+  function aiCfgClick(a,b){
+    var c=aiCfg();
+    if(a==='aimode'){c.mode=b.dataset.v;save(KEY_AI,c);applyAiCfg();if(c.mode==='ai'&&c.prov!=='claudeapp'&&!c.keys[c.prov])st.aiOpen=true;render();toast(c.mode==='ai'?'AI 연결해서 분석합니다.':'AI 없이 직접 입력합니다.');return;}
+    if(a==='aicfg'){st.aiOpen=!st.aiOpen;st.aiProv=null;render();return;}
+    if(a==='aiprov'){st.aiProv=b.dataset.v;render();return;}
+    var p=st.aiProv||c.prov,kE=document.getElementById('aiKey'),mE=document.getElementById('aiModelIn');
+    if(kE)c.keys[p]=kE.value.trim();if(mE)c.models[p]=mE.value.trim();
+    if(a==='aidel'){delete c.keys[p];save(KEY_AI,c);applyAiCfg();render();toast('키를 지웠습니다.');return;}
+    c.prov=p;if(a==='aisave'||a==='aitest'){c.mode='ai';}
+    save(KEY_AI,c);applyAiCfg();
+    if(a==='aisave'){st.aiOpen=false;render();toast('AI 연결 설정을 저장했습니다.');return;}
+    if(a==='aitest'){
+      var m=document.getElementById('aiTestMsg');if(!c.keys[p]){m.textContent='키를 먼저 넣으세요.';return;}
+      m.textContent='시험 중…';b.disabled=true;
+      apiAdapter(c).json('연결 시험이다. JSON 하나로만 답하라: {"ok":true}',{}).then(function(r){m.textContent=r&&r.ok?'✓ 연결됐습니다.':'답은 왔지만 형식이 다릅니다. 모델 이름을 확인하세요.';},function(e){m.textContent='✕ '+errMsg(e);}).then(function(){b.disabled=false;});
+      return;
+    }
+  }
   function cust(){return st.customers.filter(function(c){return c.id===st.cur;})[0]||null;}
   function selIds(c){
     var ids=(c&&Array.isArray(c.options)&&c.options.length)?c.options:[c&&c.option];
@@ -1313,6 +1477,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function render(){
     var c=cust();
     var h='<div class="ph"><div class="kicker">영업 도구</div><h1>AI 보장분석</h1><p>고객 등록 → 동의·자료 첨부 → 옵션을 골라 보장분석 → 제안서 화면·인쇄·저장까지 한 흐름으로 진행합니다.</p></div>';
+    h+=aiBar();
     h+='<div class="ai-wrap"><aside class="ai-list"><div class="ai-lh"><b>고객 목록</b><span class="note">'+st.customers.length+'명</span></div>'+
       '<input class="in" id="aiQ" placeholder="이름 검색" value="'+esc(st.q)+'" aria-label="고객 이름 검색">'+
       '<div class="ai-lb"><button class="btn sm" data-a="new">+ 새 고객</button></div><ul>';
@@ -1777,7 +1942,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   var AI_FMT='\n답은 JSON 하나만: {"contracts":[{"kind":"기존|신규","insured":"피보험자 이름(없으면 빈칸)","insurer":"보험사","product":"상품명","period":"보험기간","term":"만기 / 납기","premium":월보험료원_숫자,"items":[["담보명",가입금액_만원,담보보험료_원_or_null,"보장기간","지급주기"]]}]}\nitems는 배열 5칸으로 짧게 쓴다. 같은 담보가 실제로 여러 번 가입되어 있으면 모두 적는다(빼지 않는다). 이 부분에 담보가 없으면 {"contracts":[]}.';
   async function aiCall(text,images,kind,part){
     if(!cap.sample&&cap.sampleP)await cap.sampleP;
-    if(!cap.sample)throw {code:'unavailable'};
+    if(!cap.sample)throw {code:cap.why||'unavailable'};
     var prompt=AI_RULE+AI_FMT+(kind?'\n지정값: 모든 계약의 kind는 "'+kind+'".':'')+(part?'\n이 자료는 한 문서의 '+part+' 부분이다. 이 부분에 보이는 계약·담보만 적는다.':'')+'\n\n자료:\n'+(text||'(이미지 참조)');
     var o={modelTier:'default'};if(images&&images.length)o.images=images;
     var r=await cap.sample.json(prompt,o);
@@ -1815,7 +1980,16 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   async function imgLimit(){try{var l=cap.sample&&await cap.sample.limits();return l&&l.images?Math.max(1,Math.min(l.images.maxCount,4)):0;}catch(e){return 0;}}
   function errMsg(e){var c=e&&e.code;var M={
     not_granted:'AI 사용을 허용하지 않아 읽지 못했습니다. 페이지의 권한 설정에서 허용한 뒤 "다시 읽기"를 누르세요.',
-    unavailable:'이 화면에서는 AI 판독을 쓸 수 없습니다. 위의 "Claude에서 열기"로 열어 주세요.',
+    unavailable:'이 화면에서는 AI 판독을 쓸 수 없습니다. 위의 "AI 연결 설정"을 확인하세요.',
+    ai_off:'"AI 없이 쓰기"로 되어 있습니다. 위에서 "AI 연결해서 분석"을 고르세요.',
+    need_claude:'Claude 화면 연결은 Claude에서 열어야 합니다. 이 사이트에서는 AI 연결 설정에서 ChatGPT·Gemini·Claude API 키를 넣으세요.',
+    no_key:'AI 키가 없습니다. 위의 "AI 연결 설정"에서 키를 넣어 주세요.',
+    bad_key:'AI 키가 맞지 않거나 사용 권한이 없습니다. AI 연결 설정에서 키를 확인하세요.',
+    bad_model:'모델 이름을 찾지 못했습니다. AI 연결 설정의 모델 이름을 확인하세요.',
+    network:'AI 회사에 연결하지 못했습니다. 인터넷 연결을 확인하세요.',
+    bad_json:'AI 답을 표로 바꾸지 못했습니다. "다시 읽기"를 눌러 보세요.',
+    refused:'AI가 이 요청을 처리하지 않았습니다. 다시 시도하거나 직접 입력하세요.',
+    api_error:'AI 회사에서 오류를 돌려줬습니다.',
     sampling_disabled:'이 계정에서 AI 사용이 꺼져 있습니다.',session_expired:'Claude 로그인이 만료되었습니다. 다시 로그인한 뒤 "다시 읽기".',
     rate_limited:'AI 사용량 한도에 걸렸습니다. 잠시 뒤 "다시 읽기"를 누르세요.',
     prompt_too_large:'자료가 너무 커서 한 번에 보낼 수 없었습니다.',invalid_json:'AI 답이 중간에 잘렸습니다(담보가 매우 많은 자료).',
@@ -2024,7 +2198,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   }
   async function aiText(c){
     var o=opt(c),R=analyze(c,o),btn=document.getElementById('aiTextBtn'),note=document.getElementById('rptNote');
-    if(!cap.sample){toast(HAS_AI?'이 화면에서는 AI 문구 다듬기를 쓸 수 없습니다. 기본 문구로 진행하세요.':'AI 문구 다듬기는 Claude에서 열었을 때 쓸 수 있습니다. 기본 문구로 진행하세요.');return;}
+    if(!cap.sample){toast(errMsg({code:cap.why})+' 기본 문구로 진행하세요.');return;}
     btn.disabled=true;note.textContent='AI가 문구를 쓰는 중… (1분 정도 걸릴 수 있습니다)';
     var data={고객:c.name,나이성별:ageSex(c),옵션:o.title,옵션설명:o.desc,중심영역:o.areas.map(function(a){return {영역:a,기존:R.A[a].old,신규:R.A[a].neu,합산:R.A[a].old+R.A[a].neu,기준예시:BASE[a]||null};}),
       월보험료:{기존:R.prem.old,신규:R.prem.neu,합산:R.prem.old+R.prem.neu},동시지급:R.scen.length?{기존:R.sOld,신규:R.sNeu}:null,연간반복:(R.ann+R.ann10)?{연간:R.ann,십년한도:R.ann10,누적:R.years}:null,가족력:c.famHx,상담내용:c.memo,
@@ -2046,6 +2220,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     if(a==='pick'){gather();if(c)touch(c);st.cur=b.dataset.id;if(st.step===5||st.step===0||b.dataset.to)st.step=1;render();window.scrollTo(0,root.offsetTop-80);return;}
     if(a==='sortK'){if(st.step===2&&c)gatherDocs(c);st.sort=b.dataset.m;saveSort();var y=window.scrollY;render();window.scrollTo(0,y);return;}
     if(a==='goChk'){var d=b.dataset;gather();if(c)touch(c);st.step=+d.s;render();focusTarget(d);return;}
+    if(/^ai(mode|cfg|prov|save|test|del)$/.test(a)){aiCfgClick(a,b);return;}
     if(a==='pickRpt'){gather();st.cur=b.dataset.id;st.step=4;render();return;}
     if(!c&&a!=='saveOpt'&&a!=='resetOpt')return;
     if(a==='addFam'){gatherInfo(c);c.family.push({rel:'배우자',name:'',birth:'',note:''});render();return;}
@@ -2095,13 +2270,22 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     root.querySelectorAll('.ai-nohit').forEach(function(nh){nh.hidden=any;});
   }
 
-  window.AIMOD={mount:function(el,user,toastFn){
+  window.AIMOD={
+  content:function(c){
+    if(c.aiModels)Object.keys(c.aiModels).forEach(function(k){if(c.aiModels[k])AI_ADMIN_MODELS[k]=c.aiModels[k];});
+    if(Array.isArray(c.opts)&&c.opts.length){
+      DEF_OPTS=fillOpts(JSON.parse(JSON.stringify(c.opts)));
+      var v=String(c.optsVer||c.ver||'');if(v&&load('fc_opts_ver','')!==v){st.opts=fillOpts(JSON.parse(JSON.stringify(c.opts)));save(KEY_O,st.opts);save('fc_opts_ver',v);}
+    }
+    if(root&&document.body.contains(root))applyAiCfg();
+  },
+  getOpts:function(){return JSON.parse(JSON.stringify(st.opts));},
+  mount:function(el,user,toastFn){
     root=el;me=user;toast=toastFn;
-    render();
+    applyAiCfg();render();
     if(!DB)connectDb();
     root.addEventListener('click',onClick);root.addEventListener('change',onChange);root.addEventListener('input',onInput);
     if(window.claude&&claude.use){
-      cap.sampleP=claude.use('sample').then(function(s){cap.sample=s;if(!s){capMsg='AI 판독은 Claude 화면에서 열었을 때 쓸 수 있습니다.';var nt=document.getElementById('aiCapNote');if(nt)nt.textContent=capMsg;}});
       claude.use('downloads').then(function(d){cap.dl=d;});
     }
   }};
