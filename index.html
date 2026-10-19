@@ -452,7 +452,9 @@ tr.fx td{background:var(--gold-soft)}
 .sl .kc.d{background:#143038;border-color:#143038;color:#fff}
 .sl.nd{background:linear-gradient(180deg,#fff 0,#fff 78%,#F8F5EE 100%)}.sl.nd::before{content:"";position:absolute;left:0;top:0;bottom:0;width:calc(var(--u)*8);background:linear-gradient(180deg,#0F2240,#1D3557)}
 .sl.nd::after{content:"한국보험금융(주)";position:absolute;right:calc(var(--u)*43);top:calc(var(--u)*30);font-size:calc(var(--u)*10.5);font-weight:800;color:#0F2240;letter-spacing:.06em;border-bottom:calc(var(--u)*2) solid #CB9C3A;padding-bottom:calc(var(--u)*2)}
-.sl.nd .kc .ch{color:#0F2240}.sl .nsrc{font-size:calc(var(--u)*9);color:#9AA5AB;font-weight:600;margin-left:calc(var(--u)*6)}
+.sl.nd .kc .ch{color:#0F2240}.sl .nimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}.sl .nimg img{max-width:100%;max-height:100%;object-fit:contain;border-radius:calc(var(--u)*8);box-shadow:0 calc(var(--u)*4) calc(var(--u)*18) rgba(15,34,64,.14);border:1px solid #E6EBF1}
+.nrfg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}.nrfc{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;display:flex;flex-direction:column}.nrft{aspect-ratio:16/9;background:#F4F6F9;display:flex;align-items:center;justify-content:center;overflow:hidden}.nrft img{width:100%;height:100%;object-fit:contain}
+.nrfb{color:#0F2240;text-align:center;font-size:.8rem;line-height:1.5}.nrfb b{font-size:1rem}.nrfi{padding:10px;display:flex;flex-direction:column;gap:6px}.nrfi details .chips2{margin-top:6px}.sl .nsrc{font-size:calc(var(--u)*9);color:#9AA5AB;font-weight:600;margin-left:calc(var(--u)*6)}
 .sl .np{font-size:calc(var(--u)*11.5);color:#33424D;margin:0;line-height:1.6}.sl .np b{color:#0F2240}
 .sl .neq{display:flex;align-items:center;gap:calc(var(--u)*8);margin-top:auto}.sl .neq i{font-style:normal;font-size:calc(var(--u)*18);font-weight:800;color:#9AA5AB}
 .sl .nq{flex:1;border-radius:calc(var(--u)*8);padding:calc(var(--u)*8) calc(var(--u)*6);text-align:center;display:grid;gap:calc(var(--u)*2)}
@@ -1002,6 +1004,8 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       '<div class="panel"><h3>AI 기본 모델 <span class="note">개인 API 키를 쓰는 FC용 기본값입니다. 새 모델이 나오면 이름만 바꾸세요.</span></h3><div class="fgrid">'+
       inp('mClaude','Claude API',md.claude,'claude-opus-5-5')+inp('mOpenai','ChatGPT',md.openai,'gpt-4.1')+inp('mGemini','Gemini',md.gemini,'gemini-2.5-flash')+'</div>'+
       '<label class="row"><input type="checkbox" id="cOpts"> 이 기기의 <b>분석 옵션</b>(AI 보장분석 › 옵션 관리)을 모든 FC에게 배포</label></div>'+
+      '<div class="panel"><h3>니즈환기 참고자료 <span class="pill new">모든 FC 공용</span></h3><p class="note">관리자로 올린 자료는 분석 옵션에 연결되어, FC가 그 옵션으로 제안서를 만들 때 자동으로 붙습니다. 지금 공용 자료 <b>'+((window.AIMOD&&AIMOD.getRefs)?AIMOD.getRefs().refs.length:0)+'건</b>. 자료가 많으면(사진 포함이라 용량이 큼) ① 복사 대신 <b>content.json 받기</b> 후 GitHub에서 <b>Add file › Upload files</b>로 올리세요.</p>'+
+      '<div class="row"><button class="btn" type="button" id="cmsRefs">참고자료 올리기·관리 열기</button></div></div>'+
       '<div class="panel"><h3>사이트에 반영하는 방법</h3><ol class="note" style="margin:0;padding-left:1.2em;line-height:1.9">'+
       '<li><b>① 반영할 내용 복사</b>를 누릅니다.</li><li><b>② GitHub 편집 화면 열기</b>를 누르고(GitHub 로그인), 글 상자 안을 클릭해 <b>Ctrl+A</b> 후 <b>Ctrl+V</b>로 붙여넣습니다.</li>'+
       '<li>오른쪽 위 초록 <b>Commit changes</b> → 다시 <b>Commit changes</b>를 누르면 1~2분 뒤 모든 FC 화면에 나타납니다.</li></ol></div>'+
@@ -1019,10 +1023,12 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     var ck=document.getElementById('cOpts');
     if(ck&&ck.checked&&window.AIMOD&&AIMOD.getOpts){c.opts=AIMOD.getOpts();c.optsVer=c.ver;}
     else if(SITE&&SITE.opts){c.opts=SITE.opts;c.optsVer=SITE.optsVer||SITE.ver;}
+    if(window.AIMOD&&AIMOD.getRefs){var rr=AIMOD.getRefs();c.refs=rr.refs;c.refsVer=rr.ver||String(c.ver);}
     return c;
   }
   function bindCms(){
     var msg=document.getElementById('cmsMsg');if(!msg)return;
+    var rb=document.getElementById('cmsRefs');if(rb)rb.onclick=function(){if(window.AIMOD&&AIMOD.openRefs)AIMOD.openRefs();go('ai');};
     document.getElementById('cmsPrev').onclick=function(){applyContent(cmsCollect(),false);msg.textContent='이 기기에서만 바뀌었습니다. 다른 FC에게 보이려면 ①②로 사이트에 반영하세요.';};
     document.getElementById('cmsDl').onclick=function(){var c=cmsCollect(),b=new Blob([JSON.stringify(c,null,1)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='content.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);};
     document.getElementById('cmsCopy').onclick=function(){
@@ -1360,6 +1366,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
           snap.docs.forEach(function(d){
             var b=d.data()||{};
             if(d.id==='opts'){if(Array.isArray(b.opts)&&b.opts.length){st.opts=fillOpts(b.opts);save(KEY_O,st.opts);changed=true;}return;}
+            if(d.id.indexOf('ref_')===0&&b.r){if(!MYREF.some(function(x){return x.id===b.r.id;})){MYREF.push(b.r);changed=true;}b.r._seen=1;return;}
             if(d.id.indexOf('c_')!==0||!b.c)return;if(isEx(b.c)){col.doc(d.id).delete().catch(function(){});return;}var rc=norm(b.c),lc=byId[rc.id];
             if(!lc){st.customers.push(rc);byId[rc.id]=rc;changed=true;}
             else if((b.ts||0)>(lc.ts||0)){st.customers[st.customers.indexOf(lc)]=rc;byId[rc.id]=rc;changed=true;}
@@ -1367,6 +1374,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
             byId[rc.id]._seen=1;
           });
           st.customers.forEach(function(c){if(!c._seen)pushC(c);delete c._seen;});
+          MYREF.forEach(function(x){if(!x._seen)saveRefs('me',x);delete x._seen;});save(KEY_R,MYREF);
           if(!snap.docs.some(function(d){return d.id==='opts';})&&load(KEY_O,null))pushOpts();
           st.customers.sort(function(a,b){return String(b.createdAt).localeCompare(String(a.createdAt));});
           save(KEY_C,st.customers);
@@ -1572,14 +1580,15 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     if(st.customers.length)h+='<li class="note ai-nohit"'+(st.customers.some(function(x){return !st.q||(x.name||'').indexOf(st.q)>-1;})?' hidden':'')+'>검색된 고객이 없습니다.</li>';
     if(!st.customers.length)h+='<li class="note ai-empty">저장된 고객이 없습니다. "새 고객"으로 등록하세요.</li>';
     h+='</ul><button class="btn sm ghost" data-a="step" data-s="0">전체 고객 목록 보기</button><p class="note" id="aiSync"></p></aside><section class="ai-main">';
-    var steps=[[0,'고객 목록'],[1,'고객정보'],[2,'동의·자료'],[3,'보장분석'],[4,'제안서'],[5,'옵션 관리']];
-    h+='<div class="ai-steps" role="tablist">'+steps.map(function(s){return '<button role="tab" aria-selected="'+(st.step===s[0])+'" data-a="step" data-s="'+s[0]+'" class="'+(st.step===s[0]?'on':'')+'"><i>'+(s[0]===0?'☰':s[0]<5?s[0]:'⚙')+'</i>'+s[1]+'</button>';}).join('')+'</div>';
+    var steps=[[0,'고객 목록'],[1,'고객정보'],[2,'동의·자료'],[3,'보장분석'],[4,'제안서'],[5,'옵션 관리'],[6,'참고자료']];
+    h+='<div class="ai-steps" role="tablist">'+steps.map(function(s){return '<button role="tab" aria-selected="'+(st.step===s[0])+'" data-a="step" data-s="'+s[0]+'" class="'+(st.step===s[0]?'on':'')+'"><i>'+(s[0]===0?'☰':s[0]<5?s[0]:s[0]===5?'⚙':'＋')+'</i>'+s[1]+'</button>';}).join('')+'</div>';
     /* 단계마다 이전 단계로 돌아가는 버튼(위·아래) */
-    var SN=['고객 목록','고객정보','동의·자료','보장분석','제안서','옵션 관리'],pv=st.step===5?(st.from5==null?3:st.from5):st.step-1;
+    var SN=['고객 목록','고객정보','동의·자료','보장분석','제안서','옵션 관리','참고자료'],pv=st.step>=5?(st.from5==null?3:st.from5):st.step-1;
     var back=st.step>0?'<div class="ai-back"><button class="btn sm ghost" data-a="step" data-s="'+pv+'">◂ 뒤로: '+SN[pv]+'</button></div>':'';
     h+=back;
     if(st.step===0)h+=viewList();
     else if(st.step===5)h+=viewOpts();
+    else if(st.step===6)h+=viewRefs();
     else if(!c)h+='<div class="panel ai-none"><h3>고객을 먼저 고르세요</h3><p class="note">왼쪽에서 고객을 고르거나 "새 고객"을 누르세요.</p><div class="row"><button class="btn" data-a="new">+ 새 고객 등록</button></div></div>';
     else h+=[0,viewInfo,viewDocs,viewAnalysis,viewReport][st.step](c);
     h+=back+'</section></div>';
@@ -1672,7 +1681,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function sortSeg(){return '<span class="seg" role="group" aria-label="담보 정렬"><span class="note">정렬</span>'+[['orig','자료 순서'],['area','보장 종류별'],['ty','상해·질병별'],['amt','금액 큰 순']].map(function(m){return '<button class="'+(st.sort===m[0]?'on':'')+'" data-a="sortK" data-m="'+m[0]+'" aria-pressed="'+(st.sort===m[0])+'">'+m[1]+'</button>';}).join('')+'</span>';}
   function optCards(c){
     var ids=selIds(c);
-    return '<div class="optg" id="aiOptg">'+st.opts.map(function(o,i){var on=ids.indexOf(o.id)>-1,k=ids.indexOf(o.id)+1;return '<label class="optc'+(on?' on':'')+'"><input type="checkbox" name="aiOpt" value="'+o.id+'"'+(on?' checked':'')+'><span class="ck" aria-hidden="true">'+(on?(ids.length>1?k:'✓'):'')+'</span><span class="on-n">옵션 '+(i+1)+'</span><b>'+esc(o.title)+'</b><span class="d">'+esc(o.desc)+'</span></label>';}).join('')+'</div>';
+    return '<div class="optg" id="aiOptg">'+st.opts.map(function(o,i){var on=ids.indexOf(o.id)>-1,k=ids.indexOf(o.id)+1;return '<label class="optc'+(on?' on':'')+'"><input type="checkbox" name="aiOpt" value="'+o.id+'"'+(on?' checked':'')+'><span class="ck" aria-hidden="true">'+(on?(ids.length>1?k:'✓'):'')+'</span><span class="on-n">옵션 '+(i+1)+'</span><b>'+esc(o.title)+'</b><span class="d">'+esc(o.desc)+'</span>'+(function(){var n=allRefs().filter(function(x){return x.opts&&x.opts.indexOf(o.id)>-1;}).length;return n?'<span class="pill">참고자료 '+n+'건 연결</span>':'';})()+'</label>';}).join('')+'</div>';
   }
   function bars(R,focus){
     var mx=0;AREAS.forEach(function(a){mx=Math.max(mx,R.A[a].old+R.A[a].neu);});
@@ -1810,7 +1819,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     var A=AREAS.filter(function(a){return R.A[a][side];}).sort(function(a,b){return R.A[b][side]-R.A[a][side];}).slice(0,2);return A.length?A.join('·')+' 중심':'—';}
   /* ---- 니즈환기 참고자료: 한국보험금융 스타일로 다시 만든 장. area '공통'=표지 뒤, 그 밖=해당 보장 영역이 이 제안에 들어갈 때 부록 앞 ---- */
   var NEEDS=[
-    {id:'n01',area:'공통',title:'보장분석의 중요성',body:function(){
+    {id:'n01',opts:[],by:'base',title:'보장분석의 중요성',body:function(){
       var Y=[['1970',62.3],['1980',66.1],['1990',71.7],['2000',76.0],['2010',80.2],['2023',83.5]],W=400,H=230,b0=196,sc=2.6,bw=40,gap=(W-40-Y.length*bw)/(Y.length-1);
       var svg='<svg viewBox="0 0 '+W+' '+H+'" class="ksvg" font-family="Malgun Gothic,Noto Sans KR,sans-serif"><defs><linearGradient id="nbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E0B862"/><stop offset="1" stop-color="#CB9C3A"/></linearGradient></defs>'+
         '<line x1="14" y1="'+b0+'" x2="'+(W-14)+'" y2="'+b0+'" stroke="#C9D2DC"/>';
@@ -1830,9 +1839,24 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
         '<p class="np">✓ 중복되거나 꼭 필요하지 않은 보장은 줄이고, <b>비어 있는 보장(보장공백)</b>은 채웁니다.</p>'+
         '<div class="neq">'+eq('보험료는','합리적으로','a')+'<i>+</i>'+eq('보장금액은','크게','b')+'<i>+</i>'+eq('보장기간은','길게','c')+'</div></div></div>';}}
   ];
-  function needsFor(c,o,where){var off=c.refOff||[];return NEEDS.filter(function(x){if(off.indexOf(x.id)>-1)return false;return where==='공통'?x.area==='공통':x.area!=='공통'&&o.areas.indexOf(x.area)>-1;});}
-  function needsPick(c,o){var L=NEEDS.filter(function(x){return x.area==='공통'||o.areas.indexOf(x.area)>-1;}),off=c.refOff||[];if(!L.length)return '';
-    return '<div class="row outs"><b>참고 자료(니즈환기)</b>'+L.map(function(x){return '<label class="row" style="gap:4px"><input type="checkbox" data-ref="'+x.id+'"'+(off.indexOf(x.id)>-1?'':' checked')+'> '+esc(x.title)+' <span class="note">('+esc(x.area)+')</span></label>';}).join('')+'<span class="note">체크한 자료가 제안서에 함께 들어갑니다.</span></div>';}
+  /* ---- 참고자료 묶음: 기본(NEEDS) + 회사 공용(관리자가 올림, content.json) + 내 자료(FC가 올림, 내 계정) ----
+     opts가 비어 있으면 모든 옵션 공통(표지 뒤), 옵션이 지정되면 그 옵션을 고른 제안서에만(부록 앞) 붙는다 */
+  var KEY_R='fc_ai_refs',KEY_RD='fc_refs_draft';
+  var MYREF=load(KEY_R,[]),SHREF=[],SHVER='';
+  (function(){var d=load(KEY_RD,null);if(d&&Array.isArray(d.refs)){SHREF=d.refs;SHVER=String(d.ver||'');}})();
+  function allRefs(){return NEEDS.concat(SHREF.map(function(r){r.by='co';return r;}),MYREF.map(function(r){r.by='me';return r;}));}
+  function refOn(x,ids){return !(x.opts&&x.opts.length)||x.opts.some(function(id){return ids.indexOf(id)>-1;});}
+  function refLinked(c){var ids=selIds(c);return allRefs().filter(function(x){return refOn(x,ids);});}
+  function optName(id){var i=-1;st.opts.forEach(function(o,k){if(o.id===id)i=k;});return i<0?'':'옵션 '+(i+1)+' '+st.opts[i].title;}
+  function refWhere(x){return x.opts&&x.opts.length?x.opts.map(optName).filter(Boolean).join(', '):'모든 옵션 공통';}
+  function refBy(x){return x.by==='me'?'내 자료':x.by==='co'?'회사 공용':'기본';}
+  function needsFor(c,o,where){var off=c.refOff||[];return refLinked(c).filter(function(x){if(off.indexOf(x.id)>-1)return false;var com=!(x.opts&&x.opts.length);return where==='공통'?com:!com;});}
+  function refBody(x,c,o,R){if(x.body)return x.body(c,o,R);
+    return '<div class="nimg"><img src="'+x.img+'" alt="'+esc(x.title)+'"></div>';}
+  function refSlide(x){return x.src?'참고 자료 · 출처: '+esc(x.src)+' · 한국보험금융(주) 신채널':'참고 자료 · 한국보험금융(주) 신채널';}
+  function needsPick(c,o){var L=refLinked(c),off=c.refOff||[],hid=allRefs().length-L.length;
+    return '<div class="row outs"><b>참고 자료(니즈환기)</b>'+(L.length?L.map(function(x){return '<label class="row" style="gap:4px"><input type="checkbox" data-ref="'+x.id+'"'+(off.indexOf(x.id)>-1?'':' checked')+'> '+esc(x.title)+' <span class="note">('+esc(refWhere(x))+')</span></label>';}).join(''):'<span class="note">고른 옵션에 연결된 자료가 없습니다.</span>')+
+      '<span class="note">고른 옵션에 맞는 자료만 보입니다'+(hid?' (다른 옵션용 '+hid+'건 숨김)':'')+'.</span><button class="btn sm ghost" data-a="step" data-s="6">+ 참고자료 올리기·관리</button></div>';}
   function reportHtml(c,o,R,T){
     var oldK=useK(c).filter(function(k){return k.kind!=='신규';}),neuK=useK(c).filter(function(k){return k.kind==='신규';}),mO=oldK.length>1,mN=neuK.length>1;
     var L=o.list||[o],d=today().replace(/-/g,'.'),no=0,pg=0;
@@ -1847,7 +1871,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       '<div class="cvb" style="left:calc(var(--u)*64)"><span>기존 월보험료</span><b>'+fmt(R.prem.old)+' 원</b></div><div class="cvb" style="left:calc(var(--u)*334)"><span>신규 월보험료</span><b>'+fmt(R.prem.neu)+' 원</b></div><div class="cvb g" style="left:calc(var(--u)*604)"><span>합산 월보험료</span><b>'+fmt(R.prem.old+R.prem.neu)+' 원</b></div>'+
       '<p class="cvf">피보험자: '+esc(c.name)+(ageSex(c)?' ('+esc(ageSex(c))+')':'')+((c.jobType||c.job)?' · '+esc([c.jobType,c.job].filter(Boolean).join(' / ')):'')+'&nbsp;&nbsp;·&nbsp;&nbsp;'+esc(oldK.map(function(k){return k.insurer;}).filter(Boolean).join(', ')||'—')+'(기존)'+(neuK.length?' + '+esc(neuK.map(function(k){return k.insurer;}).filter(Boolean).join(', '))+'(신규)':'')+'&nbsp;&nbsp;·&nbsp;&nbsp;담당: '+esc(me.org)+' '+esc(me.name)+'<br>본 자료는 고객 이해를 돕기 위한 비교용 참고자료입니다</p></section></div>';
     /* 01 종합 요약: 카드 3장 */
-    needsFor(c,o,'공통').forEach(function(x){h+=slide('REFERENCE',x.title+' <small>한국보험금융</small>','',x.body(c,o,R),'참고 자료 · 한국보험금융(주) 신채널','nd');});
+    needsFor(c,o,'공통').forEach(function(x){h+=slide('REFERENCE',esc(x.title)+' <small>한국보험금융</small>','',refBody(x,c,o,R),refSlide(x),'nd');});
     var gainA=AREAS.filter(function(a){return R.A[a].neu;}).sort(function(a,b){return R.A[b].neu-R.A[a].neu;}).slice(0,2);
     function card(cls,t,prod,prem,cnt,nat){return '<div class="kc '+cls+'"><b class="ct">'+t+'</b><p class="cp">'+esc(prod)+'</p><span class="cl">월 보험료</span><b class="cv">'+fmt(prem)+' 원</b><span class="cn">담보 '+cnt+'개</span><span class="cl">보장 성격</span><b class="cna">'+esc(nat)+'</b></div>';}
     var terms=oldK.concat(neuK).map(function(k){return k.term;}).filter(Boolean).filter(function(x,i,A){return A.indexOf(x)===i;});
@@ -1918,7 +1942,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       '<p class="ccu"><b>함께 사용하기</b>&nbsp; 보장 지도·막대·누적 차트로 큰 그림을, 분석표(엑셀·PDF)로 담보별 숫자와 동시지급·누적 근거를 함께 보시면 설명이 자연스럽습니다.</p>'+
       '<p class="cvf" style="top:calc(var(--u)*486)">※ 본 자료는 가입설계서 기준 비교용 참고자료이며, 보장 여부·지급 조건은 각 상품 약관이 우선합니다. 동시지급·누적 예시는 이해를 돕기 위한 가정입니다.</p></section></div>';
     pg++;
-    needsFor(c,o,'영역').forEach(function(x){h+=slide('REFERENCE',x.title+' <small>한국보험금융</small>','',x.body(c,o,R),'참고 자료 · 한국보험금융(주) 신채널','nd');});
+    needsFor(c,o,'영역').forEach(function(x){h+=slide('REFERENCE',esc(x.title)+' <small>한국보험금융</small>','',refBody(x,c,o,R),refSlide(x),'nd');});
     /* 부록: 담보별 상세 비교 (장을 나눠서) */
     var rows=[];AREAS.forEach(function(a){var o1=dSort(R.old.filter(function(it){return it.area===a;}),mO),n1=dSort(R.neu.filter(function(it){return it.area===a;}),mN);if(!o1.length&&!n1.length)return;
       rows.push([1,'<tr class="ksec"><td colspan="6">▌ '+a+'</td></tr>']);
@@ -1940,6 +1964,64 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       ((q.points||[]).length?'<div class="rpts"><b>점검 포인트</b><ul>'+q.points.map(function(p){return '<li>'+esc(p)+'</li>';}).join('')+'</ul></div>':'')+
       (S.noBase.length?'<p class="rnote">※ '+esc(S.noBase.join('·'))+' 권장 기준은 추후 교육 콘텐츠로 적용 예정입니다.</p>':'')+'</div>'+
       (nw.title?'<div class="news"><span class="nk">관련 최근 기사</span><b>'+esc(nw.title)+'</b><em>'+esc(nw.src)+(nw.date?' · '+esc(nw.date):'')+'</em><p>'+esc(nw.sum)+'</p>'+(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(u.replace(/^https?:\/\//,'').slice(0,60))+'</a>':'')+'</div>':'')+'</div>';
+  }
+  /* ---------------- 참고자료 관리 ---------------- */
+  function isAdm(){return me&&me.role==='admin';}
+  function suggestOpts(t){t=String(t||'');var K={o1:['암','항암','표적','치료비'],o2:['뇌','심장','순환','혈관','심근','협심'],o3:['수술'],o4:['실손','비급여','자기부담'],o5:['간병','간호'],o6:['요양','치매','노후','돌봄'],o7:['사망','유족','가장','가족','후유'],o8:['유병','간편','고지','병력'],o9:['리모델링','보험료','중복','효율'],o10:['3대','진단비','암·뇌','뇌·심']};
+    return st.opts.filter(function(o){var k=K[o.id]||o.areas.map(function(a){return a.split(/[·\s]/)[0];});return k.some(function(w){return w&&t.indexOf(w)>-1;});}).map(function(o){return o.id;});}
+  function optBoxes(name,sel,attr){return '<div class="chips2"><label><input type="checkbox" '+attr+' data-all="1"'+(sel.length?'':' checked')+'><b>모든 옵션 공통</b></label>'+st.opts.map(function(o,i){return '<label><input type="checkbox" '+attr+' value="'+o.id+'"'+(sel.indexOf(o.id)>-1?' checked':'')+'>'+(i+1)+'. '+esc(o.title)+'</label>';}).join('')+'</div>';}
+  function viewRefs(){
+    var adm=isAdm(),c=cust(),cur=c?selIds(c):[];
+    var h='<div class="panel"><h3>참고자료(니즈환기) 올리기 <span class="pill new">'+(adm?'관리자: 모든 FC 공용으로 올라갑니다':'내 자료로 올라갑니다')+'</span></h3>'+
+      '<p class="note">PPT를 그림으로 저장한 파일(PNG·JPG)이나 PDF를 올리면 한 장씩 한국보험금융 틀에 넣어 제안서에 붙입니다. 아래에서 고른 <b>분석 옵션</b>을 제안서에서 고르면 그 자료가 자동으로 함께 들어갑니다. 옵션을 하나도 고르지 않으면 모든 제안서 표지 뒤에 들어갑니다.</p>'+
+      '<div class="fgrid"><label class="f">자료 제목 <span class="note">비우면 파일 이름</span><input class="in" id="rfTitle" placeholder="예: 암 치료비의 현실"></label><label class="f">출처 <span class="note">선택</span><input class="in" id="rfSrc" placeholder="예: 국립암센터 2024"></label></div>'+
+      '<p class="note" style="margin:8px 0 2px"><b>연결할 분석 옵션</b> (제목을 쓰면 관련 옵션을 자동으로 골라 드립니다)</p>'+optBoxes('rf',[],'data-rfo')+
+      '<div class="row" style="margin-top:10px"><label class="btn">파일 고르기<input type="file" id="rfFile" accept="image/png,image/jpeg,image/webp,application/pdf,.pdf" multiple hidden></label><span class="note" id="rfMsg">그림 1장 = 1장, PDF는 쪽마다 1장(최대 10쪽)</span></div></div>';
+    var groups=[['co','회사 공용 자료',SHREF],['me','내 자료',MYREF],['base','기본 자료',NEEDS]];
+    groups.forEach(function(g){
+      var can=g[0]==='me'||(g[0]==='co'&&adm);
+      h+='<div class="panel"><h3>'+g[1]+' <span class="note">'+g[2].length+'건'+(g[0]==='co'&&adm?' · 다 고친 뒤 관리자 › 콘텐츠 관리에서 사이트에 반영하세요':'')+'</span></h3>';
+      if(!g[2].length){h+='<p class="note">'+(g[0]==='co'?'관리자가 올린 공용 자료가 아직 없습니다.':'아직 올린 자료가 없습니다.')+'</p></div>';return;}
+      h+='<div class="nrfg">'+g[2].map(function(x){
+        var th=x.img?'<img src="'+x.img+'" alt="">':'<span class="nrfb">한국보험금융<br><b>'+esc(x.title)+'</b></span>';
+        return '<div class="nrfc"><div class="nrft">'+th+'</div><div class="nrfi">'+(can?'<input class="in" data-rtt="'+x.id+'" value="'+esc(x.title)+'" aria-label="제목">':'<b>'+esc(x.title)+'</b>')+
+          '<span class="note">'+esc(refBy({by:g[0]}))+' · '+esc(refWhere(x))+(x.src?' · 출처 '+esc(x.src):'')+'</span>'+
+          (can?'<details><summary class="note">연결 옵션 바꾸기</summary>'+optBoxes('',x.opts||[],'data-rto="'+x.id+'"')+'</details><button class="btn sm ghost" data-a="delRef" data-id="'+x.id+'">삭제</button>':'')+
+          (c&&refOn(x,cur)?'<span class="pill ok">지금 고객('+esc(c.name||'')+') 제안서에 들어감</span>':'')+'</div></div>';}).join('')+'</div></div>';
+    });
+    return h;
+  }
+  function refList(by){return by==='co'?SHREF:MYREF;}
+  function findRef(id){var r=null,by='';[['co',SHREF],['me',MYREF]].forEach(function(g){g[1].forEach(function(x){if(x.id===id){r=x;by=g[0];}});});return r?{r:r,by:by}:null;}
+  function saveRefs(by,x,del){
+    if(by==='co'){SHVER=String(Date.now());if(!save(KEY_RD,{ver:SHVER,refs:SHREF}))toast('이 기기에 임시 저장하지 못했습니다(용량). 콘텐츠 관리에서 바로 반영하세요.');return;}
+    if(!save(KEY_R,MYREF)&&!DB)toast('이 브라우저 저장 공간이 부족합니다. 오래된 자료를 지워 주세요.');
+    if(DB&&x){var id='ref_'+x.id;dbChain[id]=(dbChain[id]||Promise.resolve()).then(function(){return del?DB.doc(id).delete():DB.doc(id).set({ts:Date.now(),r:JSON.parse(JSON.stringify(x))});}).catch(dbErr);}
+  }
+  /* 그림을 16:9 안에 맞추고 JPEG로 줄인다(한 장 240KB 안쪽: 계정 저장 한도 256KB) */
+  function shrink(src){return new Promise(function(ok,no){var im=new Image();im.onload=function(){
+      var W=1600,sc=Math.min(1,W/im.width,900/im.height),q=0.85,out='';
+      for(var t=0;t<8;t++){var cv=document.createElement('canvas');cv.width=Math.round(im.width*sc);cv.height=Math.round(im.height*sc);var g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);g.drawImage(im,0,0,cv.width,cv.height);
+        out=cv.toDataURL('image/jpeg',q);if(out.length<240000)break;if(q>0.6)q-=0.1;else sc*=0.8;}
+      ok(out);};im.onerror=function(){no({message:'그림을 열지 못했습니다.'});};im.src=src;});}
+  function readUrl(f){return new Promise(function(ok,no){var r=new FileReader();r.onload=function(){ok(r.result);};r.onerror=no;r.readAsDataURL(f);});}
+  async function pdfImgs(f){
+    if(!window.pdfjsLib)throw {message:'PDF 읽기 도구를 불러오지 못했습니다(인터넷 연결 확인).'};
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    var doc=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,out=[];
+    for(var p=1;p<=Math.min(doc.numPages,10);p++){var pg=await doc.getPage(p),vp0=pg.getViewport({scale:1}),vp=pg.getViewport({scale:Math.min(2.5,1600/vp0.width)}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;await pg.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;out.push(cv.toDataURL('image/png'));}
+    return out;
+  }
+  async function onRefFiles(files){
+    var msg=document.getElementById('rfMsg'),ti=(document.getElementById('rfTitle')||{}).value||'',src=((document.getElementById('rfSrc')||{}).value||'').trim();ti=ti.trim();
+    var opts=[].slice.call(root.querySelectorAll('[data-rfo]:not([data-all])')).filter(function(e){return e.checked;}).map(function(e){return e.value;});
+    var by=isAdm()?'co':'me',L=refList(by),n=0;
+    for(var i=0;i<files.length;i++){var f=files[i],base=ti||f.name.replace(/\.[^.]+$/,'');
+      try{if(msg)msg.textContent=(i+1)+'/'+files.length+' 넣는 중… '+f.name;
+        var srcs=/pdf$/i.test(f.type)||/\.pdf$/i.test(f.name)?await pdfImgs(f):[await readUrl(f)];
+        for(var k=0;k<srcs.length;k++){var img=await shrink(srcs[k]);var x={id:'r'+uid().slice(1),title:base+(srcs.length>1?' ('+(k+1)+')':''),opts:opts.length?opts:suggestOpts(base),src:src,img:img,ts:Date.now()};L.push(x);saveRefs(by,x);n++;}
+      }catch(e){toast(f.name+': '+((e&&e.message)||'넣지 못했습니다.'));}}
+    render();toast(n?'참고자료 '+n+'장을 넣었습니다.'+(by==='co'?' 콘텐츠 관리에서 사이트에 반영하면 모든 FC에게 보입니다.':''):'넣은 자료가 없습니다.');
   }
   function viewOpts(){
     var h='<div class="panel"><h3>분석 옵션 관리 <span class="sp"></span><button class="btn sm ghost" data-a="resetOpt">처음 10가지로 되돌리기</button></h3><p class="note">옵션 이름·설명·중심 영역을 언제든 바꿀 수 있습니다. 설명에 적은 문장이 제안서의 분석 방향과 AI 문구에 그대로 쓰입니다. (운영 시 관리자만 수정)</p></div>';
@@ -2335,13 +2417,14 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function onClick(e){
     var b=e.target.closest('[data-a]');if(!b||!root.contains(b))return;
     var a=b.dataset.a,c=cust();
-    if(a==='step'){gather();if(c)touch(c);var ns=+b.dataset.s;if(ns===5&&st.step!==5)st.from5=st.step;st.step=ns;render();window.scrollTo(0,root.offsetTop-80);return;}
+    if(a==='step'){gather();if(c)touch(c);var ns=+b.dataset.s;if(ns>=5&&st.step<5)st.from5=st.step;st.step=ns;render();window.scrollTo(0,root.offsetTop-80);return;}
     if(a==='new'){gather();var x=blank();st.customers.unshift(x);st.cur=x.id;st.step=1;persist();render();document.getElementById('fName').focus();return;}
     if(a==='example_off'){gather();var ex=exampleCustomer();st.customers.unshift(ex);st.cur=ex.id;st.step=3;persist();pushC(ex);render();toast('예시 고객을 불러왔습니다. 옵션을 바꿔 보세요.');return;}
-    if(a==='pick'){gather();if(c)touch(c);st.cur=b.dataset.id;if(st.step===5||st.step===0||b.dataset.to)st.step=1;render();window.scrollTo(0,root.offsetTop-80);return;}
+    if(a==='pick'){gather();if(c)touch(c);st.cur=b.dataset.id;if(st.step>=5||st.step===0||b.dataset.to)st.step=1;render();window.scrollTo(0,root.offsetTop-80);return;}
     if(a==='sortK'){if(st.step===2&&c)gatherDocs(c);st.sort=b.dataset.m;saveSort();var y=window.scrollY;render();window.scrollTo(0,y);return;}
     if(a==='goChk'){var d=b.dataset;gather();if(c)touch(c);st.step=+d.s;render();focusTarget(d);return;}
     if(/^ai(mode|cfg|prov|save|test|del)$/.test(a)){aiCfgClick(a,b);return;}
+    if(a==='delRef'){var fr=findRef(b.dataset.id);if(!fr)return;if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='한 번 더 누르면 삭제';return;}var L=refList(fr.by);L.splice(L.indexOf(fr.r),1);saveRefs(fr.by,fr.r,true);render();toast('참고자료를 삭제했습니다.');return;}
     if(a==='pickRpt'){gather();st.cur=b.dataset.id;st.step=4;render();return;}
     if(!c&&a!=='saveOpt'&&a!=='resetOpt')return;
     if(a==='addFam'){gatherInfo(c);c.family.push({rel:'배우자',name:'',birth:'',note:''});render();return;}
@@ -2377,6 +2460,12 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function onChange(e){
     var t=e.target;
     if(t.dataset&&t.dataset.ref){var cc=cust();if(!cc)return;var off=(cc.refOff||[]).filter(function(x){return x!==t.dataset.ref;});if(!t.checked)off.push(t.dataset.ref);cc.refOff=off;touch(cc);render();return;}
+    if(t.id==='rfFile'&&t.files&&t.files.length){onRefFiles([].slice.call(t.files));return;}
+    if(t.dataset&&t.dataset.rtt){var fr=findRef(t.dataset.rtt);if(fr){fr.r.title=t.value.trim()||fr.r.title;saveRefs(fr.by,fr.r);toast('제목을 바꿨습니다.');}return;}
+    if(t.dataset&&(t.dataset.rto||t.hasAttribute('data-rfo'))){var box=t.closest('.chips2'),all=box.querySelector('[data-all]'),ones=[].slice.call(box.querySelectorAll('input:not([data-all])'));
+      if(t===all){if(all.checked)ones.forEach(function(e){e.checked=false;});else all.checked=true;}else all.checked=!ones.some(function(e){return e.checked;});
+      if(t.dataset.rto){var fr2=findRef(t.dataset.rto);if(fr2){fr2.r.opts=ones.filter(function(e){return e.checked;}).map(function(e){return e.value;});saveRefs(fr2.by,fr2.r);var y=window.scrollY;render();window.scrollTo(0,y);toast('연결 옵션을 바꿨습니다.');}}
+      else box.dataset.touched='1';return;}
     if(t.name==='aiOpt'){var c=cust(),ids=selIds(c).slice(),i=ids.indexOf(t.value);
       if(t.checked&&i<0)ids.push(t.value);else if(!t.checked&&i>-1){if(ids.length===1){t.checked=true;toast('옵션은 최소 1개를 골라야 합니다.');return;}ids.splice(i,1);}
       c.options=ids;c.option=ids[0];touch(c);render();return;}
@@ -2386,6 +2475,8 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   }
   /* 이름 검색: 화면을 다시 그리지 않고 목록만 숨기고 보여 준다 (다시 그리면 한글 조합이 끊겨 자음·모음이 떨어짐) */
   function onInput(e){
+    if(e.target.id==='rfTitle'){var box=root.querySelector('[data-rfo]').closest('.chips2');if(box.dataset.touched)return;var sg=suggestOpts(e.target.value);
+      box.querySelectorAll('input:not([data-all])').forEach(function(x){x.checked=sg.indexOf(x.value)>-1;});box.querySelector('[data-all]').checked=!sg.length;return;}
     if(e.target.id!=='aiQ')return;
     st.q=e.target.value.trim();var any=false;
     root.querySelectorAll('[data-nm]').forEach(function(li){var ok=!st.q||li.getAttribute('data-nm').indexOf(st.q)>-1;li.hidden=!ok;if(ok)any=true;});
@@ -2399,10 +2490,14 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       DEF_OPTS=fillOpts(JSON.parse(JSON.stringify(c.opts)));
       var v=String(c.optsVer||c.ver||'');if(v&&load('fc_opts_ver','')!==v){st.opts=fillOpts(JSON.parse(JSON.stringify(c.opts)));save(KEY_O,st.opts);save('fc_opts_ver',v);}
     }
+    if(Array.isArray(c.refs)){var rv=String(c.refsVer||c.ver||''),dr=load(KEY_RD,null);
+      if(dr&&Array.isArray(dr.refs)&&String(dr.ver||'')>rv){SHREF=dr.refs;SHVER=String(dr.ver);}else{SHREF=c.refs;SHVER=rv;if(dr)try{localStorage.removeItem(KEY_RD);}catch(e){}}}
     if('aiProxy' in c)AI_PROXY=/^https:\/\/[^\s]+$/.test(String(c.aiProxy||'').trim())?String(c.aiProxy).trim():'';
     if(root&&document.body.contains(root)){applyAiCfg();render();}
   },
   getOpts:function(){return JSON.parse(JSON.stringify(st.opts));},
+  getRefs:function(){return {refs:SHREF.map(function(x){return {id:x.id,title:x.title,opts:x.opts||[],src:x.src||'',img:x.img,ts:x.ts};}),ver:SHVER};},
+  openRefs:function(){st.from5=st.step<5?st.step:3;st.step=6;},
   mount:function(el,user,toastFn){
     root=el;me=user;toast=toastFn;
     applyAiCfg();render();
