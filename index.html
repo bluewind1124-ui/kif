@@ -450,6 +450,14 @@ tr.fx td{background:var(--gold-soft)}
 .sl .kc.o{background:#EFF2F6;border-color:#D5DEE7}.sl .kc.n{background:#FCF3DE;border-color:#EBD39A}.sl .kc.s{background:#EAF1EC;border-color:#C6DAD6}
 .sl .kc.w{background:#fff;box-shadow:0 calc(var(--u)*1) calc(var(--u)*5) rgba(0,0,0,.07)}
 .sl .kc.d{background:#143038;border-color:#143038;color:#fff}
+.sl.nd{background:linear-gradient(180deg,#fff 0,#fff 78%,#F8F5EE 100%)}.sl.nd::before{content:"";position:absolute;left:0;top:0;bottom:0;width:calc(var(--u)*8);background:linear-gradient(180deg,#0F2240,#1D3557)}
+.sl.nd::after{content:"한국보험금융(주)";position:absolute;right:calc(var(--u)*43);top:calc(var(--u)*30);font-size:calc(var(--u)*10.5);font-weight:800;color:#0F2240;letter-spacing:.06em;border-bottom:calc(var(--u)*2) solid #CB9C3A;padding-bottom:calc(var(--u)*2)}
+.sl.nd .kc .ch{color:#0F2240}.sl .nsrc{font-size:calc(var(--u)*9);color:#9AA5AB;font-weight:600;margin-left:calc(var(--u)*6)}
+.sl .np{font-size:calc(var(--u)*11.5);color:#33424D;margin:0;line-height:1.6}.sl .np b{color:#0F2240}
+.sl .neq{display:flex;align-items:center;gap:calc(var(--u)*8);margin-top:auto}.sl .neq i{font-style:normal;font-size:calc(var(--u)*18);font-weight:800;color:#9AA5AB}
+.sl .nq{flex:1;border-radius:calc(var(--u)*8);padding:calc(var(--u)*8) calc(var(--u)*6);text-align:center;display:grid;gap:calc(var(--u)*2)}
+.sl .nq span{font-size:calc(var(--u)*10);color:#5C6B72;font-weight:700}.sl .nq b{font-size:calc(var(--u)*15);font-weight:900}
+.sl .nq.a{background:#F8EFD9}.sl .nq.a b{color:#8A5E0E}.sl .nq.b{background:#E3EEF3}.sl .nq.b b{color:#1D5C78}.sl .nq.c{background:#E8EDF5}.sl .nq.c b{color:#0F2240}
 .sl .kc.gp{background:#FDECEA;border-color:#F0B4AE}
 .sl .kc.full{height:100%;overflow:hidden}.sl .kc.tall{height:100%}
 .sl .kc .ct{font-size:calc(var(--u)*16);font-weight:800}
@@ -1740,7 +1748,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     var h='<div class="panel rtool"><div class="row"><b>제안서</b><span class="pill new">'+esc(o.title)+'</span><span class="sp"></span>'+
       '<button class="btn sm ghost" data-a="aiText" id="aiTextBtn">AI로 문구 다듬기</button><button class="btn sm ghost" data-a="print">인쇄</button><button class="btn sm ghost" data-a="saveHtml">제안서 HTML</button></div>'+
       '<div class="row outs"><b>카카오톡으로 보낼 파일</b><button class="btn sm" data-a="pdfRpt">제안서 PDF 저장</button><button class="btn sm" data-a="pdfSheet">분석표 PDF 저장</button><button class="btn sm ghost" data-a="saveXlsx">분석표 엑셀 저장</button><span class="note" id="pdfNote">PDF를 저장한 뒤 카카오톡 대화방에서 파일로 첨부하면 됩니다.</span></div>'+
-      '<p class="note" id="rptNote">'+(c.ai&&c.ai.opt===o.id?'AI가 다듬은 문구입니다. 숫자는 분석표에서 계산한 값입니다.':'기본 문구입니다. 숫자는 분석표에서 계산한 값입니다.')+' 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.</p></div>';
+      needsPick(c,o)+'<p class="note" id="rptNote">'+(c.ai&&c.ai.opt===o.id?'AI가 다듬은 문구입니다. 숫자는 분석표에서 계산한 값입니다.':'기본 문구입니다. 숫자는 분석표에서 계산한 값입니다.')+' 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.</p></div>';
     h+='<div class="rpt" id="rpt">'+reportHtml(c,o,R,T)+'</div>';
     return h;
   }
@@ -1800,6 +1808,31 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function hiWords(t,words){var s=esc(t);words.filter(Boolean).sort(function(a,b){return b.length-a.length;}).forEach(function(w){s=s.split(esc(w)).join('<b class="kg">'+esc(w)+'</b>');});return s;}
   function natureOf(R,side,K){var given=K.map(function(k){return k.nature;}).filter(Boolean)[0];if(given)return given;
     var A=AREAS.filter(function(a){return R.A[a][side];}).sort(function(a,b){return R.A[b][side]-R.A[a][side];}).slice(0,2);return A.length?A.join('·')+' 중심':'—';}
+  /* ---- 니즈환기 참고자료: 한국보험금융 스타일로 다시 만든 장. area '공통'=표지 뒤, 그 밖=해당 보장 영역이 이 제안에 들어갈 때 부록 앞 ---- */
+  var NEEDS=[
+    {id:'n01',area:'공통',title:'보장분석의 중요성',body:function(){
+      var Y=[['1970',62.3],['1980',66.1],['1990',71.7],['2000',76.0],['2010',80.2],['2023',83.5]],W=400,H=230,b0=196,sc=2.6,bw=40,gap=(W-40-Y.length*bw)/(Y.length-1);
+      var svg='<svg viewBox="0 0 '+W+' '+H+'" class="ksvg" font-family="Malgun Gothic,Noto Sans KR,sans-serif"><defs><linearGradient id="nbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E0B862"/><stop offset="1" stop-color="#CB9C3A"/></linearGradient></defs>'+
+        '<line x1="14" y1="'+b0+'" x2="'+(W-14)+'" y2="'+b0+'" stroke="#C9D2DC"/>';
+      Y.forEach(function(y,i){var x=20+i*(bw+gap),h=(y[1]-50)*sc*1.55,last=i===Y.length-1;
+        svg+='<rect x="'+x+'" y="'+(b0-h)+'" width="'+bw+'" height="'+h+'" rx="4" fill="'+(last?'url(#nbg)':'#E6EBF1')+'"/>'+
+          svgT(x+bw/2,b0-h-7,y[1].toFixed(1),{s:12,c:last?'#8A5E0E':'#3B4A5A',w:800})+svgT(x+bw/2,b0+16,y[0]+'년',{s:10.5,c:'#5C6B72'});});
+      svg+='<g transform="translate(300 52)"><rect x="-6" y="-14" width="96" height="22" rx="11" fill="#0F2240"/>'+svgT(42,1.5,'100세 시대 진입',{s:10.5,c:'#fff',w:700})+'</g></svg>';
+      var coins=function(cx,cy,pos){return pos.map(function(p){return '<circle cx="'+(cx+p[0])+'" cy="'+(cy+p[1])+'" r="9" fill="#F6E7C3" stroke="#CB9C3A" stroke-width="1.5"/><text x="'+(cx+p[0])+'" y="'+(cy+p[1]+3.5)+'" font-size="9" font-weight="800" fill="#8A5E0E" text-anchor="middle">₩</text>';}).join('');};
+      var dia='<svg viewBox="0 0 400 120" class="ksvg" font-family="Malgun Gothic,Noto Sans KR,sans-serif">'+
+        coins(70,58,[[-44,-30],[-14,-38],[18,-26],[44,-6],[-36,4],[-6,-6],[26,14],[-48,34],[-14,30],[10,40],[40,34]])+svgT(70,114,'여러 보험에 흩어진 보험료',{s:10.5,c:'#5C6B72',w:700})+
+        '<path d="M150 58 H232" stroke="#CB9C3A" stroke-width="2.5" fill="none" marker-end="url(#nar)"/><defs><marker id="nar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#CB9C3A"/></marker></defs>'+svgT(191,48,'보장분석',{s:11,c:'#8A5E0E',w:800})+
+        '<circle cx="318" cy="58" r="40" fill="#0F2240"/><circle cx="318" cy="58" r="40" fill="none" stroke="#CB9C3A" stroke-width="2" stroke-dasharray="4 4"/>'+svgT(318,54,'꼭 필요한',{s:11,c:'#fff',w:700})+svgT(318,70,'보장에 집중',{s:11,c:'#E0B862',w:800})+svgT(318,114,'같은 보험료로 더 든든하게',{s:10.5,c:'#5C6B72',w:700})+'</svg>';
+      var eq=function(t,v,cl){return '<div class="nq '+cl+'"><span>'+t+'</span><b>'+v+'</b></div>';};
+      return '<div class="g2"><div class="kc w"><b class="ch">평균 기대수명 추이 <span class="nsrc">출처: 통계청 생명표</span></b><div class="kch" style="flex:1">'+svg+'</div>'+
+        '<p class="np">수명이 길어진 만큼, 보험도 <b>“얼마나 오래 보장하는가”</b>가 중요해졌습니다.<br>지금 가진 보험이 100세 시대에 맞는지 점검이 필요합니다.</p></div>'+
+        '<div class="kc w"><b class="ch">보장분석을 하는 이유</b><div class="kch" style="height:calc(var(--u)*120)">'+dia+'</div>'+
+        '<p class="np">✓ 중복되거나 꼭 필요하지 않은 보장은 줄이고, <b>비어 있는 보장(보장공백)</b>은 채웁니다.</p>'+
+        '<div class="neq">'+eq('보험료는','합리적으로','a')+'<i>+</i>'+eq('보장금액은','크게','b')+'<i>+</i>'+eq('보장기간은','길게','c')+'</div></div></div>';}}
+  ];
+  function needsFor(c,o,where){var off=c.refOff||[];return NEEDS.filter(function(x){if(off.indexOf(x.id)>-1)return false;return where==='공통'?x.area==='공통':x.area!=='공통'&&o.areas.indexOf(x.area)>-1;});}
+  function needsPick(c,o){var L=NEEDS.filter(function(x){return x.area==='공통'||o.areas.indexOf(x.area)>-1;}),off=c.refOff||[];if(!L.length)return '';
+    return '<div class="row outs"><b>참고 자료(니즈환기)</b>'+L.map(function(x){return '<label class="row" style="gap:4px"><input type="checkbox" data-ref="'+x.id+'"'+(off.indexOf(x.id)>-1?'':' checked')+'> '+esc(x.title)+' <span class="note">('+esc(x.area)+')</span></label>';}).join('')+'<span class="note">체크한 자료가 제안서에 함께 들어갑니다.</span></div>';}
   function reportHtml(c,o,R,T){
     var oldK=useK(c).filter(function(k){return k.kind!=='신규';}),neuK=useK(c).filter(function(k){return k.kind==='신규';}),mO=oldK.length>1,mN=neuK.length>1;
     var L=o.list||[o],d=today().replace(/-/g,'.'),no=0,pg=0;
@@ -1814,6 +1847,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       '<div class="cvb" style="left:calc(var(--u)*64)"><span>기존 월보험료</span><b>'+fmt(R.prem.old)+' 원</b></div><div class="cvb" style="left:calc(var(--u)*334)"><span>신규 월보험료</span><b>'+fmt(R.prem.neu)+' 원</b></div><div class="cvb g" style="left:calc(var(--u)*604)"><span>합산 월보험료</span><b>'+fmt(R.prem.old+R.prem.neu)+' 원</b></div>'+
       '<p class="cvf">피보험자: '+esc(c.name)+(ageSex(c)?' ('+esc(ageSex(c))+')':'')+((c.jobType||c.job)?' · '+esc([c.jobType,c.job].filter(Boolean).join(' / ')):'')+'&nbsp;&nbsp;·&nbsp;&nbsp;'+esc(oldK.map(function(k){return k.insurer;}).filter(Boolean).join(', ')||'—')+'(기존)'+(neuK.length?' + '+esc(neuK.map(function(k){return k.insurer;}).filter(Boolean).join(', '))+'(신규)':'')+'&nbsp;&nbsp;·&nbsp;&nbsp;담당: '+esc(me.org)+' '+esc(me.name)+'<br>본 자료는 고객 이해를 돕기 위한 비교용 참고자료입니다</p></section></div>';
     /* 01 종합 요약: 카드 3장 */
+    needsFor(c,o,'공통').forEach(function(x){h+=slide('REFERENCE',x.title+' <small>한국보험금융</small>','',x.body(c,o,R),'참고 자료 · 한국보험금융(주) 신채널','nd');});
     var gainA=AREAS.filter(function(a){return R.A[a].neu;}).sort(function(a,b){return R.A[b].neu-R.A[a].neu;}).slice(0,2);
     function card(cls,t,prod,prem,cnt,nat){return '<div class="kc '+cls+'"><b class="ct">'+t+'</b><p class="cp">'+esc(prod)+'</p><span class="cl">월 보험료</span><b class="cv">'+fmt(prem)+' 원</b><span class="cn">담보 '+cnt+'개</span><span class="cl">보장 성격</span><b class="cna">'+esc(nat)+'</b></div>';}
     var terms=oldK.concat(neuK).map(function(k){return k.term;}).filter(Boolean).filter(function(x,i,A){return A.indexOf(x)===i;});
@@ -1884,6 +1918,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       '<p class="ccu"><b>함께 사용하기</b>&nbsp; 보장 지도·막대·누적 차트로 큰 그림을, 분석표(엑셀·PDF)로 담보별 숫자와 동시지급·누적 근거를 함께 보시면 설명이 자연스럽습니다.</p>'+
       '<p class="cvf" style="top:calc(var(--u)*486)">※ 본 자료는 가입설계서 기준 비교용 참고자료이며, 보장 여부·지급 조건은 각 상품 약관이 우선합니다. 동시지급·누적 예시는 이해를 돕기 위한 가정입니다.</p></section></div>';
     pg++;
+    needsFor(c,o,'영역').forEach(function(x){h+=slide('REFERENCE',x.title+' <small>한국보험금융</small>','',x.body(c,o,R),'참고 자료 · 한국보험금융(주) 신채널','nd');});
     /* 부록: 담보별 상세 비교 (장을 나눠서) */
     var rows=[];AREAS.forEach(function(a){var o1=dSort(R.old.filter(function(it){return it.area===a;}),mO),n1=dSort(R.neu.filter(function(it){return it.area===a;}),mN);if(!o1.length&&!n1.length)return;
       rows.push([1,'<tr class="ksec"><td colspan="6">▌ '+a+'</td></tr>']);
@@ -2341,6 +2376,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   }
   function onChange(e){
     var t=e.target;
+    if(t.dataset&&t.dataset.ref){var cc=cust();if(!cc)return;var off=(cc.refOff||[]).filter(function(x){return x!==t.dataset.ref;});if(!t.checked)off.push(t.dataset.ref);cc.refOff=off;touch(cc);render();return;}
     if(t.name==='aiOpt'){var c=cust(),ids=selIds(c).slice(),i=ids.indexOf(t.value);
       if(t.checked&&i<0)ids.push(t.value);else if(!t.checked&&i>-1){if(ids.length===1){t.checked=true;toast('옵션은 최소 1개를 골라야 합니다.');return;}ids.splice(i,1);}
       c.options=ids;c.option=ids[0];touch(c);render();return;}
