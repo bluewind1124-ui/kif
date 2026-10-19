@@ -349,6 +349,7 @@ td.r,th.r{text-align:right}
 .logs p{margin:6px 0 0;line-height:1.6}
 .logadd{display:grid;grid-template-columns:220px 1fr auto;gap:10px;align-items:end}
 @media (max-width:700px){.logadd{grid-template-columns:1fr}}
+.ai-back{margin:10px 0}.ai-back+.ai-back{display:none}
 .ai-steps{display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--line)}
 .ai-steps button{display:flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--muted);padding:10px 14px;font-weight:700;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
 .ai-steps button i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--line);color:var(--ink);font-size:.78rem}
@@ -1565,11 +1566,15 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     h+='</ul><button class="btn sm ghost" data-a="step" data-s="0">전체 고객 목록 보기</button><p class="note" id="aiSync"></p></aside><section class="ai-main">';
     var steps=[[0,'고객 목록'],[1,'고객정보'],[2,'동의·자료'],[3,'보장분석'],[4,'제안서'],[5,'옵션 관리']];
     h+='<div class="ai-steps" role="tablist">'+steps.map(function(s){return '<button role="tab" aria-selected="'+(st.step===s[0])+'" data-a="step" data-s="'+s[0]+'" class="'+(st.step===s[0]?'on':'')+'"><i>'+(s[0]===0?'☰':s[0]<5?s[0]:'⚙')+'</i>'+s[1]+'</button>';}).join('')+'</div>';
+    /* 단계마다 이전 단계로 돌아가는 버튼(위·아래) */
+    var SN=['고객 목록','고객정보','동의·자료','보장분석','제안서','옵션 관리'],pv=st.step===5?(st.from5==null?3:st.from5):st.step-1;
+    var back=st.step>0?'<div class="ai-back"><button class="btn sm ghost" data-a="step" data-s="'+pv+'">◂ 뒤로: '+SN[pv]+'</button></div>':'';
+    h+=back;
     if(st.step===0)h+=viewList();
     else if(st.step===5)h+=viewOpts();
     else if(!c)h+='<div class="panel ai-none"><h3>고객을 먼저 고르세요</h3><p class="note">왼쪽에서 고객을 고르거나 "새 고객"을 누르세요.</p><div class="row"><button class="btn" data-a="new">+ 새 고객 등록</button></div></div>';
     else h+=[0,viewInfo,viewDocs,viewAnalysis,viewReport][st.step](c);
-    h+='</section></div>';
+    h+=back+'</section></div>';
     root.innerHTML=h;syncNote();
   }
   function viewList(){
@@ -2295,7 +2300,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function onClick(e){
     var b=e.target.closest('[data-a]');if(!b||!root.contains(b))return;
     var a=b.dataset.a,c=cust();
-    if(a==='step'){gather();if(c)touch(c);st.step=+b.dataset.s;render();window.scrollTo(0,root.offsetTop-80);return;}
+    if(a==='step'){gather();if(c)touch(c);var ns=+b.dataset.s;if(ns===5&&st.step!==5)st.from5=st.step;st.step=ns;render();window.scrollTo(0,root.offsetTop-80);return;}
     if(a==='new'){gather();var x=blank();st.customers.unshift(x);st.cur=x.id;st.step=1;persist();render();document.getElementById('fName').focus();return;}
     if(a==='example_off'){gather();var ex=exampleCustomer();st.customers.unshift(ex);st.cur=ex.id;st.step=3;persist();pushC(ex);render();toast('예시 고객을 불러왔습니다. 옵션을 바꿔 보세요.');return;}
     if(a==='pick'){gather();if(c)touch(c);st.cur=b.dataset.id;if(st.step===5||st.step===0||b.dataset.to)st.step=1;render();window.scrollTo(0,root.offsetTop-80);return;}
