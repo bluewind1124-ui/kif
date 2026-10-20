@@ -328,7 +328,10 @@ td.r,th.r{text-align:right}
 .band .bb{flex:none;background:rgba(255,255,255,.22);border-radius:30px;padding:8px 18px;font-weight:700}
 .pfoot{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
 @media (max-width:1100px) and (min-width:861px){.pc-hero,.pc-tools{grid-template-columns:1fr}.cat4{grid-template-columns:1fr 1fr}.tgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-/* ===== AI 보장분석 ===== */
+/* ===== AI보장분석 고급형 (advanced/ 를 iframe으로 연결) ===== */
+.ai-adv-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-6px 0 10px}
+.ai-adv{width:100%;height:calc(100vh - 190px);min-height:640px;border:1px solid var(--line);border-radius:4px;background:var(--surface);display:block}
+/* ===== AI보장분석 기본형 ===== */
 .ai-wrap{display:grid;grid-template-columns:240px minmax(0,1fr);gap:16px;align-items:start}
 .ai-list{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:12px;display:grid;gap:8px;position:sticky;top:calc(120px + env(safe-area-inset-top,0px))}
 .ai-lh{display:flex;justify-content:space-between;align-items:baseline}
@@ -651,9 +654,9 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     <div>
       <div class="mark"><img src="emblem.png" alt=""><b>한국보험금융(주)</b></div>
       <h2>상담 준비부터 청약 후 관리까지<br>한 화면에서</h2>
-      <p>상품 비교, AI 보장분석, 이달의 컨셉, 시상·소식지까지<br>FC 영업에 필요한 도구를 개인 계정으로 이용합니다.</p>
+      <p>상품 비교, AI보장분석(기본형·고급형), 이달의 컨셉, 시상·소식지까지<br>FC 영업에 필요한 도구를 개인 계정으로 이용합니다.</p>
     </div>
-    <div class="chips"><span>상품 비교</span><span>AI 보장분석</span><span>대표 상품 가설</span><span>자동차 견적</span><span>상조</span><span>교육센터</span><span>시상 공지</span></div>
+    <div class="chips"><span>상품 비교</span><span>AI보장분석 기본형</span><span>AI보장분석 고급형</span><span>대표 상품 가설</span><span>자동차 견적</span><span>상조</span><span>교육센터</span><span>시상 공지</span></div>
   </div>
   <div class="r">
     <form class="box" id="loginForm" autocomplete="off">
@@ -707,9 +710,9 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   /* ---------- 메뉴 정의 ---------- */
   var MENU=[
     {g:null,items:[['home','홈']]},
-    {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI 보장분석','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
+    {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
     {g:'외부 연계',items:[['car','자동차 비교견적'],['sangjo','상조 서비스']]},
-    {g:'교육',items:[['edu','온라인 교육센터']]},
+    {g:'교육',items:[['edu','온라인 교육센터'],['ai2','AI보장분석 고급형','NEW']]},
     {g:'공지 · 시상',items:[['news','보험사 소식지'],['award','시상 공지']]},
     {g:'관리자',admin:true,items:[['admin','관리자 페이지']]}
   ];
@@ -722,8 +725,8 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   ];
   var BLOCKS=[
     ['상품 비교',[['이번 달의 원픽',V1+'onepick.html','Hot'],['생명보험 가이드북 비교',V1+'life.html'],['담보별 비교견적',V1+'nonlife.html','Best'],['단기납 종신보험 비교',V1+'wholelife.html'],['3대질병진단비 비교',V1+'critical3.html'],['경영인 정기보험 비교',V1+'ceoterm.html']]],
-    ['보장분석 · 설계',[['AI 보장분석','ai','New'],['대표 상품 가설','hypo'],['이달의 컨셉','concept','Hot']]],
-    ['교육 · 연계',[['온라인 교육센터','edu','New'],['자동차 비교견적','car'],['상조 서비스','sangjo']]],
+    ['보장분석 · 설계',[['AI보장분석 기본형','ai'],['AI보장분석 고급형','ai2','New'],['대표 상품 가설','hypo'],['이달의 컨셉','concept','Hot']]],
+    ['교육 · 연계',[['온라인 교육센터','edu','New'],['AI보장분석 고급형','ai2','New'],['자동차 비교견적','car'],['상조 서비스','sangjo']]],
     ['공지 · 시상',[['보험사 소식지','news'],['시상 공지','award','Hot'],['상품 개정 일정','news','New']]]
   ];
   var MATS=[
@@ -761,15 +764,15 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     ['bars','담보별 비교견적','저렴한 3개사 한눈에',V1+'nonlife.html'],
     ['trend','단기납 종신 비교','환급률·사망보장 비교',V1+'wholelife.html'],
     ['pulse','3대질병진단비','합산 보험료 최저 3개',V1+'critical3.html'],
-    ['scan','AI 보장분석','고객 등록부터 제안서까지','ai','New'],
+    ['scan','AI보장분석 기본형','고객 등록부터 제안서까지','ai'],
     ['bulb','대표 상품 가설','고객 유형별 첫 제안','hypo'],
     ['book','생명보험 가이드북','18개 구분 비교',V1+'life.html'],
-    ['bld','경영인 정기보험','법인 대표 상담용',V1+'ceoterm.html']
+    ['scan','AI보장분석 고급형','보장·연금·자산 설계와 제안서','ai2','New']
   ];
   /* 관리자가 '콘텐츠 관리'에서 바꾸는 항목 (사이트의 content.json이 있으면 그 내용으로 덮어씀) */
   var CONCEPT={month:'2026.10',title:'진단비는 한 번, 치료비는 매년',target:'암 진단비만 가입한 40~50대',product:'암 주요치료비(매년 반복 지급)',
     desc:'암 진단비만 가입한 40~50대에게 반복 지급되는 치료비 담보로 기존 계약 보완을 제안합니다.',
-    steps:['기존 증권으로 AI 보장분석','진단 이후 치료비 공백 설명','원픽 상품 비교표 제시'],
+    steps:['기존 증권으로 AI보장분석 기본형','진단 이후 치료비 공백 설명','원픽 상품 비교표 제시'],
     mats:[['PPT','보험비교분석 발표자료 (항암 강화·동시지급)'],['PDF','간편건강보험 담보 비교'],['PDF','실손종합 설계 2안 비교']]};
   var BANNER={title:'11월 1일 간편건강 고지 개정 외 3건',sub:'보험사 소식지에서 일정을 확인하세요.'};
   var HYPO=[['30대 맞벌이 · 자녀 1','태아·어린이 종합 + 부부 3대질병','"아이 보험 보실 때 부모님 진단비도 같이 점검해 볼까요?"'],
@@ -873,6 +876,12 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       return h+'</div><p class="note">기존 도구는 접속코드 로그인이 한 번 더 나옵니다. 통합 후에는 포털 로그인 한 번으로 들어가게 바꿉니다.</p>';
     },
     ai:function(){return '<div id="aiApp"></div>';},
+    /* AI보장분석 고급형 — advanced/index.html (보장·연금·자산 상담 설계, 제안서, 고객 리포트, 세법 기준표·법령 점검) */
+    ai2:function(){
+      var h=head('영업 도구 · 교육','AI보장분석 고급형','상담 설계(보장·연금·자산) → 제안서(시뮬레이션·발표 노트) → 고객 리포트까지. 기본형보다 깊은 분석용입니다. 고객 자료는 이 기기의 브라우저에만 저장됩니다.');
+      h+='<div class="ai-adv-bar"><a class="btn sm" style="text-decoration:none" target="_blank" rel="noopener" href="advanced/index.html">새 창으로 크게 열기 ↗</a><button class="btn sm ghost" data-go="ai">기본형으로 이동</button></div>';
+      return h+'<iframe class="ai-adv" src="advanced/index.html" title="AI보장분석 고급형"></iframe>';
+    },
     hypo:function(){
       var h=head('영업 도구','대표 상품 가설','고객 유형별로 "이 고객에게는 이 상품부터"라는 가설과 첫 화법을 정리합니다. 관리자가 매달 바꿀 수 있습니다.');
       h+='<div class="tbl"><table><thead><tr><th>고객 유형</th><th>대표 상품 가설</th><th>첫 화법</th></tr></thead><tbody>'+
@@ -1003,7 +1012,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       inp('mProxy','회사 AI 서버 주소',SITE&&SITE.aiProxy,'https://fc-ai.○○○.workers.dev')+'<p class="note">비워 두면 FC는 복사·붙여넣기 방식으로 씁니다. 회사 API 키는 이 주소의 서버에만 넣고, 여기에는 넣지 마세요.</p></div>'+
       '<div class="panel"><h3>AI 기본 모델 <span class="note">개인 API 키를 쓰는 FC용 기본값입니다. 새 모델이 나오면 이름만 바꾸세요.</span></h3><div class="fgrid">'+
       inp('mClaude','Claude API',md.claude,'claude-opus-5-5')+inp('mOpenai','ChatGPT',md.openai,'gpt-4.1')+inp('mGemini','Gemini',md.gemini,'gemini-2.5-flash')+'</div>'+
-      '<label class="row"><input type="checkbox" id="cOpts"> 이 기기의 <b>분석 옵션</b>(AI 보장분석 › 옵션 관리)을 모든 FC에게 배포</label></div>'+
+      '<label class="row"><input type="checkbox" id="cOpts"> 이 기기의 <b>분석 옵션</b>(AI보장분석 기본형 › 옵션 관리)을 모든 FC에게 배포</label></div>'+
       '<div class="panel"><h3>니즈환기 참고자료 <span class="pill new">모든 FC 공용</span></h3><p class="note">관리자로 올린 자료는 분석 옵션에 연결되어, FC가 그 옵션으로 제안서를 만들 때 자동으로 붙습니다. 지금 공용 자료 <b>'+((window.AIMOD&&AIMOD.getRefs)?AIMOD.getRefs().refs.length:0)+'건</b>. 자료가 많으면(사진 포함이라 용량이 큼) ① 복사 대신 <b>content.json 받기</b> 후 GitHub에서 <b>Add file › Upload files</b>로 올리세요.</p>'+
       '<div class="row"><button class="btn" type="button" id="cmsRefs">참고자료 올리기·관리 열기</button></div></div>'+
       '<div class="panel"><h3>사이트에 반영하는 방법</h3><ol class="note" style="margin:0;padding-left:1.2em;line-height:1.9">'+
@@ -1084,6 +1093,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   /* ---------- 로그인 ---------- */
   function enter(id){
     me=USERS[id];
+    try{sessionStorage.setItem('fc_portal_ok','1');}catch(e){}   /* 고급형(advanced/)이 포털 로그인 여부를 확인 */
     document.getElementById('gate').hidden=true;document.getElementById('app').hidden=false;
     document.getElementById('who').innerHTML=me.org+' · <b>'+me.name+'</b>';
     go(me.role==='admin'?'admin':'home');
@@ -1094,7 +1104,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     if(USERS[id]&&USERS[id].pw===pw){document.getElementById('err').textContent='';enter(id);}
     else document.getElementById('err').textContent='아이디 또는 비밀번호가 맞지 않습니다. 위 체험용 계정을 확인하세요.';
   });
-  document.getElementById('logout').addEventListener('click',function(){me=null;document.getElementById('app').hidden=true;document.getElementById('gate').hidden=false;document.getElementById('upw').value='';});
+  document.getElementById('logout').addEventListener('click',function(){me=null;try{sessionStorage.removeItem('fc_portal_ok');}catch(e){}document.getElementById('app').hidden=true;document.getElementById('gate').hidden=false;document.getElementById('upw').value='';});
 
   /* ---------- 글자 확대 / 테마 ---------- */
   var z=parseFloat(store('fc_zoom'))||1;
@@ -1569,7 +1579,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   /* ---------------- 화면 ---------------- */
   function render(){
     var c=cust();
-    var h='<div class="ph"><div class="kicker">영업 도구</div><h1>AI 보장분석</h1><p>고객 등록 → 동의·자료 첨부 → 옵션을 골라 보장분석 → 제안서 화면·인쇄·저장까지 한 흐름으로 진행합니다.</p></div>';
+    var h='<div class="ph"><div class="kicker">영업 도구</div><h1>AI보장분석 기본형</h1><p>고객 등록 → 동의·자료 첨부 → 옵션을 골라 보장분석 → 제안서 화면·인쇄·저장까지 한 흐름으로 진행합니다.</p></div>';
     h+=aiBar();
     h+='<div class="ai-wrap"><aside class="ai-list"><div class="ai-lh"><b>고객 목록</b><span class="note">'+st.customers.length+'명</span></div>'+
       '<input class="in" id="aiQ" placeholder="이름 검색" value="'+esc(st.q)+'" aria-label="고객 이름 검색">'+
