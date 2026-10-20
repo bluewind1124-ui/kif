@@ -92,6 +92,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 .top-in{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 0;display:flex;flex-direction:column;gap:8px}
 .brand-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{display:flex;align-items:baseline;gap:8px}
+.back-btn{font-weight:700}
+.back-btn[disabled]{opacity:.4;cursor:default}
+body.pp-presenting .back-btn{display:none}
 .brand b{font-size:17px;font-weight:700;letter-spacing:-.02em}
 .brand span{font-size:12px;color:var(--ink-3)}
 .client-bar{margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -484,6 +487,7 @@ body.pp-presenting .top{display:none}
 <header class="top">
   <div class="top-in">
     <div class="brand-row">
+      <button type="button" class="btn sm back-btn no-print" id="btnBack" aria-label="이전 화면으로">← 이전</button>
       <div class="brand"><b>AI보장분석 고급형</b><span>한국보험금융 교육지원 포털</span></div>
       <div class="client-bar no-print">
         <label for="clientSel" class="small muted">고객</label>
@@ -934,8 +938,29 @@ function ringSVG(score, st, size){
 /* ════════════════ 탭 ════════════════ */
 const VIEWS = ['diag','analysis','plan','proposal','report','inbox','criteria'];
 let view = 'diag';
+/* ── 뒤로가기 (전 단계로) ──
+   화면을 옮길 때마다 직전 상태(화면·설계 분야·제안서 종류)를 쌓아 두고, 「← 이전」으로 하나씩 되돌린다.
+   더 돌아갈 곳이 없으면 포털 안에서는 포털의 이전 화면으로 넘긴다. */
+const NAV={stack:[], back:false, started:false, skip:false};
+function inPortalFrame(){ try{ return window.self!==window.top && !!window.top.document.getElementById('view'); }catch(e){ return false; } }
+function navSnap(){ let f=''; try{ f=(cur().plans||{}).field||''; }catch(e){} const pp=(typeof PP!=='undefined')?PP:{}; return {v:view, field:f, ppf:pp.field||'', rec:!!pp.withRec, y:window.scrollY}; }
+function pushNav(){
+  if(!NAV.started||NAV.back) return;
+  const s=navSnap(), t=NAV.stack[NAV.stack.length-1];
+  if(t&&t.v===s.v&&t.field===s.field&&t.ppf===s.ppf&&t.rec===s.rec) return;
+  NAV.stack.push(s); if(NAV.stack.length>60) NAV.stack.shift(); updBack();
+}
+function navBefore(){ pushNav(); NAV.skip=true; }   // 분야를 바꾼 뒤 go()를 부르는 곳에서 먼저 호출
+function goBack(){
+  if(!NAV.stack.length){ if(inPortalFrame()){ try{ window.top.postMessage({kif:'back'},'*'); }catch(e){} } return; }
+  const s=NAV.stack.pop(); NAV.back=true;
+  try{ try{ plans().field=s.field; }catch(e){} PP.field=s.ppf; PP.withRec=s.rec; go(s.v); window.scrollTo(0,s.y||0); }
+  finally{ NAV.back=false; updBack(); }
+}
+function updBack(){ const b=$('#btnBack'); if(b) b.disabled=!NAV.stack.length&&!inPortalFrame(); }
 function go(v){
   if(!VIEWS.includes(v)) v='diag';
+  if(NAV.skip) NAV.skip=false; else if(v!==view) pushNav();
   view = v;
   VIEWS.forEach(x=>{ $('#v-'+x).hidden = x!==v; const t=$('#t-'+x); if(t) t.setAttribute('aria-selected', (x===v||((v==='proposal'||v==='analysis')&&x==='plan'))?'true':'false'); });
   document.body.dataset.view=v;
@@ -2044,8 +2069,8 @@ function planText(field, rows){
   rows.forEach(r=>{ if(r.h) t+='[' +r.h+']\n'; else if(r.v) t+='- '+r.l+': '+r.v+(r.s?' ('+r.s+')':'')+'\n'; });
   return t;
 }
-$('#plCards').addEventListener('click',e=>{ const b=e.target.closest('[data-field]'); if(!b) return; plans().field=b.dataset.field; touch();
-  if(b.dataset.field==='coverage'){ go('analysis'); return; }   // 보장설계는 보장분석표(계약·담보)부터
+$('#plCards').addEventListener('click',e=>{ const b=e.target.closest('[data-field]'); if(!b) return; pushNav(); plans().field=b.dataset.field; touch();
+  if(b.dataset.field==='coverage'){ NAV.skip=true; go('analysis'); return; }   // 보장설계는 보장분석표(계약·담보)부터
   renderPlan(); });
 /* 보장설계 단계 표시줄: ① 보장분석표 → ② 필요보장 입력 → ③ 보장설계 제안서 → ④ 고객 리포트 */
 function covStepBar(active){
@@ -2054,6 +2079,7 @@ function covStepBar(active){
 }
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-step]'); if(!b) return; const s=b.dataset.step;
+  navBefore();
   if(s==='back'){ plans().field=''; touch(); go('plan'); }
   if(s==='analysis') go('analysis');
   if(s==='covform'){ plans().field='coverage'; touch(); go('plan'); }
@@ -3170,6 +3196,10 @@ renderClientSel(); updateInboxCnt(); renderDiag();
 let startView = (location.hash||'').slice(1);
 if(!VIEWS.includes(startView)){ try{ startView = sessionStorage.getItem(KEY+'-view')||''; }catch(e){} }
 go(VIEWS.includes(startView)?startView:'plan');
+NAV.started=true; updBack();
+$('#btnBack').addEventListener('click',goBack);
+document.addEventListener('keydown',e=>{ if(e.altKey&&e.key==='ArrowLeft'){ e.preventDefault(); goBack(); } });   // Alt+← 도 이전 화면
+window.addEventListener('message',e=>{ if(e.origin===location.origin&&e.data&&e.data.kif==='back-req') goBack(); });   // 포털 상단 「← 이전」에서 온 요청
 updateLawBadges();
 window.addEventListener('hashchange',()=>{ const v=(location.hash||'').slice(1); if(VIEWS.includes(v) && v!==view) go(v); });
 

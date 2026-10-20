@@ -328,6 +328,8 @@ td.r,th.r{text-align:right}
 .band .bb{flex:none;background:rgba(255,255,255,.22);border-radius:30px;padding:8px 18px;font-weight:700}
 .pfoot{font-size:.8rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
 @media (max-width:1100px) and (min-width:861px){.pc-hero,.pc-tools{grid-template-columns:1fr}.cat4{grid-template-columns:1fr 1fr}.tgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tb.back{font-weight:700;margin-right:6px}
+.tb.back[disabled]{opacity:.4;cursor:default}
 /* ===== AI보장분석 고급형 (advanced/ 를 iframe으로 연결) ===== */
 .ai-adv-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-6px 0 10px}
 .ai-adv{width:100%;height:calc(100vh - 190px);min-height:640px;border:1px solid var(--line);border-radius:4px;background:var(--surface);display:block}
@@ -674,6 +676,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 <!-- ===== 본 화면 ===== -->
 <div id="app" hidden>
   <div class="top">
+    <button class="tb back" id="portalBack" aria-label="이전 화면으로">← 이전</button>
     <a class="brand" href="#" id="toHome"><img src="emblem.png" alt=""><span class="tt"><span class="tt-long">한국보험금융(주) </span><em>신채널 FC 영업지원</em></span></a>
     <span class="sp"></span>
     <span class="who" id="who"></span>
@@ -944,6 +947,16 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 
   /* ---------- 렌더링 ---------- */
   var cur='home';
+  /* 뒤로가기: 이동할 때마다 직전 메뉴를 쌓아 두고 「← 이전」으로 되돌린다.
+     AI보장분석 고급형(iframe) 화면에서는 고급형 안의 단계부터 되돌리고, 더 없으면 포털의 이전 메뉴로 간다. */
+  var PST=[], pBack=false;
+  function updPBack(){var b=document.getElementById('portalBack');if(b)b.disabled=!PST.length&&cur!=='ai2';}
+  function portalPop(){if(!PST.length)return;pBack=true;try{go(PST.pop());}finally{pBack=false;}}
+  function portalBack(){
+    if(cur==='ai2'){var f=document.querySelector('iframe.ai-adv');if(f&&f.contentWindow){try{f.contentWindow.postMessage({kif:'back-req'},location.origin);return;}catch(e){}}}
+    portalPop();
+  }
+  window.addEventListener('message',function(e){if(e.origin===location.origin&&e.data&&e.data.kif==='back')portalPop();});
   function renderSide(){
     var h='';
     MENU.forEach(function(g){
@@ -963,7 +976,8 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     document.getElementById('gnb').innerHTML=g;
   }
   function go(id){
-    cur=id;renderSide();
+    if(!pBack&&me&&cur&&cur!==id){PST.push(cur);if(PST.length>40)PST.shift();}
+    cur=id;renderSide();updPBack();
     document.getElementById('view').innerHTML=PAGES[id]();
     if(id==='home')renderNotices();
     bindPage(id);
@@ -1089,6 +1103,8 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-go]');if(b){e.preventDefault();go(b.getAttribute('data-go'));}});
   document.getElementById('toHome').addEventListener('click',function(e){e.preventDefault();go('home');});
+  document.getElementById('portalBack').addEventListener('click',portalBack);
+  document.addEventListener('keydown',function(e){if(e.altKey&&e.key==='ArrowLeft'){e.preventDefault();portalBack();}});
 
   /* ---------- 로그인 ---------- */
   function enter(id){
@@ -1104,7 +1120,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     if(USERS[id]&&USERS[id].pw===pw){document.getElementById('err').textContent='';enter(id);}
     else document.getElementById('err').textContent='아이디 또는 비밀번호가 맞지 않습니다. 위 체험용 계정을 확인하세요.';
   });
-  document.getElementById('logout').addEventListener('click',function(){me=null;try{sessionStorage.removeItem('fc_portal_ok');}catch(e){}document.getElementById('app').hidden=true;document.getElementById('gate').hidden=false;document.getElementById('upw').value='';});
+  document.getElementById('logout').addEventListener('click',function(){me=null;PST=[];try{sessionStorage.removeItem('fc_portal_ok');}catch(e){}document.getElementById('app').hidden=true;document.getElementById('gate').hidden=false;document.getElementById('upw').value='';});
 
   /* ---------- 글자 확대 / 테마 ---------- */
   var z=parseFloat(store('fc_zoom'))||1;
