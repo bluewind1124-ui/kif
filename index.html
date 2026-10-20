@@ -340,6 +340,11 @@ a.mat:hover{outline:2px solid var(--gold);outline-offset:1px}
 .nchips .tg{border:1px solid var(--line);background:var(--card,#fff);color:var(--ink);border-radius:16px;padding:5px 12px;font:inherit;font-size:.86rem;cursor:pointer}
 .nchips .tg.on{background:var(--ink);border-color:var(--ink);color:#fff}
 .nchips .tg.on .note{color:inherit;opacity:.8}
+.nfilter .nchips{margin-bottom:10px}
+.nlist li[hidden]{display:none}
+.nlist .dt{min-width:96px}
+.nlist li{padding:8px 0}
+.nlist .note{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 .nu-drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:22px 12px;border:2px dashed var(--line);border-radius:12px;cursor:pointer;text-align:center}
 .nu-drop.on,.nu-drop:hover{border-color:var(--gold);background:var(--gold-soft)}
 .nu-rows{display:flex;flex-direction:column;gap:10px;margin-top:10px}
@@ -845,7 +850,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     });
     h+='</section>';
     /* 소식지 · 공지 (보케어 보험뉴스·커뮤니티) */
-    h+='<section class="two"><div class="panel"><h3>'+ic('news','hi3')+'보험사 소식지 <button class="more" data-go="news">더보기 +</button></h3><ul class="list">';
+    h+='<section class="two"><div class="panel"><h3>'+ic('news','hi3')+'보험사 소식지 <button class="more" data-go="news">전체 '+NEWS.length+'건 보기 +</button></h3><ul class="list">';
     NEWS.slice(0,4).forEach(function(n){h+=newsLi(n);});
     h+='</ul></div><div class="panel"><h3>'+ic('cal','hi3')+'본사 공지</h3><ul class="list noticeList"></ul></div></section>';
     /* 교육 자료 · 교육센터 강의 (보케어 보험카드·보험강의) */
@@ -882,7 +887,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       h+='<div class="sec"><h2>교육 자료 <span class="note">본사가 올린 상담·교육용 PT와 비교 자료</span></h2><div class="mats">';
       MATS.forEach(function(m){h+=matCard(m,true);});
       h+='</div></div>';
-      h+='<div class="cols"><div class="panel"><h3>보험사 소식지 <button class="more" data-go="news">더보기 +</button></h3><ul class="list">';
+      h+='<div class="cols"><div class="panel"><h3>보험사 소식지 <button class="more" data-go="news">전체 '+NEWS.length+'건 보기 +</button></h3><ul class="list">';
       NEWS.slice(0,3).forEach(function(n){h+=newsLi(n);});
       h+='</ul></div><div class="panel"><h3>본사 공지</h3><ul class="list noticeList"></ul></div></div></div>';
       return h+'<div class="pc">'+pcHome()+'</div>';
@@ -935,10 +940,16 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       return h;
     },
     news:function(){
-      var h=head('공지','보험사 소식지','보험사별 소식지를 최신순으로 모읍니다. 제목을 누르면 자료가 열립니다.');
-      var g={},order=[];NEWS.forEach(function(n){var k=n[1]||'기타';if(!g[k]){g[k]=[];order.push(k);}g[k].push(n);});
-      if(order.length>1)h+='<div class="nchips"><button type="button" class="tg on" data-nco="">전체</button>'+order.map(function(k){return '<button type="button" class="tg" data-nco="'+esc(k)+'">'+esc(k)+' <span class="note">'+g[k].length+'</span></button>';}).join('')+'</div>';
-      order.forEach(function(k){h+='<div class="panel ncard" data-co="'+esc(k)+'"><h3>'+esc(k)+' <span class="note">'+g[k].length+'건</span></h3><ul class="list">'+g[k].map(function(n){return newsLi(n,true);}).join('')+'</ul></div>';});
+      var h=head('공지','보험사 소식지','올라온 소식지 전체를 최신순으로 보여 줍니다. 회사 · 연월 · 주차로 골라 보고, 제목을 누르면 자료가 열립니다.');
+      var L=NEWS.map(function(n,i){var m=newsMeta(n);m.n=n;m.i=i;return m;}).sort(function(a,b){return a.ym<b.ym?1:a.ym>b.ym?-1:(+b.wk||0)-(+a.wk||0)||a.i-b.i;});
+      var cnt=function(key){var o={},ord=[];L.forEach(function(m){var k=m[key];if(!(k in o)){o[k]=0;ord.push(k);}o[k]++;});return {o:o,ord:ord};};
+      var C=cnt('co'),Y=cnt('ym');C.ord.sort(function(a,b){return C.o[b]-C.o[a]||(a<b?-1:1);});
+      h+='<div class="panel nfilter"><div class="nchips"><button type="button" class="tg on" data-nco="">전체 <span class="note">'+L.length+'</span></button>'+
+        C.ord.map(function(k){return '<button type="button" class="tg" data-nco="'+esc(k)+'">'+esc(k)+' <span class="note">'+C.o[k]+'</span></button>';}).join('')+'</div>'+
+        '<div class="row" style="gap:8px;flex-wrap:wrap;align-items:center"><select class="in" id="nYm" style="width:auto"><option value="">연월 전체</option>'+Y.ord.map(function(k){return '<option value="'+esc(k)+'">'+esc(k||'날짜 없음')+' ('+Y.o[k]+')</option>';}).join('')+'</select>'+
+        '<select class="in" id="nWk" style="width:auto"><option value="">주차 전체</option><option value="m">월간</option><option value="1">1주차</option><option value="2">2주차</option><option value="3">3주차</option><option value="4">4주차</option><option value="5">5주차</option></select>'+
+        '<input class="in" id="nQ" placeholder="제목 · 내용 검색" style="flex:1;min-width:140px"><span class="note" id="nCnt">'+L.length+'건</span></div></div>';
+      h+='<div class="panel"><ul class="list nlist">'+L.map(function(m){return newsRow(m);}).join('')+'</ul><p class="note" id="nNone" hidden>고른 조건에 맞는 소식지가 없습니다.</p></div>';
       return h;
     },
     award:function(){
@@ -1035,7 +1046,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       '<p class="note">한 줄에 한 건씩, 칸은 <b>|</b> 로 나눕니다. '+(SITE&&SITE.updated?'마지막 반영: '+esc(SITE.updated):'아직 사이트에 반영한 내용이 없어 기본 예시가 보입니다.')+'</p>'+
       '<div class="cols">'+
       ta('cNotice','본사 공지','날짜 | 내용 | 파일',lines(NOTICES))+
-      ta('cNews','보험사 소식지','날짜 | 보험사 | 요약 | 파일 | 제목',lines(NEWS))+
+      ta('cNews','보험사 소식지','날짜 | 보험사 | 요약 | 파일 | 제목 | 연월 | 주차',lines(NEWS))+
       ta('cAward','시상 공지','제목 | 기간 | 내용 | 상태(진행 중/발표) | 파일',lines(AWARDS))+
       ta('cHypo','대표 상품 가설','고객 유형 | 대표 상품 | 첫 화법 | 파일',lines(HYPO))+
       ta('cMats','교육 자료','종류(PPT/PDF) | 제목 | 분류 | 설명 | 파일',lines(MATS))+
@@ -1061,7 +1072,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function cmsCollect(){
     var v=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
     var c={ver:Date.now(),updated:new Date().toLocaleString('ko-KR'),
-      notices:rows(v('cNotice'),3),news:rows(v('cNews'),5),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),3),
+      notices:rows(v('cNotice'),3),news:rows(v('cNews'),7),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),3),
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
       aiProxy:v('mProxy'),aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
@@ -1154,7 +1165,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     var it={file:file, ext:ext, kind:kind, co:co||'기타', y:y, mo:mo, wk:wk, period:period, status:status, product:'', cat:'자료', date:today(),
       heading:heading, base:base, bullets:bulls, summary:pts.slice(0,4).join(' · '),
       size:file.size, pages:r?r.numPages:0, buf:buf, url:URL.createObjectURL(file)};
-    if(!it.summary)it.summary=ext==='pdf'?'본문 글자를 읽지 못했습니다(스캔본일 수 있음). 요약을 직접 적어 주세요.':'';
+    it.noText=!pts.length; /* 글자를 못 읽은 PDF(스캔본 등)도 회사·연월·주차·제목만으로 올린다 */
     nuRetitle(it);return it;
   }
   /* 제목: 소식지는 '회사 연월 주차 소식지', 나머지는 파일 이름(관리자가 붙인 이름이 가장 정확) — 이름이 숫자·영문뿐이면 첫 장의 큰 글씨 */
@@ -1197,7 +1208,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
         nuSel(i,'kind',it.kind,KINDS,'메뉴')+'<button class="btn sm ghost" type="button" data-nudel="'+i+'">빼기</button></div>'+
         '<div class="nu-x">'+nuExtra(it,i)+'</div>'+
         '<label class="nu-f wide">'+(it.kind==='hypo'?'고객 유형 (제목)':'제목')+'<input class="in" data-nu="'+i+'" data-k="title" value="'+esc(it.title)+'" style="font-weight:700"></label>'+
-        '<label class="nu-f wide">'+(it.kind==='hypo'?'첫 화법 · 요약':'요약')+'<textarea class="in" data-nu="'+i+'" data-k="summary" rows="2">'+esc(it.summary)+'</textarea></label></div>';}).join('')+'</div>':'';
+        '<label class="nu-f wide">'+(it.kind==='hypo'?'첫 화법 · 요약':'요약')+'<textarea class="in" data-nu="'+i+'" data-k="summary" rows="2" placeholder="'+(it.noText?'본문 글자를 읽지 못했습니다(스캔본일 수 있음). 비워 두면 회사·연월·주차·제목만 보입니다.':'비워 두어도 됩니다')+'">'+esc(it.summary)+'</textarea></label></div>';}).join('')+'</div>':'';
     var on=NU.items.length>0&&!NU.busy;document.getElementById('nuPub').disabled=!on;document.getElementById('nuPrev').disabled=!on;
   }
   async function nuAdd(files){
@@ -1223,7 +1234,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     var news=arr('news',NEWS),notices=arr('notices',NOTICES),awards=arr('awards',AWARDS),hypo=arr('hypo',HYPO),mats=arr('mats',MATS);
     var cp=Object.assign({},CONCEPT,c.concept||{});cp.mats=(cp.mats||[]).slice();
     list.slice().reverse().forEach(function(x){var it=x.it,p=x.path;
-      if(it.kind==='news')news.unshift([it.date,it.co,it.summary,p,it.title]);
+      if(it.kind==='news')news.unshift([it.date,it.co,it.summary,p,it.title,it.y+'.'+it.mo,it.wk]);
       else if(it.kind==='notice')notices.unshift([it.date,it.title,p]);
       else if(it.kind==='award')awards.unshift([it.title,it.period,it.summary,it.status,p]);
       else if(it.kind==='hypo')hypo.unshift([it.title,it.product,it.summary,p]);
@@ -1306,10 +1317,24 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     document.getElementById('nuTokDel').onclick=function(){ghTok('');document.getElementById('nuTok').value='';document.getElementById('nuMsg').textContent='토큰을 지웠습니다.';};
   }
   /* FC 화면: 소식지 한 줄 [날짜, 회사, 요약, 파일, 제목] — 파일이 있으면 제목을 눌러 연다 */
+  /* 소식지 줄의 회사·연월·주차 — 새 줄은 저장된 값, 예전 줄은 제목·날짜에서 읽는다 */
+  function newsMeta(n){
+    var t=String(n[4]||''),ym=n[5]||'',wk=n[6]?String(n[6]):'';
+    if(!ym){var m=t.match(/(20\d{2})\.(\d{2})/)||String(n[0]||'').match(/(20\d{2})[.\-](\d{1,2})/);ym=m?m[1]+'.'+pad2(m[2]):'';}
+    if(!wk){var w=t.match(/([1-5])주차/);wk=w?w[1]:'';}
+    return {co:n[1]||'기타',ym:ym,wk:wk,title:t};
+  }
+  function sumText(x){x=String(x||'');return /본문 글자를 읽지 못했/.test(x)?'':x;}
+  function newsRow(m){
+    var n=m.n,lab=(m.ym||esc(n[0]||''))+(m.wk?' · '+m.wk+'주차':n[4]?' · 월간':'');
+    var body=m.title?fileA(n[3],'<b>'+esc(m.title)+'</b>'):'<b>'+esc(sumText(n[2]))+'</b>';
+    var sm=m.title?sumText(n[2]):'';
+    return '<li data-co="'+esc(m.co)+'" data-ym="'+esc(m.ym)+'" data-wk="'+esc(m.wk||(n[4]?'':'-'))+'"><span class="dt">'+lab+'</span><span class="t"><span class="pill">'+esc(m.co)+'</span> '+body+(sm?'<br><span class="note">'+esc(sm)+'</span>':'')+'</span></li>';
+  }
   function newsLi(n,grouped){
     var title=n[4]||'';
     var main=title?fileA(n[3],'<b>'+esc(title)+'</b>'):(grouped?'':'<b>'+esc(n[1]||'')+'</b>');
-    return '<li><span class="dt">'+esc(n[0]||'')+'</span><span class="t">'+main+' '+(title?'<span class="note">'+esc(n[2]||'')+'</span>':esc(n[2]||''))+'</span></li>';
+    return '<li><span class="dt">'+esc(n[0]||'')+'</span><span class="t">'+main+' '+(title?'<span class="note">'+esc(sumText(n[2]))+'</span>':esc(sumText(n[2])))+'</span></li>';
   }
   function matCard(m,full){
     var inner='<div class="th '+esc(m[0])+'"><span>'+esc(m[0])+'</span><b>'+esc(m[1])+'</b></div><div class="mt">'+(full?'<span class="pill">'+esc(m[2])+'</span> ':'')+esc(m[3]||'')+(m[4]?' <span class="pill new">열기</span>':'')+'</div>';
@@ -1352,9 +1377,16 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       document.getElementById('fakeAdd').onclick=function(){document.getElementById('admMsg').textContent='실제 운영 버전에서는 아이디·이름·소속을 입력하면 계정과 임시 비밀번호가 만들어집니다.';};
       document.getElementById('fakeReset').onclick=function(){document.getElementById('admMsg').textContent='실제 운영 버전에서는 선택한 FC에게 임시 비밀번호를 새로 발급합니다.';};
     }
-    if(id==='news')Array.prototype.forEach.call(document.querySelectorAll('[data-nco]'),function(b){b.onclick=function(){var k=b.getAttribute('data-nco');
-      Array.prototype.forEach.call(document.querySelectorAll('[data-nco]'),function(x){x.classList.toggle('on',x===b);});
-      Array.prototype.forEach.call(document.querySelectorAll('.ncard'),function(c){c.hidden=!!k&&c.getAttribute('data-co')!==k;});};});
+    if(id==='news'){
+      var nco='',nf=function(){var ym=document.getElementById('nYm').value,wk=document.getElementById('nWk').value,q=document.getElementById('nQ').value.trim(),n=0;
+        Array.prototype.forEach.call(document.querySelectorAll('.nlist li'),function(li){
+          var show=(!nco||li.getAttribute('data-co')===nco)&&(!ym||li.getAttribute('data-ym')===ym)&&(!wk||(wk==='m'?!li.getAttribute('data-wk'):li.getAttribute('data-wk')===wk))&&(!q||li.textContent.indexOf(q)>-1);
+          li.hidden=!show;if(show)n++;});
+        document.getElementById('nCnt').textContent=n+'건';document.getElementById('nNone').hidden=n>0;};
+      Array.prototype.forEach.call(document.querySelectorAll('[data-nco]'),function(b){b.onclick=function(){nco=b.getAttribute('data-nco');
+        Array.prototype.forEach.call(document.querySelectorAll('[data-nco]'),function(x){x.classList.toggle('on',x===b);});nf();};});
+      ['nYm','nWk'].forEach(function(k){document.getElementById(k).onchange=nf;});document.getElementById('nQ').oninput=nf;
+    }
     if(id==='ai'&&window.AIMOD)AIMOD.mount(document.getElementById('aiApp'),me,toast);
   }
 
