@@ -330,6 +330,27 @@ td.r,th.r{text-align:right}
 @media (max-width:1100px) and (min-width:861px){.pc-hero,.pc-tools{grid-template-columns:1fr}.cat4{grid-template-columns:1fr 1fr}.tgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .tb.back{font-weight:700;margin-right:6px}
 .tb.back[disabled]{opacity:.4;cursor:default}
+/* ===== 자료 올리기 · 파일 열기 ===== */
+a.flink,a.hlink{color:inherit;text-decoration:none}
+a.flink:hover b,a.flink:hover{text-decoration:underline}
+a.flink .pill,a.hlink .pill{font-size:.68rem;padding:0 6px;vertical-align:2px;text-decoration:none}
+a.mat{color:inherit;text-decoration:none;display:block}
+a.mat:hover{outline:2px solid var(--gold);outline-offset:1px}
+.nchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.nchips .tg{border:1px solid var(--line);background:var(--card,#fff);color:var(--ink);border-radius:16px;padding:5px 12px;font:inherit;font-size:.86rem;cursor:pointer}
+.nchips .tg.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.nchips .tg.on .note{color:inherit;opacity:.8}
+.nu-drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:22px 12px;border:2px dashed var(--line);border-radius:12px;cursor:pointer;text-align:center}
+.nu-drop.on,.nu-drop:hover{border-color:var(--gold);background:var(--gold-soft)}
+.nu-rows{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.nu-row{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.nu-h{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px}
+.nu-h a{font-weight:700;word-break:break-all}
+.nu-x{display:flex;flex-wrap:wrap;gap:8px}
+.nu-f{display:flex;flex-direction:column;gap:2px;font-size:.78rem;color:var(--muted)}
+.nu-f .in{font-size:.9rem;color:var(--ink)}
+.nu-f.wide .in{width:100%}
+.nu-set summary{cursor:pointer;font-weight:700;margin-top:6px}
 /* ===== AI보장분석 고급형 (advanced/ 를 iframe으로 연결) ===== */
 .ai-adv-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-6px 0 10px}
 .ai-adv{width:100%;height:calc(100vh - 190px);min-height:640px;border:1px solid var(--line);border-radius:4px;background:var(--surface);display:block}
@@ -807,7 +828,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
         '<button class="guide" type="button" data-guide="'+t[1]+'">'+ic('book','gdi')+'사용가이드 보기</button></div>';
     });
     h+='</div><aside class="cpt"><div class="k">이달의 컨셉 · '+esc(CONCEPT.month)+'</div><h3>"'+esc(CONCEPT.title)+'"</h3><p>'+esc(CONCEPT.desc)+'</p>'+
-      '<ol>'+CONCEPT.steps.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol><button class="btn gold" data-go="concept">컨셉 자세히 보기 ▸</button></aside></section>';
+      '<ol>'+CONCEPT.steps.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol>'+(CONCEPT.file?'<a class="btn ghost" style="text-decoration:none;margin-right:6px" target="_blank" rel="noopener" href="'+fileHref(CONCEPT.file)+'">자료 열기 ↗</a>':'')+'<button class="btn gold" data-go="concept">컨셉 자세히 보기 ▸</button></aside></section>';
     /* 4칸 분류 (보케어 고객등록·고객터치·고객상담·보상관리 구성 참고) */
     var cols=[['상품 비교','bars',BLOCKS[0][1]],['보장분석 · 교육','scan',BLOCKS[1][1].concat(BLOCKS[2][1])],['공지 · 시상','cup',BLOCKS[3][1]]];
     h+='<section class="cat4"><div class="cc me"><h3>'+ic('user','hi2')+'내 영업 현황</h3>'+
@@ -825,11 +846,11 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     h+='</section>';
     /* 소식지 · 공지 (보케어 보험뉴스·커뮤니티) */
     h+='<section class="two"><div class="panel"><h3>'+ic('news','hi3')+'보험사 소식지 <button class="more" data-go="news">더보기 +</button></h3><ul class="list">';
-    NEWS.slice(0,4).forEach(function(n){h+='<li><span class="dt">'+n[0]+'</span><span class="t"><b>'+n[1]+'</b> '+n[2]+'</span></li>';});
+    NEWS.slice(0,4).forEach(function(n){h+=newsLi(n);});
     h+='</ul></div><div class="panel"><h3>'+ic('cal','hi3')+'본사 공지</h3><ul class="list noticeList"></ul></div></section>';
     /* 교육 자료 · 교육센터 강의 (보케어 보험카드·보험강의) */
     h+='<section class="two"><div class="panel"><h3>'+ic('book','hi3')+'교육 자료 <span class="note">상담·교육용 PT</span></h3><div class="mats4">';
-    MATS.forEach(function(m){h+='<div class="mat"><div class="th '+m[0]+'"><span>'+m[0]+'</span><b>'+m[1]+'</b></div><div class="mt">'+m[3]+'</div></div>';});
+    MATS.forEach(function(m){h+=matCard(m,false);});
     h+='</div></div><div class="panel"><h3>'+ic('cap','hi3')+'교육센터 새 강의 <button class="more" data-go="edu">더보기 +</button></h3><div class="lects">';
     LECT.forEach(function(l){h+='<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+l[0]+'</span><b>'+l[1]+'</b><i>'+l[2]+'</i></div></a>';});
     h+='</div></div></section>';
@@ -844,7 +865,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     home:function(){
       var h='<div class="mo"><div class="greet"><div class="panel gbox"><div class="hi"><b>'+me.name+'</b>님 반갑습니다 <span class="code">'+me.org+' · 사번 '+me.no+'</span></div>'+srchBox(false)+'</div>'+
         '<div class="upd"><div><div class="k">이달의 상품 개정 일정</div><b>'+esc(BANNER.title)+'</b><span>'+esc(BANNER.sub)+'</span></div><button class="btn sm gold" data-go="news">일정 보기 ›</button></div></div>';
-      h+='<div class="hero"><div class="k">이달의 컨셉 · '+esc(CONCEPT.month)+'</div><h2>"'+esc(CONCEPT.title)+'"</h2><p>'+esc(CONCEPT.desc)+'</p></div>';
+      h+='<div class="hero"><div class="k">이달의 컨셉 · '+esc(CONCEPT.month)+'</div><h2>'+fileA(CONCEPT.file,'"'+esc(CONCEPT.title)+'"','hlink')+'</h2><p>'+esc(CONCEPT.desc)+'</p></div>';
       h+='<div class="blocks">';
       BLOCKS.forEach(function(b){
         h+='<div class="blk"><h3>'+b[0]+'</h3><ul>';
@@ -859,10 +880,10 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       h+='<div class="vids"><div class="vid"><span class="pill">01 영업이 처음이라면</span><h3>신입 FC를 위한 포털 사용법</h3><p class="note">로그인부터 상품 비교, 보장분석까지 기본 사용법</p><span class="play">▶ 영상 준비 중</span></div>'+
         '<div class="vid"><span class="pill new">02 더 잘 쓰고 싶다면</span><h3>상담 고수를 위한 활용법</h3><p class="note">원픽 비교표와 보장분석을 묶어 제안서까지 만드는 흐름</p><span class="play">▶ 영상 준비 중</span></div></div>';
       h+='<div class="sec"><h2>교육 자료 <span class="note">본사가 올린 상담·교육용 PT와 비교 자료</span></h2><div class="mats">';
-      MATS.forEach(function(m){h+='<div class="mat"><div class="th '+m[0]+'"><span>'+m[0]+'</span><b>'+m[1]+'</b></div><div class="mt"><span class="pill">'+m[2]+'</span> '+m[3]+'</div></div>';});
+      MATS.forEach(function(m){h+=matCard(m,true);});
       h+='</div></div>';
       h+='<div class="cols"><div class="panel"><h3>보험사 소식지 <button class="more" data-go="news">더보기 +</button></h3><ul class="list">';
-      NEWS.slice(0,3).forEach(function(n){h+='<li><span class="dt">'+n[0]+'</span><span class="t"><b>'+n[1]+'</b> '+n[2]+'</span></li>';});
+      NEWS.slice(0,3).forEach(function(n){h+=newsLi(n);});
       h+='</ul></div><div class="panel"><h3>본사 공지</h3><ul class="list noticeList"></ul></div></div></div>';
       return h+'<div class="pc">'+pcHome()+'</div>';
     },
@@ -888,15 +909,15 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     hypo:function(){
       var h=head('영업 도구','대표 상품 가설','고객 유형별로 "이 고객에게는 이 상품부터"라는 가설과 첫 화법을 정리합니다. 관리자가 매달 바꿀 수 있습니다.');
       h+='<div class="tbl"><table><thead><tr><th>고객 유형</th><th>대표 상품 가설</th><th>첫 화법</th></tr></thead><tbody>'+
-        HYPO.map(function(r){return '<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td></tr>';}).join('')+
+        HYPO.map(function(r){return '<tr><td>'+fileA(r[3],'<b>'+esc(r[0])+'</b>')+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td></tr>';}).join('')+
         '</tbody></table></div><p class="note">관리자가 콘텐츠 관리에서 바꾼 내용이 모든 FC에게 보입니다.</p>';
       return h;
     },
     concept:function(){
       var h=head('영업 도구','이달의 컨셉','한 달 동안 전 FC가 같은 메시지로 상담하도록 컨셉·대상·자료를 한곳에 모읍니다.');
-      h+='<div class="hero"><div class="k">'+esc(CONCEPT.month)+'</div><h2>"'+esc(CONCEPT.title)+'"</h2><p>대상: '+esc(CONCEPT.target)+' · 핵심 상품: '+esc(CONCEPT.product)+'</p></div>';
+      h+='<div class="hero"><div class="k">'+esc(CONCEPT.month)+'</div><h2>'+fileA(CONCEPT.file,'"'+esc(CONCEPT.title)+'"','hlink')+'</h2><p>'+esc(CONCEPT.desc||'')+'</p><p>대상: '+esc(CONCEPT.target)+' · 핵심 상품: '+esc(CONCEPT.product)+'</p></div>';
       h+='<div class="cols"><div class="panel"><h3>상담 순서</h3><ul class="list">'+CONCEPT.steps.map(function(x,k){return '<li><span class="pill">'+(k+1)+'</span><span class="t">'+esc(x)+'</span></li>';}).join('')+'</ul></div>'+
-        '<div class="panel"><h3>교육 자료</h3><ul class="list">'+CONCEPT.mats.map(function(m){return '<li><span class="pill new">'+esc(m[0])+'</span><span class="t">'+esc(m[1])+'</span></li>';}).join('')+'</ul></div></div>';
+        '<div class="panel"><h3>교육 자료</h3><ul class="list">'+CONCEPT.mats.map(function(m){return '<li><span class="pill new">'+esc(m[0])+'</span><span class="t">'+fileA(m[2],esc(m[1]))+'</span></li>';}).join('')+'</ul></div></div>';
       return h;
     },
     car:function(){return extPage('자동차 비교견적','다이렉트·설계사 채널 비교','차량 번호와 운전자 정보를 입력해 여러 보험사 견적을 한 번에 받는 서비스로 연결합니다.','車');},
@@ -914,15 +935,16 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       return h;
     },
     news:function(){
-      var h=head('공지','보험사 소식지','보험사별 상품 개정·인수 기준 변경 소식을 날짜순으로 모읍니다.');
-      h+='<div class="panel"><ul class="list">';
-      NEWS.forEach(function(n){h+='<li><span class="dt">'+n[0]+'</span><span class="t"><b>'+n[1]+'</b> '+n[2]+'</span></li>';});
-      return h+'</ul></div>';
+      var h=head('공지','보험사 소식지','보험사별 소식지를 최신순으로 모읍니다. 제목을 누르면 자료가 열립니다.');
+      var g={},order=[];NEWS.forEach(function(n){var k=n[1]||'기타';if(!g[k]){g[k]=[];order.push(k);}g[k].push(n);});
+      if(order.length>1)h+='<div class="nchips"><button type="button" class="tg on" data-nco="">전체</button>'+order.map(function(k){return '<button type="button" class="tg" data-nco="'+esc(k)+'">'+esc(k)+' <span class="note">'+g[k].length+'</span></button>';}).join('')+'</div>';
+      order.forEach(function(k){h+='<div class="panel ncard" data-co="'+esc(k)+'"><h3>'+esc(k)+' <span class="note">'+g[k].length+'건</span></h3><ul class="list">'+g[k].map(function(n){return newsLi(n,true);}).join('')+'</ul></div>';});
+      return h;
     },
     award:function(){
       var h=head('공지','시상 공지','진행 중인 시상과 결과 발표를 확인합니다.');
       h+='<div class="grid">';
-      AWARDS.forEach(function(a){h+='<div class="tile"><span class="no">'+a[1]+'</span><h3>'+a[0]+' <span class="pill '+(a[3]==='진행 중'?'new':'ok')+'">'+a[3]+'</span></h3><span class="d">'+a[2]+'</span></div>';});
+      AWARDS.forEach(function(a){h+='<div class="tile"><span class="no">'+esc(a[1])+'</span><h3>'+fileA(a[4],esc(a[0]))+' <span class="pill '+(a[3]==='진행 중'?'new':'ok')+'">'+esc(a[3])+'</span></h3><span class="d">'+esc(a[2])+'</span></div>';});
       return h+'</div>';
     },
     admin:function(){
@@ -933,7 +955,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
         '<tr><td>fc1002</td><td>이서연</td><td>분당지사</td><td><span class="pill ok">사용</span></td><td>2026.10.15 18:40</td></tr>'+
         '<tr><td>fc1003</td><td>박지훈</td><td>일산지사</td><td><span class="pill warn">정지</span></td><td>2026.09.28 11:05</td></tr>'+
         '</tbody></table></div><div class="row" style="margin-top:10px"><button class="btn sm" id="fakeAdd">FC 계정 추가</button><button class="btn sm ghost" id="fakeReset">비밀번호 초기화</button></div><p class="note" id="admMsg"></p></div>'+
-        '</div>'+cmsHtml();
+        '</div>'+nuHtml()+cmsHtml();
       return h;
     }
   };
@@ -1012,15 +1034,15 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     return '<div class="panel form cms" id="cms"><h3>콘텐츠 관리 <span class="pill new">모든 FC에게 반영</span></h3>'+
       '<p class="note">한 줄에 한 건씩, 칸은 <b>|</b> 로 나눕니다. '+(SITE&&SITE.updated?'마지막 반영: '+esc(SITE.updated):'아직 사이트에 반영한 내용이 없어 기본 예시가 보입니다.')+'</p>'+
       '<div class="cols">'+
-      ta('cNotice','본사 공지','날짜 | 내용',lines(NOTICES))+
-      ta('cNews','보험사 소식지','날짜 | 보험사 | 내용',lines(NEWS))+
-      ta('cAward','시상 공지','제목 | 기간 | 내용 | 상태(진행 중/발표)',lines(AWARDS))+
-      ta('cHypo','대표 상품 가설','고객 유형 | 대표 상품 | 첫 화법',lines(HYPO))+
-      ta('cMats','교육 자료','종류(PPT/PDF) | 제목 | 분류 | 설명',lines(MATS))+
+      ta('cNotice','본사 공지','날짜 | 내용 | 파일',lines(NOTICES))+
+      ta('cNews','보험사 소식지','날짜 | 보험사 | 요약 | 파일 | 제목',lines(NEWS))+
+      ta('cAward','시상 공지','제목 | 기간 | 내용 | 상태(진행 중/발표) | 파일',lines(AWARDS))+
+      ta('cHypo','대표 상품 가설','고객 유형 | 대표 상품 | 첫 화법 | 파일',lines(HYPO))+
+      ta('cMats','교육 자료','종류(PPT/PDF) | 제목 | 분류 | 설명 | 파일',lines(MATS))+
       ta('cLect','교육센터 강의','분류 | 제목 | 길이(00:07:14)',lines(LECT),3)+
       '</div><div class="panel"><h3>이달의 컨셉</h3><div class="fgrid">'+
       inp('kMonth','달',CONCEPT.month,'2026.11')+inp('kTitle','제목',CONCEPT.title)+inp('kTarget','대상',CONCEPT.target)+inp('kProduct','핵심 상품',CONCEPT.product)+
-      '</div>'+inp('kDesc','한 줄 설명',CONCEPT.desc)+'<div class="cols">'+ta('kSteps','상담 순서','한 줄에 하나',CONCEPT.steps.join('\n'),3)+ta('kMats','컨셉 교육 자료','종류 | 제목',lines(CONCEPT.mats),3)+'</div></div>'+
+      '</div>'+inp('kDesc','한 줄 설명',CONCEPT.desc)+'<div class="cols">'+ta('kSteps','상담 순서','한 줄에 하나',CONCEPT.steps.join('\n'),3)+ta('kMats','컨셉 교육 자료','종류 | 제목 | 파일',lines(CONCEPT.mats),3)+'</div></div>'+
       '<div class="panel"><h3>상품 개정 일정 배너</h3><div class="fgrid">'+inp('bTitle','제목',BANNER.title)+inp('bSub','설명',BANNER.sub)+'</div></div>'+
       '<div class="panel"><h3>회사 AI <span class="note">주소를 넣으면 모든 FC가 키 없이 바로 AI로 읽습니다. 만드는 법: ai-relay 안내서</span></h3>'+
       inp('mProxy','회사 AI 서버 주소',SITE&&SITE.aiProxy,'https://fc-ai.○○○.workers.dev')+'<p class="note">비워 두면 FC는 복사·붙여넣기 방식으로 씁니다. 회사 API 키는 이 주소의 서버에만 넣고, 여기에는 넣지 마세요.</p></div>'+
@@ -1039,8 +1061,8 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function cmsCollect(){
     var v=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
     var c={ver:Date.now(),updated:new Date().toLocaleString('ko-KR'),
-      notices:rows(v('cNotice'),2),news:rows(v('cNews'),3),awards:rows(v('cAward'),4),hypo:rows(v('cHypo'),3),mats:rows(v('cMats'),4),lect:rows(v('cLect'),3),
-      concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),2)},
+      notices:rows(v('cNotice'),3),news:rows(v('cNews'),5),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),3),
+      concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
       aiProxy:v('mProxy'),aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
     var ck=document.getElementById('cOpts');
@@ -1061,10 +1083,242 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       else{out.hidden=false;out.value=txt;out.select();msg.textContent='아래 상자의 내용을 Ctrl+C로 복사하세요.';}
     };
   }
+  /* ---------- 자료 올리기 (관리자): 보험사 소식지 · 본사 공지 · 시상 공지 · 이달의 컨셉 · 대표 상품 가설 · 교육 자료 ----------
+     파일을 넣으면 PDF는 pdf.js로 글자를 읽어 어느 메뉴 자료인지, 회사·연월·주차·기간을 판단하고 제목·요약을 만든다.
+     「모든 FC에게 올리기」를 누르면 GitHub API로 파일과 content.json을 한 번에 커밋한다(main 브랜치 → 1~2분 뒤 사이트 반영).
+     토큰은 관리자 브라우저(localStorage)에만 저장. 소식지·공지는 보관 기간이 지나면 올릴 때 파일과 목록에서 함께 지운다. */
+  var NU={items:[], busy:false};
+  var KINDS=[['news','보험사 소식지'],['notice','본사 공지'],['award','시상 공지'],['concept','이달의 컨셉'],['hypo','대표 상품 가설'],['mats','교육 자료']];
+  function kindName(k){for(var i=0;i<KINDS.length;i++)if(KINDS[i][0]===k)return KINDS[i][1];return k;}
+  var INSURERS=['미래에셋생명','삼성생명','한화생명','교보생명','신한라이프','NH농협생명','농협생명','동양생명','흥국생명','KDB생명','DB생명','ABL생명','메트라이프생명','메트라이프','라이나생명','AIA생명','처브라이프','푸본현대생명','하나생명','KB라이프','iM라이프','IBK연금보험','BNP파리바카디프생명','카디프생명','푸르덴셜생명','교보라이프플래닛',
+    '삼성화재','현대해상','DB손해보험','DB손보','KB손해보험','KB손보','메리츠화재','한화손해보험','한화손보','롯데손해보험','롯데손보','흥국화재','MG손해보험','예별손해보험','NH농협손해보험','농협손해보험','하나손해보험','AXA손해보험','악사손해보험','캐롯손해보험','신한EZ손해보험'];
+  var ALIAS={'DB손보':'DB손해보험','KB손보':'KB손해보험','한화손보':'한화손해보험','롯데손보':'롯데손해보험','농협생명':'NH농협생명','농협손해보험':'NH농협손해보험','메트라이프':'메트라이프생명','악사손해보험':'AXA손해보험','카디프생명':'BNP파리바카디프생명'};
+  var BOILER=/판매인|고객제시|고객 제시|배포|약관|상품설명서|사내한|본 자료|교육용|증빙자료|광고|선전물|심의|준법/;
+  var EXTS=/\.(pdf|pptx?|xlsx?|docx?|hwpx?|png|jpe?g)$/i;
+  function ghTok(v){if(v===undefined)return store('kif_gh_token')||'';store('kif_gh_token',v);}
+  function nuMonths(){return Math.max(1,parseInt(store('kif_news_keep')||'3',10)||3);}
+  function pad2(x){x=String(x);return x.length<2?'0'+x:x;}
+  function today(){var d=new Date();return d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());}
+  function cut(x){return x.length>42?x.slice(0,41)+'…':x;}
+  /* 화면에서 파일 열기: 저장소 안 경로(news/… files/…)·미리보기(blob:)·외부 주소 모두 새 창으로 */
+  function fileHref(f){return !f?'':/^(blob:|https?:)/.test(f)?f:encodeURI(f);}
+  function fileA(f,inner,cls){var h=fileHref(f);return h?'<a class="'+(cls||'flink')+'" target="_blank" rel="noopener" href="'+h+'">'+inner+' <span class="pill new">열기</span></a>':inner;}
+
+  function pdfLib(){if(window.pdfjsLib&&!pdfjsLib.GlobalWorkerOptions.workerSrc)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';return window.pdfjsLib;}
+  async function readPdf(buf){
+    var lib=pdfLib();if(!lib)throw new Error('PDF 읽기 도구를 불러오지 못했습니다(인터넷 연결 확인)');
+    var doc=await lib.getDocument({data:buf.slice(0)}).promise, pages=[], big=[], n=Math.min(doc.numPages,6);
+    for(var i=1;i<=n;i++){var p=await doc.getPage(i),c=await p.getTextContent();
+      pages.push(c.items.map(function(x){return x.str;}).join(' ').replace(/\s+/g,' '));
+      if(i===1)c.items.forEach(function(x){var h=Math.abs(x.transform[3]||x.height||0),s=(x.str||'').trim();if(s.length>1)big.push({h:h,s:s});});}
+    return {pages:pages, big:big, numPages:doc.numPages};
+  }
+  function guessKind(name,p1){
+    var R=[['news',/소식지|매거진|MAGAZINE|뉴스레터|NEWS/i],['award',/시상|시책|프로모션|캠페인|포상/],['concept',/컨셉|콘셉트/],['hypo',/가설|화법|스크립트/],['notice',/공지|안내|일정|알림/],['mats',/교육|PT|발표|비교|자료/i]];
+    for(var s=0;s<2;s++){var t=s?p1.slice(0,400):name;for(var i=0;i<R.length;i++)if(R[i][1].test(t))return R[i][0];}
+    return '';
+  }
+  function detect(file,buf,r){
+    var name=file.name.replace(EXTS,''), base=name.replace(/[_]+/g,' ').replace(/\s+/g,' ').trim(), ext=(file.name.match(EXTS)||['',''])[1].toLowerCase();
+    var pages=r?r.pages:[], p1=pages[0]||'', all=name+' '+pages.join(' ');
+    var co='';INSURERS.forEach(function(k){if(!co&&name.indexOf(k)>-1)co=k;});
+    if(!co){var best=0;INSURERS.forEach(function(k){var m=all.split(k).length-1;if(m>best){best=m;co=k;}});}
+    co=ALIAS[co]||co||'';
+    var y='',mo='',m,src=[name,p1,all];
+    for(var s=0;s<src.length&&!y;s++){
+      m=src[s].match(/(20\d{2})\s*[.\-\/년]\s*(\d{1,2})\s*(?:월|[.\s~]|$)/)||src[s].match(/(?:^|[^\d])(\d{2})\s*[.년]\s*(\d{1,2})\s*월/);
+      if(m){y=m[1].length===2?'20'+m[1]:m[1];mo=pad2(+m[2]);if(+mo<1||+mo>12){y='';mo='';}}
+    }
+    /* 파일 이름에 연도 없이 '11월'만 있으면 그 달을 우선 (올해, 이미 많이 지난 달이면 내년) */
+    var nm=name.match(/(?:^|[^\d.])(\d{1,2})\s*월/);
+    if(nm&&+nm[1]>=1&&+nm[1]<=12&&!/(20\d{2}|\d{2})\s*[.년]\s*\d{1,2}\s*월/.test(name)){var nd=new Date(),ny=nd.getFullYear();if(+nm[1]<nd.getMonth()+1-6)ny++;y=String(ny);mo=pad2(+nm[1]);}
+    if(!y){var d=new Date();y=String(d.getFullYear());mo=pad2(d.getMonth()+1);}
+    /* 주차: '2주차' · '10월 2주' · '제2주'처럼 자료에 적힌 표현만 인정 */
+    var wk='';[name,p1].some(function(t){var w=t.match(/([1-5])\s*주\s*차/)||t.match(/\d{1,2}\s*월\s*([1-5])\s*주(?!년)/)||t.match(/제\s*([1-5])\s*주/)||t.match(/([1-5])(?:st|nd|rd|th)\s*week/i);if(w){wk=w[1];return true;}return false;});
+    /* 시상 기간: 2026.10.01 ~ 10.31 / 2026.10.01~2026.11.15 */
+    var noApp=all.replace(/[가-힣A-Za-z]*\s*-\s*\d{2}\s*-\s*\d{2}\s*-\s*\d+\s*\([^)]*\)/g,' '); /* 심의필 번호(유효기간)는 제외 */
+    var period='',status='진행 중',pm=noApp.match(/(20\d{2})\s*[.\-\/]\s*(\d{1,2})\s*[.\-\/]\s*(\d{1,2})\.?\s*(?:\([^)]*\))?\s*[~∼\-–]\s*(?:(20\d{2})\s*[.\-\/]\s*)?(\d{1,2})\s*[.\-\/]\s*(\d{1,2})/);
+    if(pm){period=pm[1]+'.'+pad2(pm[2])+'.'+pad2(pm[3])+' ~ '+(pm[4]?pm[4]+'.':'')+pad2(pm[5])+'.'+pad2(pm[6]);
+      var end=(pm[4]||pm[1])+'.'+pad2(pm[5])+'.'+pad2(pm[6]);if(end<today())status='발표';}
+    /* 요약: 첫 장 글머리(▪■●◆▶) → 없으면 큰 글씨 */
+    var pts=p1.split(/[▪■●◆▶►]/).slice(1).map(function(x){return x.split(/ㆍ|\*|·\s/)[0].replace(/\s+/g,' ').trim();})
+      .map(function(x){var j=co?x.indexOf(co,4):-1;return j>0?x.slice(0,j).trim():x;}) /* 글머리 뒤 본문(회사 이름부터)은 자름 */
+      .filter(function(x){return x.length>=4&&!BOILER.test(x);}).map(cut);
+    var bulls=pts.slice();
+    var big=r?r.big:[], hs=big.map(function(b){return b.h;}).sort(function(a,b){return b-a;}), seen={};
+    var heads=big.filter(function(b){return b.h>=(hs[Math.floor(hs.length*0.08)]||0)&&b.s.length>=4&&/[가-힣]/.test(b.s)&&!BOILER.test(b.s)&&(!co||b.s!==co)&&!/^[\d\s.\-~]+$/.test(b.s);})
+      .sort(function(a,b){return b.h-a.h;}).map(function(b){return cut(b.s);}).filter(function(s){if(seen[s])return false;seen[s]=1;return true;});
+    if(pts.length<2)pts=pts.concat(heads.slice(pts.length?0:1));
+    var heading=heads[0]&&heads[0].length<=36?heads[0]:'';
+    var kind=guessKind(name,p1)||store('kif_up_kind')||'news';
+    var it={file:file, ext:ext, kind:kind, co:co||'기타', y:y, mo:mo, wk:wk, period:period, status:status, product:'', cat:'자료', date:today(),
+      heading:heading, base:base, bullets:bulls, summary:pts.slice(0,4).join(' · '),
+      size:file.size, pages:r?r.numPages:0, buf:buf, url:URL.createObjectURL(file)};
+    if(!it.summary)it.summary=ext==='pdf'?'본문 글자를 읽지 못했습니다(스캔본일 수 있음). 요약을 직접 적어 주세요.':'';
+    nuRetitle(it);return it;
+  }
+  /* 제목: 소식지는 '회사 연월 주차 소식지', 나머지는 파일 이름(관리자가 붙인 이름이 가장 정확) — 이름이 숫자·영문뿐이면 첫 장의 큰 글씨 */
+  function nuRetitle(it){
+    var nameOk=/[가-힣]{2,}/.test(it.base)&&!/^(scan|img|doc|스캔)/i.test(it.base);
+    it.title=it.kind==='news'?it.co+' '+it.y+'.'+it.mo+' '+(it.wk?it.wk+'주차':'월간')+' 소식지':(nameOk?it.base:(it.heading||it.base));
+  }
+  function nuHtml(){
+    var T=ghTok(), dk=store('kif_up_kind')||'news';
+    return '<div class="panel form" id="nuPanel"><h3>자료 올리기 <span class="pill new">제목 자동 · 눌러서 열기</span></h3>'+
+      '<p class="note">파일을 넣으면 <b>어느 메뉴 자료인지</b>(소식지 · 공지 · 시상 · 컨셉 · 가설 · 교육 자료)와 <b>회사 · 연월 · 주차 · 기간</b>을 읽어 제목과 요약을 만듭니다. 확인한 뒤 <b>모든 FC에게 올리기</b>를 누르면 끝입니다. FC 화면에서 제목을 누르면 파일이 열립니다.</p>'+
+      '<label class="nu-drop" id="nuDrop"><input type="file" id="nuFile" accept=".pdf,.ppt,.pptx,.xls,.xlsx,.doc,.docx,.hwp,.hwpx,.png,.jpg,.jpeg" multiple hidden><b>파일을 여기로 끌어 놓거나 눌러서 고르세요</b><span class="note">PDF는 내용까지 읽고, PPT·엑셀·한글·사진은 파일 이름으로 제목을 만듭니다 · 여러 개 한 번에 · 파일당 50MB 이하</span></label>'+
+      '<div class="row" style="margin-top:8px;gap:8px;flex-wrap:wrap"><label class="note" style="display:flex;align-items:center;gap:6px">판단이 안 될 때 넣을 메뉴 <select class="in" id="nuDef" style="width:auto">'+KINDS.map(function(k){return '<option value="'+k[0]+'"'+(k[0]===dk?' selected':'')+'>'+k[1]+'</option>';}).join('')+'</select></label></div>'+
+      '<div id="nuList"></div>'+
+      '<div class="row" style="margin-top:10px;flex-wrap:wrap;gap:8px"><button class="btn" type="button" id="nuPub" disabled>모든 FC에게 올리기</button><button class="btn ghost" type="button" id="nuPrev" disabled>이 기기에서 미리보기</button>'+
+      '<label class="note" style="display:flex;align-items:center;gap:6px">소식지·공지 보관 <input class="in" id="nuKeep" type="number" min="1" max="24" value="'+nuMonths()+'" style="width:64px"> 개월 (지난 자료는 올릴 때 지움)</label></div>'+
+      '<p class="note" id="nuMsg" role="status"></p>'+
+      '<details class="nu-set"'+(T?'':' open')+'><summary>GitHub 연결 설정 '+(T?'<span class="pill ok">연결됨</span>':'<span class="pill warn">처음 한 번 필요</span>')+'</summary>'+
+      '<ol class="note" style="padding-left:1.2em;line-height:1.9;margin:8px 0">'+
+      '<li><a target="_blank" rel="noopener" href="https://github.com/settings/personal-access-tokens/new">GitHub 토큰 만들기 화면 ↗</a>을 엽니다 (bluewind1124-ui 계정으로 로그인).</li>'+
+      '<li>Token name은 아무거나(예: 자료올리기), Expiration은 원하는 기간, <b>Repository access → Only select repositories → mirae-bohum</b>을 고릅니다.</li>'+
+      '<li><b>Permissions → Repository permissions → Contents</b>를 <b>Read and write</b>로 바꾼 뒤 <b>Generate token</b>을 누릅니다.</li>'+
+      '<li>나온 토큰(github_pat_…)을 복사해 아래에 붙여넣고 저장합니다. 이 컴퓨터의 이 브라우저에만 저장됩니다.</li></ol>'+
+      '<div class="row" style="gap:8px"><input class="in" id="nuTok" type="password" autocomplete="off" placeholder="github_pat_..." value="'+esc(T)+'" style="flex:1;min-width:200px"><button class="btn sm" type="button" id="nuTokSave">저장</button><button class="btn sm ghost" type="button" id="nuTokDel">지우기</button></div></details></div>';
+  }
+  function nuField(i,k,v,w,lab){return '<label class="nu-f">'+lab+'<input class="in" data-nu="'+i+'" data-k="'+k+'" value="'+esc(v||'')+'" style="width:'+w+'"></label>';}
+  function nuSel(i,k,v,opts,lab){return '<label class="nu-f">'+lab+'<select class="in" data-nu="'+i+'" data-k="'+k+'">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===v?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></label>';}
+  function nuExtra(it,i){
+    if(it.kind==='news')return nuField(i,'co',it.co,'110px','회사')+nuField(i,'ym',it.y+'.'+it.mo,'76px','연월')+nuSel(i,'wk',it.wk,[['','월간'],['1','1주차'],['2','2주차'],['3','3주차'],['4','4주차'],['5','5주차']],'주차');
+    if(it.kind==='notice')return nuField(i,'date',it.date,'100px','날짜');
+    if(it.kind==='award')return nuField(i,'period',it.period,'190px','기간')+nuSel(i,'status',it.status,[['진행 중','진행 중'],['발표','발표']],'상태');
+    if(it.kind==='concept')return nuField(i,'ym',it.y+'.'+it.mo,'76px','연월');
+    if(it.kind==='hypo')return nuField(i,'product',it.product,'200px','대표 상품');
+    return nuField(i,'cat',it.cat,'90px','분류');
+  }
+  function nuRender(){
+    var L=document.getElementById('nuList');if(!L)return;
+    L.innerHTML=NU.items.length?'<div class="nu-rows">'+NU.items.map(function(it,i){
+      return '<div class="nu-row"><div class="nu-h"><a href="'+it.url+'" target="_blank" rel="noopener">'+esc(it.file.name)+'</a><span class="note">'+(it.pages?it.pages+'쪽 · ':'')+(it.size/1048576).toFixed(1)+'MB</span>'+
+        nuSel(i,'kind',it.kind,KINDS,'메뉴')+'<button class="btn sm ghost" type="button" data-nudel="'+i+'">빼기</button></div>'+
+        '<div class="nu-x">'+nuExtra(it,i)+'</div>'+
+        '<label class="nu-f wide">'+(it.kind==='hypo'?'고객 유형 (제목)':'제목')+'<input class="in" data-nu="'+i+'" data-k="title" value="'+esc(it.title)+'" style="font-weight:700"></label>'+
+        '<label class="nu-f wide">'+(it.kind==='hypo'?'첫 화법 · 요약':'요약')+'<textarea class="in" data-nu="'+i+'" data-k="summary" rows="2">'+esc(it.summary)+'</textarea></label></div>';}).join('')+'</div>':'';
+    var on=NU.items.length>0&&!NU.busy;document.getElementById('nuPub').disabled=!on;document.getElementById('nuPrev').disabled=!on;
+  }
+  async function nuAdd(files){
+    var msg=document.getElementById('nuMsg');
+    for(var i=0;i<files.length;i++){var f=files[i];
+      if(!EXTS.test(f.name)){msg.textContent=f.name+': 올릴 수 없는 형식이라 건너뜁니다 (PDF·PPT·엑셀·워드·한글·사진).';continue;}
+      if(f.size>50*1048576){msg.textContent=f.name+': 50MB를 넘어 올릴 수 없습니다.';continue;}
+      msg.textContent=(i+1)+'/'+files.length+' '+f.name+' 읽는 중…';
+      try{var buf=await f.arrayBuffer(),r=null;
+        if(/\.pdf$/i.test(f.name)){try{r=await readPdf(buf);}catch(e){msg.textContent=f.name+': 글자를 읽지 못해 파일 이름으로 제목을 만듭니다.';}}
+        NU.items.push(detect(f,buf,r));}catch(e){msg.textContent=f.name+' 읽기 실패: '+(e.message||e);}
+      nuRender();
+    }
+    if(NU.items.length)msg.textContent=NU.items.length+'개 준비됨. 메뉴·제목·요약을 확인하고 「모든 FC에게 올리기」를 누르세요.';
+  }
+  function nuPath(it){
+    var r=Math.random().toString(36).slice(2,7), nm=(it.kind==='news'?it.co+'_'+it.y+it.mo+'_'+(it.wk?it.wk+'주차':'월간'):it.base).replace(/[\\\/:*?"<>|#%&{}\s]+/g,'_').slice(0,40);
+    return (it.kind==='news'?'news/':'files/'+it.kind+'/')+it.y+'-'+it.mo+'/'+nm+'_'+r+'.'+it.ext;
+  }
+  /* content.json에 넣기: 각 줄 끝에 파일 경로가 붙는다 (예전 글만 있는 줄도 그대로 보임) */
+  function nuMerge(c,list){
+    var arr=function(k,def){return Array.isArray(c[k])?c[k].slice():def.slice();};
+    var news=arr('news',NEWS),notices=arr('notices',NOTICES),awards=arr('awards',AWARDS),hypo=arr('hypo',HYPO),mats=arr('mats',MATS);
+    var cp=Object.assign({},CONCEPT,c.concept||{});cp.mats=(cp.mats||[]).slice();
+    list.slice().reverse().forEach(function(x){var it=x.it,p=x.path;
+      if(it.kind==='news')news.unshift([it.date,it.co,it.summary,p,it.title]);
+      else if(it.kind==='notice')notices.unshift([it.date,it.title,p]);
+      else if(it.kind==='award')awards.unshift([it.title,it.period,it.summary,it.status,p]);
+      else if(it.kind==='hypo')hypo.unshift([it.title,it.product,it.summary,p]);
+      else if(it.kind==='mats')mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,it.cat,it.summary,p]);
+      else if(it.kind==='concept'){cp.month=it.y+'.'+it.mo;cp.title=it.title;if(it.summary)cp.desc=it.summary;cp.file=p;
+        if(it.bullets.length>=2)cp.steps=it.bullets.slice(0,5);cp.mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,p]);}
+    });
+    c.news=news;c.notices=notices;c.awards=awards;c.hypo=hypo;c.mats=mats;c.concept=cp;
+    return c;
+  }
+  function b64(buf){var b=new Uint8Array(buf),s='',CH=0x8000;for(var i=0;i<b.length;i+=CH)s+=String.fromCharCode.apply(null,b.subarray(i,i+CH));return btoa(s);}
+  function keepCut(){var d=new Date();d.setMonth(d.getMonth()-nuMonths());return d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());}
+  async function gh(method,path,body){
+    var r=await fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+path,{method:method,headers:{'Authorization':'Bearer '+ghTok(),'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},body:body?JSON.stringify(body):undefined});
+    if(!r.ok){var t='';try{t=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(t?' · '+t:'')+(r.status===401?' (토큰을 확인하세요)':r.status===403||r.status===404?' (토큰 권한: mirae-bohum · Contents Read and write)':''));}
+    return r.json();
+  }
+  async function nuPublish(){
+    var msg=document.getElementById('nuMsg');if(!ghTok()){msg.textContent='먼저 아래 「GitHub 연결 설정」에서 토큰을 저장하세요.';document.querySelector('.nu-set').open=true;return;}
+    NU.busy=true;nuRender();
+    try{
+      msg.textContent='GitHub 최신 상태 확인 중…';
+      var ref=await gh('GET','/git/ref/heads/'+GH.branch), base=await gh('GET','/git/commits/'+ref.object.sha);
+      var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'), have={};
+      (all.tree||[]).forEach(function(t){have[t.path]=t.sha;});
+      var cur;
+      if(have['content.json']){var bj=await gh('GET','/git/blobs/'+have['content.json']);
+        cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(ch){return ch.charCodeAt(0);})));}
+      else cur=SITE?JSON.parse(JSON.stringify(SITE)):{};
+      var tree=[], list=[];
+      for(var i=0;i<NU.items.length;i++){var it=NU.items[i];msg.textContent=(i+1)+'/'+NU.items.length+' '+it.file.name+' 올리는 중…';
+        var bl=await gh('POST','/git/blobs',{content:b64(it.buf),encoding:'base64'}),p=nuPath(it);tree.push({path:p,mode:'100644',type:'blob',sha:bl.sha});list.push({it:it,path:p});}
+      nuMerge(cur,list);
+      /* 보관 기간이 지난 소식지·공지 정리 (올린 파일이 있는 줄만) */
+      var cutD=keepCut(), del=0;
+      ['news','notices'].forEach(function(k){var fi=k==='news'?3:2;
+        cur[k]=cur[k].filter(function(n){var f=n&&n[fi];if(f&&/^(news|files)\//.test(f)&&String(n[0])<cutD){if(have[f])tree.push({path:f,mode:'100644',type:'blob',sha:null});del++;return false;}return true;});});
+      cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
+      var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
+      tree.push({path:'content.json',mode:'100644',type:'blob',sha:jb.sha});
+      msg.textContent='저장 중…';
+      var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:tree});
+      var names={};list.forEach(function(x){names[kindName(x.it.kind)]=(names[kindName(x.it.kind)]||0)+1;});
+      var what=Object.keys(names).map(function(k){return k+' '+names[k]+'건';}).join(', ');
+      var cm=await gh('POST','/git/commits',{message:'자료 올리기: '+what+(del?' · 지난 자료 '+del+'건 정리':''),tree:nt.sha,parents:[ref.object.sha]});
+      await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});
+      NU.items.forEach(function(x){URL.revokeObjectURL(x.url);});NU.items=[];
+      applyContent(cur,false);nuRefreshCms();
+      msg.textContent='올렸습니다: '+what+(del?' (보관 기간이 지난 '+del+'건 정리)':'')+'. 1~2분 뒤 모든 FC 화면에 보입니다.';
+      toast('자료를 올렸습니다');
+    }catch(e){msg.textContent='올리기 실패: '+(e.message||e)+' — 사이트는 바뀌지 않았습니다. 다시 시도하세요.';}
+    NU.busy=false;nuRender();
+  }
+  /* 올린 뒤 아래 콘텐츠 관리 칸도 새 내용으로 다시 그려, 그 칸으로 반영할 때 올린 자료가 지워지지 않게 한다 */
+  function nuRefreshCms(){var o=document.getElementById('cms');if(!o)return;var d=document.createElement('div');d.innerHTML=cmsHtml();o.parentNode.replaceChild(d.firstChild,o);bindCms();}
+  function bindNu(){
+    var fi=document.getElementById('nuFile'),dr=document.getElementById('nuDrop');if(!fi)return;
+    nuRender();
+    fi.onchange=function(){nuAdd(Array.prototype.slice.call(fi.files));fi.value='';};
+    dr.addEventListener('dragover',function(e){e.preventDefault();dr.classList.add('on');});
+    dr.addEventListener('dragleave',function(){dr.classList.remove('on');});
+    dr.addEventListener('drop',function(e){e.preventDefault();dr.classList.remove('on');nuAdd(Array.prototype.slice.call(e.dataTransfer.files));});
+    document.getElementById('nuDef').onchange=function(){store('kif_up_kind',this.value);};
+    var L=document.getElementById('nuList');
+    var setTitle=function(i,it){var e=L.querySelector('[data-nu="'+i+'"][data-k="title"]');if(e)e.value=it.title;};
+    var onEdit=function(e){var t=e.target,i=t.getAttribute('data-nu');if(i==null)return;var it=NU.items[+i],k=t.getAttribute('data-k'),v=t.value;
+      if(k==='kind'){it.kind=v;nuRetitle(it);nuRender();return;}
+      if(k==='ym'){var m=v.match(/(20\d{2})\D*(\d{1,2})/);if(m){it.y=m[1];it.mo=pad2(+m[2]);if(it.kind==='news'){nuRetitle(it);setTitle(i,it);}}return;}
+      if(k==='co'||k==='wk'){it[k]=k==='co'?(v.trim()||'기타'):v;nuRetitle(it);setTitle(i,it);return;}
+      it[k]=v;};
+    L.addEventListener('input',onEdit);
+    L.addEventListener('change',function(e){if(e.target.tagName==='SELECT')onEdit(e);});
+    L.addEventListener('click',function(e){var d=e.target.getAttribute&&e.target.getAttribute('data-nudel');if(d==null)return;URL.revokeObjectURL(NU.items[+d].url);NU.items.splice(+d,1);nuRender();});
+    document.getElementById('nuPub').onclick=nuPublish;
+    document.getElementById('nuPrev').onclick=function(){
+      var c=nuMerge(SITE?JSON.parse(JSON.stringify(SITE)):{},NU.items.map(function(it){return {it:it,path:it.url};}));
+      applyContent(c,false);document.getElementById('nuMsg').textContent='이 기기에서만 보이게 바꿨습니다. 각 메뉴에서 확인한 뒤 「모든 FC에게 올리기」를 누르세요. (새로 고침하면 원래대로)';};
+    document.getElementById('nuKeep').oninput=function(){store('kif_news_keep',String(Math.max(1,parseInt(this.value,10)||3)));};
+    document.getElementById('nuTokSave').onclick=function(){var v=document.getElementById('nuTok').value.trim();ghTok(v);document.getElementById('nuMsg').textContent=v?'토큰을 이 브라우저에 저장했습니다.':'토큰 칸이 비어 있습니다.';};
+    document.getElementById('nuTokDel').onclick=function(){ghTok('');document.getElementById('nuTok').value='';document.getElementById('nuMsg').textContent='토큰을 지웠습니다.';};
+  }
+  /* FC 화면: 소식지 한 줄 [날짜, 회사, 요약, 파일, 제목] — 파일이 있으면 제목을 눌러 연다 */
+  function newsLi(n,grouped){
+    var title=n[4]||'';
+    var main=title?fileA(n[3],'<b>'+esc(title)+'</b>'):(grouped?'':'<b>'+esc(n[1]||'')+'</b>');
+    return '<li><span class="dt">'+esc(n[0]||'')+'</span><span class="t">'+main+' '+(title?'<span class="note">'+esc(n[2]||'')+'</span>':esc(n[2]||''))+'</span></li>';
+  }
+  function matCard(m,full){
+    var inner='<div class="th '+esc(m[0])+'"><span>'+esc(m[0])+'</span><b>'+esc(m[1])+'</b></div><div class="mt">'+(full?'<span class="pill">'+esc(m[2])+'</span> ':'')+esc(m[3]||'')+(m[4]?' <span class="pill new">열기</span>':'')+'</div>';
+    return m[4]?'<a class="mat" target="_blank" rel="noopener" href="'+fileHref(m[4])+'">'+inner+'</a>':'<div class="mat">'+inner+'</div>';
+  }
   function notices(){var s=store('fc_notices');try{return s?JSON.parse(s):null;}catch(e){return null;}}
   function renderNotices(){
     var l=(SITE&&Array.isArray(SITE.notices))?NOTICES:(notices()||NOTICES);
-    var html=l.map(function(n){return '<li><span class="dt">'+n[0]+'</span><span class="t">'+esc(n[1])+'</span></li>';}).join('');
+    var html=l.map(function(n){return '<li><span class="dt">'+esc(n[0])+'</span><span class="t">'+fileA(n[2],esc(n[1]))+'</span></li>';}).join('');
     Array.prototype.forEach.call(document.querySelectorAll('.noticeList'),function(el){el.innerHTML=html;});
   }
   var tt;
@@ -1075,7 +1329,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       var IDX=[];
       BLOCKS.forEach(function(b){b[1].forEach(function(it){IDX.push([it[0],b[0],it[1]]);});});
       MATS.forEach(function(m){IDX.push([m[1]+' · '+m[3],'교육 자료','home']);});
-      NEWS.forEach(function(n){IDX.push([n[1]+' '+n[2],'보험사 소식지','news']);});
+      NEWS.forEach(function(n){IDX.push([(n[4]||n[1])+' '+n[2],'보험사 소식지','news']);});
       var KW={'암':['원픽','3대질병','암','항암','컨셉'],'간편건강':['간편'],'단기납 종신':['단기납'],'3대질병':['3대질병','뇌','진단'],'실손':['실손','담보별'],'경영인 정기':['경영인']};
       function run(q,box){
         q=q.trim();var el=box.querySelector('.srchRes');if(!q){el.innerHTML='';return;}
@@ -1094,10 +1348,13 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       Array.prototype.forEach.call(document.querySelectorAll('.guide'),function(b){b.addEventListener('click',function(){toast('"'+b.getAttribute('data-guide')+'" 사용가이드는 관리자가 등록하면 여기서 열립니다.');});});
     }
     if(id==='admin'&&me.role==='admin'){
-      bindCms();
+      bindCms();bindNu();
       document.getElementById('fakeAdd').onclick=function(){document.getElementById('admMsg').textContent='실제 운영 버전에서는 아이디·이름·소속을 입력하면 계정과 임시 비밀번호가 만들어집니다.';};
       document.getElementById('fakeReset').onclick=function(){document.getElementById('admMsg').textContent='실제 운영 버전에서는 선택한 FC에게 임시 비밀번호를 새로 발급합니다.';};
     }
+    if(id==='news')Array.prototype.forEach.call(document.querySelectorAll('[data-nco]'),function(b){b.onclick=function(){var k=b.getAttribute('data-nco');
+      Array.prototype.forEach.call(document.querySelectorAll('[data-nco]'),function(x){x.classList.toggle('on',x===b);});
+      Array.prototype.forEach.call(document.querySelectorAll('.ncard'),function(c){c.hidden=!!k&&c.getAttribute('data-co')!==k;});};});
     if(id==='ai'&&window.AIMOD)AIMOD.mount(document.getElementById('aiApp'),me,toast);
   }
 
