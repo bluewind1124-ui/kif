@@ -1,6 +1,6 @@
 {
- "ver": 1792541031317,
- "updated": "2026. 10. 21. 오전 9:03:51",
+ "ver": 1792549065428,
+ "updated": "2026. 10. 21. 오전 11:17:45",
  "notices": [
   [
    "2026.10.15",
@@ -408,5 +408,6 @@
   "claude": "",
   "openai": "",
   "gemini": ""
- }
+ },
+ "authApi": "https://kif-auth.bluewind1124.workers.dev"
 }
