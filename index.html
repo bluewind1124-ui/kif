@@ -860,27 +860,17 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 }
 
 /* ===== 움직임: 물결 배경 · 흐르는 빠른 실행 · 컨셉 커튼 ===== */
-.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.bgfx svg{position:absolute;inset:-6% -10%;width:120%;height:112%}
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;--bgn:#0f2340;--bgg:#cd9b34}
+.bgfx svg{position:absolute;inset:-8% -12%;width:124%;height:116%}
 .bgfx path{fill:none;stroke-linecap:round}
-.bgfx .w1 path{stroke:rgba(15,35,64,.09);stroke-width:1.5}
-.bgfx .w2 path{stroke:rgba(15,35,64,.065);stroke-width:1.3}
-.bgfx .w3 path{stroke:rgba(205,155,52,.35);stroke-width:1.5}
+/* 선 모양은 SVG가 출렁이게(9초 안팎), 묶음 전체는 천천히 좌우로 흐르게. 배경 물결은 기기의 「움직임 줄이기」와 상관없이 항상 움직임 */
+.bgfx .w1{transform-origin:50% 60%;will-change:transform;animation:bgflow 16s ease-in-out infinite alternate}
+@keyframes bgflow{0%{transform:translateX(-70px) translateY(8px)}50%{transform:translateX(10px) translateY(-14px)}100%{transform:translateX(80px) translateY(4px)}}
 #app>.top,#app>.shell,#app>.gnb{position:relative;z-index:1}
 #app>.top{z-index:60}
 .side{z-index:62}
-@media (prefers-reduced-motion:no-preference){
-  .bgfx .w1{animation:bgw1 18s ease-in-out infinite alternate}
-  .bgfx .w2{animation:bgw2 24s ease-in-out infinite alternate}
-  .bgfx .w3{animation:bgw3 15s ease-in-out infinite alternate}
-}
-/* 선마다 다른 속도·방향으로 오가며 살짝 기울어 물결이 흐르는 것처럼 보이게 */
-@keyframes bgw1{0%{transform:translate(-120px,10px) rotate(-1deg)}50%{transform:translate(20px,-30px) rotate(.6deg)}100%{transform:translate(140px,-10px) rotate(1.2deg)}}
-@keyframes bgw2{0%{transform:translate(130px,20px) rotate(1deg)}50%{transform:translate(0,-25px) rotate(-.5deg)}100%{transform:translate(-140px,5px) rotate(-1.2deg)}}
-@keyframes bgw3{0%{transform:translate(-90px,15px)}50%{transform:translate(40px,-35px)}100%{transform:translate(160px,0)}}
-.bgfx g{transform-origin:50% 60%;will-change:transform}
-:root[data-theme="dark"] .bgfx .w1 path,:root[data-theme="dark"] .bgfx .w2 path{stroke:rgba(230,207,151,.07)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bgfx .w1 path,:root:not([data-theme="light"]) .bgfx .w2 path{stroke:rgba(230,207,151,.07)}}
+:root[data-theme="dark"] .bgfx{--bgn:#e6cf97;--bgg:#cd9b34}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bgfx{--bgn:#e6cf97}}
 
 .hm-h .note{font-family:var(--font);font-weight:400;font-size:.82rem;color:var(--muted);margin-left:8px}
 .hm-mq{overflow:hidden;position:relative;padding:4px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
@@ -958,11 +948,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 
 <!-- ===== 본 화면 ===== -->
 <div id="app" hidden>
-  <div class="bgfx" aria-hidden="true"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
-    <g class="w1"><path d="M-200 760C200 640 420 820 760 700S1300 420 1800 520"/><path d="M-200 790C220 670 440 850 780 730S1320 450 1800 550"/><path d="M-200 820C240 700 460 880 800 760S1340 480 1800 580"/></g>
-    <g class="w2"><path d="M-200 600C180 520 520 700 900 560S1400 300 1800 380"/><path d="M-200 640C200 560 540 740 920 600S1420 340 1800 420"/></g>
-    <g class="w3"><path d="M-200 860C260 760 600 900 980 800S1450 600 1800 660"/></g>
-  </svg></div>
+  <div class="bgfx" aria-hidden="true"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="gN" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgn);stop-opacity:0"/><stop offset=".45" style="stop-color:var(--bgn);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--bgn);stop-opacity:.04"/></linearGradient><linearGradient id="gN2" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgn);stop-opacity:.03"/><stop offset=".6" style="stop-color:var(--bgn);stop-opacity:.14"/><stop offset="1" style="stop-color:var(--bgn);stop-opacity:0"/></linearGradient><linearGradient id="gG" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgg);stop-opacity:0"/><stop offset=".55" style="stop-color:var(--bgg);stop-opacity:.6"/><stop offset="1" style="stop-color:var(--bgg);stop-opacity:.08"/></linearGradient></defs><g class="w1"><path class="" d="M-100 700C300 560 600 820 900 680S1400 420 1700 520" stroke="url(#gN)" stroke-width="6"><animate attributeName="d" values="M-100 700C300 560 600 820 900 680S1400 420 1700 520;M-100 650C300 760 600 600 900 730S1400 520 1700 440;M-100 700C300 560 600 820 900 680S1400 420 1700 520" dur="9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path class="" d="M-100 730C300 600 600 850 900 715S1400 460 1700 555" stroke="url(#gN)" stroke-width="2"><animate attributeName="d" values="M-100 730C300 600 600 850 900 715S1400 460 1700 555;M-100 690C300 790 600 640 900 760S1400 555 1700 480;M-100 730C300 600 600 850 900 715S1400 460 1700 555" dur="9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path class="" d="M-100 560C250 480 650 680 1000 540S1450 300 1700 360" stroke="url(#gN2)" stroke-width="4"><animate attributeName="d" values="M-100 560C250 480 650 680 1000 540S1450 300 1700 360;M-100 610C250 650 650 520 1000 610S1450 410 1700 300;M-100 560C250 480 650 680 1000 540S1450 300 1700 360" dur="11s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path class="" d="M-100 800C350 700 700 860 1050 760S1500 600 1700 640" stroke="url(#gG)" stroke-width="5"><animate attributeName="d" values="M-100 800C350 700 700 860 1050 760S1500 600 1700 640;M-100 770C350 870 700 700 1050 810S1500 690 1700 580;M-100 800C350 700 700 860 1050 760S1500 600 1700 640" dur="7.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path class="" d="M-100 835C350 740 700 890 1050 795S1500 640 1700 680" stroke="url(#gG)" stroke-width="1.6"><animate attributeName="d" values="M-100 835C350 740 700 890 1050 795S1500 640 1700 680;M-100 805C350 900 700 740 1050 845S1500 725 1700 620;M-100 835C350 740 700 890 1050 795S1500 640 1700 680" dur="7.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path class="" d="M-100 420C300 360 700 520 1100 400S1500 220 1700 260" stroke="url(#gN2)" stroke-width="3"><animate attributeName="d" values="M-100 420C300 360 700 520 1100 400S1500 220 1700 260;M-100 460C300 500 700 380 1100 470S1500 300 1700 210;M-100 420C300 360 700 520 1100 400S1500 220 1700 260" dur="13s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path></g></svg></div>
   <div class="top">
     <button class="tb back" id="portalBack" aria-label="이전 화면으로">← 이전</button>
     <a class="brand" href="#" id="toHome"><img src="emblem.png" alt=""><span class="tt"><span class="tt-long">한국보험금융(주) </span><em>한보금on 활동지원</em></span></a>
