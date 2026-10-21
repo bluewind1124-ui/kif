@@ -7,11 +7,20 @@
 <meta name="theme-color" content="#0f2240">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="한국보험금융 교육지원 포털">
+<meta name="apple-mobile-web-app-title" content="한보금on 활동지원">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icon-180.png">
-<title>한국보험금융 교육지원 포털</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="한보금on 활동지원">
+<meta property="og:title" content="한보금on 활동지원">
+<meta property="og:description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
+<meta property="og:url" content="https://bluewind1124-ui.github.io/mirae-bohum/">
+<meta property="og:image" content="https://bluewind1124-ui.github.io/mirae-bohum/og-image.png">
+<meta property="og:image:width" content="800">
+<meta property="og:image:height" content="400">
+<meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
+<title>한보금on 활동지원</title>
 <!-- Claude Artifact 원본(fc-portal.html)을 감싼 파일. 예전 v1.0 화면은 classic/ 폴더에 보관 -->
 <style>body{margin:0}</style>
 </head>
@@ -678,7 +687,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 <!-- ===== 로그인 ===== -->
 <div id="gate">
   <div class="l">
-    <div class="eyebrow">신채널 FC 영업지원 포털</div>
+    <div class="eyebrow">한보금on 활동지원</div>
     <div>
       <div class="mark"><img src="emblem.png" alt=""><b>한국보험금융(주)</b></div>
       <h2>상담 준비부터 청약 후 관리까지<br>한 화면에서</h2>
@@ -703,7 +712,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 <div id="app" hidden>
   <div class="top">
     <button class="tb back" id="portalBack" aria-label="이전 화면으로">← 이전</button>
-    <a class="brand" href="#" id="toHome"><img src="emblem.png" alt=""><span class="tt"><span class="tt-long">한국보험금융(주) </span><em>신채널 FC 영업지원</em></span></a>
+    <a class="brand" href="#" id="toHome"><img src="emblem.png" alt=""><span class="tt"><span class="tt-long">한국보험금융(주) </span><em>한보금on 활동지원</em></span></a>
     <span class="sp"></span>
     <span class="who" id="who"></span>
     <div class="zoom" role="group" aria-label="글자 크기">
@@ -819,7 +828,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function pcHome(){
     var h='<section class="pc-hero"><div class="ph-l">'+
       '<p class="hello"><b>'+me.name+'님</b> <span>('+me.org+' · '+me.no+')</span> 반갑습니다</p>'+
-      '<p class="lead">오늘 상담 준비는 <em>신채널 FC 영업지원</em>에서 시작하세요.</p>'+
+      '<p class="lead">오늘 상담 준비는 <em>한보금on 활동지원</em>에서 시작하세요.</p>'+
       srchBox(true)+
       '<button class="updbar" data-go="news"><span class="ib">'+ic('cal')+'</span><span class="ut"><b>이달의 보험상품 개정 일정</b><span>'+esc(BANNER.title)+' · '+esc(BANNER.sub)+'</span></span><span class="ub">일정 보기 ▸</span></button>'+
       '</div><div class="ph-r">'+
@@ -861,7 +870,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     h+='</div></div></section>';
     /* 하단 배너 (OK마이보험 교육 채널 배너) */
     h+='<a class="band" target="_blank" rel="noopener" href="'+EDU+'"><span class="bi">'+ic('cap','bis')+'</span><span class="bt"><b>한국보험금융 온라인 교육센터</b><span>주간생생정보 · 보험영업백서 · 생손보 자격과정을 한곳에서</span></span><span class="bb">교육센터 바로가기 ▸</span></a>';
-    h+='<footer class="pfoot">한국보험금융(주) 신채널 FC 영업지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
+    h+='<footer class="pfoot">한국보험금융(주) 한보금on 활동지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
     return h;
   }
 
