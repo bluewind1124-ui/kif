@@ -26,18 +26,20 @@
 </head>
 <body>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@500;700;800;900&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <style>
-/* 기존 신채널 교육지원시스템 v1.0 디자인 계승: 네이비 상단바 + 골드 밑줄. PC는 홈페이지형 가로 메뉴, 모바일은 가로 탭 */
+/* 한보금on 활동지원 디자인 (시안 D, 2026.10): PC는 왼쪽 남색 사이드바 + 연회색 바탕의 흰 카드, 폰은 위쪽 가로 탭.
+   회사 색: 남색 #0F2340 · 금색 #CD9B34 (흰 바탕 위 작은 금색 글자는 진한 금 #7C5916) · 글꼴: 제목 Gothic A1, 본문 IBM Plex Sans KR */
 :root{
-  --bg:#eef1f6; --surface:#ffffff; --surface-2:#f8f9fc; --ink:#14213a; --muted:#5d6b82;
-  --line:#dbe1ea; --line-strong:#b9c3d3;
-  --navy:#0f2240; --navy-2:#1d3557; --kgold:#cb9c3a; --kgold-2:#e0b862;
-  --gold:#8f6510; --gold-soft:#f8efd9; --accent-soft:#e8edf5;
+  --bg:#f3f5f8; --surface:#ffffff; --surface-2:#f8f9fb; --ink:#18202e; --muted:#667185;
+  --line:#e1e6ed; --line-strong:#c5cedb;
+  --navy:#0f2340; --navy-2:#1d3557; --kgold:#cd9b34; --kgold-2:#e6cf97;
+  --gold:#7c5916; --gold-soft:#fbf4e3; --accent-soft:#eef1f6;
   --good:#0f7a48; --good-soft:#e2f2e9; --warn:#a4520b; --warn-soft:#fbeadb;
   --btn:#0f2240; --btn-ink:#ffffff;
   --shadow:0 1px 2px rgba(15,34,64,.06),0 6px 20px -12px rgba(15,34,64,.28);
-  --font:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --font:"IBM Plex Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --font-h:"Gothic A1","IBM Plex Sans KR","Malgun Gothic",sans-serif; --side-w:248px;
   --hero-a:#e3eaf5; --hero-b:#f7f9fc; --navy-ink:#0f2240; --rib:#d4572b; --slate:#7a8595;
   --zoom:1;
 }
@@ -58,7 +60,8 @@
 [hidden]{display:none!important}
 html{font-size:calc(14px * var(--zoom))}
 body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
-h1,h2,h3{margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1,h2,h3{margin:0;letter-spacing:-.02em;text-wrap:balance;font-family:var(--font-h)}
+body{word-break:keep-all}
 a{color:inherit}
 button,input,select,textarea{font-family:inherit;font-size:inherit}
 button{cursor:pointer}
@@ -352,7 +355,7 @@ td.r,th.r{text-align:right}
 body.adv-full{overflow:hidden}
 @media (max-width:760px){.pc-only{display:none!important}}
 /* 폰: 위쪽 막대가 좁아 「내 정보」는 메뉴(영업 도구)에서 연다 */
-@media (max-width:520px){#meBtn{display:none}#zVal{display:none}}
+@media (max-width:520px){#meBtn{display:none}.top .zoom{display:none}}
 /* ===== 상조 서비스 (제휴사 소개서) ===== */
 .sj{display:grid;gap:22px}
 .sj-hero{background:linear-gradient(135deg,#0f2240 0%,#1b3561 100%);color:#fff;border-radius:6px;padding:28px 26px;position:relative;overflow:hidden}
@@ -754,6 +757,105 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 }
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:90;background:var(--navy);color:#fff;padding:10px 18px;border-radius:30px;font-size:.9rem;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
 @media (prefers-reduced-motion:no-preference){.tile{transition:transform .12s,border-color .12s}.tile:hover{transform:translateY(-2px)}}
+
+/* ===================== 시안 D: 사이드바형 (2026.10) ===================== */
+.si{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.sd-brand,.sd-foot,.sd-pc{display:none}
+.side .si{display:none}
+.panel{border-radius:8px}
+.btn.gold{background:var(--kgold);color:#0f2340;border-color:var(--kgold);font-weight:800;text-decoration:none}
+@media (min-width:861px){
+  #app{padding-left:var(--side-w)}
+  .gnb{display:none!important}
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .side{display:flex!important;flex-direction:column;position:fixed;left:0;top:0;bottom:0;width:var(--side-w);max-height:none;z-index:62;
+    background:var(--navy);border-right:0;padding:0 0 12px;overflow-y:auto}
+  .sd-brand{display:flex;align-items:center;gap:10px;padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:6px}
+  .sd-brand img{width:38px;height:38px;border-radius:50%;background:#fff;padding:2px}
+  .sd-brand b{display:block;color:#fff;font-family:var(--font-h);font-size:1.08rem;font-weight:800;letter-spacing:-.02em}
+  .sd-brand span{font-size:.78rem;color:#8fa0ba}
+  .side .grp{color:#8fa0ba;letter-spacing:0;font-size:.8rem;font-weight:600;padding:14px 22px 6px}
+  .side button{color:#c9d3e3;padding:10px 14px;margin:1px 10px;width:calc(100% - 20px);border-left:0;border-radius:6px;font-size:.98rem;gap:12px}
+  .side .si{display:block;opacity:.9}
+  .side button:hover{background:rgba(255,255,255,.06);color:#fff}
+  .side button.on{background:var(--kgold);color:#0f2340;font-weight:700;box-shadow:0 4px 14px -6px rgba(205,155,52,.7)}
+  .side button.on .si{opacity:1}
+  .side .tag{background:var(--kgold);color:#0f2340;border-radius:10px}
+  .side button.on .tag{background:#0f2340;color:var(--kgold-2)}
+  .side .sd-mo{display:none}
+  .sd-foot{display:block;margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}
+  .sd-me{display:flex;align-items:center;gap:10px;padding:6px 22px 10px;color:#c9d3e3}
+  .sd-me b{display:block;color:#fff;font-size:.95rem}
+  .sd-me span{font-size:.8rem;color:#8fa0ba}
+  .side .sd-link{font-size:.92rem;padding:8px 14px}
+  .top{background:var(--surface);color:var(--ink);border-bottom:1px solid var(--line);min-height:56px;box-shadow:0 1px 0 rgba(15,35,64,.03)}
+  .top .brand,.top .who,#meBtn,#logout{display:none!important}
+  .top .tb,.top .zoom{border-color:var(--line-strong);color:var(--ink)}
+  .top .zoom button{color:var(--ink)}
+  .top .zoom span{color:var(--muted)}
+  .page{max-width:1240px}
+  main{padding-top:24px}
+}
+@media (max-width:860px){
+  .side .sd-mo{display:flex}
+  .side .grp.sd-mo{display:none}
+}
+/* 홈 (시안 D) */
+.hm{display:grid;gap:18px}
+.hm-hd{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.hm-date{font-size:.9rem;color:var(--muted)}
+.hm-hd h1{font-size:1.9rem;font-weight:800;color:var(--navy-ink);margin-top:4px}
+.hm-srch{flex:0 1 420px;min-width:260px}
+.hm-srch .tags{font-size:.8rem}
+.hm-strip{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:var(--gold-soft);border-radius:8px;padding:10px 16px;color:var(--gold)}
+.hm-strip b{font-weight:700;white-space:nowrap}
+.hm-strip span{flex:1;color:var(--ink)}
+.hm-strip em{font-style:normal;font-weight:700;white-space:nowrap}
+.hm-kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.hm-kpi button{display:flex;gap:14px;align-items:flex-start;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;color:var(--ink);box-shadow:0 1px 2px rgba(15,35,64,.04)}
+.hm-kpi button:hover{border-color:var(--kgold)}
+.ki{width:34px;height:34px;flex:none;fill:none;stroke:var(--navy-ink);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin-top:4px}
+.hm-kpi span{display:block;font-size:.88rem;color:var(--muted)}
+.hm-kpi b{display:block;font-family:var(--font-h);font-size:2.1rem;font-weight:800;color:var(--navy-ink);line-height:1.15;white-space:nowrap;font-variant-numeric:tabular-nums}
+.hm-kpi b small{font-size:1rem;font-weight:700;margin-left:2px;color:var(--muted)}
+.hm-kpi em{display:block;font-style:normal;font-size:.82rem;color:var(--muted);margin-top:2px}
+.hm-kpi .hot .ki{stroke:var(--kgold)}
+.hm-kpi .hot b,.hm-kpi .hot em{color:var(--gold)}
+.hm-cpt{position:relative;overflow:hidden;background:#0f2340;color:#fff;border-radius:12px;padding:28px 32px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 24px;align-items:end}
+.hm-cpt-t span{color:var(--kgold);font-weight:700;font-size:.95rem}
+.hm-cpt-t h2{font-size:2.2rem;font-weight:900;margin:6px 0 8px;color:#fff}
+.hm-cpt-t p{margin:0;color:#c9d3e3;max-width:680px}
+.hm-cpt-art{position:absolute;right:170px;top:14px;width:200px;height:160px;fill:none;stroke:rgba(205,155,52,.55);stroke-width:2;pointer-events:none}
+.hm-cpt-b{position:relative;z-index:1}
+.hm-cpt .btn.gold{padding:12px 22px;border-radius:8px}
+.hm-h{font-size:1.1rem;color:var(--navy-ink);margin-bottom:10px}
+.hm-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.hq{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;color:var(--ink);font-weight:700;font-size:1.02rem;text-decoration:none;text-align:left}
+.hq:hover{border-color:var(--kgold);background:var(--gold-soft)}
+.qi{width:24px;height:24px;flex:none;fill:none;stroke:var(--navy-ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.hm-two{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+.hm-two .panel h3{display:flex;align-items:baseline;gap:8px}
+.hm-two .panel h3 .more{margin-left:auto}
+.hm-tbl{border:0;border-radius:0}
+.hm-tbl th{background:var(--gold-soft);color:var(--ink);font-weight:700;border-bottom:1px solid var(--line)}
+.hm-tbl td{border-bottom:1px solid var(--line)}
+.hm-tbl td a.flink{font-weight:500}
+.hm-aw{list-style:none;margin:0;padding:0}
+.hm-aw li{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.li-i{width:30px;height:30px;flex:none;fill:var(--gold-soft);stroke:var(--kgold);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;border-radius:50%;padding:5px;background:var(--gold-soft)}
+.hm-aw .t{flex:1;font-weight:700}
+.hm-aw .aw-dd{border:1px solid var(--kgold);color:var(--gold);border-radius:14px;padding:1px 12px;font-weight:700;font-size:.88rem;white-space:nowrap}
+.hm-aw .aw-dd.done{border-color:var(--line-strong);color:var(--muted)}
+.hm-nt{margin-top:10px}
+.hm-nt b{font-size:.9rem;color:var(--muted)}
+.hm-nt .list li{padding:8px 0}
+@media (max-width:1100px){.hm-kpi,.hm-quick{grid-template-columns:repeat(2,minmax(0,1fr))}.hm-two{grid-template-columns:1fr}.hm-cpt-art{display:none}}
+@media (max-width:560px){
+  .hm-hd h1{font-size:1.45rem}.hm-srch{flex-basis:100%;min-width:0}
+  .hm-kpi button{padding:14px;gap:10px}.ki{width:26px;height:26px}.hm-kpi b{font-size:1.7rem}
+  .hm-cpt{grid-template-columns:1fr;padding:22px 20px}.hm-cpt-t h2{font-size:1.6rem}
+  .hm-strip{flex-wrap:wrap}.hm-tbl th:nth-child(3),.hm-tbl td:nth-child(3){display:none}
+}
 </style>
 
 <div class="demo">시제품(데모)입니다. 화면 구성 확인용이며 실제 고객·상품 데이터가 아닌 예시가 들어 있습니다.</div>
@@ -845,12 +947,13 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   /* ---------- 메뉴 정의 ---------- */
   var MENU=[
     {g:null,items:[['home','홈']]},
-    {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉'],['me','내 정보 · 자료 보관']]},
-    {g:'외부 연계',items:[['car','자동차 비교견적'],['sangjo','상조 서비스']]},
-    {g:'교육',items:[['edu','온라인 교육센터'],['ai2','AI보장분석 고급형','NEW']]},
+    {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
     {g:'공지 · 시상',items:[['news','보험사 소식지'],['award','시상 공지']]},
-    {g:'관리자',admin:true,items:[['admin','관리자 페이지']]}
+    {g:'교육 · 연계',items:[['edu','온라인 교육센터'],['car','자동차 비교견적'],['sangjo','상조 서비스']]},
+    {g:'관리자',admin:true,items:[['admin','관리자 페이지']]},
+    {g:'내 정보',mobile:true,items:[['me','내 정보 · 자료 보관']]}
   ];
+  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',award:'cup',edu:'cap',car:'car',sangjo:'heart',me:'user',admin:'gear'};
 
   var NEWS=[
     ['2026.10.14','삼성화재','간편건강보험 3.5.5 고지 개정, 11월 1일부터 적용'],
@@ -891,7 +994,15 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     news:'<path d="M4 5h13v14H6a2 2 0 01-2-2zM17 9h3v8a2 2 0 01-2 2M7 9h7M7 13h7M7 16h4"/>',
     cup:'<path d="M8 4h8v5a4 4 0 01-8 0zM8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4M12 13v4M8 20h8"/>',
     cap:'<path d="M2 9l10-5 10 5-10 5zM6 11v5c3 2 9 2 12 0v-5M22 9v6"/>',
-    user:'<path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0"/>'
+    user:'<path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0"/>',
+    home:'<path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>',
+    car:'<path d="M5 17h14M6 17v2M18 17v2M4 13l2-5a2 2 0 012-1h8a2 2 0 012 1l2 5v4H4zM7.5 13.5h.01M16.5 13.5h.01"/>',
+    heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/>',
+    gear:'<path d="M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.6 1.6 0 00-1-1.5 1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H3a2 2 0 110-4h.1a1.6 1.6 0 001.5-1 1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H9a1.6 1.6 0 001-1.5V3a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/>',
+    logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
+    search:'<path d="M11 18a7 7 0 100-14 7 7 0 000 14zM20 20l-4-4"/>',
+    doc:'<path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5"/>',
+    shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>'
   };
   function ic(n,c){return '<svg class="'+(c||'svg')+'" viewBox="0 0 24 24" aria-hidden="true">'+IC[n]+'</svg>';}
   var TOOLS=[
@@ -943,81 +1054,40 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     return '<form class="srch'+(big?' big':'')+'"><input class="in q" placeholder="메뉴·자료 검색 (예: 간편건강, 단기납 종신)" aria-label="메뉴와 자료 검색"><button class="btn" type="submit">검색</button></form>'+
       '<div class="tags">인기 검색어 '+['암','간편건강','단기납 종신','3대질병','실손','경영인 정기'].map(function(t){return '<button type="button" class="tg" data-q="'+t+'">#'+t+'</button>';}).join('')+'</div><div class="srchRes"></div>';
   }
-  function pcHome(){
-    var h='<section class="pc-hero"><div class="ph-l">'+
-      '<p class="hello"><b>'+me.name+'님</b> <span>('+me.org+' · '+me.no+')</span> 반갑습니다</p>'+
-      '<p class="lead">오늘 상담 준비는 <em>한보금on 활동지원</em>에서 시작하세요.</p>'+
-      srchBox(true)+
-      '<button class="updbar" data-go="news"><span class="ib">'+ic('cal')+'</span><span class="ut"><b>이달의 보험상품 개정 일정</b><span>'+esc(BANNER.title)+' · '+esc(BANNER.sub)+'</span></span><span class="ub">일정 보기 ▸</span></button>'+
-      '</div><div class="ph-r">'+
-      '<div class="vcard"><span class="num">01</span><span class="vk">영업이 처음이라면?</span><h3><em>신입 FC</em>를 위한 영상</h3><p>포털 기본 사용법부터<br>상품 비교·보장분석까지</p><span class="pl">'+ic('play','pls')+'</span><span class="soon">영상 준비 중</span></div>'+
-      '<div class="vcard alt"><span class="num">02</span><span class="vk">더 전문적으로 쓰려면?</span><h3><em>상담 고수</em>를 위한 영상</h3><p>원픽 비교표와 보장분석을<br>제안서로 묶는 흐름</p><span class="pl">'+ic('play','pls')+'</span><span class="soon">영상 준비 중</span></div>'+
-      '</div></section>';
-    /* 아이콘 타일 + 이달의 컨셉 */
-    h+='<section class="pc-tools"><div class="tgrid">';
-    TOOLS.forEach(function(t){
-      h+='<div class="tcell">'+link(t[3],(t[4]?'<span class="rib">'+t[4]+'</span>':'')+ic(t[0],'tic')+'<span class="cap">'+t[2]+'</span><b>'+t[1]+'</b>','tbox')+
-        '<button class="guide" type="button" data-guide="'+t[1]+'">'+ic('book','gdi')+'사용가이드 보기</button></div>';
-    });
-    h+='</div><aside class="cpt"><div class="k">이달의 컨셉 · '+esc(CONCEPT.month)+'</div><h3>"'+esc(CONCEPT.title)+'"</h3><p>'+esc(CONCEPT.desc)+'</p>'+
-      '<ol>'+CONCEPT.steps.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ol>'+(CONCEPT.file?'<a class="btn ghost" style="text-decoration:none;margin-right:6px" target="_blank" rel="noopener" href="'+fileHref(CONCEPT.file)+'">자료 열기 ↗</a>':'')+'<button class="btn gold" data-go="concept">컨셉 자세히 보기 ▸</button></aside></section>';
-    /* 4칸 분류 (보케어 고객등록·고객터치·고객상담·보상관리 구성 참고) */
-    var cols=[['상품 비교','bars',BLOCKS[0][1]],['보장분석 · 교육','scan',BLOCKS[1][1].concat(BLOCKS[2][1])],['공지 · 시상','cup',BLOCKS[3][1]]];
-    h+='<section class="cat4"><div class="cc me"><h3>'+ic('user','hi2')+'내 영업 현황</h3>'+
-      '<div class="stat"><div><span>이번 달 신계약</span><b>3<small>건</small></b></div><div><span>진행 중 시상</span><b>2<small>건</small></b></div><div><span>교육 이수</span><b>4<small>/6</small></b></div></div>'+
-      '<div class="lines"><div><span>오늘의 일정</span><b>2<small>건</small></b></div><div><span>보장분석 대기 고객</span><b>1<small>명</small></b></div></div>'+
-      '<div class="qk"><button data-go="ai">'+ic('scan','qi')+'보장분석 시작</button><button data-go="concept">'+ic('bulb','qi')+'이달의 컨셉</button><button data-go="award">'+ic('cup','qi')+'시상 보기</button><button data-go="edu">'+ic('cap','qi')+'교육센터</button></div></div>';
-    cols.forEach(function(c){
-      h+='<div class="cc"><h3>'+ic(c[1],'hi2')+c[0]+'</h3><ul>';
-      c[2].forEach(function(it){
-        var tag=it[2]?' <span class="pill '+({Hot:'warn',New:'new',Best:'ok'})[it[2]]+'">'+it[2]+'</span>':'';
-        h+='<li>'+link(it[1],'<span>'+it[0]+tag+'</span><span class="ar">›</span>','li')+'</li>';
-      });
-      h+='</ul></div>';
-    });
-    h+='</section>';
-    /* 소식지 · 공지 (보케어 보험뉴스·커뮤니티) */
-    h+='<section class="two"><div class="panel"><h3>'+ic('news','hi3')+'보험사 소식지 <button class="more" data-go="news">전체 '+NEWS.length+'건 보기 +</button></h3><ul class="list">';
-    NEWS.slice(0,4).forEach(function(n){h+=newsLi(n);});
-    h+='</ul></div><div class="panel"><h3>'+ic('cal','hi3')+'본사 공지</h3><ul class="list noticeList"></ul></div></section>';
-    /* 교육 자료 · 교육센터 강의 (보케어 보험카드·보험강의) */
-    h+='<section class="two"><div class="panel"><h3>'+ic('book','hi3')+'교육 자료 <span class="note">상담·교육용 PT</span></h3><div class="mats4">';
-    MATS.forEach(function(m){h+=matCard(m,false);});
-    h+='</div></div><div class="panel"><h3>'+ic('cap','hi3')+'교육센터 새 강의 <button class="more" data-go="edu">더보기 +</button></h3><div class="lects">';
-    LECT.forEach(function(l){h+='<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+l[0]+'</span><b>'+l[1]+'</b><i>'+l[2]+'</i></div></a>';});
-    h+='</div></div></section>';
-    /* 하단 배너 (OK마이보험 교육 채널 배너) */
-    h+='<a class="band" target="_blank" rel="noopener" href="'+EDU+'"><span class="bi">'+ic('cap','bis')+'</span><span class="bt"><b>한국보험금융 온라인 교육센터</b><span>주간생생정보 · 보험영업백서 · 생손보 자격과정을 한곳에서</span></span><span class="bb">교육센터 바로가기 ▸</span></a>';
-    h+='<footer class="pfoot">한국보험금융(주) 한보금on 활동지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
-    return h;
-  }
-
   /* ---------- 화면별 내용 ---------- */
   var PAGES={
     home:function(){
-      var h='<div class="mo"><div class="greet"><div class="panel gbox"><div class="hi"><b>'+me.name+'</b>님 반갑습니다 <span class="code">'+me.org+' · 사번 '+me.no+'</span></div>'+srchBox(false)+'</div>'+
-        '<div class="upd"><div><div class="k">이달의 상품 개정 일정</div><b>'+esc(BANNER.title)+'</b><span>'+esc(BANNER.sub)+'</span></div><button class="btn sm gold" data-go="news">일정 보기 ›</button></div></div>';
-      h+='<div class="hero"><div class="k">이달의 컨셉 · '+esc(CONCEPT.month)+'</div><h2>'+fileA(CONCEPT.file,'"'+esc(CONCEPT.title)+'"','hlink')+'</h2><p>'+esc(CONCEPT.desc)+'</p></div>';
-      h+='<div class="blocks">';
-      BLOCKS.forEach(function(b){
-        h+='<div class="blk"><h3>'+b[0]+'</h3><ul>';
-        b[1].forEach(function(it){
-          var tag=it[2]?' <span class="pill '+({Hot:'warn',New:'new',Best:'ok'})[it[2]]+'">'+it[2]+'</span>':'';
-          var lab='<span>'+it[0]+tag+'</span><span class="ar">›</span>';
-          h+='<li>'+(/^https?:/.test(it[1])?'<a target="_blank" rel="noopener" href="'+it[1]+'">'+lab+'</a>':'<button data-go="'+it[1]+'">'+lab+'</button>')+'</li>';
-        });
-        h+='</ul></div>';
-      });
-      h+='</div>';
-      h+='<div class="vids"><div class="vid"><span class="pill">01 영업이 처음이라면</span><h3>신입 FC를 위한 포털 사용법</h3><p class="note">로그인부터 상품 비교, 보장분석까지 기본 사용법</p><span class="play">▶ 영상 준비 중</span></div>'+
-        '<div class="vid"><span class="pill new">02 더 잘 쓰고 싶다면</span><h3>상담 고수를 위한 활용법</h3><p class="note">원픽 비교표와 보장분석을 묶어 제안서까지 만드는 흐름</p><span class="play">▶ 영상 준비 중</span></div></div>';
-      h+='<div class="sec"><h2>교육 자료 <span class="note">본사가 올린 상담·교육용 PT와 비교 자료</span></h2><div class="mats">';
-      MATS.forEach(function(m){h+=matCard(m,true);});
-      h+='</div></div>';
-      h+='<div class="cols"><div class="panel"><h3>보험사 소식지 <button class="more" data-go="news">전체 '+NEWS.length+'건 보기 +</button></h3><ul class="list">';
-      NEWS.slice(0,3).forEach(function(n){h+=newsLi(n);});
-      h+='</ul></div><div class="panel"><h3>본사 공지</h3><ul class="list noticeList"></ul></div></div></div>';
-      return h+'<div class="pc">'+pcHome()+'</div>';
+      var d=new Date(),W='일월화수목금토',E=esc;
+      var ds=d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+W[d.getDay()]+'요일';
+      /* 시상 마감까지 남은 날: 기간 '2026.10.01 ~ 10.31'의 끝 날짜로 계산 */
+      var dleft=function(per){var m=String(per||'').match(/(20\d{2})\D+\d{1,2}\D+\d{1,2}\D*~\D*(?:(20\d{2})\D+)?(\d{1,2})\D+(\d{1,2})/);if(!m)return null;
+        var e=new Date(+(m[2]||m[1]),+m[3]-1,+m[4]);var t=new Date(d.getFullYear(),d.getMonth(),d.getDate());return Math.round((e-t)/864e5);};
+      var live=AWARDS.filter(function(a){return a[3]==='진행 중';}).map(function(a){return {a:a,n:dleft(a[1])};}).sort(function(x,y){return (x.n==null?999:x.n)-(y.n==null?999:y.n);});
+      var near=live[0], nn=newsNew(), cust=0;try{cust=(JSON.parse(localStorage.getItem('fc_ai_customers')||'[]')||[]).length;}catch(e){}
+      var dd=function(n){return n==null?'진행 중':n>0?'D-'+n:n===0?'오늘 마감':'마감';};
+      var h='<section class="hm-hd"><div><div class="hm-date">'+ds+'</div><h1>'+E(me.name)+'님, 오늘 할 일부터 보세요</h1></div><div class="hm-srch">'+srchBox(false)+'</div></section>';
+      if(BANNER&&BANNER.title)h+='<button class="hm-strip" data-go="news"><b>이달의 상품 개정 일정</b><span>'+E(BANNER.title)+'</span><em>일정 보기 ›</em></button>';
+      h+='<section class="hm-kpi">'+
+        '<button data-go="news">'+ic('news','ki')+'<div><span>이번 주 새 소식지</span><b>'+nn+'<small>건</small></b><em>보험사 소식지 전체 '+NEWS.length+'건</em></div></button>'+
+        '<button data-go="award" class="hot">'+ic('cup','ki')+'<div><span>진행 중 시상</span><b>'+(near?dd(near.n):'없음')+'</b><em>'+(near?E(near.a[0])+(near.n>0?' 마감':''):'새 시상을 기다려 주세요')+'</em></div></button>'+
+        '<button data-go="edu">'+ic('cap','ki')+'<div><span>교육센터 새 강의</span><b>'+LECT.length+'<small>건</small></b><em>'+(LECT[0]?E(LECT[0][0]):'')+'</em></div></button>'+
+        '<button data-go="ai">'+ic('user','ki')+'<div><span>내 보장분석 고객</span><b>'+cust+'<small>명</small></b><em>이 기기에 저장된 고객</em></div></button></section>';
+      h+='<section class="hm-cpt"><div class="hm-cpt-t"><span>'+E(CONCEPT.month)+' 이달의 컨셉</span><h2>'+E(CONCEPT.title)+'</h2><p>'+E(CONCEPT.desc||'')+'</p></div>'+
+        '<svg class="hm-cpt-art" viewBox="0 0 200 160" aria-hidden="true"><path d="M100 14l58 22v42c0 36-25 58-58 68-33-10-58-32-58-68V36z"/><path d="M100 54v44M78 76h44"/><path d="M20 150V120M44 150V104M156 150V96M180 150V112"/></svg>'+
+        '<div class="hm-cpt-b">'+(CONCEPT.file?'<a class="btn gold" target="_blank" rel="noopener" href="'+E(fileHref(CONCEPT.file))+'">컨셉 자료 보기 ›</a>':'<button class="btn gold" data-go="concept">컨셉 자료 보기 ›</button>')+'</div></section>';
+      var Q=[['scan','보장분석 시작','ai'],['star','이번 달의 원픽',V1+'onepick.html'],['bars','담보별 비교견적',V1+'nonlife.html'],['trend','단기납 종신 비교',V1+'wholelife.html']];
+      h+='<section><h3 class="hm-h">빠른 실행</h3><div class="hm-quick">'+Q.map(function(q){return link(q[2],ic(q[0],'qi')+'<span>'+q[1]+'</span>','hq');}).join('')+'</div></section>';
+      var nr=NEWS.slice(0,6).map(function(n){var m=newsMeta(n),t=m.title||sumText(n[2]);
+        return '<tr><td><b>'+E(m.co)+'</b></td><td>'+(m.title?fileA(n[3],E(t)):E(t))+'</td><td>'+(m.ym?E(m.ym)+' '+(m.wk?m.wk+'주차':'월간'):'')+'</td><td class="r">'+E(String(n[0]||'').slice(5))+'</td></tr>';}).join('');
+      var ar=AWARDS.slice(0,3).map(function(a){var n=a[3]==='진행 중'?dleft(a[1]):null;
+        return '<li data-go="award">'+ic('cup','li-i')+'<span class="t">'+E(a[0])+'</span>'+(a[3]==='진행 중'?'<span class="aw-dd">'+dd(n)+'</span>':'<span class="aw-dd done">'+E(a[3])+'</span>')+'</li>';}).join('');
+      h+='<section class="hm-two"><div class="panel"><h3>보험사 소식지 <button class="more" data-go="news">전체 '+NEWS.length+'건 보기 ›</button></h3>'+
+        '<div class="tbl hm-tbl"><table><thead><tr><th>보험사</th><th>자료명</th><th>구분</th><th class="r">등록일</th></tr></thead><tbody>'+nr+'</tbody></table></div></div>'+
+        '<div class="panel"><h3>시상 · 공지 <button class="more" data-go="award">전체 보기 ›</button></h3><ul class="hm-aw">'+ar+'</ul><div class="hm-nt"><b>본사 공지</b><ul class="list noticeList"></ul></div></div></section>';
+      h+='<section class="hm-two"><div class="panel"><h3>교육 자료 <span class="note">상담·교육용 PT와 비교 자료</span></h3><div class="mats4">'+MATS.map(function(m){return matCard(m,false);}).join('')+'</div></div>'+
+        '<div class="panel"><h3>교육센터 새 강의 <button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E(l[2])+'</i></div></a>';}).join('')+'</div></div></section>';
+      h+='<footer class="pfoot">한국보험금융(주) 한보금on 활동지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
+      return '<div class="hm">'+h+'</div>';
     },
     compare:function(){
       var t=[['01','이번 달의 원픽','onepick.html','상품군을 고르면 선정 상품의 타사 비교표와 선정 이유'],
@@ -1142,14 +1212,23 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     portalPop();
   }
   window.addEventListener('message',function(e){if(e.origin===location.origin&&e.data&&e.data.kif==='back')portalPop();});
+  /* 최근 7일 안에 올라온 소식지 수 (사이드바 「새 글」·홈 숫자) */
+  function newsNew(){var d=new Date(Date.now()-7*864e5),c=d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());return NEWS.filter(function(n){return String(n[0]||'')>=c;}).length;}
   function renderSide(){
-    var h='';
+    var nn=newsNew();
+    var h='<div class="sd-brand"><img src="emblem.png" alt="한국보험금융 엠블럼"><div><b>한보금on 활동지원</b><span>한국보험금융(주)</span></div></div>';
     MENU.forEach(function(g){
       if(g.admin&&me.role!=='admin')return;
-      if(g.g)h+='<div class="grp">'+g.g+'</div>';
-      g.items.forEach(function(it){h+='<button data-go="'+it[0]+'" class="'+(it[0]===cur?'on':'')+'">'+it[1]+(it[2]?'<span class="tag">'+it[2]+'</span>':'')+'</button>';});
+      var mo=g.mobile?' sd-mo':'';
+      h+='<div class="grp'+mo+'">'+(g.g||'오늘')+'</div>';
+      g.items.forEach(function(it){var tag=it[0]==='news'&&nn?'새 글 '+nn:it[2];
+        h+='<button data-go="'+it[0]+'" class="'+(it[0]===cur?'on':'')+mo+'">'+ic(SIC[it[0]]||'star','si')+'<span class="sdl">'+it[1]+'</span>'+(tag?'<span class="tag">'+tag+'</span>':'')+'</button>';});
     });
+    h+='<div class="sd-foot"><div class="sd-me">'+ic('user','si')+'<div><b>'+esc(me.name)+'</b><span>'+esc(me.org||'')+'</span></div></div>'+
+      '<button data-go="me" class="sd-link'+(cur==='me'?' on':'')+'">'+ic('doc','si')+'<span class="sdl">내 정보 · 자료 보관</span></button>'+
+      '<button type="button" class="sd-link" id="sdLogout">'+ic('logout','si')+'<span class="sdl">로그아웃</span></button></div>';
     document.getElementById('side').innerHTML=h;
+    var lo=document.getElementById('sdLogout');if(lo)lo.onclick=function(){document.getElementById('logout').click();};
     var g='';
     MENU.forEach(function(gr){
       if(gr.admin&&me.role!=='admin')return;
@@ -2093,7 +2172,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function delC(id){if(!DB)return;clearTimeout(dbTimer[id]);dbChain[id]=(dbChain[id]||Promise.resolve()).then(function(){return DB.doc('c_'+id).delete();}).catch(dbErr);}
   function pushOpts(){if(!DB)return;dbChain._o=(dbChain._o||Promise.resolve()).then(function(){return DB.doc('opts').set({ts:Date.now(),opts:JSON.parse(JSON.stringify(st.opts))});}).catch(dbErr);}
   function dbErr(e){var c=e&&e.code;if(c==='quota_exceeded')toast('계정 저장 공간이 가득 찼습니다. 오래된 고객을 정리해 주세요.');else if(c==='revoked'||c==='not_granted'||c==='invalid_argument'){DB=null;sync='local';syncNote();}}
-  function syncNote(){var e=document.getElementById('aiSync');if(e)e.textContent=sync==='db'?'내 계정에 저장됩니다. 다른 기기에서 열어도 같은 고객이 보입니다.':sync==='wait'?'저장 위치 확인 중…':'이 기기 브라우저에만 저장됩니다. (Claude 화면에서 열면 내 계정에 저장)';}
+  function syncNote(){var e=document.getElementById('aiSync');if(e)e.textContent=sync==='db'?'내 계정에 저장됩니다. 다른 기기에서 열어도 같은 고객이 보입니다.':sync==='wait'?'저장 위치 확인 중…':'이 기기 브라우저에만 저장됩니다. 다른 기기로 옮기려면 「내 정보 → 고객 자료 보관」에서 파일로 저장하세요.';}
   function connectDb(){
     if(!(window.claude&&claude.use))return;sync='wait';syncNote();
     Promise.all([claude.use('db'),claude.use('user')]).then(function(r){
