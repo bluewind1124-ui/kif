@@ -801,7 +801,9 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   .side .grp.sd-mo{display:none}
 }
 /* 홈 (시안 D) */
-.hm{display:grid;gap:18px}
+.hm{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+.hm>section,.hm>button,.hm>footer{min-width:0}
+.hm-mq{max-width:100%;contain:paint}
 .hm-hd{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
 .hm-date{font-size:.9rem;color:var(--muted)}
 .hm-hd h1{font-size:1.9rem;font-weight:800;color:var(--navy-ink);margin-top:4px}
@@ -856,6 +858,52 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   .hm-cpt{grid-template-columns:1fr;padding:22px 20px}.hm-cpt-t h2{font-size:1.6rem}
   .hm-strip{flex-wrap:wrap}.hm-tbl th:nth-child(3),.hm-tbl td:nth-child(3){display:none}
 }
+
+/* ===== 움직임: 물결 배경 · 흐르는 빠른 실행 · 컨셉 커튼 ===== */
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bgfx svg{position:absolute;inset:-6% -10%;width:120%;height:112%}
+.bgfx path{fill:none;stroke-linecap:round}
+.bgfx .w1 path{stroke:rgba(15,35,64,.075);stroke-width:1.4}
+.bgfx .w2 path{stroke:rgba(15,35,64,.05);stroke-width:1.2}
+.bgfx .w3 path{stroke:rgba(205,155,52,.28);stroke-width:1.3}
+#app>.top,#app>.shell,#app>.gnb{position:relative;z-index:1}
+#app>.top{z-index:60}
+.side{z-index:62}
+@media (prefers-reduced-motion:no-preference){
+  .bgfx .w1{animation:bgw1 46s ease-in-out infinite alternate}
+  .bgfx .w2{animation:bgw2 58s ease-in-out infinite alternate}
+  .bgfx .w3{animation:bgw3 38s ease-in-out infinite alternate}
+}
+@keyframes bgw1{from{transform:translate(-40px,0)}to{transform:translate(60px,-26px)}}
+@keyframes bgw2{from{transform:translate(50px,10px)}to{transform:translate(-60px,-18px)}}
+@keyframes bgw3{from{transform:translate(-30px,6px)}to{transform:translate(70px,-20px)}}
+:root[data-theme="dark"] .bgfx .w1 path,:root[data-theme="dark"] .bgfx .w2 path{stroke:rgba(230,207,151,.07)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bgfx .w1 path,:root:not([data-theme="light"]) .bgfx .w2 path{stroke:rgba(230,207,151,.07)}}
+
+.hm-h .note{font-family:var(--font);font-weight:400;font-size:.82rem;color:var(--muted);margin-left:8px}
+.hm-mq{overflow:hidden;position:relative;padding:4px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.hm-mq-in{display:flex;gap:14px;width:max-content}
+.hm-mq-gap{flex:none;width:0}
+.hm-mq .hq{flex:none;min-width:210px;flex-direction:row;cursor:pointer;font-family:inherit}
+.hm-mq .hq small{margin-left:auto;font-size:.75rem;font-weight:500;color:var(--muted);padding-left:10px}
+@media (prefers-reduced-motion:no-preference){
+  .hm-mq-in{animation:mq calc(var(--n) * 5.5s) linear infinite}
+  .hm-mq:hover .hm-mq-in,.hm-mq:focus-within .hm-mq-in{animation-play-state:paused}
+}
+@media (prefers-reduced-motion:reduce){.hm-mq-in{flex-wrap:wrap;width:auto}.hm-mq-in>[aria-hidden="true"]{display:none}.hm-mq{-webkit-mask-image:none;mask-image:none}}
+@keyframes mq{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+
+.hm-cpt .cur{position:absolute;top:0;bottom:0;width:50.5%;z-index:3;background:#0b1a31;transition:transform 1.05s cubic-bezier(.7,0,.25,1)}
+.hm-cpt .cur.l{left:0;border-right:2px solid var(--kgold);background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 18px,transparent 18px 36px)}
+.hm-cpt .cur.r{right:0;border-left:2px solid var(--kgold);background-image:repeating-linear-gradient(90deg,transparent 0 18px,rgba(255,255,255,.035) 18px 36px)}
+.hm-cpt.open .cur.l{transform:translateX(-101%)}
+.hm-cpt.open .cur.r{transform:translateX(101%)}
+.hm-cpt-t h2{min-height:1.2em}
+.hm-cpt-t h2.typing:after{content:'';display:inline-block;width:3px;height:.9em;margin-left:4px;background:var(--kgold);vertical-align:-.08em;animation:caret .7s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.hm-cpt-t p,.hm-cpt-b,.hm-cpt-art{transition:opacity .6s ease .1s,transform .6s ease .1s}
+.hm-cpt:not(.typed) .hm-cpt-t p,.hm-cpt:not(.typed) .hm-cpt-b{opacity:0;transform:translateY(8px)}
+.hm-cpt:not(.open) .hm-cpt-art{opacity:0}
 </style>
 
 <div class="demo">시제품(데모)입니다. 화면 구성 확인용이며 실제 고객·상품 데이터가 아닌 예시가 들어 있습니다.</div>
@@ -908,6 +956,11 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 
 <!-- ===== 본 화면 ===== -->
 <div id="app" hidden>
+  <div class="bgfx" aria-hidden="true"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+    <g class="w1"><path d="M-200 760C200 640 420 820 760 700S1300 420 1800 520"/><path d="M-200 790C220 670 440 850 780 730S1320 450 1800 550"/><path d="M-200 820C240 700 460 880 800 760S1340 480 1800 580"/></g>
+    <g class="w2"><path d="M-200 600C180 520 520 700 900 560S1400 300 1800 380"/><path d="M-200 640C200 560 540 740 920 600S1420 340 1800 420"/></g>
+    <g class="w3"><path d="M-200 860C260 760 600 900 980 800S1450 600 1800 660"/></g>
+  </svg></div>
   <div class="top">
     <button class="tb back" id="portalBack" aria-label="이전 화면으로">← 이전</button>
     <a class="brand" href="#" id="toHome"><img src="emblem.png" alt=""><span class="tt"><span class="tt-long">한국보험금융(주) </span><em>한보금on 활동지원</em></span></a>
@@ -1072,11 +1125,14 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
         '<button data-go="award" class="hot">'+ic('cup','ki')+'<div><span>진행 중 시상</span><b>'+(near?dd(near.n):'없음')+'</b><em>'+(near?E(near.a[0])+(near.n>0?' 마감':''):'새 시상을 기다려 주세요')+'</em></div></button>'+
         '<button data-go="edu">'+ic('cap','ki')+'<div><span>교육센터 새 강의</span><b>'+LECT.length+'<small>건</small></b><em>'+(LECT[0]?E(LECT[0][0]):'')+'</em></div></button>'+
         '<button data-go="ai">'+ic('user','ki')+'<div><span>내 보장분석 고객</span><b>'+cust+'<small>명</small></b><em>이 기기에 저장된 고객</em></div></button></section>';
-      h+='<section class="hm-cpt"><div class="hm-cpt-t"><span>'+E(CONCEPT.month)+' 이달의 컨셉</span><h2>'+E(CONCEPT.title)+'</h2><p>'+E(CONCEPT.desc||'')+'</p></div>'+
+      h+='<section class="hm-cpt" id="hmCpt"><div class="cur l" aria-hidden="true"></div><div class="cur r" aria-hidden="true"></div><div class="hm-cpt-t"><span>'+E(CONCEPT.month)+' 이달의 컨셉</span><h2 data-t="'+E(CONCEPT.title)+'" aria-label="'+E(CONCEPT.title)+'">'+E(CONCEPT.title)+'</h2><p>'+E(CONCEPT.desc||'')+'</p></div>'+
         '<svg class="hm-cpt-art" viewBox="0 0 200 160" aria-hidden="true"><path d="M100 14l58 22v42c0 36-25 58-58 68-33-10-58-32-58-68V36z"/><path d="M100 54v44M78 76h44"/><path d="M20 150V120M44 150V104M156 150V96M180 150V112"/></svg>'+
         '<div class="hm-cpt-b">'+(CONCEPT.file?'<a class="btn gold" target="_blank" rel="noopener" href="'+E(fileHref(CONCEPT.file))+'">컨셉 자료 보기 ›</a>':'<button class="btn gold" data-go="concept">컨셉 자료 보기 ›</button>')+'</div></section>';
-      var Q=[['scan','보장분석 시작','ai'],['star','이번 달의 원픽',V1+'onepick.html'],['bars','담보별 비교견적',V1+'nonlife.html'],['trend','단기납 종신 비교',V1+'wholelife.html']];
-      h+='<section><h3 class="hm-h">빠른 실행</h3><div class="hm-quick">'+Q.map(function(q){return link(q[2],ic(q[0],'qi')+'<span>'+q[1]+'</span>','hq');}).join('')+'</div></section>';
+      /* 빠른 실행: 영업 도구 · 공지·시상 · 교육·연계 메뉴를 무작위 순서로 섞어 천천히 흘려 보낸다 (마우스를 올리면 멈춤) */
+      var Q=[],seen={};MENU.forEach(function(g){if(!g.g||g.admin||g.mobile)return;g.items.forEach(function(it){if(seen[it[0]])return;seen[it[0]]=1;Q.push([SIC[it[0]]||'star',it[1],it[0],g.g]);});});
+      for(var qi=Q.length-1;qi>0;qi--){var qj=Math.floor(Math.random()*(qi+1)),qt=Q[qi];Q[qi]=Q[qj];Q[qj]=qt;}
+      var qrow=Q.map(function(q){return '<button class="hq" data-go="'+q[2]+'">'+ic(q[0],'qi')+'<span>'+E(q[1])+'</span><small>'+E(q[3])+'</small></button>';}).join('');
+      h+='<section><h3 class="hm-h">빠른 실행 <span class="note">메뉴를 누르면 바로 열립니다 · 마우스를 올리면 멈춥니다</span></h3><div class="hm-mq" style="--n:'+Q.length+'"><div class="hm-mq-in">'+qrow+'<span class="hm-mq-gap" aria-hidden="true"></span>'+qrow.replace(/<button /g,'<button tabindex="-1" aria-hidden="true" ')+'</div></div></section>';
       var nr=NEWS.slice(0,6).map(function(n){var m=newsMeta(n),t=m.title||sumText(n[2]);
         return '<tr><td><b>'+E(m.co)+'</b></td><td>'+(m.title?fileA(n[3],E(t)):E(t))+'</td><td>'+(m.ym?E(m.ym)+' '+(m.wk?m.wk+'주차':'월간'):'')+'</td><td class="r">'+E(String(n[0]||'').slice(5))+'</td></tr>';}).join('');
       var ar=AWARDS.slice(0,3).map(function(a){var n=a[3]==='진행 중'?dleft(a[1]):null;
@@ -1214,6 +1270,16 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   window.addEventListener('message',function(e){if(e.origin===location.origin&&e.data&&e.data.kif==='back')portalPop();});
   /* 최근 7일 안에 올라온 소식지 수 (사이드바 「새 글」·홈 숫자) */
   function newsNew(){var d=new Date(Date.now()-7*864e5),c=d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());return NEWS.filter(function(n){return String(n[0]||'')>=c;}).length;}
+  /* 이달의 컨셉: 커튼이 열린 뒤 제목을 한 글자씩 친다 (움직임 줄이기 설정이면 바로 보여 줌) */
+  var cptTimer=null;
+  function playCpt(){
+    var box=document.getElementById('hmCpt');if(!box)return;
+    var h2=box.querySelector('h2'),t=h2.getAttribute('data-t')||h2.textContent;clearInterval(cptTimer);
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){box.classList.add('open','typed');return;}
+    h2.textContent='';box.classList.remove('open','typed');void box.offsetWidth;
+    setTimeout(function(){box.classList.add('open');},250);
+    var i=0;setTimeout(function(){h2.classList.add('typing');cptTimer=setInterval(function(){i++;h2.textContent=t.slice(0,i);if(i>=t.length){clearInterval(cptTimer);h2.classList.remove('typing');box.classList.add('typed');}},85);},1250);
+  }
   function renderSide(){
     var nn=newsNew();
     var h='<div class="sd-brand"><img src="emblem.png" alt="한국보험금융 엠블럼"><div><b>한보금on 활동지원</b><span>한국보험금융(주)</span></div></div>';
@@ -1839,6 +1905,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function toast(m){var t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true;},2600);}
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function bindPage(id){
+    if(id==='home')playCpt();
     if(id==='home'){
       var IDX=[];
       BLOCKS.forEach(function(b){b[1].forEach(function(it){IDX.push([it[0],b[0],it[1]]);});});
