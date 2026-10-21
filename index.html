@@ -15,8 +15,8 @@
 <meta property="og:site_name" content="한보금on 활동지원">
 <meta property="og:title" content="한보금on 활동지원">
 <meta property="og:description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta property="og:url" content="https://bluewind1124-ui.github.io/mirae-bohum/">
-<meta property="og:image" content="https://bluewind1124-ui.github.io/mirae-bohum/og-image.png">
+<meta property="og:url" content="https://bluewind1124-ui.github.io/kif/">
+<meta property="og:image" content="https://bluewind1124-ui.github.io/kif/og-image.png">
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
@@ -739,7 +739,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     fc1001:{pw:'1234',name:'김민준 FC',org:'강남지사',no:'1001',role:'fc'},
     admin:{pw:'admin',name:'본사 관리자',org:'전략채널본부',no:'0001',role:'admin'}
   };
-  var V1='https://bluewind1124-ui.github.io/mirae-bohum/classic/';
+  var V1='https://bluewind1124-ui.github.io/kif/classic/';
   var EDU='https://kif.fnkorea.com/index.asp';
   var me=null;
 
@@ -1030,7 +1030,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   /* ---------- 관리자 콘텐츠: content.json 불러오기 · 편집 · 사이트 반영 ----------
      FC 화면은 열릴 때마다 사이트의 content.json을 읽어 공지·소식지·시상·컨셉 등을 바꿔 보여준다.
      관리자는 여기서 고친 내용을 복사해 GitHub의 content.json 편집 화면에 붙여넣고 저장(Commit)하면 반영된다. */
-  var GH={owner:'bluewind1124-ui',repo:'mirae-bohum',path:'content.json',branch:'main'};
+  var GH={owner:'bluewind1124-ui',repo:'kif',path:'content.json',branch:'main'};
   var GH_EDIT='https://github.com/'+GH.owner+'/'+GH.repo+'/edit/'+GH.branch+'/'+GH.path;
   var CONTENT_URLS=['content.json','https://'+GH.owner+'.github.io/'+GH.repo+'/content.json'];
   function applyContent(c,redraw){
@@ -1195,7 +1195,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       '<details class="nu-set"'+(T?'':' open')+'><summary>GitHub 연결 설정 '+(T?'<span class="pill ok">연결됨</span>':'<span class="pill warn">처음 한 번 필요</span>')+'</summary>'+
       '<ol class="note" style="padding-left:1.2em;line-height:1.9;margin:8px 0">'+
       '<li><a target="_blank" rel="noopener" href="https://github.com/settings/personal-access-tokens/new">GitHub 토큰 만들기 화면 ↗</a>을 엽니다 (bluewind1124-ui 계정으로 로그인).</li>'+
-      '<li>Token name은 아무거나(예: 자료올리기), Expiration은 원하는 기간, <b>Repository access → Only select repositories → mirae-bohum</b>을 고릅니다.</li>'+
+      '<li>Token name은 아무거나(예: 자료올리기), Expiration은 원하는 기간, <b>Repository access → Only select repositories → kif</b>을 고릅니다.</li>'+
       '<li><b>Permissions → Repository permissions → Contents</b>를 <b>Read and write</b>로 바꾼 뒤 <b>Generate token</b>을 누릅니다.</li>'+
       '<li>나온 토큰(github_pat_…)을 복사해 아래에 붙여넣고 저장합니다. 이 컴퓨터의 이 브라우저에만 저장됩니다.</li></ol>'+
       '<div class="row" style="gap:8px"><input class="in" id="nuTok" type="password" autocomplete="off" placeholder="github_pat_..." value="'+esc(T)+'" style="flex:1;min-width:200px"><button class="btn sm" type="button" id="nuTokSave">저장</button><button class="btn sm ghost" type="button" id="nuTokDel">지우기</button></div></details></div>';
@@ -1258,7 +1258,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   function keepCut(){var d=new Date();d.setMonth(d.getMonth()-nuMonths());return d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());}
   async function gh(method,path,body){
     var r=await fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+path,{method:method,headers:{'Authorization':'Bearer '+ghTok(),'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},body:body?JSON.stringify(body):undefined});
-    if(!r.ok){var t='';try{t=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(t?' · '+t:'')+(r.status===401?' (토큰을 확인하세요)':r.status===403||r.status===404?' (토큰 권한: mirae-bohum · Contents Read and write)':''));}
+    if(!r.ok){var t='';try{t=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(t?' · '+t:'')+(r.status===401?' (토큰을 확인하세요)':r.status===403||r.status===404?' (토큰 권한: kif · Contents Read and write)':''));}
     return r.json();
   }
   async function nuPublish(){

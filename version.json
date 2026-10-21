@@ -1,8 +1,12 @@
 {
-  "version": "v2.3",
+  "version": "v2.4",
   "updated": "2026-10-21",
-  "build": "2026-10-21.1",
+  "build": "2026-10-21.2",
   "history": [
+    {
+      "date": "2026-10-21",
+      "text": "사이트 주소 변경: https://bluewind1124-ui.github.io/kif/ (저장소 이름 mirae-bohum → kif)"
+    },
     {
       "date": "2026-10-21",
       "text": "이름을 「한보금on 활동지원」으로 변경 · 새 아이콘(홈 화면·PC·브라우저 탭) · 카톡으로 주소를 보내면 아이콘 미리보기 카드가 보임"
