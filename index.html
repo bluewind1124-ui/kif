@@ -62,6 +62,7 @@ html{font-size:calc(14px * var(--zoom))}
 body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
 h1,h2,h3{margin:0;letter-spacing:-.02em;text-wrap:balance;font-family:var(--font-h)}
 body{word-break:keep-all}
+#app .shell,#app main{background:transparent}
 a{color:inherit}
 button,input,select,textarea{font-family:inherit;font-size:inherit}
 button{cursor:pointer}
@@ -788,7 +789,9 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   .sd-me b{display:block;color:#fff;font-size:.95rem}
   .sd-me span{font-size:.8rem;color:#8fa0ba}
   .side .sd-link{font-size:.92rem;padding:8px 14px}
-  .top{background:var(--surface);color:var(--ink);border-bottom:1px solid var(--line);min-height:56px;box-shadow:0 1px 0 rgba(15,35,64,.03)}
+  .top{background:rgba(255,255,255,.86);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:var(--ink);border:1px solid rgba(225,230,237,.9);border-radius:40px;
+    margin:14px 28px 0;top:14px;min-height:54px;padding-left:18px;padding-right:18px;box-shadow:0 10px 30px -16px rgba(15,35,64,.35)}
+  :root[data-theme="dark"] .top{background:rgba(17,33,64,.82)}
   .top .brand,.top .who,#meBtn,#logout{display:none!important}
   .top .tb,.top .zoom{border-color:var(--line-strong);color:var(--ink)}
   .top .zoom button{color:var(--ink)}
@@ -861,6 +864,11 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 
 /* ===== 움직임: 물결 배경 · 흐르는 빠른 실행 · 컨셉 커튼 ===== */
 .bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;--bgn:#0f2340;--bgg:#cd9b34}
+/* 흰 비단 배경 (files/design/silk.jpg) — 아주 천천히 커졌다 작아지며 흐름 */
+.bgfx .silk{position:absolute;inset:-4%;background:#f4f5f8 url(files/design/silk.jpg) center/cover no-repeat;animation:silk 38s ease-in-out infinite alternate;will-change:transform}
+@keyframes silk{0%{transform:scale(1) translate(0,0)}50%{transform:scale(1.05) translate(-1.2%,.8%)}100%{transform:scale(1.08) translate(1%,-1%)}}
+:root[data-theme="dark"] .bgfx .silk{filter:brightness(.22) contrast(1.1)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .bgfx .silk{filter:brightness(.22) contrast(1.1)}}
 .bgfx svg{position:absolute;inset:-8% -12%;width:124%;height:116%}
 .bgfx path{fill:none;stroke-linecap:round}
 /* 선 모양은 SVG가 출렁이게(9초 안팎), 묶음 전체는 천천히 좌우로 흐르게. 배경 물결은 기기의 「움직임 줄이기」와 상관없이 항상 움직임 */
@@ -903,6 +911,25 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .hm-cpt-t p,.hm-cpt-b,.hm-cpt-art{transition:opacity .6s ease .1s,transform .6s ease .1s}
 .hm-cpt:not(.typed) .hm-cpt-t p,.hm-cpt:not(.typed) .hm-cpt-b{opacity:0;transform:translateY(8px)}
 .hm-cpt:not(.open) .hm-cpt-art{opacity:0}
+
+/* ===== 홈 첫 소개 (한보금 ON) ===== */
+.hm-hero{text-align:center;padding:34px 0 8px}
+.hh-k{margin:0;font-size:1rem;letter-spacing:.42em;color:var(--ink);padding-left:.42em}
+.hh-w{font-family:var(--font-h);font-weight:900;font-size:4.6rem;line-height:1.05;letter-spacing:-.03em;color:var(--navy-ink);margin:10px 0 6px}
+.hh-w em{font-style:normal;color:var(--kgold)}
+.hh-s{margin:0 0 30px;font-size:1.7rem;font-weight:400;color:var(--ink);letter-spacing:-.01em}
+.hh-s em{font-style:normal;color:var(--kgold);font-weight:600}
+.hh-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;max-width:1060px;margin:0 auto}
+.hh-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:30px 20px 26px;border-radius:18px;color:#fff;
+  background:linear-gradient(180deg,rgba(46,74,114,.93),rgba(15,35,64,.96));box-shadow:0 18px 40px -22px rgba(15,35,64,.65);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.hh-card b{font-family:var(--font-h);font-weight:900;font-size:1.65rem;letter-spacing:-.02em}
+.hh-card span{color:#c9d3e3;font-size:.98rem;font-weight:600;margin-bottom:16px}
+.hh-card button{margin-top:auto;border:0;border-radius:30px;padding:13px 38px;font-weight:800;font-size:1.05rem;color:#0f2340;
+  background:linear-gradient(90deg,#cd9b34,#e6cf97);box-shadow:0 8px 18px -10px rgba(205,155,52,.9);transition:transform .15s,filter .15s}
+.hh-card button:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.hm .panel,.hm-kpi button,.hq{background:rgba(255,255,255,.9)}
+@media (max-width:900px){.hh-w{font-size:3rem}.hh-s{font-size:1.25rem}.hh-cards{grid-template-columns:1fr;gap:12px}.hh-card{padding:20px 16px}.hh-card b{font-size:1.3rem}.hh-k{letter-spacing:.25em;font-size:.85rem}}
 </style>
 
 <div class="demo">시제품(데모)입니다. 화면 구성 확인용이며 실제 고객·상품 데이터가 아닌 예시가 들어 있습니다.</div>
@@ -955,7 +982,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 
 <!-- ===== 본 화면 ===== -->
 <div id="app" hidden>
-  <div class="bgfx" aria-hidden="true"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="gN" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgn);stop-opacity:0"/><stop offset=".45" style="stop-color:var(--bgn);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--bgn);stop-opacity:.04"/></linearGradient><linearGradient id="gN2" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgn);stop-opacity:.03"/><stop offset=".6" style="stop-color:var(--bgn);stop-opacity:.14"/><stop offset="1" style="stop-color:var(--bgn);stop-opacity:0"/></linearGradient><linearGradient id="gG" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgg);stop-opacity:0"/><stop offset=".55" style="stop-color:var(--bgg);stop-opacity:.6"/><stop offset="1" style="stop-color:var(--bgg);stop-opacity:.08"/></linearGradient></defs><g class="w1"><path class="" d="M-100 700C300 560 600 820 900 680S1400 420 1700 520" stroke="url(#gN)" stroke-width="6"><animate attributeName="d" values="M-100 700C300 560 600 820 900 680S1400 420 1700 520;M-100 650C300 760 600 600 900 730S1400 520 1700 440;M-100 700C300 560 600 820 900 680S1400 420 1700 520" dur="9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path class="" d="M-100 730C300 600 600 850 900 715S1400 460 1700 555" stroke="url(#gN)" stroke-width="2"><animate attributeName="d" values="M-100 730C300 600 600 850 900 715S1400 460 1700 555;M-100 690C300 790 600 640 900 760S1400 555 1700 480;M-100 730C300 600 600 850 900 715S1400 460 1700 555" dur="9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path class="" d="M-100 560C250 480 650 680 1000 540S1450 300 1700 360" stroke="url(#gN2)" stroke-width="4"><animate attributeName="d" values="M-100 560C250 480 650 680 1000 540S1450 300 1700 360;M-100 610C250 650 650 520 1000 610S1450 410 1700 300;M-100 560C250 480 650 680 1000 540S1450 300 1700 360" dur="11s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path class="" d="M-100 800C350 700 700 860 1050 760S1500 600 1700 640" stroke="url(#gG)" stroke-width="5"><animate attributeName="d" values="M-100 800C350 700 700 860 1050 760S1500 600 1700 640;M-100 770C350 870 700 700 1050 810S1500 690 1700 580;M-100 800C350 700 700 860 1050 760S1500 600 1700 640" dur="7.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path class="" d="M-100 835C350 740 700 890 1050 795S1500 640 1700 680" stroke="url(#gG)" stroke-width="1.6"><animate attributeName="d" values="M-100 835C350 740 700 890 1050 795S1500 640 1700 680;M-100 805C350 900 700 740 1050 845S1500 725 1700 620;M-100 835C350 740 700 890 1050 795S1500 640 1700 680" dur="7.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path class="" d="M-100 420C300 360 700 520 1100 400S1500 220 1700 260" stroke="url(#gN2)" stroke-width="3"><animate attributeName="d" values="M-100 420C300 360 700 520 1100 400S1500 220 1700 260;M-100 460C300 500 700 380 1100 470S1500 300 1700 210;M-100 420C300 360 700 520 1100 400S1500 220 1700 260" dur="13s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path></g></svg></div>
+  <div class="bgfx" aria-hidden="true"><div class="silk"></div><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="gN" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgn);stop-opacity:0"/><stop offset=".45" style="stop-color:var(--bgn);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--bgn);stop-opacity:.04"/></linearGradient><linearGradient id="gN2" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgn);stop-opacity:.03"/><stop offset=".6" style="stop-color:var(--bgn);stop-opacity:.14"/><stop offset="1" style="stop-color:var(--bgn);stop-opacity:0"/></linearGradient><linearGradient id="gG" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgg);stop-opacity:0"/><stop offset=".55" style="stop-color:var(--bgg);stop-opacity:.6"/><stop offset="1" style="stop-color:var(--bgg);stop-opacity:.08"/></linearGradient></defs><g class="w1"><path class="" d="M-100 800C350 700 700 860 1050 760S1500 600 1700 640" stroke="url(#gG)" stroke-width="5"><animate attributeName="d" values="M-100 800C350 700 700 860 1050 760S1500 600 1700 640;M-100 770C350 870 700 700 1050 810S1500 690 1700 580;M-100 800C350 700 700 860 1050 760S1500 600 1700 640" dur="7.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path class="" d="M-100 835C350 740 700 890 1050 795S1500 640 1700 680" stroke="url(#gG)" stroke-width="1.6"><animate attributeName="d" values="M-100 835C350 740 700 890 1050 795S1500 640 1700 680;M-100 805C350 900 700 740 1050 845S1500 725 1700 620;M-100 835C350 740 700 890 1050 795S1500 640 1700 680" dur="7.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path></g></svg></div>
   <div class="top">
     <button class="tb back" id="portalBack" aria-label="이전 화면으로">← 이전</button>
     <a class="brand" href="#" id="toHome"><img src="emblem.png" alt=""><span class="tt"><span class="tt-long">한국보험금융(주) </span><em>한보금on 활동지원</em></span></a>
@@ -1113,7 +1140,10 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       var live=AWARDS.filter(function(a){return a[3]==='진행 중';}).map(function(a){return {a:a,n:dleft(a[1])};}).sort(function(x,y){return (x.n==null?999:x.n)-(y.n==null?999:y.n);});
       var near=live[0], nn=newsNew(), cust=0;try{cust=(JSON.parse(localStorage.getItem('fc_ai_customers')||'[]')||[]).length;}catch(e){}
       var dd=function(n){return n==null?'진행 중':n>0?'D-'+n:n===0?'오늘 마감':'마감';};
-      var h='<section class="hm-hd"><div><div class="hm-date">'+ds+'</div><h1>'+E(me.name)+'님, 오늘 할 일부터 보세요</h1></div><div class="hm-srch">'+srchBox(false)+'</div></section>';
+      var P=[['영업 도구','상품 비교 · AI보장분석 · 이달의 컨셉','compare'],['교육 · 연계','온라인 교육센터 · 자동차 견적 · 상조','edu'],['공지 · 시상','보험사 소식지 · 시상 공지','news']];
+      var h='<section class="hm-hero"><p class="hh-k">한국보험금융 FC 활동지원</p><h1 class="hh-w">한보금 <em>ON</em></h1><p class="hh-s">사람을 위한 <em>따뜻한</em> 보험</p>'+
+        '<div class="hh-cards">'+P.map(function(c){return '<div class="hh-card"><b>'+c[0]+'</b><span>'+c[1]+'</span><button type="button" data-go="'+c[2]+'">바로가기</button></div>';}).join('')+'</div></section>';
+      h+='<section class="hm-hd"><div><div class="hm-date">'+ds+'</div><h1>'+E(me.name)+'님, 오늘 할 일부터 보세요</h1></div><div class="hm-srch">'+srchBox(false)+'</div></section>';
       if(BANNER&&BANNER.title)h+='<button class="hm-strip" data-go="news"><b>이달의 상품 개정 일정</b><span>'+E(BANNER.title)+'</span><em>일정 보기 ›</em></button>';
       h+='<section class="hm-kpi">'+
         '<button data-go="news">'+ic('news','ki')+'<div><span>이번 주 새 소식지</span><b>'+nn+'<small>건</small></b><em>보험사 소식지 전체 '+NEWS.length+'건</em></div></button>'+
