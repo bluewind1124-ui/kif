@@ -14,6 +14,7 @@ FC 영업지원·교육지원 포털. GitHub Pages로 배포됩니다: https://b
 | `auth-server/` | **계정 서버**(Cloudflare Worker) — 로그인·계정 신청·승인·비밀번호 변경/찾기. 아이디·비밀번호(해시)·권한·상태만 보관. 만드는 법: `auth-server/README.md` |
 | `ai-relay/` | AI보장분석 기본형이 쓰는 AI 중계 서버(Cloudflare Worker) 코드 |
 | `content.json` | 관리자가 바꾸는 공지·소식지·시상·컨셉 |
+| `files/sangjo/` | 상조 서비스 제휴사 원본 소개서(PDF). 화면 내용은 `index.html`의 `SJ_DOC`, 주소·전화는 관리자 「상조 서비스 안내」(content.json `sangjo`) |
 | `news/`, `files/` | 관리자 「자료 올리기」로 올린 파일 (소식지는 `news/연-월/`, 나머지는 `files/메뉴/연-월/`) |
 | `version.json` | 버전과 업데이트 내역 (화면 상단·홈에 표시) |
 | `app.html`, `manifest.webmanifest`, `icon-*`, `desktop-icon.zip`, `og-image.png` | 홈 화면 아이콘 설치 · 카톡 미리보기 카드 그림 |

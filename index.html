@@ -351,6 +351,63 @@ td.r,th.r{text-align:right}
 .adv-close{position:fixed;right:10px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:91;background:#0f2240;color:#fff;border:2px solid var(--gold);border-radius:20px;padding:8px 14px;font-weight:700;font-size:.9rem;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 body.adv-full{overflow:hidden}
 @media (max-width:760px){.pc-only{display:none!important}}
+/* 폰: 위쪽 막대가 좁아 「내 정보」는 메뉴(영업 도구)에서 연다 */
+@media (max-width:520px){#meBtn{display:none}#zVal{display:none}}
+/* ===== 상조 서비스 (제휴사 소개서) ===== */
+.sj{display:grid;gap:22px}
+.sj-hero{background:linear-gradient(135deg,#0f2240 0%,#1b3561 100%);color:#fff;border-radius:6px;padding:28px 26px;position:relative;overflow:hidden}
+.sj-hero:after{content:'';position:absolute;right:-60px;top:-60px;width:260px;height:260px;border:2px solid rgba(203,156,58,.35);border-radius:50%}
+.sj-hl{position:relative;z-index:1;max-width:640px}
+.sj-k{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.08em;color:#e6c27a;border-bottom:1px solid #cb9c3a;padding-bottom:3px;margin-bottom:12px}
+.sj-brand{font-size:2rem;font-weight:900;line-height:1.1}
+.sj-brand small{display:block;font-size:.8rem;font-weight:700;letter-spacing:.28em;color:#c9d3e3;margin-top:6px}
+.sj-en{margin:10px 0 0;color:#e6c27a;font-weight:700;letter-spacing:.04em}
+.sj-lead{font-size:1.25rem;font-weight:700;line-height:1.55;margin:16px 0 6px}
+.sj-tag{color:#c9d3e3;margin:0 0 16px}
+.sj-act{display:flex;flex-wrap:wrap;gap:8px}
+.sj-hero .btn.line,.sj-box .btn.line{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.6)}
+.btn.gold{background:#cb9c3a;color:#0f2240;border-color:#cb9c3a;font-weight:800}
+.sj-t{margin:0 0 12px}
+.sj-t span{font-size:.78rem;font-weight:700;color:var(--gold);letter-spacing:.06em}
+.sj-t h2{font-size:1.3rem;margin:2px 0 4px}
+.sj-t p{margin:0;color:var(--muted)}
+.sj-check{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.sj-check li{position:relative;padding-left:26px;line-height:1.6}
+.sj-check li:before{content:'';position:absolute;left:0;top:.35em;width:16px;height:16px;border-radius:50%;background:var(--navy,#0f2240);box-shadow:inset 0 0 0 4px var(--surface),0 0 0 1px var(--navy,#0f2240)}
+.sj-vals{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sj-vals div{text-align:center;border:1px solid var(--line);border-radius:6px;padding:12px 4px}
+.sj-vals b{display:block;font-size:.82rem;letter-spacing:.06em;color:var(--navy,#0f2240)}
+.sj-vals span{font-size:.85rem;color:var(--muted)}
+.sj-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.sj-card{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--navy,#0f2240);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.sj-card b{font-size:1.02rem}
+.sj-card>span:last-child{color:var(--muted);font-size:.9rem;line-height:1.55}
+.sj-no{font-size:.78rem;font-weight:800;color:var(--gold);letter-spacing:.06em}
+.sj-flow{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;counter-reset:f}
+.sj-flow li{position:relative;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 8px;display:flex;flex-direction:column;gap:4px;align-items:center}
+.sj-flow li:not(:last-child):after{content:'›';position:absolute;right:-10px;top:50%;transform:translateY(-50%);font-size:1.4rem;color:var(--gold);font-weight:900}
+.sj-dot{width:44px;height:44px;border-radius:50%;background:#0f2240;color:#fff;display:grid;place-items:center;font-weight:800;margin-bottom:4px}
+.sj-flow span:last-child{font-size:.85rem;color:var(--muted)}
+.sj-bar{background:#0f2240;color:#fff;text-align:center;border-radius:6px;padding:10px 12px;margin:12px 0 0;font-weight:700}
+.sj-tbl th{background:#0f2240;color:#fff}
+.sj-tbl td:first-child{width:30%}
+.sj-nums{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.sj-nums li{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.sj-nums .sj-no{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center}
+.sj-nums b{display:block}
+.sj-nums div span{color:var(--muted);font-size:.9rem}
+.sj-contact{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;align-items:stretch}
+.sj-box{background:#0f2240;color:#fff;border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:2px}
+.sj-box>span{font-size:.8rem;color:#c9d3e3;margin-top:8px}
+.sj-box>b{font-size:1.15rem;word-break:break-all}
+.sj-box .sj-act{margin-top:14px}
+.sj-fc{border-top:2px dashed var(--line);padding-top:18px}
+@media (max-width:760px){
+  .sj-hero{padding:22px 18px}.sj-brand{font-size:1.6rem}.sj-lead{font-size:1.1rem}
+  .sj-flow{grid-template-columns:1fr}.sj-flow li{flex-direction:row;text-align:left;gap:10px;padding:10px 12px}.sj-flow li:not(:last-child):after{content:'⌄';right:auto;left:30px;top:auto;bottom:-16px;transform:none;font-size:1rem}
+  .sj-dot{width:36px;height:36px;margin:0;flex:none}.sj-flow b{min-width:72px}
+  .sj-contact{grid-template-columns:1fr}.sj-vals{grid-template-columns:repeat(2,1fr)}
+}
 /* ===== FC 계정 관리 ===== */
 .acc-issued{border:2px solid var(--gold);background:var(--gold-soft);border-radius:10px;padding:12px;margin:0 0 12px}
 .acc-cred{font-size:1.05rem;margin:6px 0}
@@ -788,7 +845,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   /* ---------- 메뉴 정의 ---------- */
   var MENU=[
     {g:null,items:[['home','홈']]},
-    {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
+    {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉'],['me','내 정보 · 자료 보관']]},
     {g:'외부 연계',items:[['car','자동차 비교견적'],['sangjo','상조 서비스']]},
     {g:'교육',items:[['edu','온라인 교육센터'],['ai2','AI보장분석 고급형','NEW']]},
     {g:'공지 · 시상',items:[['news','보험사 소식지'],['award','시상 공지']]},
@@ -852,6 +909,27 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     desc:'암 진단비만 가입한 40~50대에게 반복 지급되는 치료비 담보로 기존 계약 보완을 제안합니다.',
     steps:['기존 증권으로 AI보장분석 기본형','진단 이후 치료비 공백 설명','원픽 상품 비교표 제시'],
     mats:[['PPT','보험비교분석 발표자료 (항암 강화·동시지급)'],['PDF','간편건강보험 담보 비교'],['PDF','실손종합 설계 2안 비교']]};
+  /* 상조 서비스 — 제휴사 소개서(삼우라이프 자료.pdf) 내용을 화면으로 옮김. 소개서가 바뀌면 SJ_DOC를 고친다.
+     홈페이지 주소·상담 전화·실적 기준 등은 관리자 페이지 「상조 서비스 안내」에서 바꾸고 content.json의 sangjo로 저장된다. */
+  var SJ_DOC={
+    name:'삼우라이프',en:'SAMWOO LIFE',sub:'Premium Life Service',
+    lead:['고객의 삶을 더 가치있게','삼우라이프가 함께합니다'],tag:'신뢰와 품격을 담은 라이프 케어 서비스',
+    about:['고객 중심 라이프 서비스 전문기업','체계적인 회원 관리 시스템 운영','다양한 생활 지원 서비스 제공','신뢰 기반의 맞춤형 상품 설계'],
+    values:[['TRUST','신뢰'],['CARE','배려'],['PREMIUM','품격'],['SERVICE','서비스']],
+    products:[['합리적인 가입 구성','합리적인 비용으로 부담을 최소화'],['다양한 혜택 제공','다양한 혜택으로 가치를 더합니다'],['안정적인 서비스 운영','체계적 운영으로 안전하게 관리'],['고객 맞춤형 관리','고객 특성에 맞춘 맞춤 관리 서비스']],
+    benefits:[['경제적 부담 완화','합리적인 비용으로 체계적 서비스 이용'],['전문 상담 서비스','전문 인력을 통한 맞춤 상담 제공'],['다양한 연계 서비스','생활·복지·라이프케어 서비스 지원'],['고객 중심 운영','회원 만족 중심의 체계적 관리']],
+    steps:[['상담 신청','고객 상담 신청 접수'],['상품 안내','상품 내용 및 혜택 안내'],['가입 진행','가입 상담 및 계약 체결'],['회원 관리','회원 정보 관리 및 서비스 안내'],['서비스 제공','다양한 서비스 제공 및 지원']],
+    stepNote:'체계적인 절차와 전문적인 관리로 고객 만족을 실현합니다.',
+    edge:[['서비스','고객 맞춤형 서비스 제공'],['관리 시스템','체계적이고 안정적인 운영 시스템'],['상담','전문 컨설턴트를 통한 맞춤 상담'],['혜택','다양한 연계 서비스 및 혜택 제공'],['만족도','고객 중심 관리로 높은 만족도 실현']],
+    care:[['신속한 응대','고객 문의에 신속하고 정확하게 응대'],['정확한 서비스 안내','정확하고 투명한 서비스 정보 제공'],['지속적인 사후관리','가입 후에도 지속적인 관리와 지원'],['안정적인 운영 시스템','체계적 시스템으로 안정적인 서비스 제공']],
+    why:[['안정적인 서비스','신뢰할 수 있는 안정적인 서비스 제공'],['합리적인 구성','합리적인 비용으로 최적의 서비스 구성'],['고객 중심 운영','고객 만족을 위한 맞춤형 관리'],['전문 상담 시스템','전문 컨설턴트의 맞춤 상담 서비스'],['프리미엄 라이프 케어','품격 있는 라이프 케어 서비스 제공']],
+    whyNote:'고객의 삶을 더 가치있게, 삼우라이프가 함께합니다.',
+    contact:[['상담 문의','전문 상담사와 1:1 상담 가능'],['가입 절차 안내','간편하고 정확한 가입 절차 안내'],['맞춤 설계 제공','고객 맞춤형 상품 설계 및 추천']]
+  };
+  var SANGJO={partner:'삼우라이프',url:'',tel:'',pdf:'files/sangjo/samwoolife.pdf',
+    target:['부모님이 고령인 40~60대 고객','자녀가 멀리 살거나 1인 가구인 고객','장례 등 큰 비용을 미리 정해진 금액으로 준비하고 싶은 고객','종신·정기보험 상담 고객 — 보장 이야기 끝에 가족 준비까지 이어갈 때'],
+    check:['상조회사가 공정거래위원회에 선불식 할부거래업자로 등록되어 있는지, 고객 납입금을 은행 예치·공제조합 등으로 보전하고 있는지 확인하세요.','중도 해약 시 돌려받는 금액(해약환급금) 기준을 고객에게 꼭 안내하세요.','상품에 포함되지 않아 따로 드는 비용이 있는지 미리 설명하세요.','가족에게 이전·양도할 수 있는지, 다른 지역에서도 서비스를 받을 수 있는지 확인하세요.'],
+    perf:'고객 소개 시 실적 반영 기준은 본사 공지를 확인하세요.'};
   var BANNER={title:'11월 1일 간편건강 고지 개정 외 3건',sub:'보험사 소식지에서 일정을 확인하세요.'};
   var HYPO=[['30대 맞벌이 · 자녀 1','태아·어린이 종합 + 부부 3대질병','"아이 보험 보실 때 부모님 진단비도 같이 점검해 볼까요?"'],
     ['50대 · 고혈압 약 복용','간편건강보험(3.5.5)','"약 드시는 분도 고지 3가지만 확인하면 가입됩니다."'],
@@ -976,7 +1054,36 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       return h;
     },
     car:function(){return extPage('자동차 비교견적','다이렉트·설계사 채널 비교','차량 번호와 운전자 정보를 입력해 여러 보험사 견적을 한 번에 받는 서비스로 연결합니다.','車');},
-    sangjo:function(){return extPage('상조 서비스','제휴 상조 상품 안내','제휴 상조사 상품 안내와 상담 신청 페이지로 연결합니다. 고객 소개 시 실적 반영 기준도 함께 안내합니다.','喪');},
+    sangjo:function(){
+      var D=SJ_DOC,S=SANGJO,E=esc,n2=function(i){return pad2(i+1);};
+      var home=S.url?'<a class="btn gold" style="text-decoration:none" target="_blank" rel="noopener" href="'+E(S.url)+'">홈페이지 바로가기 ↗</a>':'<button class="btn gold" type="button" disabled style="opacity:.6">홈페이지 바로가기 (주소 준비 중)</button>';
+      var tel=S.tel?'<a class="btn line" style="text-decoration:none" href="tel:'+E(String(S.tel).replace(/[^0-9+]/g,''))+'">상담 전화 '+E(S.tel)+'</a>':'';
+      var pdf=S.pdf?'<a class="btn line" style="text-decoration:none" target="_blank" rel="noopener" href="'+E(fileHref(S.pdf))+'">원본 소개서(PDF) 보기</a>':'';
+      var h='<section class="sj-hero"><div class="sj-hl"><span class="sj-k">제휴 상조 서비스</span><div class="sj-brand">'+E(D.name)+'<small>'+E(D.en)+'</small></div><p class="sj-en">'+E(D.sub)+'</p>'+
+        '<p class="sj-lead">'+D.lead.map(E).join('<br>')+'</p><p class="sj-tag">'+E(D.tag)+'</p><div class="sj-act">'+home+tel+pdf+'</div></div></section>';
+      h+='<section class="sj-sec"><div class="sj-t"><span>회사 소개</span><h2>'+E(D.name)+' 소개</h2><p>고객 중심의 라이프 서비스 전문기업</p></div>'+
+        '<div class="cols"><div class="panel"><ul class="sj-check">'+D.about.map(function(x){return '<li>'+E(x)+'</li>';}).join('')+'</ul></div>'+
+        '<div class="panel"><h3>핵심 가치</h3><div class="sj-vals">'+D.values.map(function(v){return '<div><b>'+E(v[0])+'</b><span>'+E(v[1])+'</span></div>';}).join('')+'</div></div></div></section>';
+      var cards=function(a,num){return '<div class="sj-cards">'+a.map(function(x,i){return '<div class="sj-card">'+(num?'<span class="sj-no">'+n2(i)+'</span>':'')+'<b>'+E(x[0])+'</b><span>'+E(x[1])+'</span></div>';}).join('')+'</div>';};
+      h+='<section class="sj-sec"><div class="sj-t"><span>상품 소개</span><h2>상품 안내</h2><p>고객의 라이프스타일에 맞춘 합리적이고 체계적인 서비스</p></div>'+cards(D.products,false)+'</section>';
+      h+='<section class="sj-sec"><div class="sj-t"><span>주요 혜택</span><h2>고객 혜택</h2></div>'+cards(D.benefits,true)+'</section>';
+      h+='<section class="sj-sec"><div class="sj-t"><span>서비스 프로세스</span><h2>서비스 진행 절차</h2></div><ol class="sj-flow">'+
+        D.steps.map(function(x,i){return '<li><span class="sj-dot">'+n2(i)+'</span><b>'+E(x[0])+'</b><span>'+E(x[1])+'</span></li>';}).join('')+'</ol><p class="sj-bar">'+E(D.stepNote)+'</p></section>';
+      h+='<section class="sj-sec"><div class="sj-t"><span>차별화 포인트</span><h2>'+E(D.name)+'만의 경쟁력</h2></div><div class="tbl"><table class="sj-tbl"><thead><tr><th>구분</th><th>'+E(D.name)+'</th></tr></thead><tbody>'+
+        D.edge.map(function(x){return '<tr><td><b>'+E(x[0])+'</b></td><td>'+E(x[1])+'</td></tr>';}).join('')+'</tbody></table></div></section>';
+      h+='<section class="sj-sec"><div class="cols"><div><div class="sj-t"><span>고객 중심 서비스</span><h2>고객 만족 실현</h2><p>고객의 신뢰를 최우선으로 생각합니다</p></div><ul class="sj-nums">'+
+        D.care.map(function(x,i){return '<li><span class="sj-no">'+n2(i)+'</span><div><b>'+E(x[0])+'</b><span>'+E(x[1])+'</span></div></li>';}).join('')+'</ul></div>'+
+        '<div><div class="sj-t"><span>기대 효과</span><h2>'+E(D.name)+' 선택 이유</h2></div><ul class="sj-nums">'+
+        D.why.map(function(x,i){return '<li><span class="sj-no">'+n2(i)+'</span><div><b>'+E(x[0])+'</b><span>'+E(x[1])+'</span></div></li>';}).join('')+'</ul></div></div><p class="sj-bar">'+E(D.whyNote)+'</p></section>';
+      h+='<section class="sj-sec"><div class="sj-t"><span>상담 안내</span><h2>상담 및 가입 문의</h2><p>전문 상담을 통해 맞춤형 상품을 안내해 드립니다</p></div><div class="sj-contact"><ul class="sj-nums">'+
+        D.contact.map(function(x,i){return '<li><span class="sj-no">'+n2(i)+'</span><div><b>'+E(x[0])+'</b><span>'+E(x[1])+'</span></div></li>';}).join('')+'</ul>'+
+        '<div class="sj-box"><span>상담 문의</span><b>'+(S.tel?E(S.tel):'관리자 등록 예정')+'</b><span>홈페이지</span><b>'+(S.url?E(S.url.replace(/^https?:\/\//,'')):'관리자 등록 예정')+'</b><div class="sj-act">'+home+'</div></div></div></section>';
+      h+='<section class="sj-sec sj-fc"><div class="sj-t"><span>FC 상담 도움말</span><h2>이렇게 안내하세요</h2></div><div class="cols">'+
+        '<div class="panel"><h3>이런 고객에게 권하세요</h3><ul class="list">'+(S.target||[]).map(function(x){return '<li><span class="pill new">추천</span><span class="t">'+E(x)+'</span></li>';}).join('')+'</ul></div>'+
+        '<div class="panel"><h3>상담 전 꼭 확인할 점</h3><ul class="list">'+(S.check||[]).map(function(x){return '<li><span class="pill warn">확인</span><span class="t">'+E(x)+'</span></li>';}).join('')+'</ul></div>'+
+        '<div class="panel"><h3>실적 반영 기준</h3><p style="margin:0;line-height:1.7">'+E(S.perf||'')+'</p></div></div></section>';
+      return '<div class="sj">'+h+'</div>';
+    },
     edu:function(){
       var U='https://kif.fnkorea.com/index.asp';
       var CATS=[['주간생생정보','주간생생정보 · WEEKLY FUN'],['보험HOT이슈','이번 주 보험 이슈'],['보험영업백서','1분 성공노트 · 보장설계 세일즈스킬 · 재무/은퇴설계 · 법인영업 · 신인교육과정'],['생·손보 자격과정','생명·손해보험 자격 교육'],['금융자격과정','금융 자격 교육'],['지식한입','알·쓸·지 · 쉽게 푸는 경제용어'],['직영채널','직영채널 전용 과정'],['보험사 영업방향','보험사별 영업 방향 안내'],['마이페이지','내 수강 이력 · 이수 현황']];
@@ -1011,7 +1118,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     admin:function(){
       if(me.role!=='admin')return head('관리자','접근 권한 없음','관리자 계정으로 로그인해야 볼 수 있습니다.');
       var h=head('관리자','관리자 페이지','FC 계정, 공지, 메뉴 내용을 수정하고 접속 기록을 확인합니다.');
-      h+=acctHtml()+nuHtml()+cmsHtml();
+      h+=acctHtml()+nuHtml()+sjHtml()+cmsHtml();
       return h;
     }
   };
@@ -1073,7 +1180,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     if(!c||typeof c!=='object')return;SITE=c;
     if(Array.isArray(c.news))NEWS=c.news;if(Array.isArray(c.awards))AWARDS=c.awards;if(Array.isArray(c.mats))MATS=c.mats;
     if(Array.isArray(c.lect))LECT=c.lect;if(Array.isArray(c.hypo))HYPO=c.hypo;if(Array.isArray(c.notices))NOTICES=c.notices;
-    if(c.concept)CONCEPT=Object.assign({},CONCEPT,c.concept);if(c.banner)BANNER=Object.assign({},BANNER,c.banner);
+    if(c.concept)CONCEPT=Object.assign({},CONCEPT,c.concept);if(c.banner)BANNER=Object.assign({},BANNER,c.banner);if(c.sangjo)SANGJO=Object.assign({},SANGJO,c.sangjo);
     if(window.AIMOD&&AIMOD.content)AIMOD.content(c);
     if(!me)gateMode();
     if(redraw!==false&&me&&cur!=='ai'&&cur!=='admin')go(cur);
@@ -1121,7 +1228,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       notices:rows(v('cNotice'),3),news:rows(v('cNews'),7),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),3),
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
-      aiProxy:v('mProxy'),authApi:(SITE&&SITE.authApi)||'',aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
+      aiProxy:v('mProxy'),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
     var ck=document.getElementById('cOpts');
     if(ck&&ck.checked&&window.AIMOD&&AIMOD.getOpts){c.opts=AIMOD.getOpts();c.optsVer=c.ver;}
     else if(SITE&&SITE.opts){c.opts=SITE.opts;c.optsVer=SITE.optsVer||SITE.ver;}
@@ -1615,6 +1722,34 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       };r.readAsText(file);
     };
   }
+  /* ---------- 관리자: 상조 서비스 안내 ---------- */
+  function sjHtml(){
+    var S=SANGJO,ta=function(id,lab,help,val,r){return '<label class="f">'+lab+' <span class="note">'+help+'</span><textarea class="in" id="'+id+'" rows="'+(r||4)+'">'+esc(val)+'</textarea></label>';};
+    return '<div class="panel form" id="sjPanel"><h3>상조 서비스 안내 <span class="pill new">메뉴 「상조 서비스」</span></h3>'+
+      '<p class="note">FC 화면 「외부 연계 → 상조 서비스」에 '+esc(SJ_DOC.name)+' 소개서 내용이 나옵니다. 아래 칸은 바로 바꿀 수 있고, 홈페이지 주소를 넣으면 「홈페이지 바로가기」 버튼이 켜집니다.</p>'+
+      '<div class="fgrid"><label class="f">홈페이지 주소<input class="in" id="sjUrl" value="'+esc(S.url||'')+'" placeholder="https://"></label>'+
+      '<label class="f">상담 전화<input class="in" id="sjTel" value="'+esc(S.tel||'')+'" placeholder="예: 1588-0000"></label></div>'+
+      '<div class="cols">'+ta('sjTarget','권할 고객','한 줄에 하나',(S.target||[]).join('\n'),4)+ta('sjCheck','상담 전 확인할 점','한 줄에 하나',(S.check||[]).join('\n'),4)+'</div>'+
+      ta('sjPerf','실적 반영 기준','',S.perf,2)+
+      '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn" type="button" id="sjSave">저장 (모든 FC에게 반영)</button><button class="btn ghost" type="button" id="sjPrev">이 기기에서 미리보기</button></div>'+
+      '<p class="note" id="sjMsg" role="status"></p></div>';
+  }
+  function sjCollect(){
+    var v=function(id){var e=document.getElementById(id);return e?e.value.trim():'';},L=function(id){return v(id).split('\n').map(function(x){return x.trim();}).filter(Boolean);};
+    var url=v('sjUrl');if(url&&!/^https?:\/\//i.test(url))url='https://'+url;
+    return {url:url,tel:v('sjTel'),target:L('sjTarget'),check:L('sjCheck'),perf:v('sjPerf')};
+  }
+  function bindSj(){
+    var sv=document.getElementById('sjSave'),pv=document.getElementById('sjPrev'),m=document.getElementById('sjMsg');if(!sv)return;
+    pv.onclick=function(){SANGJO=Object.assign({},SANGJO,sjCollect());m.innerHTML='이 기기에서만 바꿨습니다. <a href="#" data-go="sangjo">상조 서비스 화면 보기</a> · 다른 FC에게 보이려면 「저장」을 누르세요.';};
+    sv.onclick=async function(){
+      var d=sjCollect();if(d.url&&!/^https?:\/\/[^\s.]+\.[^\s]+$/i.test(d.url)){m.textContent='홈페이지 주소를 확인해 주세요. (예: https://www.○○.co.kr)';return;}
+      sv.disabled=true;m.textContent='저장 중… (GitHub)';
+      try{var cur=Object.assign({},(SITE&&SITE.sangjo)||{},d);await siteSet({sangjo:cur},'상조 서비스 안내 수정');SANGJO=Object.assign({},SANGJO,d);m.innerHTML='저장했습니다. 1~2분 뒤 모든 FC 화면에 보입니다. <a href="#" data-go="sangjo">상조 서비스 화면 보기</a>';}
+      catch(x){m.textContent='저장 실패: '+(x&&x.message||x);}
+      sv.disabled=false;
+    };
+  }
   function notices(){var s=store('fc_notices');try{return s?JSON.parse(s):null;}catch(e){return null;}}
   function renderNotices(){
     var l=(SITE&&Array.isArray(SITE.notices))?NOTICES:(notices()||NOTICES);
@@ -1648,7 +1783,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       Array.prototype.forEach.call(document.querySelectorAll('.guide'),function(b){b.addEventListener('click',function(){toast('"'+b.getAttribute('data-guide')+'" 사용가이드는 관리자가 등록하면 여기서 열립니다.');});});
     }
     if(id==='admin'&&me.role==='admin'){
-      bindCms();bindNu();bindAcct();
+      bindCms();bindNu();bindAcct();bindSj();
     }
     if(id==='news'){
       var nco='',nf=function(){var ym=document.getElementById('nYm').value,wk=document.getElementById('nWk').value,q=document.getElementById('nQ').value.trim(),n=0;
