@@ -1,7 +1,7 @@
 {
-  "name": "한국보험금융 교육지원 포털",
-  "short_name": "교육지원 포털",
-  "description": "한국보험금융(주) FC 영업지원 포털 바로가기",
+  "name": "한보금on 활동지원",
+  "short_name": "한보금on 활동지원",
+  "description": "한국보험금융(주) 한보금on 활동지원 바로가기",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,7 +9,17 @@
   "theme_color": "#0f2240",
   "lang": "ko",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }
