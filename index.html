@@ -885,11 +885,18 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 @media (prefers-reduced-motion:reduce){.hm-mq-in{flex-wrap:wrap;width:auto}.hm-mq-in>[aria-hidden="true"]{display:none}.hm-mq{-webkit-mask-image:none;mask-image:none}}
 @keyframes mq{from{transform:translateX(-50%)}to{transform:translateX(0)}}
 
-.hm-cpt .cur{position:absolute;top:0;bottom:0;width:50.5%;z-index:3;background:#0b1a31;transition:transform 1.05s cubic-bezier(.7,0,.25,1)}
-.hm-cpt .cur.l{left:0;border-right:2px solid var(--kgold);background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 18px,transparent 18px 36px)}
-.hm-cpt .cur.r{right:0;border-left:2px solid var(--kgold);background-image:repeating-linear-gradient(90deg,transparent 0 18px,rgba(255,255,255,.035) 18px 36px)}
-.hm-cpt.open .cur.l{transform:translateX(-101%)}
-.hm-cpt.open .cur.r{transform:translateX(101%)}
+.hm-cpt{--curtain:url(files/design/curtain.jpg)}
+.hm-cpt .cur{position:absolute;top:-2px;bottom:-2px;width:51%;z-index:3;
+  background:linear-gradient(90deg,rgba(0,0,0,.25),transparent 30%,transparent 70%,rgba(0,0,0,.25)),var(--curtain) left bottom/auto 100%,#0b1a31;
+  box-shadow:0 0 28px rgba(0,0,0,.45);
+  transition:transform 1.5s cubic-bezier(.62,0,.32,1),filter 1.5s ease}
+.hm-cpt .cur.l{left:0;transform-origin:0 50%;border-right:3px solid var(--kgold)}
+.hm-cpt .cur.r{right:0;transform-origin:100% 50%;border-left:3px solid var(--kgold);background-position:0 0,right bottom,0 0}
+/* 걷히면 양옆에 좁게 모인 커튼으로 남음 (주름이 촘촘해짐) */
+.hm-cpt.open .cur.l{transform:scaleX(.075) skewY(.6deg);filter:brightness(1.12)}
+.hm-cpt.open .cur.r{transform:scaleX(.075) skewY(-.6deg);filter:brightness(1.12)}
+.hm-cpt-t,.hm-cpt-b{position:relative;z-index:2}
+.hm-cpt{padding-left:56px;padding-right:56px}
 .hm-cpt-t h2{min-height:1.2em}
 .hm-cpt-t h2.typing:after{content:'';display:inline-block;width:3px;height:.9em;margin-left:4px;background:var(--kgold);vertical-align:-.08em;animation:caret .7s steps(1) infinite}
 @keyframes caret{50%{opacity:0}}
@@ -1259,14 +1266,22 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   /* 최근 7일 안에 올라온 소식지 수 (사이드바 「새 글」·홈 숫자) */
   function newsNew(){var d=new Date(Date.now()-7*864e5),c=d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());return NEWS.filter(function(n){return String(n[0]||'')>=c;}).length;}
   /* 이달의 컨셉: 커튼이 열린 뒤 제목을 한 글자씩 친다 (움직임 줄이기 설정이면 바로 보여 줌) */
-  var cptTimer=null;
+  /* 이달의 컨셉: 벨벳 커튼이 가운데에서 좌우로 걷히며(양옆에 주름져 모임) 제목을 한 글자씩 친다.
+     다 보여 준 뒤 6초 쉬고 커튼이 다시 닫혔다가 열리기를 되풀이한다. 홈을 떠나면 멈춘다. */
+  var cptTimer=null,cptRun=0;
   function playCpt(){
     var box=document.getElementById('hmCpt');if(!box)return;
-    var h2=box.querySelector('h2'),t=h2.getAttribute('data-t')||h2.textContent;clearInterval(cptTimer);
-    if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){box.classList.add('open','typed');return;}
+    var h2=box.querySelector('h2'),t=h2.getAttribute('data-t')||h2.textContent,run=++cptRun;
+    clearInterval(cptTimer);
+    var alive=function(){return run===cptRun&&document.getElementById('hmCpt')===box;};
+    var later=function(ms,f){setTimeout(function(){if(alive())f();},ms);};
+    var type=function(){var i=0;h2.classList.add('typing');clearInterval(cptTimer);
+      cptTimer=setInterval(function(){if(!alive()){clearInterval(cptTimer);return;}i++;h2.textContent=t.slice(0,i);
+        if(i>=t.length){clearInterval(cptTimer);h2.classList.remove('typing');box.classList.add('typed');later(6500,closeAgain);}},85);};
+    var open=function(){box.classList.add('open');later(1350,type);};
+    var closeAgain=function(){box.classList.remove('open','typed');later(1500,function(){h2.textContent='';later(500,open);});};
     h2.textContent='';box.classList.remove('open','typed');void box.offsetWidth;
-    setTimeout(function(){box.classList.add('open');},250);
-    var i=0;setTimeout(function(){h2.classList.add('typing');cptTimer=setInterval(function(){i++;h2.textContent=t.slice(0,i);if(i>=t.length){clearInterval(cptTimer);h2.classList.remove('typing');box.classList.add('typed');}},85);},1250);
+    later(350,open);
   }
   function renderSide(){
     var nn=newsNew();
