@@ -339,6 +339,23 @@ td.r,th.r{text-align:right}
 @media (max-width:1100px) and (min-width:861px){.pc-hero,.pc-tools{grid-template-columns:1fr}.cat4{grid-template-columns:1fr 1fr}.tgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .tb.back{font-weight:700;margin-right:6px}
 .tb.back[disabled]{opacity:.4;cursor:default}
+/* ===== 로그인: 계정 신청 · 찾기 / 고급형 크게 보기 ===== */
+.gx{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0 0;font-size:.92rem}
+.gx a{color:var(--ink);font-weight:700}
+.gx span{color:var(--muted)}
+#gateExtra .box{margin-top:0}
+#gate .r{align-content:center}
+#gateExtra{width:100%;max-width:380px}
+#gateExtra>.gx{margin:4px 0 14px}
+.ai-adv.full{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;min-height:0;z-index:90;border:0;border-radius:0}
+.adv-close{position:fixed;right:10px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:91;background:#0f2240;color:#fff;border:2px solid var(--gold);border-radius:20px;padding:8px 14px;font-weight:700;font-size:.9rem;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+body.adv-full{overflow:hidden}
+@media (max-width:760px){.pc-only{display:none!important}}
+/* ===== FC 계정 관리 ===== */
+.acc-issued{border:2px solid var(--gold);background:var(--gold-soft);border-radius:10px;padding:12px;margin:0 0 12px}
+.acc-cred{font-size:1.05rem;margin:6px 0}
+.acc-cred code{font-size:1.1rem;font-weight:800;padding:2px 8px;background:var(--card,#fff);border-radius:6px}
+#acct .tbl td .btn.sm{padding:4px 8px}
 /* ===== 자료 올리기 · 파일 열기 ===== */
 a.flink,a.hlink{color:inherit;text-decoration:none}
 a.flink:hover b,a.flink:hover{text-decoration:underline}
@@ -705,6 +722,28 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       <div class="err" id="err"></div>
       <div class="hint"><b>시제품 체험용 계정</b><br>FC 화면: <code>fc1001</code> / <code>1234</code><br>관리자 화면: <code>admin</code> / <code>admin</code></div>
     </form>
+    <div id="gateExtra" hidden>
+      <p class="gx"><a href="#" data-gate="gSignup">처음이신가요? 계정 신청</a><span>·</span><a href="#" data-gate="gForgot">비밀번호를 잊으셨나요?</a></p>
+      <div id="gSignup" hidden><form class="box" id="sgForm" autocomplete="off">
+        <h1>계정 신청</h1>
+        <p class="sub">아이디는 <b>회사 아이디(사번)</b>로 정하면 관리자가 알아보기 쉽습니다. 관리자가 승인하면 로그인할 수 있습니다.</p>
+        <label class="f">아이디 (영문 소문자·숫자)<input class="in" id="sgId" placeholder="예: 회사 사번" autocomplete="username"></label>
+        <label class="f">비밀번호 (8자 이상)<input class="in" id="sgPw" type="password" autocomplete="new-password"></label>
+        <label class="f">비밀번호 확인<input class="in" id="sgPw2" type="password" autocomplete="new-password"></label>
+        <button class="btn" type="submit">신청하기</button>
+        <div class="err" id="sgMsg" role="status"></div>
+        <div class="hint">회사 비밀번호와 <b>다르게</b> 정하는 것을 권장합니다. 비밀번호는 원래 글자로 저장되지 않습니다.</div>
+        <p class="gx"><a href="#" data-gate="loginForm">← 로그인으로 돌아가기</a></p>
+      </form></div>
+      <div id="gForgot" hidden><form class="box" id="fgForm" autocomplete="off">
+        <h1>비밀번호 찾기</h1>
+        <p class="sub">아이디를 넣으면 관리자에게 <b>비밀번호 초기화 요청</b>이 갑니다. 관리자가 임시 비밀번호를 알려 드리면 그걸로 로그인한 뒤 새 비밀번호로 바꾸세요.</p>
+        <label class="f">아이디<input class="in" id="fgId" autocomplete="username"></label>
+        <button class="btn" type="submit">초기화 요청 보내기</button>
+        <div class="err" id="fgMsg" role="status"></div>
+        <p class="gx"><a href="#" data-gate="loginForm">← 로그인으로 돌아가기</a></p>
+      </form></div>
+    </div>
   </div>
 </div>
 
@@ -719,6 +758,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       <button id="zOut" aria-label="글자 작게">가-</button><span id="zVal">100%</span><button id="zIn" aria-label="글자 크게">가+</button>
     </div>
     <button class="tb" id="theme" aria-label="화면 테마 전환">☾</button>
+    <button class="tb" id="meBtn">내 정보</button>
     <button class="tb" id="logout">로그아웃</button>
   </div>
   <nav class="gnb" aria-label="주 메뉴"><div class="gnb-in" id="gnb"></div></nav>
@@ -739,7 +779,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     fc1001:{pw:'1234',name:'김민준 FC',org:'강남지사',no:'1001',role:'fc'},
     admin:{pw:'admin',name:'본사 관리자',org:'전략채널본부',no:'0001',role:'admin'}
   };
-  var V1='https://bluewind1124-ui.github.io/kif/classic/';
+  var V1=new URL('classic/',location.href).href; /* 상품 비교(v1.0): 같은 사이트라 포털 로그인으로 바로 열림 */
   var EDU='https://kif.fnkorea.com/index.asp';
   var me=null;
 
@@ -914,11 +954,12 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       return h+'</div><p class="note">기존 도구는 접속코드 로그인이 한 번 더 나옵니다. 통합 후에는 포털 로그인 한 번으로 들어가게 바꿉니다.</p>';
     },
     ai:function(){return '<div id="aiApp"></div>';},
+    me:function(){return meHtml();},
     /* AI보장분석 고급형 — advanced/index.html (보장·연금·자산 상담 설계, 제안서, 고객 리포트, 세법 기준표·법령 점검) */
     ai2:function(){
       var h=head('영업 도구 · 교육','AI보장분석 고급형','상담 설계(보장·연금·자산) → 제안서(시뮬레이션·발표 노트) → 고객 리포트까지. 기본형보다 깊은 분석용입니다. 고객 자료는 이 기기의 브라우저에만 저장됩니다.');
-      h+='<div class="ai-adv-bar"><a class="btn sm" style="text-decoration:none" target="_blank" rel="noopener" href="advanced/index.html">새 창으로 크게 열기 ↗</a><button class="btn sm ghost" data-go="ai">기본형으로 이동</button></div>';
-      return h+'<iframe class="ai-adv" src="advanced/index.html" title="AI보장분석 고급형"></iframe>';
+      h+='<div class="ai-adv-bar"><button class="btn sm" type="button" id="advFull">크게 보기 (전체 화면)</button><a class="btn sm ghost pc-only" style="text-decoration:none" target="_blank" rel="noopener" href="advanced/index.html">새 창으로 열기 ↗</a><button class="btn sm ghost" data-go="ai">기본형으로 이동</button></div>';
+      return h+'<button class="adv-close" id="advClose" type="button" hidden>✕ 작게 보기</button><iframe class="ai-adv" src="advanced/index.html" title="AI보장분석 고급형"></iframe>';
     },
     hypo:function(){
       var h=head('영업 도구','대표 상품 가설','고객 유형별로 "이 고객에게는 이 상품부터"라는 가설과 첫 화법을 정리합니다. 관리자가 매달 바꿀 수 있습니다.');
@@ -970,12 +1011,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     admin:function(){
       if(me.role!=='admin')return head('관리자','접근 권한 없음','관리자 계정으로 로그인해야 볼 수 있습니다.');
       var h=head('관리자','관리자 페이지','FC 계정, 공지, 메뉴 내용을 수정하고 접속 기록을 확인합니다.');
-      h+='<div class="cols"><div class="panel"><h3>FC 계정 관리</h3><div class="tbl"><table><thead><tr><th>아이디</th><th>이름</th><th>소속</th><th>상태</th><th>최근 접속</th></tr></thead><tbody>'+
-        '<tr><td>fc1001</td><td>김민준</td><td>강남지사</td><td><span class="pill ok">사용</span></td><td>2026.10.16 09:12</td></tr>'+
-        '<tr><td>fc1002</td><td>이서연</td><td>분당지사</td><td><span class="pill ok">사용</span></td><td>2026.10.15 18:40</td></tr>'+
-        '<tr><td>fc1003</td><td>박지훈</td><td>일산지사</td><td><span class="pill warn">정지</span></td><td>2026.09.28 11:05</td></tr>'+
-        '</tbody></table></div><div class="row" style="margin-top:10px"><button class="btn sm" id="fakeAdd">FC 계정 추가</button><button class="btn sm ghost" id="fakeReset">비밀번호 초기화</button></div><p class="note" id="admMsg"></p></div>'+
-        '</div>'+nuHtml()+cmsHtml();
+      h+=acctHtml()+nuHtml()+cmsHtml();
       return h;
     }
   };
@@ -1039,6 +1075,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     if(Array.isArray(c.lect))LECT=c.lect;if(Array.isArray(c.hypo))HYPO=c.hypo;if(Array.isArray(c.notices))NOTICES=c.notices;
     if(c.concept)CONCEPT=Object.assign({},CONCEPT,c.concept);if(c.banner)BANNER=Object.assign({},BANNER,c.banner);
     if(window.AIMOD&&AIMOD.content)AIMOD.content(c);
+    if(!me)gateMode();
     if(redraw!==false&&me&&cur!=='ai'&&cur!=='admin')go(cur);
   }
   (function loadContent(i){
@@ -1084,7 +1121,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       notices:rows(v('cNotice'),3),news:rows(v('cNews'),7),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),3),
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
-      aiProxy:v('mProxy'),aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
+      aiProxy:v('mProxy'),authApi:(SITE&&SITE.authApi)||'',aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
     var ck=document.getElementById('cOpts');
     if(ck&&ck.checked&&window.AIMOD&&AIMOD.getOpts){c.opts=AIMOD.getOpts();c.optsVer=c.ver;}
     else if(SITE&&SITE.opts){c.opts=SITE.opts;c.optsVer=SITE.optsVer||SITE.ver;}
@@ -1349,6 +1386,235 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     var inner='<div class="th '+esc(m[0])+'"><span>'+esc(m[0])+'</span><b>'+esc(m[1])+'</b></div><div class="mt">'+(full?'<span class="pill">'+esc(m[2])+'</span> ':'')+esc(m[3]||'')+(m[4]?' <span class="pill new">열기</span>':'')+'</div>';
     return m[4]?'<a class="mat" target="_blank" rel="noopener" href="'+fileHref(m[4])+'">'+inner+'</a>':'<div class="mat">'+inner+'</div>';
   }
+  /* ---------- 개인 계정 (계정 서버: auth-server/worker.js) ----------
+     계정 서버에는 아이디 · 비밀번호(풀 수 없는 형태) · 권한 · 상태만 있다. 이름·고객 자료는 없다.
+     비밀번호는 이 기기에서 먼저 PBKDF2로 바꿔 보내므로 원문이 인터넷으로 나가지 않는다.
+     계정 서버 주소(content.json의 authApi)가 없으면 시제품 체험용 계정(USERS)으로 동작한다. */
+  var ACC={list:null, issued:null, busy:false, note:''};
+  var SSO_KEY='kif_sso', TOK_KEY='kif_tok', PH_ITER=150000;
+  var TE=new TextEncoder();
+  function authApi(){return (SITE&&SITE.authApi)||'';}
+  function b2a(u){var s='';u=new Uint8Array(u);for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);return btoa(s);}
+  async function phOf(id,pw){
+    var b=await crypto.subtle.importKey('raw',TE.encode(pw),'PBKDF2',false,['deriveBits']);
+    return b2a(await crypto.subtle.deriveBits({name:'PBKDF2',salt:TE.encode('kif-pw:'+String(id).trim().toLowerCase()),iterations:PH_ITER,hash:'SHA-256'},b,256));
+  }
+  function tempPw(){var A='abcdefghjkmnpqrstuvwxyz23456789',r=crypto.getRandomValues(new Uint8Array(8)),s='';for(var i=0;i<8;i++)s+=A[r[i]%A.length];return s;}
+  async function api(body){
+    var u=authApi();if(!u)throw '계정 서버 주소가 아직 없습니다.';
+    var r;try{r=await fetch(u,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});}catch(e){throw '계정 서버에 연결하지 못했습니다. 인터넷 연결을 확인하세요.';}
+    var j={};try{j=await r.json();}catch(e){}
+    if(!r.ok||!j.ok)throw j.error||('계정 서버 오류 ('+r.status+')');
+    return j;
+  }
+  function tok(){try{var t=JSON.parse(localStorage.getItem(TOK_KEY)||'null');return t&&t.exp>Date.now()?t.token:'';}catch(e){return '';}}
+  /* content.json을 먼저 읽어야 계정 서버 주소를 안다 */
+  var siteReady=new Promise(function(res){var n=0,t=setInterval(function(){if(SITE||++n>40){clearInterval(t);res();}},100);});
+  async function accLogin(id,pw){
+    await siteReady;
+    if(!authApi()){var d=USERS[id];if(d&&d.pw===pw)return {id:id,name:d.name,org:d.org,no:d.no,role:d.role,demo:true};throw '아이디 또는 비밀번호가 맞지 않습니다. 위 체험용 계정을 확인하세요.';}
+    var j=await api({op:'login',id:id,ph:await phOf(id,pw)});
+    try{localStorage.setItem(TOK_KEY,JSON.stringify({token:j.token,exp:j.exp}));}catch(e){}
+    return {id:j.id,name:j.id,org:j.role==='admin'?'관리자':'FC',no:'',role:j.role,must:j.must,exp:j.exp};
+  }
+  /* 포털 로그인 한 번으로 상품 비교(classic/)·고급형(advanced/)까지: 같은 사이트의 localStorage에 표시를 남긴다 */
+  function ssoSet(p){try{localStorage.setItem(SSO_KEY,JSON.stringify({id:p.id,name:p.name,org:p.org,no:p.no,role:p.role,demo:!!p.demo,must:!!p.must,exp:p.exp||Date.now()+12*3600000}));}catch(e){}}
+  function ssoGet(){try{var s=JSON.parse(localStorage.getItem(SSO_KEY)||'null');return s&&s.exp>Date.now()?s:null;}catch(e){return null;}}
+  function ssoClear(){try{localStorage.removeItem(SSO_KEY);localStorage.removeItem(TOK_KEY);localStorage.removeItem('kif_keep');sessionStorage.removeItem('kif_ok');}catch(e){}}
+
+  /* ---- 로그인 화면: 계정 신청 · 비밀번호 찾기 ---- */
+  function bindGateExtra(){
+    var box=document.getElementById('gateExtra');if(!box)return;
+    var show=function(w){['loginForm','gSignup','gForgot'].forEach(function(id){var e=document.getElementById(id);if(e)e.hidden=id!==w;});};
+    box.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-gate]');if(!b)return;e.preventDefault();show(b.getAttribute('data-gate'));});
+    document.getElementById('sgForm').addEventListener('submit',async function(e){
+      e.preventDefault();var m=document.getElementById('sgMsg'),id=document.getElementById('sgId').value.trim().toLowerCase(),p1=document.getElementById('sgPw').value,p2=document.getElementById('sgPw2').value;
+      if(!/^[a-z0-9._-]{3,30}$/.test(id)){m.textContent='아이디는 영문 소문자·숫자 3~30자로 정해 주세요. (예: 회사 사번)';return;}
+      if(p1.length<8){m.textContent='비밀번호는 8자 이상으로 정해 주세요.';return;}
+      if(p1!==p2){m.textContent='비밀번호 확인이 다릅니다.';return;}
+      m.textContent='신청 중…';
+      try{var j=await api({op:'signup',id:id,ph:await phOf(id,p1)});
+        m.textContent=j.st==='on'?'관리자 계정이 만들어졌습니다. 「로그인」을 눌러 들어가세요.':'신청했습니다. 관리자가 승인하면 이 아이디·비밀번호로 로그인할 수 있습니다.';
+        document.getElementById('sgPw').value='';document.getElementById('sgPw2').value='';
+      }catch(x){m.textContent=String(x);}
+    });
+    document.getElementById('fgForm').addEventListener('submit',async function(e){
+      e.preventDefault();var m=document.getElementById('fgMsg'),id=document.getElementById('fgId').value.trim();
+      if(!id){m.textContent='아이디를 넣어 주세요.';return;}
+      m.textContent='보내는 중…';
+      try{await api({op:'forgot',id:id});m.textContent='관리자에게 초기화 요청을 보냈습니다. 관리자가 임시 비밀번호를 알려 드리면, 그 비밀번호로 로그인한 뒤 새 비밀번호로 바꾸세요.';}catch(x){m.textContent=String(x);}
+    });
+  }
+  function gateMode(){
+    var on=!!authApi(),hn=document.querySelector('#loginForm .hint'),ex=document.getElementById('gateExtra');
+    if(hn)hn.hidden=on;if(ex)ex.hidden=!on;
+    var u=document.getElementById('uid');if(u)u.placeholder=on?'본사에 신청한 아이디 (예: 회사 사번)':'예: fc1001';
+  }
+
+  /* ---- 내 정보: 비밀번호 변경 · 고객 자료 보관 ---- */
+  function meHtml(){
+    var h=head('내 정보','내 정보 · 자료 보관','비밀번호를 바꾸고, 고객 자료를 내 PC나 내 클라우드(구글 드라이브·원드라이브·아이클라우드)에 보관합니다.');
+    if(me.must)h+='<div class="panel" style="border:2px solid var(--gold)"><b>지금은 임시 비밀번호입니다.</b> 아래에서 새 비밀번호로 바꿔 주세요.</div>';
+    h+='<div class="cols"><div class="panel form"><h3>비밀번호 변경</h3>';
+    if(!authApi()||me.demo)h+='<p class="note">시제품 체험용 계정은 비밀번호를 바꿀 수 없습니다.</p>';
+    else h+='<p class="note">아이디 <b>'+esc(me.id)+'</b></p><label class="f">지금 비밀번호<input class="in" id="pwOld" type="password" autocomplete="current-password"></label>'+
+      '<label class="f">새 비밀번호 (8자 이상)<input class="in" id="pwNew" type="password" autocomplete="new-password"></label><label class="f">새 비밀번호 확인<input class="in" id="pwNew2" type="password" autocomplete="new-password"></label>'+
+      '<div class="row"><button class="btn" type="button" id="pwChange">비밀번호 바꾸기</button></div><p class="note">회사 비밀번호와 다르게 정하는 것을 권장합니다.</p>';
+    h+='<p class="note" id="pwMsg" role="status"></p></div>'+bkHtml()+'</div>';
+    return h;
+  }
+  function bindMe(){
+    var b=document.getElementById('pwChange');
+    if(b)b.onclick=async function(){
+      var m=document.getElementById('pwMsg'),o=document.getElementById('pwOld').value,n=document.getElementById('pwNew').value;
+      if(n.length<8){m.textContent='새 비밀번호는 8자 이상으로 정해 주세요.';return;}
+      if(n!==document.getElementById('pwNew2').value){m.textContent='새 비밀번호 확인이 다릅니다.';return;}
+      if(n===o){m.textContent='지금 비밀번호와 다르게 정해 주세요.';return;}
+      b.disabled=true;m.textContent='바꾸는 중…';
+      try{await api({op:'change',token:tok(),ph:await phOf(me.id,o),nph:await phOf(me.id,n)});me.must=false;ssoSet(me);
+        m.textContent='비밀번호를 바꿨습니다. 다음 로그인부터 새 비밀번호를 쓰세요.';['pwOld','pwNew','pwNew2'].forEach(function(i){document.getElementById(i).value='';});}
+      catch(x){m.textContent=String(x);}
+      b.disabled=false;
+    };
+    bindBk();
+  }
+
+  /* ---- 관리자: 계정 관리 ---- */
+  function fmtT(t){if(!t)return '-';var d=new Date(t);return d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());}
+  function acctIssued(){
+    var x=ACC.issued;if(!x)return '';
+    var txt='[한보금on 활동지원] 계정 안내\n아이디: '+x.id+'\n임시 비밀번호: '+x.pw+'\n\n로그인 후 「내 정보」에서 새 비밀번호로 바꿔 주세요.\n폰에 아이콘 만들기: https://bluewind1124-ui.github.io/kif/app.html';
+    return '<div class="acc-issued"><b>'+esc(x.title)+'</b><div class="acc-cred">아이디 <code>'+esc(x.id)+'</code> &nbsp; 임시 비밀번호 <code>'+esc(x.pw)+'</code></div>'+
+      '<p class="note">이 비밀번호는 <b>지금 이 화면에서만</b> 볼 수 있습니다. 복사해서 본인에게 카톡으로 보내 주세요. 본인이 로그인하면 새 비밀번호로 바꾸라는 안내가 나옵니다.</p>'+
+      '<textarea class="in" id="accMsgTxt" rows="5" readonly>'+esc(txt)+'</textarea><div class="row" style="margin-top:6px;gap:6px"><button class="btn sm" type="button" id="accCopy">안내 문구 복사</button><button class="btn sm ghost" type="button" id="accIssuedClose">닫기</button></div></div>';
+  }
+  function acctHtml(){
+    var h='<div class="panel form" id="acct"><h3>FC 계정 관리 <span class="pill new">신청 · 승인 · 초기화</span></h3>';
+    if(!authApi()){
+      h+='<p class="note">아직 <b>계정 서버</b>가 연결되지 않아 시제품 체험용 계정(fc1001 · admin)으로 동작합니다. 안내서(auth-server/README.md)대로 클라우드플레어에 계정 서버를 만든 뒤, 받은 주소를 아래에 넣고 저장하세요.</p>'+
+        '<div class="row" style="gap:6px"><input class="in" id="authUrl" placeholder="https://kif-auth.○○○.workers.dev" style="flex:1;min-width:220px"><button class="btn" type="button" id="authSave">계정 서버 연결</button></div>'+
+        '<p class="note">저장하면 1~2분 뒤부터 체험용 계정은 막히고, 로그인 화면에 「계정 신청」「비밀번호 찾기」가 생깁니다. 그다음 로그인 화면 「계정 신청」에서 <b>ADMIN_ID로 정한 아이디</b>로 신청하면 바로 관리자가 됩니다. (GitHub 토큰 필요)</p>';
+    }else if(me.demo){
+      h+='<p class="note">계정 서버가 연결되었습니다. 로그아웃한 뒤 관리자 아이디로 다시 로그인하세요.</p>';
+    }else if(!ACC.list){
+      h+='<p class="note">명단을 불러오는 중…</p>';
+    }else{
+      var L=ACC.list,pend=L.filter(function(u){return u.st==='pending';}),rq=L.filter(function(u){return u.rq&&u.st!=='pending';});
+      h+=acctIssued();
+      h+='<h4>승인 대기 <span class="pill '+(pend.length?'warn':'ok')+'">'+pend.length+'건</span></h4>'+(pend.length?'<div class="tbl"><table><thead><tr><th>아이디</th><th>신청일</th><th></th></tr></thead><tbody>'+pend.map(function(u){return '<tr><td><b>'+esc(u.id)+'</b></td><td>'+fmtT(u.ca)+'</td><td style="white-space:nowrap"><button class="btn sm" type="button" data-acc="approve" data-id="'+esc(u.id)+'">승인</button> <button class="btn sm ghost" type="button" data-acc="reject" data-id="'+esc(u.id)+'">거절</button></td></tr>';}).join('')+'</tbody></table></div>':'<p class="note">새 신청이 없습니다.</p>');
+      h+='<h4>비밀번호 초기화 요청 <span class="pill '+(rq.length?'warn':'ok')+'">'+rq.length+'건</span></h4>'+(rq.length?'<div class="tbl"><table><thead><tr><th>아이디</th><th>요청일</th><th></th></tr></thead><tbody>'+rq.map(function(u){return '<tr><td><b>'+esc(u.id)+'</b></td><td>'+fmtT(u.rq.at)+'</td><td style="white-space:nowrap"><button class="btn sm" type="button" data-acc="reset" data-id="'+esc(u.id)+'">임시 비밀번호 발급</button> <button class="btn sm ghost" type="button" data-acc="dismiss" data-id="'+esc(u.id)+'">요청 지우기</button></td></tr>';}).join('')+'</tbody></table></div>':'<p class="note">요청이 없습니다.</p>');
+      var act=L.filter(function(u){return u.st!=='pending';});
+      h+='<h4>전체 계정 <span class="note">'+act.length+'명</span></h4><div class="tbl"><table><thead><tr><th>아이디</th><th>권한</th><th>상태</th><th>가입</th><th>최근 접속</th><th>관리</th></tr></thead><tbody>'+
+        act.map(function(u){var mine=u.id===me.id;return '<tr><td><b>'+esc(u.id)+'</b>'+(u.must?' <span class="pill">임시 비번</span>':'')+'</td><td>'+(u.role==='admin'?'<span class="pill warn">관리자</span>':'FC')+'</td><td>'+(u.st==='off'?'<span class="pill warn">정지</span>':'<span class="pill ok">사용</span>')+'</td><td>'+fmtT(u.ca)+'</td><td>'+fmtT(u.la)+'</td>'+
+          '<td style="white-space:nowrap">'+(mine?'<span class="note">본인</span>':'<button class="btn sm ghost" type="button" data-acc="reset" data-id="'+esc(u.id)+'">비번 초기화</button> <button class="btn sm ghost" type="button" data-acc="'+(u.st==='off'?'resume':'stop')+'" data-id="'+esc(u.id)+'">'+(u.st==='off'?'다시 사용':'정지')+'</button> <button class="btn sm ghost" type="button" data-acc="role" data-role="'+(u.role==='admin'?'fc':'admin')+'" data-id="'+esc(u.id)+'">'+(u.role==='admin'?'FC로':'관리자로')+'</button> <button class="btn sm ghost" type="button" data-acc="delete" data-id="'+esc(u.id)+'">삭제</button>')+'</td></tr>';}).join('')+
+        '</tbody></table></div>'+
+        '<h4>직접 발급 <span class="note">신청 없이 관리자가 바로 만들기 — 임시 비밀번호가 자동으로 만들어집니다</span></h4><div class="row" style="gap:6px;flex-wrap:wrap"><input class="in" id="nId" placeholder="아이디 (예: 회사 사번)" style="max-width:220px" autocomplete="off"><select class="in" id="nRole" style="width:auto"><option value="fc">FC</option><option value="admin">관리자</option></select><button class="btn" type="button" id="nAdd">계정 발급</button><button class="btn ghost" type="button" id="accReload">새로 고침</button></div>';
+    }
+    return h+'<p class="note" id="accMsg" role="status">'+esc(ACC.note||'')+'</p></div>';
+  }
+  function acctRefresh(){var o=document.getElementById('acct');if(!o)return;var d=document.createElement('div');d.innerHTML=acctHtml();o.parentNode.replaceChild(d.firstChild,o);bindAcct();}
+  async function accLoadList(){try{ACC.list=(await api({op:'list',token:tok()})).users;}catch(x){ACC.list=[];var m=document.getElementById('accMsg');acctRefresh();m=document.getElementById('accMsg');if(m)m.textContent=String(x);return;}acctRefresh();}
+  function bindAcct(){
+    var box=document.getElementById('acct');if(!box)return;
+    var msg=document.getElementById('accMsg');
+    var sv=document.getElementById('authSave');
+    if(sv)sv.onclick=async function(){
+      var u=document.getElementById('authUrl').value.trim().replace(/\/+$/,'');
+      if(!/^https:\/\/[^\s]+$/.test(u)){msg.textContent='https:// 로 시작하는 주소를 넣어 주세요.';return;}
+      sv.disabled=true;msg.textContent='계정 서버 확인 중…';
+      try{var r=await fetch(u);var j=await r.json();if(!j.ready)throw '계정 서버 설정이 덜 끝났습니다: '+(j.missing||[]).join(', ');}catch(x){msg.textContent=typeof x==='string'?x:'그 주소에서 계정 서버를 찾지 못했습니다. 주소를 확인하세요.';sv.disabled=false;return;}
+      try{msg.textContent='포털 설정에 저장 중… (GitHub)';await siteSet({authApi:u},'계정 서버 연결');msg.textContent='연결했습니다. 1~2분 뒤 로그인 화면에 「계정 신청」이 생깁니다. 로그아웃 → 「계정 신청」에서 ADMIN_ID로 정한 아이디로 신청하세요.';}
+      catch(x){msg.textContent='저장 실패: '+(x&&x.message||x);sv.disabled=false;}
+    };
+    if(authApi()&&!me.demo&&!ACC.list&&!ACC.busy){ACC.busy=true;accLoadList().then(function(){ACC.busy=false;});}
+    var rl=document.getElementById('accReload');if(rl)rl.onclick=function(){ACC.list=null;acctRefresh();};
+    var add=document.getElementById('nAdd');
+    if(add)add.onclick=async function(){
+      var id=document.getElementById('nId').value.trim().toLowerCase();
+      if(!/^[a-z0-9._-]{3,30}$/.test(id)){msg.textContent='아이디는 영문 소문자·숫자 3~30자로 정해 주세요.';return;}
+      add.disabled=true;msg.textContent='발급 중…';var pw=tempPw();
+      try{await api({op:'create',token:tok(),id:id,role:document.getElementById('nRole').value,nph:await phOf(id,pw)});ACC.issued={title:id+' 계정을 발급했습니다',id:id,pw:pw};ACC.list=null;acctRefresh();}
+      catch(x){msg.textContent=String(x);add.disabled=false;}
+    };
+    box.addEventListener('click',async function(e){
+      var b=e.target.closest&&e.target.closest('[data-acc]');if(!b)return;
+      var op=b.getAttribute('data-acc'),id=b.getAttribute('data-id'),role=b.getAttribute('data-role');
+      var ask={reject:id+' 신청을 거절할까요?',delete:id+' 계정을 삭제할까요? 되돌릴 수 없습니다.',reset:id+'에게 임시 비밀번호를 새로 발급할까요? 예전 비밀번호는 더 이상 쓸 수 없습니다.',stop:id+' 계정을 정지할까요?',role:id+'를 '+(role==='admin'?'관리자':'FC')+'로 바꿀까요?'}[op];
+      if(ask&&!confirm(ask))return;
+      b.disabled=true;msg.textContent='처리 중…';
+      try{var body={op:op,token:tok(),id:id,role:role},pw=null;
+        if(op==='reset'){pw=tempPw();body.nph=await phOf(id,pw);}
+        await api(body);
+        ACC.issued=pw?{title:id+' 임시 비밀번호를 발급했습니다',id:id,pw:pw}:ACC.issued;ACC.list=null;
+        ACC.note=pw?'':id+' — '+({approve:'승인했습니다',reject:'거절했습니다',stop:'정지했습니다',resume:'다시 쓸 수 있게 했습니다',delete:'삭제했습니다',role:'권한을 바꿨습니다',dismiss:'요청을 지웠습니다'})[op]+'.';acctRefresh();
+      }catch(x){msg.textContent=String(x);b.disabled=false;}
+    });
+    var cp=document.getElementById('accCopy');
+    if(cp)cp.onclick=function(){var t=document.getElementById('accMsgTxt');t.select();var ok=function(){msg.textContent='복사했습니다. 카톡에 붙여넣어 본인에게 보내세요.';};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t.value).then(ok,function(){document.execCommand('copy');ok();});else{document.execCommand('copy');ok();}};
+    var cl=document.getElementById('accIssuedClose');if(cl)cl.onclick=function(){ACC.issued=null;acctRefresh();};
+  }
+  /* content.json의 몇 칸만 바꿔 바로 저장 (GitHub API) */
+  async function siteSet(patch,msg){
+    if(!ghTok())throw new Error('먼저 아래 「자료 올리기 → GitHub 연결 설정」에서 토큰을 저장하세요.');
+    var ref=await gh('GET','/git/ref/heads/'+GH.branch),base=await gh('GET','/git/commits/'+ref.object.sha);
+    var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'),sha=null;(all.tree||[]).forEach(function(t){if(t.path==='content.json')sha=t.sha;});
+    var cur={};if(sha){var bj=await gh('GET','/git/blobs/'+sha);cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(c){return c.charCodeAt(0);})));}
+    Object.keys(patch).forEach(function(k){cur[k]=patch[k];});cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
+    var jb=await gh('POST','/git/blobs',{content:b64(TE.encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
+    var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:[{path:'content.json',mode:'100644',type:'blob',sha:jb.sha}]});
+    var cm=await gh('POST','/git/commits',{message:msg,tree:nt.sha,parents:[ref.object.sha]});
+    await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});
+    applyContent(cur,false);
+  }
+
+  /* ---- 고객 자료 보관: 내 PC · 내 클라우드에 파일로 ----
+     고객 자료는 계정 서버에 올리지 않는다. 이 기기 브라우저에 있고, 아래 버튼으로 파일 한 개로 저장·불러오기 한다.
+     PC(크롬·엣지): 원드라이브·구글 드라이브 폴더에 저장해 두면 다음부터 같은 파일에 바로 덮어쓴다.
+     폰: 저장을 누르면 공유 창이 떠서 구글 드라이브·내 파일(아이클라우드)에 넣을 수 있다. */
+  var BK_KEYS=['fc_ai_customers','fc_ai_options','fc_ai_sort','cov-planner-v1'];
+  var BK_LAST='kif_bk_last', bkHandle=null;
+  function bkCollect(){var d={};BK_KEYS.forEach(function(k){try{var v=localStorage.getItem(k);if(v!=null)d[k]=v;}catch(e){}});return {app:'한보금on 활동지원',kind:'고객 자료',v:1,at:new Date().toISOString(),by:me&&me.id||'',data:d};}
+  function bkCount(){var n=0,m=0;try{n=(JSON.parse(localStorage.getItem('fc_ai_customers')||'[]')||[]).length;}catch(e){}try{var a=JSON.parse(localStorage.getItem('cov-planner-v1')||'null');m=a&&a.clients?a.clients.length:0;}catch(e){}return {basic:n,adv:m};}
+  function bkName(){var d=new Date();return '한보금on_내고객자료_'+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+'.json';}
+  function bkHtml(){
+    var c=bkCount(),last=store(BK_LAST);
+    return '<div class="panel form" id="bkPanel"><h3>고객 자료 보관 <span class="pill new">내 PC · 내 클라우드</span></h3>'+
+      '<p class="note">고객 자료는 회사 서버에 올라가지 않고 <b>이 기기</b>에만 있습니다. 폰을 바꾸거나 브라우저 기록을 지우면 사라질 수 있으니, 아래 버튼으로 <b>내 PC나 내 클라우드</b>(구글 드라이브·원드라이브·아이클라우드)에 파일로 보관하세요.</p>'+
+      '<p>지금 이 기기: AI보장분석 기본형 고객 <b>'+c.basic+'명</b> · 고급형 고객 <b>'+c.adv+'명</b><br><span class="note">마지막 보관: '+(last?esc(new Date(+last).toLocaleString('ko-KR')):'아직 없음')+'</span></p>'+
+      '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn" type="button" id="bkSave">내 PC·클라우드에 저장</button><button class="btn ghost" type="button" id="bkLoad">저장한 파일 불러오기</button><input type="file" id="bkFile" accept=".json,application/json" hidden></div>'+
+      '<ol class="note" style="padding-left:1.2em;line-height:1.8;margin:10px 0 0"><li><b>PC</b>: 저장 창에서 <b>OneDrive</b>나 <b>Google Drive</b> 폴더를 고르면 내 클라우드에 보관됩니다.</li><li><b>폰</b>: 저장을 누르면 나오는 창에서 <b>드라이브</b>(안드로이드)나 <b>파일에 저장 → iCloud Drive</b>(아이폰)를 고르세요.</li><li>다른 기기에서는 <b>저장한 파일 불러오기</b>로 같은 파일을 고르면 고객 자료가 그대로 옮겨집니다.</li></ol>'+
+      '<p class="note" id="bkMsg" role="status"></p></div>';
+  }
+  function bindBk(){
+    var s=document.getElementById('bkSave'),l=document.getElementById('bkLoad'),f=document.getElementById('bkFile'),m=document.getElementById('bkMsg');if(!s)return;
+    var done=function(t){store(BK_LAST,String(Date.now()));m.textContent=t;};
+    s.onclick=async function(){
+      var txt=JSON.stringify(bkCollect()),name=bkName(),blob=new Blob([txt],{type:'application/json'});
+      try{
+        if(window.showSaveFilePicker&&!/Android|iPhone|iPad/i.test(navigator.userAgent)){
+          if(!bkHandle)bkHandle=await showSaveFilePicker({suggestedName:name,types:[{description:'한보금on 고객 자료',accept:{'application/json':['.json']}}]});
+          var w=await bkHandle.createWritable();await w.write(blob);await w.close();done('저장했습니다: '+bkHandle.name+' (이 창을 닫기 전까지는 같은 파일에 바로 덮어씁니다)');return;
+        }
+        var file=new File([blob],name,{type:'application/json'});
+        if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'한보금on 고객 자료'});done('보관했습니다. 고른 곳(드라이브·파일)에서 확인하세요.');return;}
+      }catch(e){if(e&&e.name==='AbortError'){m.textContent='저장을 취소했습니다.';return;}}
+      var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href);},4000);
+      done('파일을 내려받았습니다('+name+'). 다운로드 폴더에서 드라이브·클라우드로 옮겨 두세요.');
+    };
+    l.onclick=function(){f.click();};
+    f.onchange=function(){
+      var file=f.files[0];f.value='';if(!file)return;
+      var r=new FileReader();r.onload=function(){
+        var j;try{j=JSON.parse(r.result);}catch(e){m.textContent='한보금on 고객 자료 파일이 아닙니다.';return;}
+        if(!j||!j.data||j.app!=='한보금on 활동지원'){m.textContent='한보금on 고객 자료 파일이 아닙니다.';return;}
+        var n=0,a=0;try{n=(JSON.parse(j.data.fc_ai_customers||'[]')||[]).length;}catch(e){}try{var x=JSON.parse(j.data['cov-planner-v1']||'null');a=x&&x.clients?x.clients.length:0;}catch(e){}
+        if(!confirm('파일('+new Date(j.at).toLocaleString('ko-KR')+' 저장)의 자료로 이 기기 고객 자료를 바꿀까요?\n기본형 고객 '+n+'명 · 고급형 고객 '+a+'명\n지금 이 기기에 있는 고객 자료는 파일 내용으로 바뀝니다.'))return;
+        BK_KEYS.forEach(function(k){try{if(k in j.data)localStorage.setItem(k,j.data[k]);}catch(e){}});
+        m.textContent='불러왔습니다. 화면을 새로 고칩니다…';setTimeout(function(){location.reload();},700);
+      };r.readAsText(file);
+    };
+  }
   function notices(){var s=store('fc_notices');try{return s?JSON.parse(s):null;}catch(e){return null;}}
   function renderNotices(){
     var l=(SITE&&Array.isArray(SITE.notices))?NOTICES:(notices()||NOTICES);
@@ -1382,9 +1648,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
       Array.prototype.forEach.call(document.querySelectorAll('.guide'),function(b){b.addEventListener('click',function(){toast('"'+b.getAttribute('data-guide')+'" 사용가이드는 관리자가 등록하면 여기서 열립니다.');});});
     }
     if(id==='admin'&&me.role==='admin'){
-      bindCms();bindNu();
-      document.getElementById('fakeAdd').onclick=function(){document.getElementById('admMsg').textContent='실제 운영 버전에서는 아이디·이름·소속을 입력하면 계정과 임시 비밀번호가 만들어집니다.';};
-      document.getElementById('fakeReset').onclick=function(){document.getElementById('admMsg').textContent='실제 운영 버전에서는 선택한 FC에게 임시 비밀번호를 새로 발급합니다.';};
+      bindCms();bindNu();bindAcct();
     }
     if(id==='news'){
       var nco='',nf=function(){var ym=document.getElementById('nYm').value,wk=document.getElementById('nWk').value,q=document.getElementById('nQ').value.trim(),n=0;
@@ -1396,29 +1660,47 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
         Array.prototype.forEach.call(document.querySelectorAll('[data-nco]'),function(x){x.classList.toggle('on',x===b);});nf();};});
       ['nYm','nWk'].forEach(function(k){document.getElementById(k).onchange=nf;});document.getElementById('nQ').oninput=nf;
     }
+    if(id==='me')bindMe();
+    if(id==='ai2'){var fb=document.getElementById('advFull'),fr=document.querySelector('iframe.ai-adv'),fx=document.getElementById('advClose');
+      var setF=function(on){fr.classList.toggle('full',on);fx.hidden=!on;document.body.classList.toggle('adv-full',on);};
+      if(fb)fb.onclick=function(){setF(true);};if(fx)fx.onclick=function(){setF(false);};}
     if(id==='ai'&&window.AIMOD)AIMOD.mount(document.getElementById('aiApp'),me,toast);
   }
 
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-go]');if(b){e.preventDefault();go(b.getAttribute('data-go'));}});
   document.getElementById('toHome').addEventListener('click',function(e){e.preventDefault();go('home');});
   document.getElementById('portalBack').addEventListener('click',portalBack);
+  document.getElementById('meBtn').addEventListener('click',function(){go('me');});
   document.addEventListener('keydown',function(e){if(e.altKey&&e.key==='ArrowLeft'){e.preventDefault();portalBack();}});
 
   /* ---------- 로그인 ---------- */
-  function enter(id){
-    me=USERS[id];
+  function enter(p){
+    me=p;ssoSet(p);
     try{sessionStorage.setItem('fc_portal_ok','1');}catch(e){}   /* 고급형(advanced/)이 포털 로그인 여부를 확인 */
     document.getElementById('gate').hidden=true;document.getElementById('app').hidden=false;
     document.getElementById('who').innerHTML=me.org+' · <b>'+me.name+'</b>';
-    go(me.role==='admin'?'admin':'home');
+    go(me.must?'me':location.hash==='#ai2'?'ai2':me.role==='admin'?'admin':'home');
+    if(location.hash)try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
   }
   document.getElementById('loginForm').addEventListener('submit',function(e){
     e.preventDefault();
-    var id=document.getElementById('uid').value.trim(),pw=document.getElementById('upw').value;
-    if(USERS[id]&&USERS[id].pw===pw){document.getElementById('err').textContent='';enter(id);}
-    else document.getElementById('err').textContent='아이디 또는 비밀번호가 맞지 않습니다. 위 체험용 계정을 확인하세요.';
+    var id=document.getElementById('uid').value.trim(),pw=document.getElementById('upw').value,er=document.getElementById('err'),bt=e.target.querySelector('button[type=submit]');
+    if(!id||!pw){er.textContent='아이디와 비밀번호를 넣어 주세요.';return;}
+    er.textContent='확인 중…';if(bt)bt.disabled=true;
+    accLogin(id,pw).then(function(p){er.textContent='';document.getElementById('upw').value='';enter(p);},function(m){er.textContent=typeof m==='string'?m:'로그인하지 못했습니다. 잠시 후 다시 시도하세요.';}).then(function(){if(bt)bt.disabled=false;});
   });
-  document.getElementById('logout').addEventListener('click',function(){me=null;PST=[];try{sessionStorage.removeItem('fc_portal_ok');}catch(e){}document.getElementById('app').hidden=true;document.getElementById('gate').hidden=false;document.getElementById('upw').value='';});
+  /* 계정 명단이 있으면 체험용 안내를 숨기고, 12시간 안에 로그인했던 기기는 바로 들어간다 */
+  /* content.json을 읽은 뒤: 계정 서버가 있으면 신청·찾기를 보이고, 12시간 안에 로그인했던 기기는 바로 들어간다 */
+  bindGateExtra();
+  siteReady.then(function(){
+    gateMode();
+    var s=ssoGet();if(!s||me)return;
+    if(!authApi()){if(s.demo)enter(s);else ssoClear();return;}
+    if(s.demo||!tok()){ssoClear();return;}
+    api({op:'check',token:tok()}).then(function(j){s.role=j.role;s.must=j.must;enter(s);},function(){ssoClear();}); /* 정지·삭제된 계정은 들어가지 않음 */
+  });
+
+  document.getElementById('logout').addEventListener('click',function(){me=null;PST=[];ssoClear();ACC.list=null;ACC.issued=null;try{sessionStorage.removeItem('fc_portal_ok');}catch(e){}document.getElementById('app').hidden=true;document.getElementById('gate').hidden=false;document.getElementById('upw').value='';});
 
   /* ---------- 글자 확대 / 테마 ---------- */
   var z=parseFloat(store('fc_zoom'))||1;

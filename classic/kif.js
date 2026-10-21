@@ -19,8 +19,8 @@
   var page=(location.pathname.split('/').pop()||'index.html');
 
   function logout(){
-    try{sessionStorage.removeItem('kif_ok');localStorage.removeItem('kif_keep');}catch(e){}
-    location.href='index.html';
+    try{sessionStorage.removeItem('kif_ok');localStorage.removeItem('kif_keep');localStorage.removeItem('kif_sso');}catch(e){}
+    location.href='../index.html';  /* 포털 로그아웃과 같음 */
   }
   function setTheme(t){theme=t;root.setAttribute('data-theme',t);set(KEY_THEME,t);sync();}
   function sync(){

@@ -160,10 +160,7 @@ html[data-theme="dark"] .tool{border-top-color:#cb9c3a}
 
 <script src="kif.js"></script>
 <script>
-/* ─────────────────────────────────────
-   접속 코드 — 여기 숫자를 바꾸면 코드가 바뀝니다.
-   ───────────────────────────────────── */
-var ACCESS_CODE = "1023";
+/* 접속코드는 없앴습니다 — 한보금on 활동지원(포털)에 로그인하면 바로 열리고, 아니면 포털 로그인으로 보냅니다. */
 
 (function(){
   var gate=document.getElementById('gate'), home=document.getElementById('home');
@@ -177,10 +174,10 @@ var ACCESS_CODE = "1023";
   showShell(false);
   var already=false;
   try{
-    var k=localStorage.getItem('kif_keep');
-    already=sessionStorage.getItem('kif_ok')==='1'||(k&&+k>Date.now());
+    already=false; /* 예전 접속코드 기억은 쓰지 않음 */
   }catch(e){}
-  if(already){unlock(false);return;}
+  try{var sso=JSON.parse(localStorage.getItem('kif_sso')||'null');if(sso&&sso.exp>Date.now()){unlock(false);return;}}catch(e){}
+  location.replace('../index.html');return;
 
   var pw=document.getElementById('pw'),btn=document.getElementById('enter'),
       err=document.getElementById('err'),card=document.getElementById('gateCard'),keep=document.getElementById('keep');

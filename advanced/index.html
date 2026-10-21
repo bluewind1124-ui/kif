@@ -14,12 +14,12 @@
 (function(){
   var inPortal=false;
   try{ inPortal = window.self!==window.top && !!window.top.document.getElementById('view'); }catch(e){}
-  var ok=false; try{ ok = sessionStorage.getItem('fc_portal_ok')==='1'; }catch(e){}
+  var ok=false; try{ var sso=JSON.parse(localStorage.getItem('kif_sso')||'null'); ok = sessionStorage.getItem('fc_portal_ok')==='1' || !!(sso&&sso.exp>Date.now()); }catch(e){}
   if(!inPortal && !ok && !/[?&]standalone=1/.test(location.search)){
     document.addEventListener('DOMContentLoaded',function(){
       document.body.innerHTML='<div style="max-width:520px;margin:12vh auto;padding:24px;font-family:sans-serif;text-align:center;line-height:1.7">'+
         '<h2 style="margin:0 0 8px">AI보장분석 고급형</h2><p>한보금on 활동지원에 로그인한 뒤 <b>영업 도구 › AI보장분석 고급형</b> 메뉴에서 열어 주세요.</p>'+
-        '<p><a href="../" style="display:inline-block;padding:10px 18px;background:#0f2240;color:#fff;border-radius:6px;text-decoration:none">포털로 이동</a></p></div>';
+        '<p><a href="../index.html#ai2" style="display:inline-block;padding:10px 18px;background:#0f2240;color:#fff;border-radius:6px;text-decoration:none">포털로 이동</a></p></div>';
     });
   }
   if(inPortal){ try{ var t=window.top.document.documentElement.getAttribute('data-theme'); if(t) document.documentElement.setAttribute('data-theme',t); }catch(e){} }
