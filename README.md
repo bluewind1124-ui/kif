@@ -51,5 +51,6 @@ FC 영업지원·교육지원 포털. GitHub Pages로 배포됩니다: https://b
    - 포털에 생기는 모든 수정·추가(아이콘 포함)는 새로 만들지 않고 이 저장소(kif)의 같은 파일을 고쳐 실제 사이트에 바로 반영합니다. 이름·아이콘이 바뀌면 icon-*.png · og-image.png · desktop-icon.zip · manifest · 설치 안내 그림(install-guide.png, 바탕화면 배포용_설치안내)을 함께 바꿉니다.
 2. 고급형을 고치면 `docs/AI보장분석_고급형_생성기록.md`에 버전과 내용을, 포털 변경은 `version.json`의 `history`에 한 줄을 추가합니다.
 3. 세법·법령 수치는 고급형 「기준 설정 → 세법 기준표」와 「법령·세법 점검」으로 관리합니다 (`docs/법령·세법 업데이트 설명서.md`).
-4. 배포: GitHub 저장소 `bluewind1124-ui/kif`의 `main` 브랜치에 올리면 GitHub Pages에 반영됩니다. 배포 전 작업은 별도 브랜치에 올려 둡니다.
+4. 배포할 때마다 `version.json`의 `build`와 `index.html`의 `<meta name="kif-build">` 값을 똑같이 올립니다. 포털이 열릴 때 둘이 다르면 저절로 새 화면을 불러옵니다(브라우저 10분 기억 문제 해결).
+5. 배포: GitHub 저장소 `bluewind1124-ui/kif`의 `main` 브랜치에 올리면 GitHub Pages에 반영됩니다. 배포 전 작업은 별도 브랜치에 올려 둡니다.
 5. 고객 자료는 각 FC 브라우저(localStorage)에만 저장됩니다. 저장소에 고객 정보나 대화 기록을 올리지 않습니다.

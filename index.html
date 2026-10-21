@@ -20,6 +20,23 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
+<meta name="kif-build" content="2026-10-22.2">
+<script>
+/* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
+   이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
+(function(){
+  var mine=document.querySelector('meta[name="kif-build"]').content;
+  function check(){
+    fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(v){
+      if(!v||!v.build||v.build===mine)return;
+      var k='kif_reload_'+v.build;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');}catch(e){}
+      location.replace(location.pathname+'?v='+encodeURIComponent(v.build)+location.hash);
+    }).catch(function(){});
+  }
+  check();setInterval(check,30*60*1000);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')check();});
+})();
+</script>
 <title>한보금on 활동지원</title>
 <!-- Claude Artifact 원본(fc-portal.html)을 감싼 파일. 예전 v1.0 화면은 classic/ 폴더에 보관 -->
 <style>body{margin:0}</style>
