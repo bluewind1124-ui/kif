@@ -657,7 +657,7 @@ tr.fx td{background:var(--gold-soft)}
 .sl .kt2 .r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .sl .kt2 tr.del td{text-decoration:line-through;color:#98A2AD}.sl .kt2 b.g{color:#1E7B4F}.sl .kt2 b.r{color:#B42318}.sl .kt2 tr.fx td:first-child{font-weight:800}
 .adjk{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}.adjk.off{opacity:.6;background:#fbf3f2}.adjt tr.drop td{text-decoration:line-through;color:#98A2AD}.adjt tr.drop td:first-child{text-decoration:none}
-td.up{color:#1E7B4F;font-weight:800}td.dn{color:#B42318;font-weight:800}.aifirst{border:2px solid var(--kgold,#cb9c3a);background:#fffaf0}.list.pc li .t b{color:var(--ink)}
+td.up{color:#1E7B4F;font-weight:800}td.dn{color:#B42318;font-weight:800}.ai1{border:1px solid var(--kgold,#cb9c3a);background:#fffaf0}.aifirst{border:2px solid var(--kgold,#cb9c3a);background:#fffaf0}.list.pc li .t b{color:var(--ink)}
 .sl .kt2 tr.ksec td{background:#2E5A55;color:#fff;font-weight:700}
 .sl .kt2 tr.add td{background:#FCF3DE}.sl .kt2 tr.sum td{background:#EAF1EC;font-weight:700}
 .sl .isrc{display:block;font-size:calc(var(--u)*8);color:#6b7891}
@@ -1465,6 +1465,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<div class="panel"><h3>상품 개정 일정 배너</h3><div class="fgrid">'+inp('bTitle','제목',BANNER.title)+inp('bSub','설명',BANNER.sub)+'</div></div>'+
       '<div class="panel"><h3>회사 AI <span class="note">주소를 넣으면 모든 FC가 키 없이 바로 AI로 읽습니다. 만드는 법: ai-relay 안내서</span></h3>'+
       inp('mProxy','회사 AI 서버 주소',SITE&&SITE.aiProxy,'https://fc-ai.○○○.workers.dev')+'<p class="note">비워 두면 FC는 복사·붙여넣기 방식으로 씁니다. 회사 API 키는 이 주소의 서버에만 넣고, 여기에는 넣지 마세요.</p></div>'+
+      '<div class="panel"><h3>AI 보장분석 규칙 <span class="note">모든 FC의 AI(ChatGPT·Claude·Gemini·회사 AI)에 똑같이 보내는 규칙입니다</span></h3><textarea class="in" id="mRules" rows="9">'+esc((window.AIMOD&&AIMOD.getRules)?AIMOD.getRules():'')+'</textarea><p class="note">유리·불리 기준, 문장 표현, 금지 표현을 여기서 바꾸면 사이트에 반영한 뒤부터 모든 FC의 분석에 적용됩니다. 숫자와 출력물 모양은 포털이 정합니다.</p></div>'+
       '<div class="panel"><h3>AI 기본 모델 <span class="note">개인 API 키를 쓰는 FC용 기본값입니다. 새 모델이 나오면 이름만 바꾸세요.</span></h3><div class="fgrid">'+
       inp('mClaude','Claude API',md.claude,'claude-opus-5-5')+inp('mOpenai','ChatGPT',md.openai,'gpt-4.1')+inp('mGemini','Gemini',md.gemini,'gemini-2.5-flash')+'</div>'+
       '<label class="row"><input type="checkbox" id="cOpts"> 이 기기의 <b>분석 옵션</b>(AI보장분석 기본형 › 옵션 관리)을 모든 FC에게 배포</label></div>'+
@@ -1483,7 +1484,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       notices:rows(v('cNotice'),3),news:rows(v('cNews'),7),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),3),
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
-      aiProxy:v('mProxy'),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
+      aiProxy:v('mProxy'),aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
     var ck=document.getElementById('cOpts');
     if(ck&&ck.checked&&window.AIMOD&&AIMOD.getOpts){c.opts=AIMOD.getOpts();c.optsVer=c.ver;}
     else if(SITE&&SITE.opts){c.opts=SITE.opts;c.optsVer=SITE.optsVer||SITE.ver;}
@@ -2751,6 +2752,36 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return h;
   }
 
+
+  /* ---- 포털 보장분석 규칙: FC가 어떤 AI를 고르든 같은 규칙을 보낸다. 관리자가 콘텐츠 관리에서 바꿀 수 있음(content.json aiRules) ---- */
+  var AI_RULES_DEF=['[한국보험금융 보장분석 규칙]',
+    '1. 숫자는 주어진 데이터에 있는 값만 쓴다. 새 숫자를 만들거나 반올림해 바꾸지 않는다. 단위: 가입금액 만원, 보험료 원.',
+    '2. 유리한 부분 = 권장 기준(예시) 이상인 영역, 90세 이상·종신까지 가는 보장, 연간·매회 반복 지급 담보, 실손의료비 보유, 납입면제, 비갱신형.',
+    '3. 불리한 부분 = 보장이 없는 영역(보장 공백), 권장 기준보다 부족한 영역, 갱신형 담보(보험료 인상 가능), 80세 이전에 끝나는 담보, 진단비 위주라 치료비가 약한 구성, 같은 담보 중복.',
+    '4. 고른 분석 관점(옵션)의 중심 영역을 먼저, 더 자세히 다룬다.',
+    '5. 항목마다 제목(15자 안팎) + 설명 1문장. 고객이 바로 알아듣는 쉬운 말로 쓴다.',
+    '6. 과장·단정 표현(무조건, 반드시 받습니다, 최고 등)과 특정 회사 비방은 쓰지 않는다. 지급 여부는 약관이 우선한다는 점을 해치지 않는다.',
+    '7. 출력 형식은 포털 샘플(16:9 리포트·엑셀 분석표)에 들어갈 문장만 만든다. 표·디자인은 포털이 만든다.'].join('\n');
+  var AI_RULES=AI_RULES_DEF;
+  function provName(){var c=aiCfg();return (AIP[c.prov]||{}).name||'내 AI';}
+  /* 1단계: 내 AI로 보장분석 — 포털이 계산한 숫자 + 규칙을 보내고, 유리·불리·결론 문장을 받는다 */
+  async function aiAnalyze1(c){
+    var o=opt(c),v=vOld(c),R=analyze(v,o),PC=prosCons(Object.assign({},v,{ai1:null}),o,R),btn=document.getElementById('ai1Btn'),note=document.getElementById('ai1Note');
+    if(!cap.sample&&cap.sampleP)await cap.sampleP;
+    if(!cap.sample){toast(errMsg({code:cap.why})+' 규칙으로 정리한 기본 결과를 그대로 씁니다.');return;}
+    if(btn)btn.disabled=true;if(note)note.textContent=provName()+'에게 포털 보장분석 규칙과 분석 숫자를 보내는 중…';
+    var data={고객:c.name,나이성별:ageSex(c),직업:[c.jobType,c.job].filter(Boolean).join(' / '),가족력:c.famHx||'',상담메모:c.memo||'',
+      분석관점:(o.list||[o]).map(function(q){return {옵션:q.title,설명:q.desc,중심영역:q.areas};}),
+      계약:useK(v).map(function(k){return {보험사:k.insurer,상품:k.product,만기납기:k.term,월보험료:n(k.premium),담보:(k.items||[]).map(function(it){return [it.name,it.amt==null?null:n(it.amt),it.term||'',it.cycle||''];})};}),
+      영역별:AREAS.filter(function(a){return a!=='기타'&&(R.A[a].old||BASE[a]||o.areas.indexOf(a)>-1);}).map(function(a){var vv=R.A[a];return {영역:a,현재:vv.old,권장기준예시:BASE[a]||null,판정:vv.old?verdict(a,vv)[0]:'보장 공백',관점중심:o.areas.indexOf(a)>-1};}),
+      월보험료합계:R.prem.old,포털이먼저찾은유리:PC.P,포털이먼저찾은불리:PC.C};
+    try{
+      var r=await cap.sample.json('너는 한국보험금융 FC의 기계약 보장분석 조수다. 아래 규칙을 반드시 지켜라.\n'+AI_RULES+'\n\n아래 데이터만 근거로 기존 계약의 유리한 부분과 불리한 부분을 정리하라. "포털이먼저찾은" 항목은 참고하되 빠진 것이 있으면 보태고, 틀린 것은 빼라. JSON 하나로만 답하라: {"pros":[["제목","설명 1문장"], 최대 6개],"cons":[["제목","설명 1문장"], 최대 6개],"conclusion":"1단계 결론 2문장 (지금 보험의 중심 + 2단계에서 조정·보완할 점)"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
+      var ok=function(L){return Array.isArray(L)?L.filter(function(x){return Array.isArray(x)&&x[0];}).slice(0,6).map(function(x){return [String(x[0]),String(x[1]||'')];}):[];};
+      var P=ok(r&&r.pros),C=ok(r&&r.cons);if(!P.length&&!C.length)throw {code:'bad_json'};
+      c.ai1={opt:o.id,P:P.length?P:PC.P,C:C.length?C:PC.C,conclusion:String((r&&r.conclusion)||''),by:provName(),at:nowStr()};touch(c);render();toast(provName()+'가 포털 규칙으로 보장분석을 정리했습니다.');
+    }catch(e){if(note)note.textContent=errMsg(e)+' 규칙으로 정리한 기본 결과를 그대로 씁니다.';if(btn)btn.disabled=false;}
+  }
   /* ---- 1단계·2단계 데이터 보기 ----
      1단계(기계약 분석) = 기존 계약 전체.  2단계 After = 유지한 기존(삭제 담보·해지 계약 뺌) + 신계약.  Before = 1단계와 같음 */
   function vOld(c){return Object.assign({},c,{contracts:(c.contracts||[]).filter(function(k){return k.kind!=='신규';}),_stage:1});}
@@ -2769,6 +2800,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function kTerm(it,k){return String((it.term||'')+' '+((k&&k.term)||''));}
   /* 기계약의 유리한 부분 / 불리한 부분 (규칙으로 뽑음, 숫자는 분석값 그대로) */
   function prosCons(v,o,R){
+    if(v.ai1&&v.ai1.opt===o.id&&(v.ai1.P||[]).length)return {P:v.ai1.P,C:v.ai1.C,ai:v.ai1};
     var P=[],C=[],K=useK(v),all=[];K.forEach(function(k){(k.items||[]).forEach(function(it){all.push({it:it,k:k});});});
     function nm(L){return L.slice(0,3).map(function(x){return shortNm(x.it.name);}).join(', ')+(L.length>3?' 외 '+(L.length-3)+'개':'');}
     AREAS.forEach(function(a){var t=R.A[a].old,b=BASE[a];if(a==='기타')return;
@@ -2800,6 +2832,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+='<div class="panel"><h3>분석 관점(옵션) 선택 <span class="note">여러 개 선택 가능 · 지금 '+selIds(c).length+'개</span><span class="sp"></span><button class="btn sm ghost" data-a="step" data-s="5">옵션 내용 바꾸기</button></h3><p class="note">고른 옵션의 중심 영역을 더 자세히 봅니다. 2단계 제안서도 같은 옵션으로 만듭니다.</p>'+optCards(c)+'</div>';
     if(!K.length)return h+'<div class="panel"><h3>기존 계약이 없습니다</h3><p class="note">먼저 "기계약 자료"에 증권·보장분석표를 첨부하세요.</p><div class="row"><button class="btn" data-a="step" data-s="2">기계약 자료 첨부하기 ▸</button></div></div>';
     h+='<div class="kpis"><div><span>기존 월보험료</span><b>'+fmt(R.prem.old)+'<small>원</small></b><em>계약 '+K.length+'건</em></div><div><span>담보</span><b>'+R.cnt.old+'<small>개</small></b><em>'+AREAS.filter(function(a){return R.A[a].old;}).length+'개 영역</em></div><div class="t"><span>점검 결과</span><b>유리 '+PC.P.length+' · 불리 '+PC.C.length+'</b><em>아래 정리 참고</em></div></div>';
+    h+='<div class="panel ai1"><div class="row"><b>내 AI로 보장분석</b><span class="note">'+(PC.ai?'✓ '+esc(PC.ai.by)+'가 포털 규칙으로 정리 ('+esc(PC.ai.at)+')':'지금은 포털 규칙으로 자동 정리한 결과입니다. 버튼을 누르면 내 AI('+esc(provName())+')가 같은 규칙으로 다시 정리합니다.')+'</span><span class="sp"></span><button class="btn sm" data-a="ai1" id="ai1Btn">'+(PC.ai?'다시 분석':'보장분석 실행')+'</button>'+(PC.ai?'<button class="btn sm ghost" data-a="ai1off">규칙 기본 결과로</button>':'')+'</div><p class="note" id="ai1Note">어떤 AI를 쓰든 숫자는 포털이 계산하고, 문장은 관리자가 정한 <b>보장분석 규칙</b>을 그대로 지켜 씁니다. 출력물 모양은 샘플 형식 그대로입니다.</p></div>';
     h+='<div class="cols"><div class="panel"><h3>👍 유리한 부분 <span class="note">유지할 가치가 있는 보장</span></h3><ul class="list pc pc-g">'+PC.P.map(function(x){return '<li><span class="pill ok">유리</span><span class="t"><b>'+esc(x[0])+'</b><br><span class="note">'+esc(x[1])+'</span></span></li>';}).join('')+'</ul></div>'+
       '<div class="panel"><h3>⚠ 불리한 부분 <span class="note">2단계에서 조정·보완할 곳</span></h3><ul class="list pc pc-r">'+PC.C.map(function(x){return '<li><span class="pill warn">불리</span><span class="t"><b>'+esc(x[0])+'</b><br><span class="note">'+esc(x[1])+'</span></span></li>';}).join('')+'</ul></div></div>';
     h+='<div class="cols"><div class="panel"><h3>보장 지도 <span class="note">굵은 줄 = 옵션 중심 영역</span></h3>'+bars1(R,R.focus)+'</div>';
@@ -3128,7 +3161,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+=slide('PROS & CONS','유리한 부분과 불리한 부분','','<div class="g2"><div class="kc s tall"><span class="cl">유리한 부분 · 유지할 가치</span><ul class="kl">'+PC.P.slice(0,6).map(function(x){return '<li><b>'+esc(x[0])+'</b> — '+esc(x[1])+'</li>';}).join('')+'</ul></div>'+
       '<div class="kc gp tall"><span class="cl">불리한 부분 · 조정·보완할 곳</span><ul class="kl">'+PC.C.slice(0,6).map(function(x){return '<li><b>'+esc(x[0])+'</b> — '+esc(x[1])+'</li>';}).join('')+'</ul></div></div>','다음 단계에서 불리한 부분을 중심으로 조정·보완안을 Before/After로 보여 드립니다.');
     /* 한 줄 결론 */
-    var c1='지금 보험은 '+(strong.length?strong.slice(0,2).join('·')+' 중심':'기본 보장 위주')+'으로 준비되어 있습니다.',c2=(gaps.length?gaps.slice(0,3).join('·')+' 보장은 비어 있고, ':'')+(PC.C.length?PC.C[0][0].replace(/^\[|\]/g,'')+' 등을 2단계에서 조정·보완합니다.':'큰 공백 없이 유지하는 것이 좋습니다.');
+    var aiC=PC.ai&&PC.ai.conclusion?String(PC.ai.conclusion).split(/(?<=[.다])\s+/):null;
+    var c1=aiC?aiC.shift():'지금 보험은 '+(strong.length?strong.slice(0,2).join('·')+' 중심':'기본 보장 위주')+'으로 준비되어 있습니다.',c2=aiC?aiC.join(' '):(gaps.length?gaps.slice(0,3).join('·')+' 보장은 비어 있고, ':'')+(PC.C.length?PC.C[0][0].replace(/^\[|\]/g,'')+' 등을 2단계에서 조정·보완합니다.':'큰 공백 없이 유지하는 것이 좋습니다.');
     h+='<div class="slw"><section class="sl cv cc"><i class="kc3"></i><i class="kc4"></i><div class="cvk" style="top:calc(var(--u)*79)">1단계 결론</div><p class="cch">'+hiWords(c1,strong.slice(0,2))+'</p><p class="ccs">'+hiWords(c2,gaps.concat(['비어']))+'</p>'+
       '<div class="cvb g big"><span>기존 월 보험료</span><b>'+fmt(R.prem.old)+' 원</b></div><p class="cvf" style="top:calc(var(--u)*486)">※ 본 자료는 첨부한 계약 자료 기준 참고자료이며, 보장 여부·지급 조건은 각 상품 약관이 우선합니다.</p></section></div>';
     pg++;
@@ -3647,7 +3681,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       월보험료:{Before:vA._B.R0.prem.old,유지기존:R.prem.old,신규:R.prem.neu,After:R.prem.old+R.prem.neu},정리한담보:vA._B.drop.map(function(x){return x.it.name+' '+n(x.it.amt)+'만';}),동시지급:R.scen.length?{기존:R.sOld,신규:R.sNeu}:null,연간반복:(R.ann+R.ann10)?{연간:R.ann,십년한도:R.ann10,누적:R.years}:null,가족력:c.famHx,상담내용:c.memo,
       옵션별:(o.list||[o]).map(function(q){var S=spotInfo(q,R);return {옵션:q.title,보장공백:S.gap,기준미달:S.weak,점검포인트:q.points||[],관련기사:q.news&&q.news.title?q.news.src+' '+q.news.date+' "'+q.news.title+'" — '+q.news.sum:null};})};
     try{
-      var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션마다 최소 한 개의 포인트를 쓰고, 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 근거로 한 번만 짧게 인용할 수 있다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
+      var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. 아래 규칙을 반드시 지켜라.\n'+AI_RULES+'\n\nBefore(기존 그대로)와 After(조정한 기존 + 신계약)를 비교하는 관점으로 쓴다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션마다 최소 한 개의 포인트를 쓰고, 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 근거로 한 번만 짧게 인용할 수 있다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
       if(r&&r.points&&r.points.length){c.ai={opt:o.id,s2:1,points:r.points.slice(0,6).map(String),conclusion:String(r.conclusion||'')};touch(c);render();toast('AI 문구로 바꿨습니다.');return;}
       throw {code:'x'};
     }catch(e){note.textContent=errMsg(e)+' 기본 문구를 그대로 씁니다.';btn.disabled=false;}
@@ -3692,6 +3726,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(a==='pdfRpt'){pdfReport(dataC(c),b);return;}
     if(a==='pdfSheet'){pdfSheet(dataC(c),b);return;}
     if(a==='aiText'){aiText(c);return;}
+    if(a==='ai1'){aiAnalyze1(c);return;}
+    if(a==='ai1off'){c.ai1=null;touch(c);render();toast('포털 규칙으로 정리한 기본 결과로 돌렸습니다.');return;}
     if(a==='print'){window.print();return;}
     if(a==='saveHtml'){saveHtml(dataC(c));return;}
     if(a==='saveXlsx'){saveXlsx(dataC(c),b);return;}
@@ -3736,10 +3772,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     }
     if(Array.isArray(c.refs)){var rv=String(c.refsVer||c.ver||''),dr=load(KEY_RD,null);
       if(dr&&Array.isArray(dr.refs)&&String(dr.ver||'')>rv){SHREF=dr.refs;SHVER=String(dr.ver);}else{SHREF=c.refs;SHVER=rv;if(dr)try{localStorage.removeItem(KEY_RD);}catch(e){}}}
+    if(typeof c.aiRules==='string'&&c.aiRules.trim())AI_RULES=c.aiRules.trim();
     if('aiProxy' in c)AI_PROXY=/^https:\/\/[^\s]+$/.test(String(c.aiProxy||'').trim())?String(c.aiProxy).trim():'';
     if(root&&document.body.contains(root)){applyAiCfg();render();}
   },
   getOpts:function(){return JSON.parse(JSON.stringify(st.opts));},
+  getRules:function(){return AI_RULES;},defRules:function(){return AI_RULES_DEF;},
   getRefs:function(){return {refs:SHREF.map(function(x){return {id:x.id,title:x.title,opts:x.opts||[],src:x.src||'',img:x.img,ts:x.ts};}),ver:SHVER};},
   openRefs:function(adm){st.from5=!isSide(st.step)?st.step:3;st.step=6;st.refAdm=!!adm;},
   mount:function(el,user,toastFn){
