@@ -2497,12 +2497,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         (img?' 이 자료는 스캔본이라 <b>'+esc(PASTE_FILE||'원본 파일')+'</b> 파일도 함께 첨부해 주세요.':'')+'</p><div class="row">'+
         PASTE_SITES.map(function(x){return '<button class="btn sm'+(x[0]===c.site?'':' ghost')+'" type="button" data-p="go" data-v="'+x[0]+'">'+x[1]+'로 보내기 ↗</button>';}).join('')+
         '</div><p class="note" data-p="cmsg" role="status"></p><details data-p="det"><summary class="note">질문 내용 보기</summary><textarea class="in" rows="4" readonly data-p="q"></textarea></details></li>'+
-        '<li><b>AI의 답을 복사한 뒤 가져오기</b><p class="note">AI 답 아래의 <b>복사</b> 아이콘을 누르고 이 창으로 돌아와 아래 버튼을 누르세요.</p>'+
+        '<li><b>AI의 답을 복사한 뒤 가져오기</b><p class="note">AI 답 아래의 <b>복사</b> 아이콘을 누르고 이 창으로 돌아오면 <b>자동으로 반영</b>됩니다. 안 되면 아래 버튼을 누르세요.</p>'+
         '<div class="row"><button class="btn" type="button" data-p="grab">복사한 답 가져오기</button><button class="btn ghost" type="button" data-p="cancel">취소</button></div>'+
-        '<p class="note" data-p="amsg" role="status"></p><details data-p="man"><summary class="note">가져오기가 안 되면: 직접 붙여넣기</summary><textarea class="in" rows="4" data-p="ans" placeholder="{ &quot;contracts&quot;: … 로 시작하는 답"></textarea><div class="row"><button class="btn sm" type="button" data-p="ok">반영</button></div></details></li></ol></div>';
+        '<p class="note" data-p="amsg" role="status"></p><details data-p="man"><summary class="note">가져오기가 안 되면: 직접 붙여넣기</summary><textarea class="in" rows="4" data-p="ans" placeholder="AI 답 전체를 붙여넣기 ( { 로 시작 )"></textarea><div class="row"><button class="btn sm" type="button" data-p="ok">반영</button></div></details></li></ol></div>';
       document.body.appendChild(w);
       var $=function(k){return w.querySelector('[data-p="'+k+'"]');};$('q').value=q;
-      var fin=function(){w.remove();document.removeEventListener('keydown',esck);};
+      var sent=false,onF=function(){if(!sent||!(navigator.clipboard&&navigator.clipboard.readText))return;setTimeout(function(){navigator.clipboard.readText().then(function(t){var r;try{r=pickJson(t);}catch(er){return;}if(t===q)return;fin();res(r);},function(){});},400);};window.addEventListener('focus',onF);
+      var fin=function(){w.remove();document.removeEventListener('keydown',esck);window.removeEventListener('focus',onF);};
       var esck=function(e){if(e.key==='Escape'){fin();rej({code:'paste_cancel'});}};document.addEventListener('keydown',esck);
       /* 새 창이 열리기 전에(같은 클릭 안에서) 바로 복사한다 */
       var copyNow=function(){var t=document.createElement('textarea');t.value=q;t.setAttribute('readonly','');t.style.cssText='position:fixed;left:-9999px;top:0';w.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}t.remove();
@@ -2512,7 +2513,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         if(k==='go'){var x=PASTE_SITES.filter(function(y){return y[0]===b.dataset.v;})[0];var ok=copyNow();
           var sv=load(KEY_AI,null)||{};sv.site=x[0];save(KEY_AI,sv);w.querySelectorAll('[data-p="go"]').forEach(function(y){y.classList.toggle('ghost',y!==b);});
           $('cmsg').textContent=ok?'✓ 질문을 복사했습니다. 열린 '+x[1]+' 창에 붙여넣고 보내세요.':'자동 복사가 막혔습니다. "질문 내용 보기"를 열어 직접 복사하세요.';if(!ok)$('det').open=true;
-          window.open(x[2],'_blank','noopener');}
+          sent=true;window.open(x[2],'_blank','noopener');}
         else if(k==='grab'){
           if(!(navigator.clipboard&&navigator.clipboard.readText)){$('man').open=true;$('amsg').textContent='이 브라우저는 자동 가져오기를 막습니다. 아래 칸에 직접 붙여넣으세요.';return;}
           navigator.clipboard.readText().then(function(t){tryApply(t,true);},function(){$('man').open=true;$('amsg').textContent='붙여넣기 허용이 필요합니다. 브라우저가 물으면 "허용"을 누르거나, 아래 칸에 직접 붙여넣으세요.';});}
