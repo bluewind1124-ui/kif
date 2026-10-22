@@ -655,6 +655,9 @@ tr.fx td{background:var(--gold-soft)}
 .sl .kt2 thead th{background:#143038;color:#fff;white-space:nowrap;font-weight:700}
 .sl .kt2.xs{font-size:calc(var(--u)*9.5)}.sl .kt2.xs td{padding:calc(var(--u)*2.5) calc(var(--u)*6)}
 .sl .kt2 .r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sl .kt2 tr.del td{text-decoration:line-through;color:#98A2AD}.sl .kt2 b.g{color:#1E7B4F}.sl .kt2 b.r{color:#B42318}.sl .kt2 tr.fx td:first-child{font-weight:800}
+.adjk{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}.adjk.off{opacity:.6;background:#fbf3f2}.adjt tr.drop td{text-decoration:line-through;color:#98A2AD}.adjt tr.drop td:first-child{text-decoration:none}
+td.up{color:#1E7B4F;font-weight:800}td.dn{color:#B42318;font-weight:800}.aifirst{border:2px solid var(--kgold,#cb9c3a);background:#fffaf0}.list.pc li .t b{color:var(--ink)}
 .sl .kt2 tr.ksec td{background:#2E5A55;color:#fff;font-weight:700}
 .sl .kt2 tr.add td{background:#FCF3DE}.sl .kt2 tr.sum td{background:#EAF1EC;font-weight:700}
 .sl .isrc{display:block;font-size:calc(var(--u)*8);color:#6b7891}
@@ -2331,7 +2334,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!c.contracts.some(function(k){return k.kind!=='신규';}))P('warn','기존 계약 자료가 없습니다. 엑셀·증권을 올리거나 직접 입력하세요.',{s:2,el:'up-기존'});
     var nw=c.contracts.filter(function(k){return k.nameWarn&&!k.nameOk;});if(nw.length)P('warn','다른 사람 자료로 보이는 계약 '+nw.length+'건('+nw.map(function(k){return k.nameWarn;}).filter(function(x,i,A){return A.indexOf(x)===i;}).join(', ')+'님 자료로 보임)은 분석에서 뺐습니다.',{s:2,tk:ki(function(k){return k.nameWarn&&!k.nameOk;})});
     c.contracts.forEach(function(k,i){var d=dupSet(k),nm=Object.keys(d);if(nm.length&&!k.dupOk){var fi=-1;k.items.forEach(function(it,j){if(fi<0&&d[dupKey(it)])fi=j;});P('warn',(k.insurer||'계약')+' '+(k.product||'')+': 같은 담보가 두 번 이상 있습니다('+nm.slice(0,3).map(function(q){return q.split('|')[0]+' ×'+d[q];}).join(', ')+(nm.length>3?' 외':'')+'). 실제 중복 가입인지 확인하세요.',{s:2,tk:i,ti:fi,tg:'name'});}});
-    if(!c.contracts.some(function(k){return k.kind==='신규';}))P('warn','신규(제안) 계약이 없습니다. 제안 상품의 가입설계서를 넣으면 기존·신규·합산 비교가 됩니다.',{s:2,el:'up-신규'});
+    if(!c.contracts.some(function(k){return k.kind==='신규';}))P('warn','신규(제안) 계약이 없습니다. 제안 상품의 가입설계서를 넣으면 기존·신규·합산 비교가 됩니다.',{s:8,el:'up-신규'});
     var unc=c.contracts.filter(function(k){return !k.confirmed;});
     if(unc.length)P('warn','AI가 읽은 계약 '+unc.length+'건을 아직 확인하지 않았습니다. 가입설계서와 숫자를 대조하세요.',{s:2,tk:ki(function(k){return !k.confirmed;})});
     var noAmt=0,noCyc=0,fa=null,fc=null;c.contracts.forEach(function(k,i){k.items.forEach(function(it,j){if(!n(it.amt)){noAmt++;if(!fa)fa={s:2,tk:i,ti:j,tg:'amt'};}if(!it.cycle){noCyc++;if(!fc)fc={s:2,tk:i,ti:j,tg:'cycle'};}});});
@@ -2341,8 +2344,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var gain=opt.areas.filter(function(a){return R.A[a].neu>0;});
       if(!gain.length&&c.contracts.some(function(k){return k.kind==='신규';}))P('warn','선택한 옵션("'+opt.title+'")의 중심 영역에 신규 담보가 없습니다. 옵션을 바꾸거나 제안 상품을 다시 확인하세요.',{s:3,el:'aiOptg'});
       opt.areas.forEach(function(a){var v=R.A[a],t=v.old+v.neu,vd=verdict(a,v);
-        if(!t)P('warn','"'+a+'" 보장이 기존·신규 모두 없습니다. 제안서에 "보장 공백"으로 부각됩니다. 신규 제안 담보를 확인하세요.',{s:2,el:'kg-신규'});
-        else if(vd[1]==='warn')P('info','"'+a+'" 합산 '+fmt(t)+'만원 — 권장 기준(예시) '+(BASE[a]?fmt(BASE[a])+'만원':'')+' 대비 '+vd[0]+'.',{s:2,el:'kg-신규'});});
+        if(!t)P('warn','"'+a+'" 보장이 기존·신규 모두 없습니다. 제안서에 "보장 공백"으로 부각됩니다. 신규 제안 담보를 확인하세요.',{s:8,el:'kg-신규'});
+        else if(vd[1]==='warn')P('info','"'+a+'" 합산 '+fmt(t)+'만원 — 권장 기준(예시) '+(BASE[a]?fmt(BASE[a])+'만원':'')+' 대비 '+vd[0]+'.',{s:8,el:'kg-신규'});});
       var oi=function(f){for(var i=0;i<st.opts.length;i++)if(f(st.opts[i]))return i;return 0;};
       if(opt.scen&&!R.scen.length)P('info','동시 지급 예시를 만들 담보가 부족해 해당 장은 빠집니다.',{s:5,topt:oi(function(q){return q.scen&&selIds(c).indexOf(q.id)>-1;})});
       if(opt.annual&&!(R.ann+R.ann10))P('info','"연간 1회" 담보가 없어 매년 반복 누적 장은 빠집니다.',{s:5,topt:oi(function(q){return q.annual&&selIds(c).indexOf(q.id)>-1;})});
@@ -2353,7 +2356,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!L.length)P('ok','확인할 부분이 없습니다. 제안서를 만들 수 있습니다.');
     return L;
   }
-  var STEPN={1:'고객정보',2:'동의·자료',3:'보장분석',4:'제안서',5:'옵션 관리'};
+  var STEPN={1:'고객정보',2:'기계약 자료',3:'1단계 분석',4:'Before/After 제안서',5:'옵션 관리',8:'2단계 조정·신계약'};
   function goAttr(g){var h=' data-s="'+g.s+'"';['el','tk','ti','tg','topt'].forEach(function(k){if(g[k]!=null&&g[k]!==-1)h+=' data-'+k+'="'+esc(g[k])+'"';});return h;}
   /* 화면을 옮긴 뒤 고칠 칸으로 스크롤하고 잠깐 빛나게 한다 */
   function focusTarget(d){
@@ -2535,9 +2538,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!c.keys[c.prov]){cap.why='no_key';capMsg=AIP[c.prov].name+' 키가 없습니다. <b>AI 연결 설정</b>에서 키를 넣어 주세요.';return;}
     cap.sample=apiAdapter(c);capMsg='연결된 AI: <b>'+AIP[c.prov].name+'</b> ('+esc(aiModel(c,c.prov))+')';
   }
+  function aiChosen(){var r=load(KEY_AI,null);return !!(r&&(r.prov||r.mode));}
   function aiBar(){
-    var c=aiCfg(),on=c.mode==='ai';
-    var h='<div class="panel aibar"><div class="row"><b>보장분석 방식</b><div class="seg"><button data-a="aimode" data-v="ai" class="'+(on?'on':'')+'">AI 연결해서 분석</button><button data-a="aimode" data-v="manual" class="'+(on?'':'on')+'">AI 없이 쓰기</button></div>'+
+    var c=aiCfg(),on=c.mode==='ai',first=!aiChosen();if(first)st.aiOpen=true;
+    var h=(first?'<div class="panel aifirst"><h3>처음 한 번: 내 AI를 정해 주세요</h3><p class="note">아래에서 이 포털에서 쓸 AI를 고르고 <b>저장</b>을 누르면, 다음부터는 묻지 않고 그 AI로 자료를 읽고 분석합니다. 나중에 "AI 연결 설정"에서 바꿀 수 있습니다.</p></div>':'')+'<div class="panel aibar"><div class="row"><b>보장분석 방식</b><div class="seg"><button data-a="aimode" data-v="ai" class="'+(on?'on':'')+'">AI 연결해서 분석</button><button data-a="aimode" data-v="manual" class="'+(on?'':'on')+'">AI 없이 쓰기</button></div>'+
       '<span class="sp"></span><button class="btn sm ghost" data-a="aicfg">AI 연결 설정 '+(st.aiOpen?'▴':'▾')+'</button></div><p class="note" style="margin:6px 0 0">'+capMsg+'</p>';
     if(st.aiOpen){
       var p=st.aiProv||c.prov;
@@ -2607,7 +2611,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       return;
     }
     var c=cust();
-    var h='<div class="ph"><div class="kicker">영업 도구</div><h1>AI보장분석 기본형</h1><p>고객 등록 → 동의·자료 첨부 → 옵션을 골라 보장분석 → 제안서 화면·인쇄·저장까지 한 흐름으로 진행합니다.</p></div>';
+    var h='<div class="ph"><div class="kicker">영업 도구</div><h1>AI보장분석 기본형</h1><p><b>1단계</b> 기존 계약 첨부 → 기계약 보장분석(유리한 부분·불리한 부분, 리포트·엑셀) → <b>2단계</b> 기존 담보 유지·정리 + 신계약 첨부 → Before/After 제안서</p></div>';
     h+=aiBar();
     h+='<div class="ai-wrap"><aside class="ai-list"><div class="ai-lh"><b>고객 목록</b><span class="note">'+st.customers.length+'명</span></div>'+
       '<input class="in" id="aiQ" placeholder="이름 검색" value="'+esc(st.q)+'" aria-label="고객 이름 검색">'+
@@ -2618,17 +2622,19 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(st.customers.length)h+='<li class="note ai-nohit"'+(st.customers.some(function(x){return !st.q||(x.name||'').indexOf(st.q)>-1;})?' hidden':'')+'>검색된 고객이 없습니다.</li>';
     if(!st.customers.length)h+='<li class="note ai-empty">저장된 고객이 없습니다. "새 고객"으로 등록하세요.</li>';
     h+='</ul><button class="btn sm ghost" data-a="step" data-s="0">전체 고객 목록 보기</button><p class="note" id="aiSync"></p></aside><section class="ai-main">';
-    var steps=[[0,'고객 목록'],[1,'고객정보'],[2,'동의·자료'],[3,'보장분석'],[4,'제안서'],[5,'옵션 관리'],[6,'참고자료']];
-    h+='<div class="ai-steps" role="tablist">'+steps.map(function(s){return '<button role="tab" aria-selected="'+(st.step===s[0])+'" data-a="step" data-s="'+s[0]+'" class="'+(st.step===s[0]?'on':'')+'"><i>'+(s[0]===0?'☰':s[0]<5?s[0]:s[0]===5?'⚙':'＋')+'</i>'+s[1]+'</button>';}).join('')+'</div>';
+    var steps=[[0,'고객 목록','☰'],[1,'고객정보','1'],[2,'기계약 자료','2'],[3,'1단계 기계약 분석','3'],[8,'2단계 조정·신계약','4'],[4,'2단계 Before/After','5'],[5,'옵션 관리','⚙'],[6,'참고자료','＋']];
+    h+='<div class="ai-steps" role="tablist">'+steps.map(function(s){return '<button role="tab" aria-selected="'+(st.step===s[0])+'" data-a="step" data-s="'+s[0]+'" class="'+(st.step===s[0]?'on':'')+'"><i>'+s[2]+'</i>'+s[1]+'</button>';}).join('')+'</div>';
     /* 단계마다 이전 단계로 돌아가는 버튼(위·아래) */
-    var SN=['고객 목록','고객정보','동의·자료','보장분석','제안서','옵션 관리','참고자료'],pv=st.step>=5?(st.from5==null?3:st.from5):st.step-1;
+    var SN={0:'고객 목록',1:'고객정보',2:'기계약 자료',3:'1단계 기계약 분석',8:'2단계 조정·신계약',4:'2단계 Before/After',5:'옵션 관리',6:'참고자료'},ORD=[0,1,2,3,8,4],pv=isSide(st.step)?(st.from5==null?3:st.from5):ORD[Math.max(0,ORD.indexOf(st.step)-1)];
     var back=st.step>0?'<div class="ai-back"><button class="btn sm ghost" data-a="step" data-s="'+pv+'">◂ 뒤로: '+SN[pv]+'</button></div>':'';
     h+=back;
     if(st.step===0)h+=viewList();
     else if(st.step===5)h+=viewOpts();
     else if(st.step===6)h+=viewRefs();
     else if(!c)h+='<div class="panel ai-none"><h3>고객을 먼저 고르세요</h3><p class="note">왼쪽에서 고객을 고르거나 "새 고객"을 누르세요.</p><div class="row"><button class="btn" data-a="new">+ 새 고객 등록</button></div></div>';
-    else h+=[0,viewInfo,viewDocs,viewAnalysis,viewReport][st.step](c);
+    else if(st.step===8)h+=viewAdjust(c);
+    else if(st.step===2)h+=viewDocs(c,'기존');
+    else h+=[0,viewInfo,0,viewAnalysis1,viewReport][st.step](c);
     h+=back+'</section></div>';
     root.innerHTML=h;syncNote();
   }
@@ -2672,16 +2678,17 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+='<div class="ai-act"><button class="btn" data-a="saveInfo">저장</button><button class="btn ghost" data-a="saveNext">저장하고 다음 ▸</button><span class="sp"></span><button class="btn ghost danger" data-a="delCust">고객 삭제</button></div>';
     return h;
   }
-  function viewDocs(c){
-    var h='<div class="aiwho">지금 <b>'+esc(c.name||'(이름 없음)')+'</b> 고객의 자료를 첨부합니다. 이 고객 화면에서 올린 자료만 이 고객 분석에 쓰입니다.</div>'+'<div class="cols"><div class="panel"><h3>기존계약 조회 개인정보동의서</h3><p class="note">고객에게 동의서를 보내 기존 계약을 조회하는 기능이 들어갈 자리입니다. (추후 개발·연결 예정)</p>'+
+  function viewDocs(c,G0){
+    var OLD=G0!=='신규';
+    var h=(OLD?'<div class="aiwho">지금 <b>'+esc(c.name||'(이름 없음)')+'</b> 고객의 <b>기존 계약</b> 자료를 첨부합니다. 이 자료로 1단계 기계약 보장분석을 합니다.</div>'+'<div class="cols"><div class="panel"><h3>기존계약 조회 개인정보동의서</h3>':'<div class="cols"><div class="panel" hidden><h3></h3>')+'<p class="note">고객에게 동의서를 보내 기존 계약을 조회하는 기능이 들어갈 자리입니다. (추후 개발·연결 예정)</p>'+
       '<div class="consent"><span class="pill '+(/완료/.test(c.consent)?'ok':'warn')+'">'+esc(c.consent)+'</span><div class="row"><button class="btn sm" disabled>카카오톡 발송 (준비 중)</button><button class="btn sm" disabled>문자 발송 (준비 중)</button></div></div>'+
       '<label class="f">동의 상태 직접 기록<select class="in" id="fCons">'+['미발송','발송함','동의 완료(서면)','거절'].map(function(o){return '<option'+(o===c.consent?' selected':'')+'>'+o+'</option>';}).join('')+'</select></label></div>'+
       '<div class="panel"><h3>자료 첨부</h3><p class="note">엑셀(올려 주신 보장분석 형식·입력 양식)은 바로 읽고, PDF·사진은 AI가 읽은 뒤 확인을 받습니다. 긴 가입설계서는 몇 쪽씩 나눠 읽습니다.</p>'+
-      upBox(c,'기존','기존 계약 자료','증권, 기존 보장분석표, 보장 조회 결과')+upBox(c,'신규','신규 제안 자료','가입설계서, 제안 상품 보장표')+
+      (OLD?upBox(c,'기존','기존 계약 자료','증권, 기존 보장분석표, 보장 조회 결과, 보케어 보장분석'):upBox(c,'신규','신계약·추천 계약 자료','가입설계서, 제안 상품 보장표'))+
       '<div class="row"><button class="btn sm ghost" data-a="tpl">엑셀 입력 양식 받기</button><span class="note" id="aiCapNote">'+capMsg+'</span></div><div id="aiProg" class="note" role="status"></div></div></div>';
     h+='<div class="panel"><h3>계약·담보 확인표<span class="sp"></span>'+sortSeg()+'</h3><p class="note">"보장 종류별"·"상해·질병별"은 보기 순서만 바꿉니다(자료는 그대로). 상해/질병은 담보 이름으로 자동 구분하며, 틀리면 칸에서 바꾸세요. 엑셀·AI가 읽은 내용이 여기에 들어옵니다. 숫자는 가입설계서와 꼭 대조하고, 맞으면 "확인 완료"를 누르세요. 금액 단위: 가입금액 만원, 보험료 원.</p>';
 
-    ['기존','신규'].forEach(function(G){
+    [OLD?'기존':'신규'].forEach(function(G){
       var idx=[];c.contracts.forEach(function(k,ki){if((k.kind==='신규'?'신규':'기존')===G)idx.push(ki);});
       var sm=idx.reduce(function(s,i){return s+n(c.contracts[i].premium);},0),ct=idx.reduce(function(s,i){return s+c.contracts[i].items.length;},0);
       h+='<div class="kgrp'+(G==='신규'?' nw':'')+'" id="kg-'+G+'"><div class="kgh"><span class="pill'+(G==='신규'?' new':'')+'">'+G+'</span><b>'+(G==='기존'?'기존 계약':'신규 제안')+'</b><span class="note">계약 '+idx.length+'건 · 담보 '+ct+'개 · 월 '+fmt(sm)+'원</span><span class="sp"></span><button class="btn sm ghost" data-a="addK" data-kind="'+G+'">+ '+G+' 계약 직접 추가</button></div>';
@@ -2703,7 +2710,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       });
       h+='</div>';
     });
-    h+='</div><div class="ai-act"><button class="btn" data-a="saveDocs">저장</button><button class="btn ghost" data-a="docsNext">저장하고 보장분석 ▸</button></div>';
+    h+='</div>'+(OLD?'<div class="ai-act"><button class="btn" data-a="saveDocs">저장</button><button class="btn ghost" data-a="docsNext">저장하고 1단계 기계약 분석 ▸</button></div>':'');
     return h;
   }
   function upBox(c,kind,title,hint){
@@ -2742,6 +2749,88 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       h+='<tr class="'+(R.focus.indexOf(a)>-1?'fx':'')+'"><td>'+a+'</td><td class="tyc">'+(TYS.filter(function(t){return tc[t];}).map(function(t){return '<span class="ty '+tyCls(t)+'">'+t+' '+tc[t]+'</span>';}).join(' ')||'<span class="note">—</span>')+'</td><td class="r">'+fmt(v.old)+'</td><td class="r">'+(v.neu?'+'+fmt(v.neu):'—')+'</td><td class="r"><b>'+fmt(v.old+v.neu)+'</b></td><td class="r">'+(BASE[a]?fmt(BASE[a]):'—')+'</td><td><span class="pill '+vd[1]+'">'+(!(v.old+v.neu)?'보장 공백':vd[0])+'</span></td></tr>';});
     h+='</tbody></table></div></div>'+spotPanel(o,R)+itemsPanel(c)+'<div class="ai-act"><button class="btn" data-a="step" data-s="4">이 옵션으로 제안서 만들기 ▸</button></div>';
     return h;
+  }
+
+  /* ---- 1단계·2단계 데이터 보기 ----
+     1단계(기계약 분석) = 기존 계약 전체.  2단계 After = 유지한 기존(삭제 담보·해지 계약 뺌) + 신계약.  Before = 1단계와 같음 */
+  function vOld(c){return Object.assign({},c,{contracts:(c.contracts||[]).filter(function(k){return k.kind!=='신규';}),_stage:1});}
+  function vAfter(c){
+    var o=opt(c),R0=analyze(vOld(c),o),ks=[],drop=[],saved=0,unk=0,cancel=0;
+    useK(c).forEach(function(k){
+      if(k.kind==='신규'){ks.push(k);return;}
+      if(k.cancel){cancel++;(k.items||[]).forEach(function(it){drop.push({it:it,k:k,all:1});});saved+=n(k.premium);return;}
+      var dr=(k.items||[]).filter(function(it){return it.drop;});if(!dr.length){ks.push(k);return;}
+      var pm=n(k.premium);dr.forEach(function(it){drop.push({it:it,k:k});if(it.prem==null||it.prem===''){unk++;}else{pm-=n(it.prem);saved+=n(it.prem);}});
+      ks.push(Object.assign({},k,{items:k.items.filter(function(it){return !it.drop;}),premium:Math.max(0,pm)}));
+    });
+    return Object.assign({},c,{contracts:ks,_stage:2,_B:{R0:R0,drop:drop,saved:saved,unk:unk,cancel:cancel}});
+  }
+  function dataC(c){return st.step===3?vOld(c):st.step===4?vAfter(c):c;}
+  function kTerm(it,k){return String((it.term||'')+' '+((k&&k.term)||''));}
+  /* 기계약의 유리한 부분 / 불리한 부분 (규칙으로 뽑음, 숫자는 분석값 그대로) */
+  function prosCons(v,o,R){
+    var P=[],C=[],K=useK(v),all=[];K.forEach(function(k){(k.items||[]).forEach(function(it){all.push({it:it,k:k});});});
+    function nm(L){return L.slice(0,3).map(function(x){return shortNm(x.it.name);}).join(', ')+(L.length>3?' 외 '+(L.length-3)+'개':'');}
+    AREAS.forEach(function(a){var t=R.A[a].old,b=BASE[a];if(a==='기타')return;
+      if(b&&t>=b)P.push(['['+a+'] 권장 기준 이상',fmt(t)+'만원 보유 (기준 예시 '+fmt(b)+'만원)']);
+      else if(b&&t)C.push(['['+a+'] 권장 기준보다 부족',fmt(t)+'만원 / 기준 예시 '+fmt(b)+'만원 — '+fmt(b-t)+'만원 모자람']);
+      else if(!t&&(o.areas.indexOf(a)>-1||/암 진단비|뇌·심장 진단비|실손의료비|수술비/.test(a)))C.push(['['+a+'] 보장 없음(공백)','가입된 담보가 없습니다'+(o.areas.indexOf(a)>-1?' — 선택한 분석 관점의 중심 영역':'')]);});
+    var rep=all.filter(function(x){return /연간|매회|매년|반복/.test((x.it.cycle||'')+x.it.name);});if(rep.length)P.push(['해마다·치료 때마다 반복 지급',rep.length+'개 담보 ('+nm(rep)+')']);
+    var lng=all.filter(function(x){return /(9\d|1\d\d)세|종신/.test(kTerm(x.it,x.k));});if(lng.length)P.push(['90세 이상·종신까지 오래 보장',lng.length+'개 담보가 노후까지 이어짐']);
+    if(R.A['실손의료비'].oldN)P.push(['실손의료비 보유','실제 쓴 병원비를 돌려받는 기본 보장이 있음']);
+    if(R.A['납입면제'].oldN)P.push(['납입면제 있음','큰 병 진단 시 이후 보험료를 내지 않아도 됨']);
+    var gr=all.filter(function(x){return /갱신/.test(x.it.name+' '+kTerm(x.it,x.k)+' '+(x.it.cycle||''))&&!/비갱신/.test(x.it.name+' '+kTerm(x.it,x.k));});if(gr.length)C.push(['갱신형 담보 '+gr.length+'개','갱신 때마다 보험료가 오를 수 있음 ('+nm(gr)+')']);
+    var sh=all.filter(function(x){var m=kTerm(x.it,x.k).match(/(?:^|[^\d])(\d{2,3})세/);return m&&+m[1]<=80;});if(sh.length)C.push(['80세 이전에 끝나는 담보 '+sh.length+'개','노후에 보장이 끊길 수 있음 ('+nm(sh)+')']);
+    var dk=K.filter(function(k){return Object.keys(dupSet(k)).length&&!k.dupOk;});if(dk.length)C.push(['같은 담보 중복','계약 '+dk.length+'건에 같은 담보가 두 번 이상 있음 — 보험료 중복 여부 확인']);
+    var dx=R.old.filter(function(it){return /진단/.test(it.name);}).length,tx=R.old.filter(function(it){return /주요치료|항암|치료비/.test(it.name);}).length;
+    if(dx>=2&&!tx)C.push(['진단비 위주 구성','진단 때 한 번 받는 일시금 중심 — 치료가 길어질 때의 치료비 보장이 약함']);
+    if(!P.length)P.push(['기본 보장 유지 중','가입된 계약을 바탕으로 점검했습니다']);
+    if(!C.length)C.push(['큰 약점 없음','권장 기준 대비 눈에 띄는 공백이 없습니다']);
+    return {P:P,C:C};
+  }
+  function bars1(R,focus){return bars(R,focus).replace('<span><i class="mo"></i>기존</span><span><i class="mt"></i>신규 가입 후(합산)</span>','<span><i class="mt"></i>기존 계약 보장</span>');}
+  function rptBar(c,title,pill){return '<div class="panel rtool"><div class="row"><b>'+title+'</b><span class="pill new">'+esc(pill)+'</span><span class="sp"></span>'+
+      (st.step===4?'<button class="btn sm ghost" data-a="aiText" id="aiTextBtn">AI로 문구 다듬기</button>':'')+'<button class="btn sm ghost" data-a="print">인쇄</button><button class="btn sm ghost" data-a="saveHtml">HTML 저장</button></div>'+
+      '<div class="row outs"><b>카카오톡으로 보낼 파일</b><button class="btn sm" data-a="pdfRpt">'+(st.step===3?'분석 리포트':'제안서')+' PDF 저장</button><button class="btn sm" data-a="pdfSheet">분석표 PDF 저장</button><button class="btn sm ghost" data-a="saveXlsx">분석표 엑셀 저장</button><span class="note" id="pdfNote">PDF를 저장한 뒤 카카오톡 대화방에서 파일로 첨부하면 됩니다.</span></div>'+
+      needsPick(c,opt(c));}
+  /* 화면 3: 1단계 기계약 보장분석 */
+  function viewAnalysis1(c){
+    var o=opt(c),v=vOld(c),R=analyze(v,o),PC=prosCons(v,o,R),K=useK(v);
+    var h='<div class="aiwho"><b>1단계 · 기계약 보장분석</b> — 지금 가입한 보험만으로 무엇이 든든하고 무엇이 비어 있는지 정리합니다. 신계약은 2단계에서 붙입니다.</div>';
+    h+='<div class="panel"><h3>분석 관점(옵션) 선택 <span class="note">여러 개 선택 가능 · 지금 '+selIds(c).length+'개</span><span class="sp"></span><button class="btn sm ghost" data-a="step" data-s="5">옵션 내용 바꾸기</button></h3><p class="note">고른 옵션의 중심 영역을 더 자세히 봅니다. 2단계 제안서도 같은 옵션으로 만듭니다.</p>'+optCards(c)+'</div>';
+    if(!K.length)return h+'<div class="panel"><h3>기존 계약이 없습니다</h3><p class="note">먼저 "기계약 자료"에 증권·보장분석표를 첨부하세요.</p><div class="row"><button class="btn" data-a="step" data-s="2">기계약 자료 첨부하기 ▸</button></div></div>';
+    h+='<div class="kpis"><div><span>기존 월보험료</span><b>'+fmt(R.prem.old)+'<small>원</small></b><em>계약 '+K.length+'건</em></div><div><span>담보</span><b>'+R.cnt.old+'<small>개</small></b><em>'+AREAS.filter(function(a){return R.A[a].old;}).length+'개 영역</em></div><div class="t"><span>점검 결과</span><b>유리 '+PC.P.length+' · 불리 '+PC.C.length+'</b><em>아래 정리 참고</em></div></div>';
+    h+='<div class="cols"><div class="panel"><h3>👍 유리한 부분 <span class="note">유지할 가치가 있는 보장</span></h3><ul class="list pc pc-g">'+PC.P.map(function(x){return '<li><span class="pill ok">유리</span><span class="t"><b>'+esc(x[0])+'</b><br><span class="note">'+esc(x[1])+'</span></span></li>';}).join('')+'</ul></div>'+
+      '<div class="panel"><h3>⚠ 불리한 부분 <span class="note">2단계에서 조정·보완할 곳</span></h3><ul class="list pc pc-r">'+PC.C.map(function(x){return '<li><span class="pill warn">불리</span><span class="t"><b>'+esc(x[0])+'</b><br><span class="note">'+esc(x[1])+'</span></span></li>';}).join('')+'</ul></div></div>';
+    h+='<div class="cols"><div class="panel"><h3>보장 지도 <span class="note">굵은 줄 = 옵션 중심 영역</span></h3>'+bars1(R,R.focus)+'</div>';
+    h+='<div class="panel"><h3>확인·수정할 부분</h3><ul class="list chk">'+checks(c,o,R).filter(function(x){return !/신규/.test(x[1]);}).map(function(x){return '<li><span class="pill '+(x[0]==='ok'?'ok':x[0]==='warn'?'warn':'')+'">'+(x[0]==='ok'?'완료':x[0]==='warn'?'확인':'참고')+'</span><span class="t">'+esc(x[1])+(x[2]?'<br><button class="chkgo" data-a="goChk"'+goAttr(x[2])+'>'+STEPN[x[2].s]+' 화면에서 '+(x[0]==='warn'?'확인·수정':'보기')+' ▸</button>':'')+'</span></li>';}).join('')+'</ul></div></div>';
+    h+='<div class="panel"><h3>영역별 보장 현황 <span class="note">단위: 만원 · 기준은 예시값</span></h3><div class="tbl"><table><thead><tr><th>보장영역</th><th class="r">현재 보장</th><th class="r">기준(예시)</th><th>판정</th></tr></thead><tbody>';
+    AREAS.forEach(function(a){var vv=R.A[a];if(!vv.old&&R.focus.indexOf(a)<0)return;var vd=verdict(a,vv);
+      h+='<tr class="'+(R.focus.indexOf(a)>-1?'fx':'')+'"><td>'+a+'</td><td class="r"><b>'+fmt(vv.old)+'</b></td><td class="r">'+(BASE[a]?fmt(BASE[a]):'—')+'</td><td><span class="pill '+vd[1]+'">'+(!vv.old?'보장 공백':vd[0])+'</span></td></tr>';});
+    h+='</tbody></table></div></div>'+itemsPanel(v);
+    h+=rptBar(c,'1단계 기계약 보장분석 리포트',o.title)+'<p class="note" id="rptNote">숫자는 분석표에서 계산한 값입니다. 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.</p></div>';
+    h+='<div class="rpt" id="rpt">'+report1Html(v,o,R,PC)+'</div>';
+    return h+'<div class="ai-act"><button class="btn" data-a="step" data-s="8">2단계: 기존 계약 조정·신계약 첨부 ▸</button></div>';
+  }
+  /* 화면 4: 2단계 조정(유지·삭제·해지) + 신계약 첨부 */
+  function baRows(c,o){var v=vAfter(c),R=analyze(v,o),R0=v._B.R0,out=[];AREAS.forEach(function(a){var b=R0.A[a].old,f=R.A[a].old+R.A[a].neu;if(!b&&!f&&o.areas.indexOf(a)<0)return;out.push({a:a,b:b,f:f,d:f-b,fx:o.areas.indexOf(a)>-1});});return {rows:out,R:R,R0:R0,v:v};}
+  function viewAdjust(c){
+    var o=opt(c),X=baRows(c,o),B=X.v._B,bp=X.R0.prem.old,ap=X.R.prem.old+X.R.prem.neu;
+    var h='<div class="aiwho"><b>2단계 · 조정과 신계약</b> — ① 기존 계약에서 유지할 담보와 정리할 담보를 고르고 ② 신계약·추천 계약을 첨부하면, 컨설팅 전(Before)과 후(After)를 비교한 제안서가 만들어집니다.</div>';
+    h+='<div class="panel"><h3>① 기존 계약 조정 <span class="note">체크 = 유지 · 체크를 끄면 정리(삭제)</span></h3><p class="note">계약을 통째로 해지하려면 계약 줄의 "계약 유지" 체크를 끄세요. 담보별 보험료가 적혀 있으면 After 보험료에 바로 반영됩니다.</p>';
+    var any=false;
+    c.contracts.forEach(function(k,ki){if(k.kind==='신규'||(k.nameWarn&&!k.nameOk))return;any=true;
+      h+='<div class="adjk'+(k.cancel?' off':'')+'"><div class="row"><label class="row" style="gap:6px"><input type="checkbox" data-kc="'+ki+'"'+(k.cancel?'':' checked')+'><b>계약 유지</b></label><b>'+esc(k.insurer||'보험사')+'</b> '+esc(k.product||'')+'<span class="sp"></span><span class="note">월 '+fmt(n(k.premium))+'원 · 담보 '+(k.items||[]).length+'개</span>'+(k.cancel?'<span class="pill warn">해지</span>':'')+'</div>';
+      if(!k.cancel){h+='<div class="tbl"><table class="adjt"><thead><tr><th>유지</th><th>보장영역</th><th>담보명</th><th class="r">가입금액(만원)</th><th class="r">보험료(원)</th><th>보장기간·주기</th></tr></thead><tbody>';
+        (k.items||[]).forEach(function(it,ii){h+='<tr class="'+(it.drop?'drop':'')+'"><td><input type="checkbox" data-kd="'+ki+':'+ii+'"'+(it.drop?'':' checked')+' aria-label="'+esc(it.name)+' 유지"></td><td>'+esc(it.area)+'</td><td>'+esc(it.name)+'</td><td class="r">'+(it.amt==null?'—':fmt(n(it.amt)))+'</td><td class="r">'+(it.prem==null||it.prem===''?'<span class="note">모름</span>':fmt(n(it.prem)))+'</td><td>'+esc([it.term,it.cycle].filter(Boolean).join(' · '))+'</td></tr>';});
+        h+='</tbody></table></div>';}
+      h+='</div>';});
+    if(!any)h+='<p class="note">기존 계약이 없습니다. 바로 신계약을 첨부하면 됩니다.</p>';
+    if(B.unk)h+='<p class="note bad">⚠ 정리한 담보 중 '+B.unk+'개는 담보 보험료가 없어 After 보험료에 빠지지 않았습니다. "기계약 자료" 화면에서 담보 보험료를 넣거나 실제 감액 후 보험료로 계약 보험료를 고치세요.</p>';
+    h+='</div>'+viewDocs(c,'신규');
+    h+='<div class="panel"><h3>③ Before / After 미리보기 <span class="note">단위: 만원 · 보험료 원</span></h3><div class="kpis"><div><span>Before 월보험료</span><b>'+fmt(bp)+'<small>원</small></b><em>기존 계약 그대로</em></div><div><span>정리·신규</span><b>−'+fmt(B.saved)+' / +'+fmt(X.R.prem.neu)+'</b><em>담보 '+B.drop.length+'개 정리 · 신규 '+X.R.cnt.neu+'개</em></div><div class="t"><span>After 월보험료</span><b>'+fmt(ap)+'<small>원</small></b><em>'+(ap>bp?'+'+fmt(ap-bp)+'원':ap<bp?'−'+fmt(bp-ap)+'원':'변동 없음')+'</em></div></div>'+
+      '<div class="tbl"><table><thead><tr><th>보장영역</th><th class="r">Before</th><th class="r">After</th><th class="r">변화</th></tr></thead><tbody>'+X.rows.map(function(r){return '<tr class="'+(r.fx?'fx':'')+'"><td>'+r.a+'</td><td class="r">'+fmt(r.b)+'</td><td class="r"><b>'+fmt(r.f)+'</b></td><td class="r '+(r.d>0?'up':r.d<0?'dn':'')+'">'+(r.d>0?'+'+fmt(r.d):r.d<0?'−'+fmt(-r.d):'—')+'</td></tr>';}).join('')+'</tbody></table></div></div>';
+    return h+'<div class="ai-act"><button class="btn" data-a="saveDocs">저장</button><button class="btn ghost" data-a="adjNext">저장하고 Before/After 제안서 ▸</button></div>';
   }
   /* 옵션 하나의 부각 내용: 공백(0원)·부족·보강 영역과 한 줄 메시지 */
   function spotInfo(q,R){
@@ -2786,17 +2875,16 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(R.scen.length)P.push('[동시 지급] 같은 사건에서 기존 '+fmt(R.sOld)+'만 + 신규 '+fmt(R.sNeu)+'만 = 약 '+fmt(R.sOld+R.sNeu)+'만원이 차감 없이 겹쳐 지급될 수 있습니다(가정).');
     if(R.ann+R.ann10)P.push('[매년 반복] "연간 1회" 담보는 보험연도마다 다시 지급되어 3년 '+fmt(R.years[2][2])+'만, 5년 '+fmt(R.years[3][2])+'만원까지 누적될 수 있습니다(가정).');
     if(gapA.length)P.push('[보장 공백] '+gapA.join('·')+' 보장은 기존·신규 모두 없습니다. '+(o.list||[o]).filter(function(q){return q.areas.some(function(a){return gapA.indexOf(a)>-1;});}).map(function(q){return '"'+q.title+'"';}).join('·')+' 관점에서 따로 보완이 필요합니다.');
-    P.push('합산 월 보험료는 '+fmt(R.prem.old+R.prem.neu)+'원(기존 '+fmt(R.prem.old)+' + 신규 '+fmt(R.prem.neu)+')입니다.');
+    if(c._B){var B=c._B;if(B.drop.length)P.unshift('[조정] 기존 담보 '+B.drop.length+'개를 정리해'+(B.saved?' 월 '+fmt(B.saved)+'원을 줄이고,':'')+' 필요한 보장은 신계약으로 더합니다.');P.push('월 보험료는 Before '+fmt(B.R0.prem.old)+'원 → After '+fmt(R.prem.old+R.prem.neu)+'원(유지 기존 '+fmt(R.prem.old)+' + 신규 '+fmt(R.prem.neu)+')입니다.');}
+    else P.push('합산 월 보험료는 '+fmt(R.prem.old+R.prem.neu)+'원(기존 '+fmt(R.prem.old)+' + 신규 '+fmt(R.prem.neu)+')입니다.');
     var con='기존의 '+(top[0]||'보장')+' 중심 보장 위에 '+o.areas.slice(0,o.list?5:3).join('·')+' 보장이 더해집니다. '+(R.scen.length?'한 사건에서 여러 담보가 차감 없이 동시에 지급되고, ':'')+((R.ann+R.ann10)?'"연간 1회" 담보는 해마다 반복되므로 치료가 길어지고 재발할수록 합산 보장의 힘이 커집니다.':'"'+o.title+'" 관점에서 기존 보장의 빈틈이 채워집니다.')+(gapA.length?' 다만 '+gapA.join('·')+' 보장은 아직 비어 있어 보완을 권합니다.':'');
     return {points:P.slice(0,MAXP),conclusion:con};
   }
   function viewReport(c){
-    var o=opt(c),R=analyze(c,o),T=(c.ai&&c.ai.opt===o.id)?c.ai:defText(c,o,R);
-    var h='<div class="panel rtool"><div class="row"><b>제안서</b><span class="pill new">'+esc(o.title)+'</span><span class="sp"></span>'+
-      '<button class="btn sm ghost" data-a="aiText" id="aiTextBtn">AI로 문구 다듬기</button><button class="btn sm ghost" data-a="print">인쇄</button><button class="btn sm ghost" data-a="saveHtml">제안서 HTML</button></div>'+
-      '<div class="row outs"><b>카카오톡으로 보낼 파일</b><button class="btn sm" data-a="pdfRpt">제안서 PDF 저장</button><button class="btn sm" data-a="pdfSheet">분석표 PDF 저장</button><button class="btn sm ghost" data-a="saveXlsx">분석표 엑셀 저장</button><span class="note" id="pdfNote">PDF를 저장한 뒤 카카오톡 대화방에서 파일로 첨부하면 됩니다.</span></div>'+
-      needsPick(c,o)+'<p class="note" id="rptNote">'+(c.ai&&c.ai.opt===o.id?'AI가 다듬은 문구입니다. 숫자는 분석표에서 계산한 값입니다.':'기본 문구입니다. 숫자는 분석표에서 계산한 값입니다.')+' 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.</p></div>';
-    h+='<div class="rpt" id="rpt">'+reportHtml(c,o,R,T)+'</div>';
+    var o=opt(c),v=vAfter(c),R=analyze(v,o),T=(c.ai&&c.ai.opt===o.id&&c.ai.s2)?c.ai:defText(v,o,R);
+    var h='<div class="aiwho"><b>2단계 · Before / After 제안서</b> — 기존 계약은 이랬는데(Before), 컨설팅 후 조정 계약은 이렇게 됩니다(After).</div>'+rptBar(c,'Before/After 제안서',o.title)+
+      '<p class="note" id="rptNote">'+(c.ai&&c.ai.opt===o.id&&c.ai.s2?'AI가 다듬은 문구입니다. 숫자는 분석표에서 계산한 값입니다.':'기본 문구입니다. 숫자는 분석표에서 계산한 값입니다.')+' 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.</p></div>';
+    h+='<div class="rpt" id="rpt">'+reportHtml(v,o,R,T)+'</div>';
     return h;
   }
   /* ---- 제안서: 김덕중님 발표자료(PPT 16:9) 형식. 960×540 기준 좌표를 --u 단위로 쓴다 ---- */
@@ -2897,24 +2985,38 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<span class="note">고른 옵션에 맞는 자료만 보입니다'+(hid?' (다른 옵션용 '+hid+'건 숨김)':'')+'.</span><button class="btn sm ghost" data-a="step" data-s="6">+ 참고자료 올리기·관리</button></div>';}
   function reportHtml(c,o,R,T){
     var oldK=useK(c).filter(function(k){return k.kind!=='신규';}),neuK=useK(c).filter(function(k){return k.kind==='신규';}),mO=oldK.length>1,mN=neuK.length>1;
-    var L=o.list||[o],d=today().replace(/-/g,'.'),no=0,pg=0;
+    var L=o.list||[o],d=today().replace(/-/g,'.'),no=0,pg=0,B=c._B,bp=B?B.R0.prem.old:0,ap=R.prem.old+R.prem.neu;
     function prodOf(K){return K.map(function(k){return (k.insurer?k.insurer.replace(/손해보험|생명보험|화재해상보험|화재/,'')+' ':'')+(k.product||'');}).join(' · ')||'—';}
     function slide(tag,title,sub,body,foot,cls){pg++;var num=tag?String(++no).padStart(2,'0')+'&nbsp; '+tag:'';
       return '<div class="slw"><section class="sl '+(cls||'')+'">'+(tag?'<div class="kk">'+num+'</div>':'')+(title?'<h2 class="kt">'+title+'</h2>':'')+(sub?'<p class="ks">'+sub+'</p>':'')+'<div class="kb'+(sub?' lo':'')+'">'+body+'</div>'+(foot?'<p class="kf">'+foot+'</p>':'')+'<span class="kpg">'+esc(c.name)+'님 보험 비교분석 · '+pg+'</span></section></div>';}
     var kw=L.map(function(q){return q.title.replace(/ 중심| 관점|\(리모델링\)| 종합 점검/g,'');}).join(' · ');
     /* 표지 */
-    var h='<div class="slw"><section class="sl cv"><i class="kc1"></i><i class="kc2"></i>'+
+    var h=B?'<div class="slw"><section class="sl cv"><i class="kc1"></i><i class="kc2"></i>'+
+      '<div class="cvk">보장 컨설팅 제안서 · '+d+'</div><h1 class="cvt">'+esc(c.name)+'님 보장 Before &amp; After</h1>'+
+      '<p class="cvs"><b>Before → After</b>&nbsp;&nbsp;|&nbsp;&nbsp;'+esc(kw)+'</p>'+
+      '<div class="cvb" style="left:calc(var(--u)*64)"><span>Before 월보험료</span><b>'+fmt(bp)+' 원</b></div><div class="cvb" style="left:calc(var(--u)*334)"><span>After 월보험료</span><b>'+fmt(ap)+' 원</b></div><div class="cvb g" style="left:calc(var(--u)*604)"><span>'+(ap>bp?'보장 강화에 더하는 보험료':'월 보험료 변화')+'</span><b>'+(ap>bp?'+'+fmt(ap-bp):ap<bp?'−'+fmt(bp-ap):'0')+' 원</b></div>'+
+      '<p class="cvf">피보험자: '+esc(c.name)+(ageSex(c)?' ('+esc(ageSex(c))+')':'')+'&nbsp;&nbsp;·&nbsp;&nbsp;Before = 기존 계약 그대로 · After = 조정한 기존 + 신계약&nbsp;&nbsp;·&nbsp;&nbsp;담당: '+esc(me.org)+' '+esc(me.name)+'<br>본 자료는 고객 이해를 돕기 위한 비교용 참고자료입니다</p></section></div>':'<div class="slw"><section class="sl cv"><i class="kc1"></i><i class="kc2"></i>'+
       '<div class="cvk">보장 분석 리포트 · '+d+'</div><h1 class="cvt">'+esc(c.name)+'님 보험 비교분석</h1>'+
       '<p class="cvs"><b>기존 · 신규 · 합산</b>&nbsp;&nbsp;|&nbsp;&nbsp;'+esc(kw)+'</p>'+
       '<div class="cvb" style="left:calc(var(--u)*64)"><span>기존 월보험료</span><b>'+fmt(R.prem.old)+' 원</b></div><div class="cvb" style="left:calc(var(--u)*334)"><span>신규 월보험료</span><b>'+fmt(R.prem.neu)+' 원</b></div><div class="cvb g" style="left:calc(var(--u)*604)"><span>합산 월보험료</span><b>'+fmt(R.prem.old+R.prem.neu)+' 원</b></div>'+
       '<p class="cvf">피보험자: '+esc(c.name)+(ageSex(c)?' ('+esc(ageSex(c))+')':'')+((c.jobType||c.job)?' · '+esc([c.jobType,c.job].filter(Boolean).join(' / ')):'')+'&nbsp;&nbsp;·&nbsp;&nbsp;'+esc(oldK.map(function(k){return k.insurer;}).filter(Boolean).join(', ')||'—')+'(기존)'+(neuK.length?' + '+esc(neuK.map(function(k){return k.insurer;}).filter(Boolean).join(', '))+'(신규)':'')+'&nbsp;&nbsp;·&nbsp;&nbsp;담당: '+esc(me.org)+' '+esc(me.name)+'<br>본 자료는 고객 이해를 돕기 위한 비교용 참고자료입니다</p></section></div>';
     /* 01 종합 요약: 카드 3장 */
     needsFor(c,o,'공통').forEach(function(x){h+=slide('REFERENCE',esc(x.title)+' <small>한국보험금융</small>','',refBody(x,c,o,R),refSlide(x),'nd');});
+    if(B){var R0=B.R0,ba=AREAS.filter(function(a){return a!=='기타'&&(R0.A[a].old||R.A[a].old+R.A[a].neu||o.areas.indexOf(a)>-1);});
+      var addI=R.neu.slice().sort(function(a,b){return n(b.amt)-n(a.amt);}),dl=B.drop.slice().sort(function(a,b){return n(b.it.amt)-n(a.it.amt);});
+      h+=slide('BEFORE → AFTER','컨설팅 전과 후 — 이렇게 달라집니다','Before = 지금 계약 그대로 · After = 정리할 것은 정리하고, 필요한 보장을 더한 조정 계약',
+        '<div class="g2l"><div><table class="kt2 xs"><thead><tr><th>보장영역</th><th class="r">Before</th><th class="r">After</th><th class="r">변화(만원)</th></tr></thead><tbody>'+
+        ba.map(function(a){var b=R0.A[a].old,f=R.A[a].old+R.A[a].neu,df=f-b;return '<tr'+(o.areas.indexOf(a)>-1?' class="fx"':'')+'><td>'+esc(a)+'</td><td class="r">'+fmt(b)+'</td><td class="r"><b>'+fmt(f)+'</b></td><td class="r">'+(df>0?'<b class="g">+'+fmt(df)+'</b>':df<0?'<b class="r">−'+fmt(-df)+'</b>':'—')+'</td></tr>';}).join('')+
+        '<tr class="sum"><td>월 보험료(원)</td><td class="r">'+fmt(bp)+'</td><td class="r"><b>'+fmt(ap)+'</b></td><td class="r">'+(ap-bp>0?'+'+fmt(ap-bp):ap-bp<0?'−'+fmt(bp-ap):'—')+'</td></tr></tbody></table></div>'+
+        '<div class="kcol"><div class="kc gp"><span class="cl">정리(삭제)하는 기존 담보 '+dl.length+'개'+(B.saved?' · 월 −'+fmt(B.saved)+'원':'')+'</span><ul class="kl s">'+(dl.length?dl.slice(0,4).map(function(x){return '<li>'+esc(shortNm(x.it.name))+' '+man(n(x.it.amt))+(x.all?' (계약 해지)':'')+'</li>';}).join('')+(dl.length>4?'<li>외 '+(dl.length-4)+'개</li>':''):'<li>정리하는 담보 없음 — 기존 계약 모두 유지</li>')+'</ul></div>'+
+        '<div class="kc n"><span class="cl">새로 더하는 담보 '+addI.length+'개 · 월 +'+fmt(R.prem.neu)+'원</span><ul class="kl s">'+(addI.length?addI.slice(0,4).map(function(it){return '<li>'+esc(shortNm(it.name))+' '+man(n(it.amt))+(it.cycle?' · '+esc(it.cycle):'')+'</li>';}).join('')+(addI.length>4?'<li>외 '+(addI.length-4)+'개</li>':''):'<li>신계약 없음</li>')+'</ul></div></div></div>',
+        '※ 변화 = After − Before. 정리한 담보 중 보험료를 모르는 담보는 월 보험료 계산에서 빠졌을 수 있습니다.');}
+
     var gainA=AREAS.filter(function(a){return R.A[a].neu;}).sort(function(a,b){return R.A[b].neu-R.A[a].neu;}).slice(0,2);
     function card(cls,t,prod,prem,cnt,nat){return '<div class="kc '+cls+'"><b class="ct">'+t+'</b><p class="cp">'+esc(prod)+'</p><span class="cl">월 보험료</span><b class="cv">'+fmt(prem)+' 원</b><span class="cn">담보 '+cnt+'개</span><span class="cl">보장 성격</span><b class="cna">'+esc(nat)+'</b></div>';}
     var terms=oldK.concat(neuK).map(function(k){return k.term;}).filter(Boolean).filter(function(x,i,A){return A.indexOf(x)===i;});
-    h+=slide('OVERVIEW','종합 요약 — 기존 vs 신규 vs 합산','','<div class="g3">'+card('o','기존 보험',prodOf(oldK),R.prem.old,R.cnt.old,natureOf(R,'old',oldK))+card('n','신규 보험(제안)',prodOf(neuK),R.prem.neu,R.cnt.neu,natureOf(R,'neu',neuK))+
-      card('s','합산',gainA.length?gainA.join('·')+' 보강으로 빈틈 채움':'기존 + 신규',R.prem.old+R.prem.neu,R.cnt.old+R.cnt.neu,'기존 보장 + '+(gainA[0]||'신규')+' 보강')+'</div>',
+    h+=slide('OVERVIEW',B?'After 구성 — 유지하는 기존 + 신계약':'종합 요약 — 기존 vs 신규 vs 합산','','<div class="g3">'+card('o',B?'유지하는 기존 보험':'기존 보험',prodOf(oldK),R.prem.old,R.cnt.old,natureOf(R,'old',oldK))+card('n','신규 보험(제안)',prodOf(neuK),R.prem.neu,R.cnt.neu,natureOf(R,'neu',neuK))+
+      card('s',B?'After 합계':'합산',gainA.length?gainA.join('·')+' 보강으로 빈틈 채움':'기존 + 신규',R.prem.old+R.prem.neu,R.cnt.old+R.cnt.neu,'기존 보장 + '+(gainA[0]||'신규')+' 보강')+'</div>',
       (terms.length?'만기/납기: '+esc(terms.join(' · '))+'&nbsp;&nbsp;|&nbsp;&nbsp;':'')+'신규 추가 담보는 상세자료에 별도 표시');
     /* 02 보장 지도 */
     var mx=0;AREAS.forEach(function(a){mx=Math.max(mx,R.A[a].old+R.A[a].neu);});
@@ -2976,7 +3078,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var hw=o.areas.concat(['동시','해마다','매년 반복','일시금','보장 공백','반복']);
     h+='<div class="slw"><section class="sl cv cc"><i class="kc3"></i><i class="kc4"></i><div class="cvk" style="top:calc(var(--u)*79)">한 줄 결론</div>'+
       '<p class="cch">'+hiWords(c1,hw)+'</p>'+(c2?'<p class="ccs">'+hiWords(c2,hw)+'</p>':'')+
-      '<div class="cvb g big"><span>합산 월 보험료</span><b>'+fmt(R.prem.old+R.prem.neu)+' 원</b></div>'+
+      '<div class="cvb g big"><span>'+(B?'After 월 보험료 (Before '+fmt(bp)+'원)':'합산 월 보험료')+'</span><b>'+fmt(R.prem.old+R.prem.neu)+' 원</b></div>'+
       '<p class="ccu"><b>함께 사용하기</b>&nbsp; 보장 지도·막대·누적 차트로 큰 그림을, 분석표(엑셀·PDF)로 담보별 숫자와 동시지급·누적 근거를 함께 보시면 설명이 자연스럽습니다.</p>'+
       '<p class="cvf" style="top:calc(var(--u)*486)">※ 본 자료는 가입설계서 기준 비교용 참고자료이며, 보장 여부·지급 조건은 각 상품 약관이 우선합니다. 동시지급·누적 예시는 이해를 돕기 위한 가정입니다.</p></section></div>';
     pg++;
@@ -2987,10 +3089,56 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       o1.forEach(function(it){rows.push([mO?1.55:1,'<tr><td>'+tyTag(it)+esc(it.name)+srcLine(it,mO)+'</td><td class="r">'+fmt(n(it.amt))+'</td><td>—</td><td class="r">—</td><td>'+esc(it.term||'')+'</td><td>'+esc(it.cycle||'')+'</td></tr>']);});
       n1.forEach(function(it){rows.push([mN?1.55:1,'<tr class="add"><td>—</td><td class="r">—</td><td>'+tyTag(it)+esc(it.name)+srcLine(it,mN)+'</td><td class="r">'+fmt(n(it.amt))+'</td><td>'+esc(it.term||'')+'</td><td>'+esc(it.cycle||'')+'</td></tr>']);});
       rows.push([1,'<tr class="sum"><td>'+a+' 합계</td><td class="r">'+fmt(R.A[a].old)+'</td><td></td><td class="r">'+fmt(R.A[a].neu)+'</td><td colspan="2">합산 '+fmt(R.A[a].old+R.A[a].neu)+'</td></tr>']);});
+    if(B&&B.drop.length){rows.push([1,'<tr class="ksec"><td colspan="6">▌ 정리(삭제)하는 기존 담보 — After에서 빠짐</td></tr>']);B.drop.forEach(function(x){rows.push([1,'<tr class="del"><td>'+tyTag(x.it)+esc(x.it.name)+(x.all?' (계약 해지)':'')+'</td><td class="r">'+fmt(n(x.it.amt))+'</td><td>—</td><td class="r">—</td><td>'+esc(x.it.term||'')+'</td><td>'+esc(x.it.cycle||'')+'</td></tr>']);});}
     rows.push([1,'<tr class="sum"><td>월 보험료 합계(원)</td><td class="r">'+fmt(R.prem.old)+'</td><td></td><td class="r">'+fmt(R.prem.neu)+'</td><td colspan="2">합산 '+fmt(R.prem.old+R.prem.neu)+'</td></tr>']);
     var chunks=[],cur=[],w=0;rows.forEach(function(r){if(w+r[0]>18.5&&cur.length){chunks.push(cur);cur=[];w=0;}cur.push(r[1]);w+=r[0];});if(cur.length){if(cur.length<=3&&chunks.length)chunks[chunks.length-1]=chunks[chunks.length-1].concat(cur);else chunks.push(cur);}
     chunks.forEach(function(ch,i){h+=slide(i?'':'APPENDIX','담보별 상세 비교'+(chunks.length>1?' ('+(i+1)+'/'+chunks.length+')':'')+(mO||mN?' <small>여러 계약: 담보 › 회사 순</small>':''),'',
       '<table class="kt2 xs"><thead><tr><th>기존 담보명</th><th class="r">기존(만)</th><th>신규 담보명</th><th class="r">신규(만)</th><th>보장기간</th><th>지급주기</th></tr></thead><tbody>'+ch.join('')+'</tbody></table>',i===chunks.length-1?'노란색 행 = 신규 가입으로 추가되는 담보 · 상해/질병 = 담보 이름 기준 구분':'');});
+    return h;
+  }
+  /* ---- 1단계 기계약 보장분석 리포트: 2단계 제안서와 같은 16:9 틀 ---- */
+  function report1Html(c,o,R,PC){
+    var K=useK(c),mO=K.length>1,d=today().replace(/-/g,'.'),no=0,pg=0;
+    function slide(tag,title,sub,body,foot,cls){pg++;var num=tag?String(++no).padStart(2,'0')+'&nbsp; '+tag:'';
+      return '<div class="slw"><section class="sl '+(cls||'')+'">'+(tag?'<div class="kk">'+num+'</div>':'')+(title?'<h2 class="kt">'+title+'</h2>':'')+(sub?'<p class="ks">'+sub+'</p>':'')+'<div class="kb'+(sub?' lo':'')+'">'+body+'</div>'+(foot?'<p class="kf">'+foot+'</p>':'')+'<span class="kpg">'+esc(c.name)+'님 기계약 보장분석 · '+pg+'</span></section></div>';}
+    var strong=AREAS.filter(function(a){return a!=='기타'&&R.A[a].old;}).sort(function(a,b){return R.A[b].old-R.A[a].old;});
+    var gaps=AREAS.filter(function(a){return a!=='기타'&&!R.A[a].old&&(o.areas.indexOf(a)>-1||BASE[a]);});
+    var h='<div class="slw"><section class="sl cv"><i class="kc1"></i><i class="kc2"></i>'+
+      '<div class="cvk">기계약 보장분석 리포트 · '+d+'</div><h1 class="cvt">'+esc(c.name)+'님 기존 보험 점검</h1>'+
+      '<p class="cvs"><b>지금 가입한 보험</b>&nbsp;&nbsp;|&nbsp;&nbsp;무엇이 든든하고, 무엇이 비어 있는가</p>'+
+      '<div class="cvb" style="left:calc(var(--u)*64)"><span>기존 월보험료</span><b>'+fmt(R.prem.old)+' 원</b></div><div class="cvb" style="left:calc(var(--u)*334)"><span>계약 · 담보</span><b>'+K.length+'건 · '+R.cnt.old+'개</b></div><div class="cvb g" style="left:calc(var(--u)*604)"><span>점검 결과</span><b>유리 '+PC.P.length+' · 불리 '+PC.C.length+'</b></div>'+
+      '<p class="cvf">피보험자: '+esc(c.name)+(ageSex(c)?' ('+esc(ageSex(c))+')':'')+((c.jobType||c.job)?' · '+esc([c.jobType,c.job].filter(Boolean).join(' / ')):'')+'&nbsp;&nbsp;·&nbsp;&nbsp;담당: '+esc(me.org)+' '+esc(me.name)+'<br>본 자료는 고객 이해를 돕기 위한 참고자료입니다</p></section></div>';
+    needsFor(c,o,'공통').forEach(function(x){h+=slide('REFERENCE',esc(x.title)+' <small>한국보험금융</small>','',refBody(x,c,o,R),refSlide(x),'nd');});
+    /* 계약 현황 */
+    h+=slide('MY CONTRACTS','가입한 계약 한눈에 보기','','<table class="kt2"><thead><tr><th>보험사</th><th>상품명</th><th>만기 / 납기</th><th class="r">월 보험료(원)</th><th class="r">담보</th><th>보장 성격</th></tr></thead><tbody>'+
+      K.map(function(k){return '<tr><td>'+esc(k.insurer||'')+'</td><td>'+esc(k.product||'')+'</td><td>'+esc(k.term||'')+'</td><td class="r">'+fmt(n(k.premium))+'</td><td class="r">'+(k.items||[]).length+'개</td><td>'+esc(k.nature||'')+'</td></tr>';}).join('')+
+      '<tr class="sum"><td colspan="3"><b>합계</b></td><td class="r"><b>'+fmt(R.prem.old)+'</b></td><td class="r"><b>'+R.cnt.old+'개</b></td><td></td></tr></tbody></table>','계약 정보는 첨부한 증권·보장분석 자료 기준입니다.');
+    /* 보장 지도 */
+    var mx=0;AREAS.forEach(function(a){mx=Math.max(mx,R.A[a].old);});
+    var ax=AREAS.filter(function(a){return a!=='기타'&&(R.A[a].old||o.areas.indexOf(a)>-1);}).slice(0,10).map(function(a){var t=mx?Math.sqrt(R.A[a].old)/Math.sqrt(mx)*100:0;return {a:a,l:a.replace(' 주요치료비',' 치료').replace(' 진단비',' 진단'),o:t,t:t,f:o.areas.indexOf(a)>-1};});
+    while(ax.length<3)ax.push({a:'',l:'',o:0,t:0});
+    h+=slide('COVERAGE MAP','지금 보장의 모양 — 어디가 두텁고 어디가 비었나','','<div class="g2l"><div class="kch">'+radarSvg(ax)+'</div><div class="kc w"><b class="ch">읽는 법</b><ul class="kl">'+
+      strong.slice(0,3).map(function(a){return '<li class="g">'+esc(a)+' '+man(R.A[a].old)+' — 두터운 영역</li>';}).join('')+
+      (gaps.length?'<li class="r">'+esc(gaps.slice(0,4).join('·'))+' — 비어 있는 영역</li>':'')+'<li>면이 넓을수록 그 영역의 보장이 큽니다</li></ul></div></div>','※ 점수는 영역별 총 보장금액에 제곱근 정규화를 적용한 상대 지표입니다.');
+    /* 영역별 점검 */
+    var rows=AREAS.filter(function(a){return a!=='기타'&&(R.A[a].old||o.areas.indexOf(a)>-1||BASE[a]);});
+    h+=slide('CHECK','영역별 보장 점검 — 권장 기준(예시)과 비교','','<table class="kt2"><thead><tr><th>보장영역</th><th class="r">현재 보장(만원)</th><th class="r">권장 기준(예시)</th><th>판정</th></tr></thead><tbody>'+
+      rows.map(function(a){var v=R.A[a],vd=verdict(a,v),z=!v.old;return '<tr'+(o.areas.indexOf(a)>-1?' class="fx"':'')+'><td>'+esc(a)+(o.areas.indexOf(a)>-1?' ●':'')+'</td><td class="r">'+fmt(v.old)+'</td><td class="r">'+(BASE[a]?fmt(BASE[a]):'—')+'</td><td>'+(z?'<b class="r">보장 공백</b>':vd[1]==='warn'?'<b class="r">'+vd[0]+'</b>':esc(vd[0]))+'</td></tr>';}).join('')+'</tbody></table>','● = 선택한 분석 관점의 중심 영역 · 권장 기준은 교육용 예시값입니다.');
+    /* 유리 · 불리 */
+    h+=slide('PROS & CONS','유리한 부분과 불리한 부분','','<div class="g2"><div class="kc s tall"><span class="cl">유리한 부분 · 유지할 가치</span><ul class="kl">'+PC.P.slice(0,6).map(function(x){return '<li><b>'+esc(x[0])+'</b> — '+esc(x[1])+'</li>';}).join('')+'</ul></div>'+
+      '<div class="kc gp tall"><span class="cl">불리한 부분 · 조정·보완할 곳</span><ul class="kl">'+PC.C.slice(0,6).map(function(x){return '<li><b>'+esc(x[0])+'</b> — '+esc(x[1])+'</li>';}).join('')+'</ul></div></div>','다음 단계에서 불리한 부분을 중심으로 조정·보완안을 Before/After로 보여 드립니다.');
+    /* 한 줄 결론 */
+    var c1='지금 보험은 '+(strong.length?strong.slice(0,2).join('·')+' 중심':'기본 보장 위주')+'으로 준비되어 있습니다.',c2=(gaps.length?gaps.slice(0,3).join('·')+' 보장은 비어 있고, ':'')+(PC.C.length?PC.C[0][0].replace(/^\[|\]/g,'')+' 등을 2단계에서 조정·보완합니다.':'큰 공백 없이 유지하는 것이 좋습니다.');
+    h+='<div class="slw"><section class="sl cv cc"><i class="kc3"></i><i class="kc4"></i><div class="cvk" style="top:calc(var(--u)*79)">1단계 결론</div><p class="cch">'+hiWords(c1,strong.slice(0,2))+'</p><p class="ccs">'+hiWords(c2,gaps.concat(['비어']))+'</p>'+
+      '<div class="cvb g big"><span>기존 월 보험료</span><b>'+fmt(R.prem.old)+' 원</b></div><p class="cvf" style="top:calc(var(--u)*486)">※ 본 자료는 첨부한 계약 자료 기준 참고자료이며, 보장 여부·지급 조건은 각 상품 약관이 우선합니다.</p></section></div>';
+    pg++;
+    needsFor(c,o,'영역').forEach(function(x){h+=slide('REFERENCE',esc(x.title)+' <small>한국보험금융</small>','',refBody(x,c,o,R),refSlide(x),'nd');});
+    /* 부록: 담보 상세 */
+    var tr=[];AREAS.forEach(function(a){var L=dSort(R.old.filter(function(it){return it.area===a;}),mO);if(!L.length)return;tr.push([1,'<tr class="ksec"><td colspan="4">▌ '+a+'</td></tr>']);
+      L.forEach(function(it){tr.push([mO?1.55:1,'<tr><td>'+tyTag(it)+esc(it.name)+srcLine(it,mO)+'</td><td class="r">'+fmt(n(it.amt))+'</td><td>'+esc(it.term||'')+'</td><td>'+esc(it.cycle||'')+'</td></tr>']);});
+      tr.push([1,'<tr class="sum"><td>'+a+' 합계</td><td class="r">'+fmt(R.A[a].old)+'</td><td colspan="2"></td></tr>']);});
+    var ch=[],cu=[],w=0;tr.forEach(function(r){if(w+r[0]>18.5&&cu.length){ch.push(cu);cu=[];w=0;}cu.push(r[1]);w+=r[0];});if(cu.length)ch.push(cu);
+    ch.forEach(function(x,i){h+=slide(i?'':'APPENDIX','기존 담보 상세'+(ch.length>1?' ('+(i+1)+'/'+ch.length+')':''),'','<table class="kt2 xs"><thead><tr><th>담보명</th><th class="r">가입금액(만)</th><th>보장기간</th><th>지급주기</th></tr></thead><tbody>'+x.join('')+'</tbody></table>','');});
     return h;
   }
   /* 옵션 부각 장: 영역 표 + 점검 포인트 + 관련 최근 기사 */
@@ -3106,7 +3254,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     root.querySelectorAll('[data-hx]').forEach(function(e){c.history[+e.dataset.hx][e.dataset.k]=e.value;});
   }
   function gatherDocs(c){
-    var cs=document.getElementById('fCons');if(!cs)return;c.consent=cs.value;
+    var cs=document.getElementById('fCons');if(cs)c.consent=cs.value;
     root.querySelectorAll('[data-k][data-f]').forEach(function(e){c.contracts[+e.dataset.k][e.dataset.f]=e.dataset.f==='premium'?n(e.value):e.value;});
     root.querySelectorAll('[data-k][data-i][data-g]').forEach(function(e){var it=c.contracts[+e.dataset.k].items[+e.dataset.i];it[e.dataset.g]=(e.dataset.g==='amt'||e.dataset.g==='prem')?(e.value===''?null:n(e.value)):e.value;});
   }
@@ -3116,7 +3264,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     root.querySelectorAll('[data-o][data-nf]').forEach(function(e){var o=st.opts[+e.dataset.o];if(!o.news)o.news={};o.news[e.dataset.nf]=e.value.trim();});
     st.opts.forEach(function(o,i){o.areas=[].slice.call(root.querySelectorAll('[data-o="'+i+'"][data-area]')).filter(function(e){return e.checked;}).map(function(e){return e.dataset.area;});});
   }
-  function gather(){var c=cust();if(st.step===5){gatherOpts();return;}if(!c)return;if(st.step===1)gatherInfo(c);if(st.step===2)gatherDocs(c);}
+  function isSide(x){return x===5||x===6;}
+  function gather(){var c=cust();if(st.step===5){gatherOpts();return;}if(!c)return;if(st.step===1)gatherInfo(c);if(st.step===2||st.step===8)gatherDocs(c);}
   function touch(c){c.updated=today();c.ts=Date.now();persist();pushC(c);}
 
   /* ---------------- 파일 읽기 ---------------- */
@@ -3305,7 +3454,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* 분석표(김덕중님 엑셀 형식): 시트 모델 하나로 엑셀과 PDF를 같이 만든다.
      칸 = {v:값, s:모양, f:엑셀 수식, l:링크}, 행.span = B열부터 합칠 칸 수. 표는 B2에서 시작 */
   function sheets(c){
-    var o=opt(c),R=analyze(c,o),T=(c.ai&&c.ai.opt===o.id)?c.ai:defText(c,o,R);
+    if(c._stage===1)return sheets1(c);
+    var o=opt(c),R=analyze(c,o),T=(c.ai&&c.ai.opt===o.id&&c.ai.s2)?c.ai:defText(c,o,R);
     var oldK=useK(c).filter(function(k){return k.kind!=='신규';}),neuK=useK(c).filter(function(k){return k.kind==='신규';}),mO=oldK.length>1,mN=neuK.length>1;
     function j(L,f){return L.map(function(k){return k[f];}).filter(Boolean).join('\n')||'—';}
     var S=[];
@@ -3315,8 +3465,16 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     function gap(x){x.rows.push([]);}
     function L(i){return String.fromCharCode(66+i);}
     function nm(it,multi){return it.name+(multi&&srcTxt(it)?'\n'+srcTxt(it):'');}
+    if(c._B){var B=c._B,R0=B.R0,bx=sh('Before·After',[22,14,14,14,30]);
+      row(bx,[[c.name+'님 보장 Before · After  (단위: 만원 / 보험료: 원)','title']],5);row(bx,[['Before = 기존 계약 그대로 · After = 정리한 담보를 뺀 기존 + 신계약','sub']],5);gap(bx);
+      row(bx,[['보장영역','h'],['Before','hO'],['After','hS'],['변화','hN'],['비고','h']]);
+      AREAS.forEach(function(a){var b=R0.A[a].old,f=R.A[a].old+R.A[a].neu;if(!b&&!f&&o.areas.indexOf(a)<0)return;var r=rn(bx);row(bx,[[a,f?'lab':'gapL'],[b,'num'],[f,'numB'],[f-b,'num','D'+r+'-C'+r],[!f?'보장 공백':f>b?'보강':f<b?'감소':'','c']]);});
+      var rp=rn(bx);row(bx,[['월 보험료(원)','sumL'],[R0.prem.old,'sumN'],[R.prem.old+R.prem.neu,'sumN'],[R.prem.old+R.prem.neu-R0.prem.old,'sumN','D'+rp+'-C'+rp],['','sum']]);gap(bx);
+      row(bx,[['■ 정리(삭제)하는 기존 담보 '+B.drop.length+'개','sec']],5);
+      B.drop.forEach(function(x2){row(bx,[[x2.it.area,'td'],[x2.it.name+(x2.all?' (계약 해지)':''),'tdw'],[n(x2.it.amt),'num'],[x2.it.prem==null||x2.it.prem===''?'—':n(x2.it.prem),'num'],[(x2.k.insurer||'')+' '+(x2.k.product||''),'tdw']]);});
+      if(!B.drop.length)row(bx,[['정리하는 담보 없음 — 기존 계약 모두 유지','td']],5);}
     /* 1. 종합요약 */
-    var x=sh('종합요약',[20,36,36,18]);
+    var x=sh(c._B?'After 요약':'종합요약',[20,36,36,18]);
     row(x,[[c.name+'님 보험 비교분석 (기존 · 신규 · 합산)','title']],4);
     row(x,[['피보험자: '+c.name+(ageSex(c)?' ('+ageSex(c)+')':'')+'  /  작성기준: '+today()+'  /  옵션: '+o.title,'sub']],4);gap(x);
     row(x,[['구분','h'],['기존 보험','hO'],['신규 보험(제안)','hN'],['합산','hS']]);
@@ -3363,6 +3521,32 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       row(x,[['경과','h'],['신규 누적(연간)','hN'],['10년한 포함','hN'],['기존(1회성)','hO']]);R.years.forEach(function(y){row(x,[[y[0]+'년차','lab'],[y[1],'num'],[y[2],'numB'],[y[3],'num']]);});}
     return S;
   }
+  /* 1단계 기계약 분석표: 요약(유리·불리) / 담보 상세 / 영역별 점검 */
+  function sheets1(c){
+    var o=opt(c),R=analyze(c,o),PC=prosCons(c,o,R),K=useK(c),S=[];
+    function sh(name,cols){var x={name:name,cols:cols,rows:[]};S.push(x);return x;}
+    function rn(x){return x.rows.length+2;}
+    function row(x,cells,span){var r=cells.map(function(q){return Array.isArray(q)?{v:q[0],s:q[1]||'td',f:q[2],l:q[3]}:{v:q,s:'td'};});r.span=span||0;x.rows.push(r);}
+    function gap(x){x.rows.push([]);}
+    var x=sh('기계약 요약',[22,34,18,14,10,20]);
+    row(x,[[c.name+'님 기계약 보장분석 (1단계)','title']],6);row(x,[['피보험자: '+c.name+(ageSex(c)?' ('+ageSex(c)+')':'')+'  /  작성기준: '+today()+'  /  분석 관점: '+o.title,'sub']],6);gap(x);
+    row(x,[['보험사','h'],['상품명','h'],['만기 / 납기','h'],['월 보험료(원)','hO'],['담보 수','h'],['보장 성격','h']]);var f0=rn(x);
+    K.forEach(function(k){row(x,[[k.insurer||'','td'],[k.product||'','tdw'],[k.term||'','c'],[n(k.premium),'num'],[(k.items||[]).length,'num'],[k.nature||'','tdw']]);});
+    var f1=rn(x)-1;row(x,[['합계','sumL'],['','sum'],['','sum'],[R.prem.old,'sumN','SUM(E'+f0+':E'+f1+')'],[R.cnt.old,'sumN','SUM(F'+f0+':F'+f1+')'],['','sum']]);gap(x);
+    row(x,[['■ 유리한 부분 (유지할 가치)','sec']],6);PC.P.forEach(function(p){row(x,[['• '+p[0]+' — '+p[1],'tdw']],6);});gap(x);
+    row(x,[['■ 불리한 부분 (2단계에서 조정·보완)','sec']],6);PC.C.forEach(function(p){row(x,[['• '+p[0]+' — '+p[1],'gap']],6);});
+    x=sh('기존 담보 상세',[16,8,42,12,12,12,12,22]);
+    row(x,[['기존 담보 상세 (가입금액 만원 / 보험료 원)','title']],8);
+    row(x,[['보장영역','h'],['상해/질병','h'],['담보명','hO'],['가입금액','hO'],['보험료','h'],['보장기간','h'],['지급주기','hC'],['보험사·상품','h']]);
+    AREAS.forEach(function(a){var L=dSort(R.old.filter(function(i){return i.area===a;}),K.length>1);if(!L.length)return;row(x,[['▌ '+a,'sec']],8);var g0=rn(x);
+      L.forEach(function(i){row(x,[['','td'],[tyOf(i),tyCls(tyOf(i))],[i.name,'tdw'],[n(i.amt),'num'],[i.prem==null||i.prem===''?'—':n(i.prem),i.prem==null||i.prem===''?'c':'num'],[i.term||'','c'],[i.cycle||'','c'],[(i._ins||'')+' '+(i._prd||''),'tdw']]);});
+      var g1=rn(x)-1;row(x,[[a+' 합계','sumL'],['','sum'],['','sum'],[R.A[a].old,'sumN','SUM(E'+g0+':E'+g1+')'],['','sum'],['','sum'],['','sum'],['','sum']]);});
+    x=sh('영역별 점검',[22,14,14,16,10]);
+    row(x,[['영역별 보장 점검 · 분석 관점: '+o.title+' (단위: 만원)','title']],5);
+    row(x,[['보장영역','h'],['현재 보장','hO'],['기준(예시)','h'],['판정','h'],['관점 중심','h']]);
+    AREAS.forEach(function(a){var v=R.A[a];if(a==='기타'||(!v.old&&o.areas.indexOf(a)<0&&!BASE[a]))return;var fx=o.areas.indexOf(a)>-1;row(x,[[a,v.old?(fx?'labF':'lab'):'gapL'],[v.old,'num'],[BASE[a]||'—',BASE[a]?'num':'c'],[v.old?verdict(a,v)[0]:'보장 공백',v.old&&verdict(a,v)[1]!=='warn'?'c':'gap'],[fx?'●':'','c']]);});
+    return S;
+  }
   var XB={style:'thin',color:{rgb:'BFBFBF'}},XBR={top:XB,bottom:XB,left:XB,right:XB};
   function xf(fill,font,al,extra){var o={border:XBR,font:Object.assign({sz:9,name:'맑은 고딕'},font||{}),alignment:Object.assign({vertical:'center',wrapText:true},al||{})};if(fill)o.fill={patternType:'solid',fgColor:{rgb:fill}};if(extra)for(var k in extra)o[k]=extra[k];return o;}
   var XS={title:{font:{bold:true,sz:15,color:{rgb:'FFFFFF'},name:'맑은 고딕'},fill:{patternType:'solid',fgColor:{rgb:'1F3864'}},alignment:{vertical:'center'}},
@@ -3402,7 +3586,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     try{
       var X=await xlsxLib();if(!X){toast('엑셀 도구를 불러오지 못했습니다(인터넷 연결 확인).');return;}
       var wb=X.utils.book_new();sheets(c).forEach(function(x){X.utils.book_append_sheet(wb,toWs(X,x),x.name);});
-      await dl(fileBase(c)+'_보장분석표_'+ymd()+'.xlsx',new Uint8Array(X.write(wb,{bookType:'xlsx',type:'array'})));
+      await dl(fileBase(c)+(c._stage===1?'_기계약분석표_':'_BeforeAfter분석표_')+ymd()+'.xlsx',new Uint8Array(X.write(wb,{bookType:'xlsx',type:'array'})));
     }finally{if(btn)btn.disabled=false;}
   }
   /* 분석표를 엑셀 모양 HTML로 (PDF용) */
@@ -3447,24 +3631,24 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     finally{root.querySelectorAll('[data-a="pdfRpt"],[data-a="pdfSheet"]').forEach(function(x){x.disabled=false;});}
   }
   function pdfReport(c,btn){var el=document.getElementById('rpt');if(!el)return;
-    pdfRun(btn,'제안서 PDF',async function(prog){var data=await makePdf(el.innerHTML,{orient:'l',fmt:[338.67,190.5],m:0,w:1280,cls:'rpt',sel:'.sl',prog:prog});await dl(fileBase(c)+'_보장분석제안서_'+ymd()+'.pdf',data);});}
+    pdfRun(btn,'제안서 PDF',async function(prog){var data=await makePdf(el.innerHTML,{orient:'l',fmt:[338.67,190.5],m:0,w:1280,cls:'rpt',sel:'.sl',prog:prog});await dl(fileBase(c)+(c._stage===1?'_기계약보장분석_':'_BeforeAfter제안서_')+ymd()+'.pdf',data);});}
   function pdfSheet(c,btn){
-    pdfRun(btn,'분석표 PDF',async function(prog){var data=await makePdf(sheetHtml(c),{orient:'p',w:1000,cls:'xbook',sel:'.xsh',prog:prog});await dl(fileBase(c)+'_보장분석표_'+ymd()+'.pdf',data);});}
+    pdfRun(btn,'분석표 PDF',async function(prog){var data=await makePdf(sheetHtml(c),{orient:'p',w:1000,cls:'xbook',sel:'.xsh',prog:prog});await dl(fileBase(c)+(c._stage===1?'_기계약분석표_':'_BeforeAfter분석표_')+ymd()+'.pdf',data);});}
   function saveTpl(){
     if(!window.XLSX){toast('엑셀 도구를 불러오지 못했습니다.');return;}
     var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['계약구분','보험사','상품명','계약 월보험료','담보명','가입금액(만원)','보험료(원)','보장기간','지급주기'],['기존','OO손해보험','(예시) 종합보험',85000,'암진단비(유사암제외)',3000,12000,'90세','최초1회'],['신규','OO손해보험','(예시) 간편건강보험',47000,'암주요치료비(항암약물치료시)(연간1회한)',1000,8800,'90세','연간1회']]),'입력양식');
     dl('보장분석_입력양식.xlsx',new Uint8Array(XLSX.write(wb,{bookType:'xlsx',type:'array'})));
   }
   async function aiText(c){
-    var o=opt(c),R=analyze(c,o),btn=document.getElementById('aiTextBtn'),note=document.getElementById('rptNote');
+    var o=opt(c),vA=vAfter(c),R=analyze(vA,o),btn=document.getElementById('aiTextBtn'),note=document.getElementById('rptNote');
     if(!cap.sample){toast(errMsg({code:cap.why})+' 기본 문구로 진행하세요.');return;}
     btn.disabled=true;note.textContent='AI가 문구를 쓰는 중… (1분 정도 걸릴 수 있습니다)';
     var data={고객:c.name,나이성별:ageSex(c),옵션:o.title,옵션설명:o.desc,중심영역:o.areas.map(function(a){return {영역:a,기존:R.A[a].old,신규:R.A[a].neu,합산:R.A[a].old+R.A[a].neu,기준예시:BASE[a]||null};}),
-      월보험료:{기존:R.prem.old,신규:R.prem.neu,합산:R.prem.old+R.prem.neu},동시지급:R.scen.length?{기존:R.sOld,신규:R.sNeu}:null,연간반복:(R.ann+R.ann10)?{연간:R.ann,십년한도:R.ann10,누적:R.years}:null,가족력:c.famHx,상담내용:c.memo,
+      월보험료:{Before:vA._B.R0.prem.old,유지기존:R.prem.old,신규:R.prem.neu,After:R.prem.old+R.prem.neu},정리한담보:vA._B.drop.map(function(x){return x.it.name+' '+n(x.it.amt)+'만';}),동시지급:R.scen.length?{기존:R.sOld,신규:R.sNeu}:null,연간반복:(R.ann+R.ann10)?{연간:R.ann,십년한도:R.ann10,누적:R.years}:null,가족력:c.famHx,상담내용:c.memo,
       옵션별:(o.list||[o]).map(function(q){var S=spotInfo(q,R);return {옵션:q.title,보장공백:S.gap,기준미달:S.weak,점검포인트:q.points||[],관련기사:q.news&&q.news.title?q.news.src+' '+q.news.date+' "'+q.news.title+'" — '+q.news.sum:null};})};
     try{
       var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션마다 최소 한 개의 포인트를 쓰고, 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 근거로 한 번만 짧게 인용할 수 있다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
-      if(r&&r.points&&r.points.length){c.ai={opt:o.id,points:r.points.slice(0,6).map(String),conclusion:String(r.conclusion||'')};touch(c);render();toast('AI 문구로 바꿨습니다.');return;}
+      if(r&&r.points&&r.points.length){c.ai={opt:o.id,s2:1,points:r.points.slice(0,6).map(String),conclusion:String(r.conclusion||'')};touch(c);render();toast('AI 문구로 바꿨습니다.');return;}
       throw {code:'x'};
     }catch(e){note.textContent=errMsg(e)+' 기본 문구를 그대로 씁니다.';btn.disabled=false;}
   }
@@ -3474,12 +3658,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var b=e.target.closest('[data-a]');if(!b||!root.contains(b))return;
     var a=b.dataset.a,c=cust();
     if(a==='pubRefs'){pubNow();return;}
-    if(a==='step'){st.refAdm=false;gather();if(c)touch(c);var ns=+b.dataset.s;if(ns>=5&&st.step<5)st.from5=st.step;st.step=ns;render();window.scrollTo(0,root.offsetTop-80);return;}
+    if(a==='step'){st.refAdm=false;gather();if(c)touch(c);var ns=+b.dataset.s;if(isSide(ns)&&!isSide(st.step))st.from5=st.step;st.step=ns;render();window.scrollTo(0,root.offsetTop-80);return;}
     if(a==='new'){gather();var x=blank();st.customers.unshift(x);st.cur=x.id;st.step=1;persist();render();document.getElementById('fName').focus();return;}
     if(a==='example_off'){gather();var ex=exampleCustomer();st.customers.unshift(ex);st.cur=ex.id;st.step=3;persist();pushC(ex);render();toast('예시 고객을 불러왔습니다. 옵션을 바꿔 보세요.');return;}
-    if(a==='pick'){gather();if(c)touch(c);st.cur=b.dataset.id;if(st.step>=5||st.step===0||b.dataset.to)st.step=1;render();window.scrollTo(0,root.offsetTop-80);return;}
+    if(a==='pick'){gather();if(c)touch(c);st.cur=b.dataset.id;if(isSide(st.step)||st.step===0||b.dataset.to)st.step=1;render();window.scrollTo(0,root.offsetTop-80);return;}
     if(a==='sortK'){if(st.step===2&&c)gatherDocs(c);st.sort=b.dataset.m;saveSort();var y=window.scrollY;render();window.scrollTo(0,y);return;}
-    if(a==='goChk'){var d=b.dataset;gather();if(c)touch(c);st.step=+d.s;render();focusTarget(d);return;}
+    if(a==='goChk'){var d=b.dataset;gather();if(c)touch(c);st.step=+d.s;if(st.step===2&&c&&d.tk!=null&&c.contracts[+d.tk]&&c.contracts[+d.tk].kind==='신규')st.step=8;render();focusTarget(d);return;}
     if(/^ai(mode|cfg|prov|save|test|del)$/.test(a)){aiCfgClick(a,b);return;}
     if(a==='delRef'){var fr=findRef(b.dataset.id);if(!fr)return;if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='한 번 더 누르면 삭제';return;}var L=refList(fr.by);L.splice(L.indexOf(fr.r),1);saveRefs(fr.by,fr.r,true);render();toast('참고자료를 삭제했습니다.');return;}
     if(a==='pickRpt'){gather();st.cur=b.dataset.id;st.step=4;render();return;}
@@ -3503,14 +3687,14 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(a==='nameOk'){gatherDocs(c);c.contracts[+b.dataset.k].nameOk=true;touch(c);render();toast('이 고객 자료로 확인했습니다. 분석에 넣습니다.');return;}
     if(a==='dupOk'){gatherDocs(c);c.contracts[+b.dataset.k].dupOk=true;touch(c);render();toast('중복 가입으로 확인했습니다. 합산에 그대로 들어갑니다.');return;}
     if(a==='okK'){gatherDocs(c);c.contracts[+b.dataset.k].confirmed=true;touch(c);render();toast('확인 완료로 표시했습니다.');return;}
-    if(a==='saveDocs'||a==='docsNext'){gatherDocs(c);c.contracts.forEach(function(k){k.items.forEach(function(it){if(it.area==='기타')it.area=classify(it.name);});});touch(c);if(a==='docsNext')st.step=3;render();toast('저장했습니다.');return;}
+    if(a==='saveDocs'||a==='docsNext'||a==='adjNext'){gatherDocs(c);c.contracts.forEach(function(k){k.items.forEach(function(it){if(it.area==='기타')it.area=classify(it.name);});});touch(c);if(a==='docsNext')st.step=3;if(a==='adjNext')st.step=4;render();toast('저장했습니다.');return;}
     if(a==='tpl'){saveTpl();return;}
-    if(a==='pdfRpt'){pdfReport(c,b);return;}
-    if(a==='pdfSheet'){pdfSheet(c,b);return;}
+    if(a==='pdfRpt'){pdfReport(dataC(c),b);return;}
+    if(a==='pdfSheet'){pdfSheet(dataC(c),b);return;}
     if(a==='aiText'){aiText(c);return;}
     if(a==='print'){window.print();return;}
-    if(a==='saveHtml'){saveHtml(c);return;}
-    if(a==='saveXlsx'){saveXlsx(c,b);return;}
+    if(a==='saveHtml'){saveHtml(dataC(c));return;}
+    if(a==='saveXlsx'){saveXlsx(dataC(c),b);return;}
     if(a==='saveOpt'){gatherOpts();save(KEY_O,st.opts);pushOpts();render();toast('옵션을 저장했습니다.');return;}
     if(a==='resetOpt'){st.opts=JSON.parse(JSON.stringify(DEF_OPTS));save(KEY_O,st.opts);pushOpts();render();toast('처음 10가지로 되돌렸습니다.');return;}
   }
@@ -3523,6 +3707,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       if(t===all){if(all.checked)ones.forEach(function(e){e.checked=false;});else all.checked=true;}else all.checked=!ones.some(function(e){return e.checked;});
       if(t.dataset.rto){var fr2=findRef(t.dataset.rto);if(fr2){fr2.r.opts=ones.filter(function(e){return e.checked;}).map(function(e){return e.value;});saveRefs(fr2.by,fr2.r);var y=window.scrollY;render();window.scrollTo(0,y);toast('연결 옵션을 바꿨습니다.');}}
       else box.dataset.touched='1';return;}
+    if(t.dataset&&(t.dataset.kc!=null||t.dataset.kd)){var ca=cust();if(!ca)return;gatherDocs(ca);
+      if(t.dataset.kc!=null){ca.contracts[+t.dataset.kc].cancel=!t.checked;}else{var pr=t.dataset.kd.split(':');ca.contracts[+pr[0]].items[+pr[1]].drop=!t.checked;}
+      touch(ca);var yy=window.scrollY;render();window.scrollTo(0,yy);return;}
     if(t.name==='aiOpt'){var c=cust(),ids=selIds(c).slice(),i=ids.indexOf(t.value);
       if(t.checked&&i<0)ids.push(t.value);else if(!t.checked&&i>-1){if(ids.length===1){t.checked=true;toast('옵션은 최소 1개를 골라야 합니다.');return;}ids.splice(i,1);}
       c.options=ids;c.option=ids[0];touch(c);render();return;}
@@ -3554,7 +3741,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   },
   getOpts:function(){return JSON.parse(JSON.stringify(st.opts));},
   getRefs:function(){return {refs:SHREF.map(function(x){return {id:x.id,title:x.title,opts:x.opts||[],src:x.src||'',img:x.img,ts:x.ts};}),ver:SHVER};},
-  openRefs:function(adm){st.from5=st.step<5?st.step:3;st.step=6;st.refAdm=!!adm;},
+  openRefs:function(adm){st.from5=!isSide(st.step)?st.step:3;st.step=6;st.refAdm=!!adm;},
   mount:function(el,user,toastFn){
     root=el;me=user;toast=toastFn;
     applyAiCfg();render();
