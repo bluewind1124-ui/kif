@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-22.3">
+<meta name="kif-build" content="2026-10-22.4">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -947,6 +947,33 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .hh-card button:hover{transform:translateY(-2px);filter:brightness(1.05)}
 .hm .panel,.hm-kpi button,.hq{background:rgba(255,255,255,.9)}
 @media (max-width:900px){.hh-w{font-size:3rem}.hh-s{font-size:1.25rem}.hh-cards{grid-template-columns:1fr;gap:12px}.hh-card{padding:20px 16px}.hh-card b{font-size:1.3rem}.hh-k{letter-spacing:.25em;font-size:.85rem}}
+
+/* ===== 작은 노트북: 왼쪽 메뉴 스크롤 · 스크롤 버튼 · 홈 버튼 ===== */
+.tb.home{font-weight:700;margin-right:6px}
+@media (min-width:861px){
+  .side{height:100vh;height:100dvh;bottom:auto!important;max-height:100dvh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(205,155,52,.7) rgba(255,255,255,.06)}
+  .side::-webkit-scrollbar{width:8px}
+  .side::-webkit-scrollbar-track{background:rgba(255,255,255,.05)}
+  .side::-webkit-scrollbar-thumb{background:rgba(205,155,52,.65);border-radius:8px}
+  .side::-webkit-scrollbar-thumb:hover{background:#cd9b34}
+}
+/* 화면 높이가 낮은 노트북: 메뉴 간격을 촘촘하게 */
+@media (min-width:861px) and (max-height:820px){
+  .sd-brand{padding:12px 18px 10px}.sd-brand img{width:30px;height:30px}
+  .side .grp{padding:8px 22px 3px;font-size:.76rem}
+  .side button{padding:7px 14px;font-size:.93rem}
+  .sd-foot{padding-top:8px}.sd-me{padding:4px 22px 6px}.side .sd-link{padding:6px 14px}
+}
+html::-webkit-scrollbar{width:12px}
+html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;border:3px solid transparent;background-clip:padding-box}
+.scr{position:fixed;left:calc(var(--side-w) + 8px);bottom:14px;z-index:64;display:flex;flex-direction:column;gap:6px;opacity:.85}
+.scr:hover{opacity:1}
+.scr button{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line-strong);background:rgba(255,255,255,.95);color:var(--navy-ink);
+  border-radius:50%;padding:0;font-weight:800;font-size:.85rem;box-shadow:0 6px 16px -8px rgba(15,35,64,.5);cursor:pointer}
+.scr button span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.scr button:hover{border-color:var(--kgold);background:var(--gold-soft)}
+.scr button:disabled{opacity:.35;cursor:default}
+@media (max-width:860px){.scr{left:8px;bottom:12px}}
 </style>
 
 <div class="demo">시제품(데모)입니다. 화면 구성 확인용이며 실제 고객·상품 데이터가 아닌 예시가 들어 있습니다.</div>
@@ -1001,7 +1028,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 <div id="app" hidden>
   <div class="bgfx" aria-hidden="true"><div class="silk"></div><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="gN" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgn);stop-opacity:0"/><stop offset=".45" style="stop-color:var(--bgn);stop-opacity:.11"/><stop offset="1" style="stop-color:var(--bgn);stop-opacity:.02"/></linearGradient><linearGradient id="gN2" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgn);stop-opacity:.015"/><stop offset=".6" style="stop-color:var(--bgn);stop-opacity:.07"/><stop offset="1" style="stop-color:var(--bgn);stop-opacity:0"/></linearGradient><linearGradient id="gG" x1="0" x2="1"><stop offset="0" style="stop-color:var(--bgg);stop-opacity:0"/><stop offset=".55" style="stop-color:var(--bgg);stop-opacity:.28"/><stop offset="1" style="stop-color:var(--bgg);stop-opacity:.04"/></linearGradient></defs><g class="w1"><path d="M-150 130 C250 30 550 138 850 90 S1350 10 1750 50" stroke="url(#gG)" stroke-width="3"><animate attributeName="d" values="M-150 130 C250 30 550 138 850 90 S1350 10 1750 50;M-150 130 C250 150 550 42 850 90 S1350 130 1750 50;M-150 130 C250 30 550 138 850 90 S1350 10 1750 50" dur="11s" begin="-2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path d="M-150 160 C250 110 550 254 850 190 S1350 125 1750 220" stroke="url(#gN)" stroke-width="1.6"><animate attributeName="d" values="M-150 160 C250 110 550 254 850 190 S1350 125 1750 220;M-150 160 C250 270 550 126 850 190 S1350 285 1750 220;M-150 160 C250 110 550 254 850 190 S1350 125 1750 220" dur="14s" begin="-5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path d="M-150 350 C250 230 550 356 850 300 S1350 205 1750 250" stroke="url(#gG)" stroke-width="4.5"><animate attributeName="d" values="M-150 350 C250 230 550 356 850 300 S1350 205 1750 250;M-150 350 C250 370 550 244 850 300 S1350 345 1750 250;M-150 350 C250 230 550 356 850 300 S1350 205 1750 250" dur="9s" begin="-1s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path d="M-150 380 C250 330 550 492 850 420 S1350 350 1750 460" stroke="url(#gN2)" stroke-width="2"><animate attributeName="d" values="M-150 380 C250 330 550 492 850 420 S1350 350 1750 460;M-150 380 C250 510 550 348 850 420 S1350 530 1750 460;M-150 380 C250 330 550 492 850 420 S1350 350 1750 460" dur="16s" begin="-7s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path d="M-150 565 C250 455 550 590 850 530 S1350 437 1750 495" stroke="url(#gG)" stroke-width="3.5"><animate attributeName="d" values="M-150 565 C250 455 550 590 850 530 S1350 437 1750 495;M-150 565 C250 605 550 470 850 530 S1350 587 1750 495;M-150 565 C250 455 550 590 850 530 S1350 437 1750 495" dur="12s" begin="-4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path d="M-150 590 C250 555 550 708 850 640 S1350 580 1750 690" stroke="url(#gN)" stroke-width="1.8"><animate attributeName="d" values="M-150 590 C250 555 550 708 850 640 S1350 580 1750 690;M-150 590 C250 725 550 572 850 640 S1350 750 1750 690;M-150 590 C250 555 550 708 850 640 S1350 580 1750 690" dur="13s" begin="-9s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path d="M-150 800 C250 690 550 816 850 760 S1350 670 1750 720" stroke="url(#gG)" stroke-width="5"><animate attributeName="d" values="M-150 800 C250 690 550 816 850 760 S1350 670 1750 720;M-150 800 C250 830 550 704 850 760 S1350 810 1750 720;M-150 800 C250 690 550 816 850 760 S1350 670 1750 720" dur="10s" begin="-3s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path><path d="M-150 820 C250 790 550 898 850 850 S1350 805 1750 880" stroke="url(#gN2)" stroke-width="2.2"><animate attributeName="d" values="M-150 820 C250 790 550 898 850 850 S1350 805 1750 880;M-150 820 C250 910 550 802 850 850 S1350 925 1750 880;M-150 820 C250 790 550 898 850 850 S1350 805 1750 880" dur="15s" begin="-6s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.5;1" keySplines=".45 0 .55 1;.45 0 .55 1"/></path></g></svg></div>
   <div class="top">
-    <button class="tb back" id="portalBack" aria-label="이전 화면으로">← 이전</button>
+    <button class="tb back" id="portalBack" aria-label="이전 화면으로">← 이전</button><button class="tb home" id="portalHome" aria-label="홈 화면으로">⌂ 홈</button>
     <a class="brand" href="#" id="toHome"><img src="emblem.png" alt=""><span class="tt"><span class="tt-long">한국보험금융(주) </span><em>한보금on 활동지원</em></span></a>
     <span class="sp"></span>
     <span class="who" id="who"></span>
@@ -1020,6 +1047,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 </div>
 
 <div class="toast" id="toast" hidden></div>
+<div class="scr" id="scrBtns" hidden><button type="button" id="scrUp" aria-label="맨 위로" title="맨 위로">▲<span>맨 위로</span></button><button type="button" id="scrDown" aria-label="아래로" title="아래로 한 화면">▼<span>아래로</span></button></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
@@ -1309,7 +1337,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     if(cur==='ai2'){var f=document.querySelector('iframe.ai-adv');if(f&&f.contentWindow){try{f.contentWindow.postMessage({kif:'back-req'},location.origin);return;}catch(e){}}}
     portalPop();
   }
-  window.addEventListener('message',function(e){if(e.origin===location.origin&&e.data&&e.data.kif==='back')portalPop();});
+  window.addEventListener('message',function(e){if(e.origin!==location.origin||!e.data)return;if(e.data.kif==='back')portalPop();if(e.data.kif==='home')go('home');});
   /* 최근 7일 안에 올라온 소식지 수 (사이드바 「새 글」·홈 숫자) */
   function newsNew(){var d=new Date(Date.now()-7*864e5),c=d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());return NEWS.filter(function(n){return String(n[0]||'')>=c;}).length;}
   /* 이달의 컨셉: 커튼이 열린 뒤 제목을 한 글자씩 친다 (움직임 줄이기 설정이면 바로 보여 줌) */
@@ -1356,6 +1384,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
     document.getElementById('gnb').innerHTML=g;
   }
   function go(id){
+    document.body.classList.remove('adv-full'); /* 고급형 「크게 보기」에서 나올 때 스크롤 잠금이 남지 않게 */
     if(!pBack&&me&&cur&&cur!==id){PST.push(cur);if(PST.length>40)PST.shift();}
     cur=id;renderSide();updPBack();
     document.getElementById('view').innerHTML=PAGES[id]();
@@ -2001,6 +2030,16 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-go]');if(b){e.preventDefault();go(b.getAttribute('data-go'));}});
   document.getElementById('toHome').addEventListener('click',function(e){e.preventDefault();go('home');});
   document.getElementById('portalBack').addEventListener('click',portalBack);
+  document.getElementById('portalHome').addEventListener('click',function(){go('home');});
+  /* 왼쪽 아래 스크롤 버튼: 화면이 길 때만 보이고, ▲ 맨 위로 / ▼ 한 화면씩 아래로 */
+  (function(){
+    var box=document.getElementById('scrBtns'),up=document.getElementById('scrUp'),dn=document.getElementById('scrDown');
+    function upd(){var long=document.documentElement.scrollHeight>innerHeight+40&&!document.getElementById('app').hidden;box.hidden=!long;if(!long)return;
+      up.disabled=scrollY<20;dn.disabled=scrollY+innerHeight>=document.documentElement.scrollHeight-8;}
+    up.onclick=function(){scrollTo(0,0);};
+    dn.onclick=function(){scrollBy(0,Math.round(innerHeight*.8));};
+    addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);setInterval(upd,1200);upd();
+  })();
   document.getElementById('meBtn').addEventListener('click',function(){go('me');});
   document.addEventListener('keydown',function(e){if(e.altKey&&e.key==='ArrowLeft'){e.preventDefault();portalBack();}});
 

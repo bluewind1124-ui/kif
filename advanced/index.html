@@ -487,7 +487,7 @@ body.pp-presenting .top{display:none}
 <header class="top">
   <div class="top-in">
     <div class="brand-row">
-      <button type="button" class="btn sm back-btn no-print" id="btnBack" aria-label="이전 화면으로">← 이전</button>
+      <button type="button" class="btn sm back-btn no-print" id="btnBack" aria-label="이전 화면으로">← 이전</button><button type="button" class="btn sm back-btn no-print" id="btnHome" aria-label="포털 홈으로">⌂ 포털 홈</button>
       <div class="brand"><b>AI보장분석 고급형</b><span>한보금on 활동지원</span></div>
       <div class="client-bar no-print">
         <label for="clientSel" class="small muted">고객</label>
@@ -952,12 +952,12 @@ function pushNav(){
 }
 function navBefore(){ pushNav(); NAV.skip=true; }   // 분야를 바꾼 뒤 go()를 부르는 곳에서 먼저 호출
 function goBack(){
-  if(!NAV.stack.length){ if(inPortalFrame()){ try{ window.top.postMessage({kif:'back'},'*'); }catch(e){} } return; }
+  if(!NAV.stack.length){ if(inPortalFrame()){ try{ window.top.postMessage({kif:'back'},'*'); }catch(e){} } else { location.href='../index.html'; } return; }
   const s=NAV.stack.pop(); NAV.back=true;
   try{ try{ plans().field=s.field; }catch(e){} PP.field=s.ppf; PP.withRec=s.rec; go(s.v); window.scrollTo(0,s.y||0); }
   finally{ NAV.back=false; updBack(); }
 }
-function updBack(){ const b=$('#btnBack'); if(b) b.disabled=!NAV.stack.length&&!inPortalFrame(); }
+function updBack(){ const b=$('#btnBack'); if(b) b.disabled=false; }   // 더 돌아갈 단계가 없으면 포털로
 function go(v){
   if(!VIEWS.includes(v)) v='diag';
   if(NAV.skip) NAV.skip=false; else if(v!==view) pushNav();
@@ -3198,6 +3198,7 @@ if(!VIEWS.includes(startView)){ try{ startView = sessionStorage.getItem(KEY+'-vi
 go(VIEWS.includes(startView)?startView:'plan');
 NAV.started=true; updBack();
 $('#btnBack').addEventListener('click',goBack);
+$('#btnHome').addEventListener('click',()=>{ if(inPortalFrame()){ try{ window.top.postMessage({kif:'home'},location.origin); }catch(e){} } else location.href='../index.html'; });
 document.addEventListener('keydown',e=>{ if(e.altKey&&e.key==='ArrowLeft'){ e.preventDefault(); goBack(); } });   // Alt+← 도 이전 화면
 window.addEventListener('message',e=>{ if(e.origin===location.origin&&e.data&&e.data.kif==='back-req') goBack(); });   // 포털 상단 「← 이전」에서 온 요청
 updateLawBadges();
