@@ -1097,7 +1097,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
     {g:'공지 · 시상',items:[['news','보험사 소식지'],['award','시상 공지']]},
     {g:'교육 · 연계',items:[['edu','온라인 교육센터'],['car','자동차 비교견적'],['sangjo','상조 서비스']]},
-    {g:'관리자',admin:true,items:[['admin','관리자 페이지']]},
+    {g:'관리자',admin:true,items:[['admin','관리자 페이지'],['refadmin','보장분석 샘플 올리기']]},
     {g:'내 정보',mobile:true,items:[['me','내 정보 · 자료 보관']]}
   ];
   var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',award:'cup',edu:'cap',car:'car',sangjo:'heart',me:'user',admin:'gear'};
@@ -1255,6 +1255,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       return h+'</div><p class="note">기존 도구는 접속코드 로그인이 한 번 더 나옵니다. 통합 후에는 포털 로그인 한 번으로 들어가게 바꿉니다.</p>';
     },
     ai:function(){return '<div id="aiApp"></div>';},
+    refadmin:function(){if(me.role!=='admin')return head('관리자','접근 권한 없음','관리자 계정으로 로그인해야 볼 수 있습니다.');return '<div id="aiApp"></div>';},
     me:function(){return meHtml();},
     /* AI보장분석 고급형 — advanced/index.html (보장·연금·자산 상담 설계, 제안서, 고객 리포트, 세법 기준표·법령 점검) */
     ai2:function(){
@@ -1464,8 +1465,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<div class="panel"><h3>AI 기본 모델 <span class="note">개인 API 키를 쓰는 FC용 기본값입니다. 새 모델이 나오면 이름만 바꾸세요.</span></h3><div class="fgrid">'+
       inp('mClaude','Claude API',md.claude,'claude-opus-5-5')+inp('mOpenai','ChatGPT',md.openai,'gpt-4.1')+inp('mGemini','Gemini',md.gemini,'gemini-2.5-flash')+'</div>'+
       '<label class="row"><input type="checkbox" id="cOpts"> 이 기기의 <b>분석 옵션</b>(AI보장분석 기본형 › 옵션 관리)을 모든 FC에게 배포</label></div>'+
-      '<div class="panel"><h3>니즈환기 참고자료 <span class="pill new">모든 FC 공용</span></h3><p class="note">관리자로 올린 자료는 분석 옵션에 연결되어, FC가 그 옵션으로 제안서를 만들 때 자동으로 붙습니다. 지금 공용 자료 <b>'+((window.AIMOD&&AIMOD.getRefs)?AIMOD.getRefs().refs.length:0)+'건</b>. 자료가 많으면(사진 포함이라 용량이 큼) ① 복사 대신 <b>content.json 받기</b> 후 GitHub에서 <b>Add file › Upload files</b>로 올리세요.</p>'+
-      '<div class="row"><button class="btn" type="button" id="cmsRefs">참고자료 올리기·관리 열기</button></div></div>'+
+      '<div class="panel"><h3>보장분석 샘플(니즈환기 참고자료) <span class="pill new">모든 FC 공용</span></h3><p class="note">왼쪽 메뉴 <b>관리자 › 보장분석 샘플 올리기</b>에서 파일을 고르면 바로 모든 FC에게 올라갑니다(1~2분 뒤 반영). 따로 content.json을 받거나 GitHub에 붙여넣을 필요가 없습니다. 지금 공용 자료 <b>'+((window.AIMOD&&AIMOD.getRefs)?AIMOD.getRefs().refs.length:0)+'건</b>.</p>'+
+      '<div class="row"><button class="btn" type="button" id="cmsRefs">보장분석 샘플 올리기 열기</button></div></div>'+
       '<div class="panel"><h3>사이트에 반영하는 방법</h3><ol class="note" style="margin:0;padding-left:1.2em;line-height:1.9">'+
       '<li><b>① 반영할 내용 복사</b>를 누릅니다.</li><li><b>② GitHub 편집 화면 열기</b>를 누르고(GitHub 로그인), 글 상자 안을 클릭해 <b>Ctrl+A</b> 후 <b>Ctrl+V</b>로 붙여넣습니다.</li>'+
       '<li>오른쪽 위 초록 <b>Commit changes</b> → 다시 <b>Commit changes</b>를 누르면 1~2분 뒤 모든 FC 화면에 나타납니다.</li></ol></div>'+
@@ -1488,7 +1489,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   function bindCms(){
     var msg=document.getElementById('cmsMsg');if(!msg)return;
-    var rb=document.getElementById('cmsRefs');if(rb)rb.onclick=function(){if(window.AIMOD&&AIMOD.openRefs)AIMOD.openRefs();go('ai');};
+    var rb=document.getElementById('cmsRefs');if(rb)rb.onclick=function(){go('refadmin');};
     document.getElementById('cmsPrev').onclick=function(){applyContent(cmsCollect(),false);msg.textContent='이 기기에서만 바뀌었습니다. 다른 FC에게 보이려면 ①②로 사이트에 반영하세요.';};
     document.getElementById('cmsDl').onclick=function(){var c=cmsCollect(),b=new Blob([JSON.stringify(c,null,1)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='content.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);};
     document.getElementById('cmsCopy').onclick=function(){
@@ -1656,6 +1657,26 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!r.ok){var t='';try{t=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(t?' · '+t:'')+(r.status===401?' (토큰을 확인하세요)':r.status===403||r.status===404?' (토큰 권한: kif · Contents Read and write)':''));}
     return r.json();
   }
+  /* 보장분석 샘플(참고자료) 바로 반영: 그림은 refs/<id>.jpg 파일로, 목록은 content.json refs에 한 번에 커밋 */
+  window.KIFPUB={
+    ready:function(){return !!ghTok();},
+    refs:async function(list,add,del){
+      if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다');
+      var ref=await gh('GET','/git/ref/heads/'+GH.branch),base=await gh('GET','/git/commits/'+ref.object.sha);
+      var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'),have={};(all.tree||[]).forEach(function(t){have[t.path]=t.sha;});
+      var cur={};if(have['content.json']){var bj=await gh('GET','/git/blobs/'+have['content.json']);cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(c){return c.charCodeAt(0);})));}
+      var tree=[];
+      for(var i=0;i<add.length;i++){var bl=await gh('POST','/git/blobs',{content:add[i].data.replace(/^data:[^,]*,/,''),encoding:'base64'});tree.push({path:add[i].path,mode:'100644',type:'blob',sha:bl.sha});}
+      del.forEach(function(pth){if(have[pth])tree.push({path:pth,mode:'100644',type:'blob',sha:null});});
+      cur.refs=list;cur.ver=Date.now();cur.refsVer=String(cur.ver);cur.updated=new Date().toLocaleString('ko-KR');
+      var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
+      tree.push({path:'content.json',mode:'100644',type:'blob',sha:jb.sha});
+      var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:tree});
+      var cm=await gh('POST','/git/commits',{message:'보장분석 샘플 올리기: 공용 참고자료 '+list.length+'건',tree:nt.sha,parents:[ref.object.sha]});
+      await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});
+      SITE=cur;return cur.refsVer;
+    }
+  };
   async function nuPublish(){
     var msg=document.getElementById('nuMsg');if(!ghTok()){msg.textContent='먼저 아래 「GitHub 연결 설정」에서 토큰을 저장하세요.';document.querySelector('.nu-set').open=true;return;}
     NU.busy=true;nuRender();
@@ -2052,6 +2073,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var setF=function(on){fr.classList.toggle('full',on);fx.hidden=!on;document.body.classList.toggle('adv-full',on);};
       if(fb)fb.onclick=function(){setF(true);};if(fx)fx.onclick=function(){setF(false);};}
     if(id==='ai'&&window.AIMOD)AIMOD.mount(document.getElementById('aiApp'),me,toast);
+    if(id==='refadmin'&&window.AIMOD&&document.getElementById('aiApp')){AIMOD.openRefs(true);AIMOD.mount(document.getElementById('aiApp'),me,toast);}
   }
 
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-go]');if(b){e.preventDefault();go(b.getAttribute('data-go'));}});
@@ -2578,6 +2600,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
 
   /* ---------------- 화면 ---------------- */
   function render(){
+    if(st.refAdm&&st.step===6&&isAdm()){
+      root.innerHTML='<div class="ph"><div class="kicker">관리자</div><h1>보장분석 샘플 올리기</h1><p>여기서 올린 자료는 <b>모든 FC</b>의 AI 보장분석 제안서에, 연결한 분석 옵션에 맞춰 자동으로 붙습니다. 파일을 고르면 바로 사이트에 올라갑니다(1~2분 뒤 반영).</p></div>'+
+        '<div class="panel"><div class="row"><b>올리기 상태</b><span class="note" id="rfPub">'+(PUB.msg||(window.KIFPUB&&KIFPUB.ready()?'GitHub 연결됨 · 파일을 고르면 바로 올라갑니다.':'⚠ 처음 한 번 <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장해야 바로 올라갑니다.'))+'</span><span class="sp"></span>'+
+        (load(KEY_RD,null)?'<button class="btn sm" data-a="pubRefs">지금 올리기</button>':'')+'</div></div>'+viewRefs();
+      return;
+    }
     var c=cust();
     var h='<div class="ph"><div class="kicker">영업 도구</div><h1>AI보장분석 기본형</h1><p>고객 등록 → 동의·자료 첨부 → 옵션을 골라 보장분석 → 제안서 화면·인쇄·저장까지 한 흐름으로 진행합니다.</p></div>';
     h+=aiBar();
@@ -2990,7 +3018,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var groups=[['co','회사 공용 자료',SHREF],['me','내 자료',MYREF],['base','기본 자료',NEEDS]];
     groups.forEach(function(g){
       var can=g[0]==='me'||(g[0]==='co'&&adm);
-      h+='<div class="panel"><h3>'+g[1]+' <span class="note">'+g[2].length+'건'+(g[0]==='co'&&adm?' · 다 고친 뒤 관리자 › 콘텐츠 관리에서 사이트에 반영하세요':'')+'</span></h3>';
+      h+='<div class="panel"><h3>'+g[1]+' <span class="note">'+g[2].length+'건'+(g[0]==='co'&&adm?' · 제목·옵션을 고치거나 지우면 바로 모든 FC에게 반영됩니다':'')+'</span></h3>';
       if(!g[2].length){h+='<p class="note">'+(g[0]==='co'?'관리자가 올린 공용 자료가 아직 없습니다.':'아직 올린 자료가 없습니다.')+'</p></div>';return;}
       h+='<div class="nrfg">'+g[2].map(function(x){
         var th=x.img?'<img src="'+x.img+'" alt="">':'<span class="nrfb">한국보험금융<br><b>'+esc(x.title)+'</b></span>';
@@ -3003,8 +3031,26 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   function refList(by){return by==='co'?SHREF:MYREF;}
   function findRef(id){var r=null,by='';[['co',SHREF],['me',MYREF]].forEach(function(g){g[1].forEach(function(x){if(x.id===id){r=x;by=g[0];}});});return r?{r:r,by:by}:null;}
+  var PUB={t:null,del:[],busy:false,again:false,msg:''};
+  function pubMsg(t){PUB.msg=t;var e=document.getElementById('rfPub');if(e)e.innerHTML=t;}
+  function pubShared(){clearTimeout(PUB.t);PUB.t=setTimeout(pubNow,800);}
+  async function pubNow(){
+    if(PUB.busy){PUB.again=true;return;}
+    if(!(window.KIFPUB&&KIFPUB.ready())){pubMsg('⚠ 아직 모든 FC에게 올라가지 않았습니다. <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 한 번 저장한 뒤 여기서 다시 <b>지금 올리기</b>를 누르세요.');return;}
+    PUB.busy=true;pubMsg('모든 FC에게 올리는 중…');
+    try{
+      var add=[],list=SHREF.map(function(x){var y={id:x.id,title:x.title,opts:x.opts||[],src:x.src||'',img:x.img,ts:x.ts};
+        if(/^data:/.test(x.img||'')){y.img='refs/'+x.id+'.jpg';add.push({path:y.img,data:x.img});}return y;});
+      var del=PUB.del.slice();
+      var v=await KIFPUB.refs(list,add,del);
+      PUB.del=PUB.del.filter(function(d){return del.indexOf(d)<0;});
+      SHREF.forEach(function(x){if(/^data:/.test(x.img||''))x.img='refs/'+x.id+'.jpg';});SHVER=v;try{localStorage.removeItem(KEY_RD);}catch(e){}
+      pubMsg('✓ 모든 FC에게 올렸습니다. 1~2분 뒤 FC 화면에 보입니다.');toast('보장분석 샘플을 모든 FC에게 올렸습니다.');
+    }catch(e){pubMsg('⚠ 올리지 못했습니다: '+esc(e.message||String(e))+' · 이 기기에는 남아 있으니 <b>지금 올리기</b>로 다시 시도하세요.');}
+    PUB.busy=false;if(PUB.again){PUB.again=false;pubNow();}
+  }
   function saveRefs(by,x,del){
-    if(by==='co'){SHVER=String(Date.now());if(!save(KEY_RD,{ver:SHVER,refs:SHREF}))toast('이 기기에 임시 저장하지 못했습니다(용량). 콘텐츠 관리에서 바로 반영하세요.');return;}
+    if(by==='co'){SHVER=String(Date.now());save(KEY_RD,{ver:SHVER,refs:SHREF});if(del&&x&&/^refs\//.test(x.img||''))PUB.del.push(x.img);pubShared();return;}
     if(!save(KEY_R,MYREF)&&!DB)toast('이 브라우저 저장 공간이 부족합니다. 오래된 자료를 지워 주세요.');
     if(DB&&x){var id='ref_'+x.id;dbChain[id]=(dbChain[id]||Promise.resolve()).then(function(){return del?DB.doc(id).delete():DB.doc(id).set({ts:Date.now(),r:JSON.parse(JSON.stringify(x))});}).catch(dbErr);}
   }
@@ -3031,7 +3077,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         var srcs=/pdf$/i.test(f.type)||/\.pdf$/i.test(f.name)?await pdfImgs(f):[await readUrl(f)];
         for(var k=0;k<srcs.length;k++){var img=await shrink(srcs[k]);var x={id:'r'+uid().slice(1),title:base+(srcs.length>1?' ('+(k+1)+')':''),opts:opts.length?opts:suggestOpts(base),src:src,img:img,ts:Date.now()};L.push(x);saveRefs(by,x);n++;}
       }catch(e){toast(f.name+': '+((e&&e.message)||'넣지 못했습니다.'));}}
-    render();toast(n?'참고자료 '+n+'장을 넣었습니다.'+(by==='co'?' 콘텐츠 관리에서 사이트에 반영하면 모든 FC에게 보입니다.':''):'넣은 자료가 없습니다.');
+    render();toast(n?'참고자료 '+n+'장을 넣었습니다.'+(by==='co'?' 모든 FC에게 올리는 중입니다.':''):'넣은 자료가 없습니다.');
   }
   function viewOpts(){
     var h='<div class="panel"><h3>분석 옵션 관리 <span class="sp"></span><button class="btn sm ghost" data-a="resetOpt">처음 10가지로 되돌리기</button></h3><p class="note">옵션 이름·설명·중심 영역을 언제든 바꿀 수 있습니다. 설명에 적은 문장이 제안서의 분석 방향과 AI 문구에 그대로 쓰입니다. (운영 시 관리자만 수정)</p></div>';
@@ -3427,7 +3473,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function onClick(e){
     var b=e.target.closest('[data-a]');if(!b||!root.contains(b))return;
     var a=b.dataset.a,c=cust();
-    if(a==='step'){gather();if(c)touch(c);var ns=+b.dataset.s;if(ns>=5&&st.step<5)st.from5=st.step;st.step=ns;render();window.scrollTo(0,root.offsetTop-80);return;}
+    if(a==='pubRefs'){pubNow();return;}
+    if(a==='step'){st.refAdm=false;gather();if(c)touch(c);var ns=+b.dataset.s;if(ns>=5&&st.step<5)st.from5=st.step;st.step=ns;render();window.scrollTo(0,root.offsetTop-80);return;}
     if(a==='new'){gather();var x=blank();st.customers.unshift(x);st.cur=x.id;st.step=1;persist();render();document.getElementById('fName').focus();return;}
     if(a==='example_off'){gather();var ex=exampleCustomer();st.customers.unshift(ex);st.cur=ex.id;st.step=3;persist();pushC(ex);render();toast('예시 고객을 불러왔습니다. 옵션을 바꿔 보세요.');return;}
     if(a==='pick'){gather();if(c)touch(c);st.cur=b.dataset.id;if(st.step>=5||st.step===0||b.dataset.to)st.step=1;render();window.scrollTo(0,root.offsetTop-80);return;}
@@ -3507,7 +3554,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   },
   getOpts:function(){return JSON.parse(JSON.stringify(st.opts));},
   getRefs:function(){return {refs:SHREF.map(function(x){return {id:x.id,title:x.title,opts:x.opts||[],src:x.src||'',img:x.img,ts:x.ts};}),ver:SHVER};},
-  openRefs:function(){st.from5=st.step<5?st.step:3;st.step=6;},
+  openRefs:function(adm){st.from5=st.step<5?st.step:3;st.step=6;st.refAdm=!!adm;},
   mount:function(el,user,toastFn){
     root=el;me=user;toast=toastFn;
     applyAiCfg();render();
