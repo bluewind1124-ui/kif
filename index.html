@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-22.4">
+<meta name="kif-build" content="2026-10-22.5">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -974,6 +974,33 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
 .scr button:hover{border-color:var(--kgold);background:var(--gold-soft)}
 .scr button:disabled{opacity:.35;cursor:default}
 @media (max-width:860px){.scr{left:8px;bottom:12px}}
+
+/* ===== 세로가 짧은 노트북: 위쪽 소개·패널·배너를 줄여 아래 내용이 더 보이게 ===== */
+#zVal{cursor:pointer;min-width:4.6em}
+@media (min-width:861px) and (max-height:820px){
+  .top{min-height:46px;margin-top:8px;top:8px;padding-top:4px;padding-bottom:4px}
+  main{padding-top:12px}
+  .hm{gap:12px}
+  .hm-hero{padding:10px 0 2px}
+  .hh-k{font-size:.82rem}
+  .hh-w{font-size:3.1rem;margin:4px 0 2px}
+  .hh-s{font-size:1.2rem;margin-bottom:14px}
+  .hh-card{padding:16px 16px 14px;border-radius:14px}
+  .hh-card b{font-size:1.3rem}
+  .hh-card span{margin-bottom:10px;font-size:.88rem}
+  .hh-card button{padding:8px 26px;font-size:.95rem}
+  .hm-hd h1{font-size:1.5rem}
+  .hm-kpi button{padding:12px 14px}.ki{width:26px;height:26px}.hm-kpi b{font-size:1.7rem}
+  .hm-cpt{padding:18px 48px}.hm-cpt-t h2{font-size:1.75rem;margin:4px 0 6px}
+  .hm-strip{padding:7px 14px}
+}
+@media (min-width:861px) and (max-height:700px){
+  .hh-k{display:none}
+  .hh-w{font-size:2.6rem}
+  .hh-s{font-size:1.05rem;margin-bottom:10px}
+  .hh-card span{display:none}
+  .hh-card button{margin-top:8px}
+}
 </style>
 
 <div class="demo">시제품(데모)입니다. 화면 구성 확인용이며 실제 고객·상품 데이터가 아닌 예시가 들어 있습니다.</div>
@@ -2073,10 +2100,17 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   document.getElementById('logout').addEventListener('click',function(){me=null;PST=[];ssoClear();ACC.list=null;ACC.issued=null;try{sessionStorage.removeItem('fc_portal_ok');}catch(e){}document.getElementById('app').hidden=true;document.getElementById('gate').hidden=false;document.getElementById('upw').value='';});
 
   /* ---------- 글자 확대 / 테마 ---------- */
-  var z=parseFloat(store('fc_zoom'))||1;
-  function setZ(v){z=Math.max(.9,Math.min(1.5,Math.round(v*10)/10));document.documentElement.style.setProperty('--zoom',z);document.getElementById('zVal').textContent=Math.round(z*100)+'%';store('fc_zoom',String(z));}
-  document.getElementById('zIn').onclick=function(){setZ(z+.1);};
-  document.getElementById('zOut').onclick=function(){setZ(z-.1);};
+  /* 화면 비율: 따로 고르지 않았으면 노트북 화면 크기(가로·세로)에 맞춰 저절로 80~100%.
+     「가- / 가+」로 고르면 그 크기를 기억하고(fc_zoom2), 가운데 % 를 누르면 다시 자동. 창 크기를 바꾸면 자동일 때 다시 맞춤 */
+  function autoZ(){if(innerWidth<=860)return 1;return Math.max(.8,Math.min(1,Math.floor(Math.min(innerWidth/1480,innerHeight/860)*20)/20));}
+  var zMan=parseFloat(store('fc_zoom2'))||0,zAuto=!zMan,z=zAuto?autoZ():zMan;
+  function setZ(v,manual){z=Math.max(.8,Math.min(1.5,Math.round(v*20)/20));if(manual){zAuto=false;store('fc_zoom2',String(z));}
+    document.documentElement.style.setProperty('--zoom',z);var e=document.getElementById('zVal');e.textContent=(zAuto?'자동 ':'')+Math.round(z*100)+'%';
+    e.title=zAuto?'화면 크기에 맞춰 자동으로 정해졌습니다':'누르면 화면 크기에 맞춰 자동으로 돌아갑니다';}
+  document.getElementById('zIn').onclick=function(){setZ(z+.1,true);};
+  document.getElementById('zOut').onclick=function(){setZ(z-.1,true);};
+  document.getElementById('zVal').onclick=function(){zAuto=true;store('fc_zoom2','');setZ(autoZ());};
+  addEventListener('resize',function(){if(zAuto)setZ(autoZ());});
   setZ(z);
   document.getElementById('theme').onclick=function(){
     var r=document.documentElement,now=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
