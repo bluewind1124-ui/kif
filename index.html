@@ -1294,7 +1294,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var h=head('영업 도구','이달의 컨셉','한 달 동안 전 FC가 같은 메시지로 상담하도록 컨셉·대상·자료를 한곳에 모읍니다.');
       h+='<div class="hero"><div class="k">'+esc(CONCEPT.month)+'</div><h2>'+fileA(CONCEPT.file,'"'+esc(CONCEPT.title)+'"','hlink')+'</h2><p>'+esc(CONCEPT.desc||'')+'</p><p>대상: '+esc(CONCEPT.target)+' · 핵심 상품: '+esc(CONCEPT.product)+'</p></div>';
       h+='<div class="cols"><div class="panel"><h3>상담 순서</h3><ul class="list">'+CONCEPT.steps.map(function(x,k){return '<li><span class="pill">'+(k+1)+'</span><span class="t">'+esc(x)+'</span></li>';}).join('')+'</ul></div>'+
-        '<div class="panel"><h3>교육 자료</h3><ul class="list">'+CONCEPT.mats.map(function(m){return '<li><span class="pill new">'+esc(m[0])+'</span><span class="t">'+fileA(m[2],esc(m[1]))+'</span></li>';}).join('')+'</ul></div></div>';
+        '<div class="panel"><h3>교육 자료 <button class="more" data-go="home">교육 자료실 ›</button></h3><ul class="list">'+(CONCEPT.mats||[]).map(function(m){return '<li><span class="pill new">'+esc(m[0])+'</span><span class="t">'+cptMatLink(m)+'</span></li>';}).join('')+'</ul></div></div>';
       return h;
     },
     car:function(){return extPage('자동차 비교견적','다이렉트·설계사 채널 비교','차량 번호와 운전자 정보를 입력해 여러 보험사 견적을 한 번에 받는 서비스로 연결합니다.','車');},
@@ -1633,7 +1633,21 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(it.kind==='award')return nuField(i,'period',it.period,'190px','기간')+nuSel(i,'status',it.status,[['진행 중','진행 중'],['발표','발표']],'상태');
     if(it.kind==='concept')return nuField(i,'ym',it.y+'.'+it.mo,'76px','연월');
     if(it.kind==='hypo')return nuField(i,'product',it.product,'200px','대표 상품');
+    if(BOARD[it.kind])return nuField(i,'date',it.date,'100px','날짜');
     return nuField(i,'cat',it.cat,'90px','분류');
+  }
+  /* 이달의 컨셉 자료 ↔ 교육 자료(자료실) 연결: 컨셉 자료에 파일이 없으면 교육 자료에서 같은(또는 앞부분이 같은) 제목의 파일을 찾아 쓴다 */
+  function cptMatRow(m){
+    if(!m)return null;var f=m[2],t=String(m[1]||'').replace(/\s+/g,' ').trim();
+    var hit=MATS.filter(function(r){return r[4]&&(f?r[4]===f:(r[1]===t||(r[1]&&t.indexOf(r[1])===0)||(t&&String(r[1]).indexOf(t)===0)));});
+    hit.sort(function(a,b){return isPdf(b[4])-isPdf(a[4]);});
+    return hit[0]||null;
+  }
+  function cptMatFile(m){if(m&&m[2])return m[2];var r=cptMatRow(m);return r?r[4]:'';}
+  function cptMatLink(m){
+    var r=cptMatRow(m);
+    if(r)return '<a class="flink" target="_blank" rel="noopener" href="'+fileHref(r[4])+'" data-mview="'+MATS.indexOf(r)+'">'+esc(m[1])+' <span class="pill new">열기</span></a>';
+    return m[2]?fileA(m[2],esc(m[1])):esc(m[1])+' <span class="pill warn">파일 준비 중</span>';
   }
   /* 올리기 전에 그 메뉴에 지금 올라가 있는 자료를 같은 화면에서 보여 준다 (고르기 전엔 「판단이 안 될 때 넣을 메뉴」 기준) */
   function nuNow(k){
@@ -1643,7 +1657,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(k==='award')return R(AWARDS,function(a){return {t:a[0]||'',s:(a[1]||'')+' · '+(a[3]||''),f:a[4]};});
     if(k==='hypo')return R(HYPO,function(h){return {t:h[0]||'',s:h[1]||'',f:h[3]};});
     if(k==='mats')return R(MATS,function(m){return {t:m[1]||'',s:(m[0]||'')+' · '+(m[2]||''),f:m[4]};});
-    if(k==='concept')return [{t:CONCEPT.title||'',s:(CONCEPT.month||'')+' · 지금 보이는 컨셉',f:CONCEPT.file}].concat(R(CONCEPT.mats,function(m){return {t:m[1]||'',s:'컨셉 교육 자료 · '+(m[0]||''),f:m[2]};}));
+    if(BOARD[k])return R(((SITE&&SITE.boards)||{})[k],function(n){return {t:n[1]||'',s:n[0]||'',f:n[3]};});
+    if(k==='concept')return [{t:CONCEPT.title||'',s:(CONCEPT.month||'')+' · 지금 보이는 컨셉',f:CONCEPT.file}].concat(R(CONCEPT.mats,function(m){return {t:m[1]||'',s:'컨셉 교육 자료 · '+(m[0]||''),f:cptMatFile(m)};}));
     return [];
   }
   function nuDup(it){var t=String(it.title||'').trim();return !!t&&nuNow(it.kind).some(function(x){return String(x.t).trim()===t;});}
@@ -1693,6 +1708,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var cp=Object.assign({},CONCEPT,c.concept||{});cp.mats=(cp.mats||[]).slice();
     var arch=false;
     list.slice().reverse().forEach(function(x){var it=x.it,p=x.path;
+      if(BOARD[it.kind]){c.boards=c.boards||{};(c.boards[it.kind]=c.boards[it.kind]||[]).unshift([it.date,it.title,it.summary,p]);return;}
       if(it.kind==='news')news.unshift([it.date,it.co,it.summary,p,it.title,it.y+'.'+it.mo,it.wk]);
       else if(it.kind==='notice')notices.unshift([it.date,it.title,p]);
       else if(it.kind==='award')awards.unshift([it.title,it.period,it.summary,it.status,p]);
@@ -1700,7 +1716,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       else if(it.kind==='mats')mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,it.cat,it.summary,p]);
       else if(it.kind==='concept'){if(!arch&&cp.title&&cp.title!==it.title){arch=true;c.concepts=Array.isArray(c.concepts)?c.concepts:[];c.concepts.unshift(JSON.parse(JSON.stringify(cp)));cp.mats=[];}
         cp.month=it.y+'.'+it.mo;cp.title=it.title;if(it.summary)cp.desc=it.summary;cp.file=p;
-        if(it.bullets.length>=2)cp.steps=it.bullets.slice(0,5);cp.mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,p]);}
+        if(it.bullets.length>=2)cp.steps=it.bullets.slice(0,5);cp.mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,p]);
+        mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,'이달의 컨셉',cp.month+' 이달의 컨셉 자료',p]);}
     });
     c.news=news;c.notices=notices;c.awards=awards;c.hypo=hypo;c.mats=mats;c.concept=cp;
     return c;
@@ -1856,6 +1873,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(CM.w)return CM.w;var S=SITE||{};
     CM.w={news:cmClone(NEWS),awards:cmClone(AWARDS),hypo:cmClone(HYPO),mats:cmClone(MATS),notices:cmClone(NOTICES),
       off:cmClone(S.off||{}),compare:cmClone(CMPL),concept:cmClone(CONCEPT),concepts:cmClone(S.concepts||[])};
+    Object.keys(BOARD).forEach(function(b){CM.w['board:'+b]=cmClone(((S.boards||{})[b])||[]);});
     return CM.w;
   }
   function cmPath(kind,name){
@@ -1882,7 +1900,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         keys.forEach(function(k){
           if(k==='concept'){c.concept=cmClone(W.concept);c.concepts=cmClone(W.concepts);return;}
           if(k==='compare'){c.compare=cmClone(W.compare);return;}
-          var key=CM_KEY[k];c[key]=cmClone(W[key]);c.off=c.off||{};c.off[k]=cmClone(W.off[k]||[]);
+          var key=CM_KEY[k];if(/^board:/.test(key)){c.boards=c.boards||{};c.boards[k]=cmClone(W[key]||[]);}else c[key]=cmClone(W[key]);c.off=c.off||{};c.off[k]=cmClone(W.off[k]||[]);
         });
       },add,del,'자료 관리: '+(keys.map(cmName).join(', ')||'파일 정리'));
       CM.add=CM.add.filter(function(a){return add.indexOf(a)<0;});CM.del=CM.del.filter(function(d){return del.indexOf(d)<0;});
@@ -1919,7 +1937,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   function cmDelBtn(attr){return CM.ask===attr?'<button class="btn sm danger" type="button" data-cmdel="'+attr+'">정말 지우기</button><button class="btn sm ghost" type="button" data-cm="nodel">취소</button>':'<button class="btn sm ghost danger" type="button" data-cmdel="'+attr+'">삭제</button>';}
   function cmRows(k){
-    var W=cmW(),key=CM_KEY[k],L=W[key]||[],O=(W.off[k]||[]),C=CM_COLS[k],fi=CM_FI[k];
+    var W=cmW(),key=CM_KEY[k],L=W[key]=W[key]||[],O=(W.off[k]||[]),C=CM_COLS[k],fi=CM_FI[k];
     var card=function(r,i,off){var id=(off?'o':'v')+i;
       return '<div class="smp-c'+(off?' off':'')+'"><div class="row"><span class="pill'+(off?'':' new')+'">'+(off?'꺼 둠':'보이는 중')+'</span>'+
         '<label class="note" style="white-space:nowrap"><input type="checkbox" data-cmon="'+id+'"'+(off?'':' checked')+'> FC에게 보이기</label>'+
@@ -1945,19 +1963,23 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<div class="nu-x">'+f('month','달','90px')+f('title','제목','w')+f('target','대상','w')+f('product','핵심 상품','w')+f('desc','한 줄 설명','a')+
       '<label class="nu-f wide">상담 순서 <span class="note">한 줄에 하나</span><textarea class="in" rows="3" data-cmk="steps">'+esc((c.steps||[]).join('\n'))+'</textarea></label></div>'+
       '<h3 style="margin:12px 0 6px;font-size:.95rem">컨셉 교육 자료 <button class="btn sm ghost" type="button" data-cm="kmat">＋ 한 줄 추가</button></h3>'+
-      ((c.mats||[]).length?(c.mats||[]).map(function(m,i){return '<div class="row cm-km">'+cmIn('data-cmkm="'+i+'" data-c="0"',m[0],'70px','종류')+cmIn('data-cmkm="'+i+'" data-c="1"',m[1],'w','제목')+cmFileBtns(m[2],'data-cmf="km'+i+'"')+cmDelBtn('km'+i)+'</div>';}).join(''):'<p class="note">자료가 없습니다.</p>')+'</div>';
+      ((c.mats||[]).length?(c.mats||[]).map(function(m,i){return '<div class="row cm-km">'+cmIn('data-cmkm="'+i+'" data-c="0"',m[0],'70px','종류')+cmIn('data-cmkm="'+i+'" data-c="1"',m[1],'w','제목')+cmFileBtns(m[2],'data-cmf="km'+i+'"')+cmMatPick(m,i)+cmDelBtn('km'+i)+'</div>'+(!m[2]&&cptMatRow(m)?'<p class="note" style="margin:0 0 6px">↳ 교육 자료 「'+esc(cptMatRow(m)[1])+'」 파일과 자동으로 연결됨</p>':(!m[2]?'<p class="note" style="margin:0 0 6px;color:#a15c00">↳ 파일이 없어 FC 화면에서 열리지 않습니다. 「파일 붙이기」나 「교육 자료에서 연결」을 쓰세요.</p>':''));}).join(''):'<p class="note">자료가 없습니다.</p>')+'</div>';
     h+='<h3 style="margin-top:16px">지난 컨셉 <span class="note">'+W.concepts.length+'건 · 「이걸로 바꾸기」를 누르면 다시 이달의 컨셉이 됩니다</span></h3><div class="smp-l">'+
       (W.concepts.length?W.concepts.map(function(x,i){return '<div class="smp-c off"><div class="row"><span class="pill">'+esc(x.month||'')+'</span><b>'+esc(x.title||'(제목 없음)')+'</b><span class="sp"></span>'+
         '<button class="btn sm" type="button" data-cmkuse="'+i+'">이걸로 바꾸기</button>'+cmDelBtn('ka'+i)+'</div><p class="note" style="margin:4px 0 0">'+esc(x.desc||'')+'</p></div>';}).join(''):'<p class="note">아직 지난 컨셉이 없습니다.</p>')+'</div>';
     return h;
   }
+  function cmMatPick(m,i){var L=cmW().mats.filter(function(r){return r[4];});if(!L.length)return '';
+    return '<label class="nu-f">교육 자료에서 연결<select class="in" data-cmkl="'+i+'"><option value="">— 고르기 —</option>'+L.map(function(r){return '<option value="'+esc(r[4])+'"'+(r[4]===m[2]?' selected':'')+'>'+esc('['+r[0]+'] '+r[1])+'</option>';}).join('')+'</select></label>';}
+  /* 컨셉에 붙인 파일은 교육 자료(자료실)에도 같이 올려 둔다 */
+  function cmMatAdd(type,title,p){var W=cmW();if(!p||W.mats.some(function(r){return r[4]===p;}))return;W.mats.unshift([type,title,'이달의 컨셉',(W.concept.month||'')+' 이달의 컨셉 자료',p]);cmTouch('mats');}
   function cmHtml(){
     var T=ghTok(),k=CM.tab;
     var h=head('관리자','자료 관리','메뉴별 자료를 올리고, FC에게 보일지 켜고 끄고, 고치고, 지웁니다. 바꾸면 잠시 뒤 바로 모든 FC 화면에 반영됩니다(1~2분).');
     h+='<div class="panel"><div class="row"><b>올리기 상태</b><span class="note" id="cmPub">'+(CM.msg||(T?'GitHub 연결됨 · 바꾸면 바로 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 아래 「GitHub 연결 설정」에서 토큰을 저장해야 모든 FC에게 올라갑니다.'))+'</span></div>'+
       '<details class="nu-set"'+(T?'':' open')+'><summary>GitHub 연결 설정 '+(T?'<span class="pill ok">연결됨</span>':'<span class="pill warn">처음 한 번 필요</span>')+'</summary><p class="note">토큰 만드는 법은 <button class="btn sm ghost" type="button" data-go="admin">관리자 페이지 › 자료 올리기</button>의 같은 칸에 적혀 있습니다. 같은 토큰을 씁니다.</p>'+
       '<div class="row" style="gap:8px"><input class="in" id="cmTok" type="password" autocomplete="off" placeholder="github_pat_..." value="'+esc(T)+'" style="flex:1;min-width:200px"><button class="btn sm" type="button" data-cm="tok">저장</button></div></details></div>';
-    h+='<div class="nchips cm-tabs" role="tablist">'+CM_TABS.map(function(t){var n=t[0]==='compare'?cmW().compare.length:t[0]==='concept'?1+cmW().concepts.length:(cmW()[CM_KEY[t[0]]]||[]).length+((cmW().off[t[0]]||[]).length);
+    h+='<div class="nchips cm-tabs" role="tablist">'+CM_TABS.map(function(t){var n=t[0]==='compare'?cmW().compare.length:t[0]==='concept'?1+cmW().concepts.length:((cmW()[CM_KEY[t[0]]])||[]).length+((cmW().off[t[0]]||[]).length);
       return '<button type="button" role="tab" class="tg'+(t[0]===k?' on':'')+'" aria-selected="'+(t[0]===k)+'" data-cmtab="'+t[0]+'">'+t[1]+' <span class="note">'+n+'</span></button>';}).join('')+'</div>';
     var acc=k==='compare'?'.html,.htm,.pdf,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg':'.pdf,.ppt,.pptx,.xls,.xlsx,.doc,.docx,.hwp,.hwpx,.png,.jpg,.jpeg';
     h+='<div class="panel"><h3>'+cmName(k)+' 올리기</h3><p class="note">'+CM_HELP[k]+'</p>'+
@@ -2011,6 +2033,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       if((a=t.getAttribute('data-cmr'))!=null){var l=cmLoc(a),c=t.getAttribute('data-c');if(l.obj)l.obj[c]=t.value;else l.row[+c]=t.value;cmTouch(k);return;}
       if((a=t.getAttribute('data-cmk'))!=null){W.concept[a]=a==='steps'?t.value.split('\n').map(function(x){return x.trim();}).filter(Boolean):t.value;cmTouch('concept');return;}
       if((a=t.getAttribute('data-cmkm'))!=null){W.concept.mats[+a][+t.getAttribute('data-c')]=t.value;cmTouch('concept');return;}
+      if((a=t.getAttribute('data-cmkl'))!=null){var mk=W.concept.mats[+a],r0=W.mats.filter(function(r){return r[4]===t.value;})[0];mk[2]=t.value;if(r0&&!mk[0])mk[0]=r0[0];cmTouch('concept');cmRender();return;}
       if((a=t.getAttribute('data-cmon'))!=null){
         if(a[0]==='p'){W.compare[+a.slice(1)].on=t.checked;}
         else{var key=CM_KEY[k],off=W.off[k]=W.off[k]||[],i=+a.slice(1);
@@ -2019,8 +2042,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       if((a=t.getAttribute('data-cmf'))!=null&&t.files&&t.files[0]){
         var f=t.files[0],old,np;
         try{
-          if(a==='k'){old=W.concept.file;np=await cmStage('concept',f);W.concept.file=np;cmTouch('concept');}
-          else if(/^km/.test(a)){var m=W.concept.mats[+a.slice(2)];old=m[2];np=await cmStage('concept',f);m[2]=np;cmTouch('concept');}
+          var fx2=(f.name.match(/\.([a-z0-9]+)$/i)||['',''])[1].toUpperCase();fx2=/^PPT/.test(fx2)?'PPT':fx2;
+          if(a==='k'){old=W.concept.file;np=await cmStage('concept',f);W.concept.file=np;cmTouch('concept');cmMatAdd(fx2,W.concept.title||f.name,np);}
+          else if(/^km/.test(a)){var m=W.concept.mats[+a.slice(2)];old=m[2];np=await cmStage('concept',f);m[2]=np;m[0]=fx2||m[0];cmTouch('concept');cmMatAdd(m[0],m[1]||f.name,np);}
           else{var lc=cmLoc(a);
             if(lc.obj){old=lc.obj.file;var keep=lc.obj.base&&/\.html?$/i.test(f.name);np=await cmStage('compare',f,keep?lc.obj.file:null);if(!keep){lc.obj.file=np;lc.obj.kind=/\.html?$/i.test(f.name)?'tool':'file';}else old='';}
             else{var fx=CM_FI[k];old=lc.row[fx];np=await cmStage(k,f);while(lc.row.length<CM_LEN[k])lc.row.push('');lc.row[fx]=np;if(k==='mats'){var ex=(f.name.match(/\.([a-z0-9]+)$/i)||['',''])[1].toUpperCase();lc.row[0]=/^PPT/.test(ex)?'PPT':ex;}}
@@ -2059,9 +2083,27 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     else if(a==='nodel'){CM.ask='';cmRender();}
     else if(a==='kmat'){W.concept.mats=W.concept.mats||[];W.concept.mats.push(['PDF','새 자료','']);cmRender();}
     else if(a==='addrow'){var key=CM_KEY[k],r=[];for(var i=0;i<CM_LEN[k];i++)r.push('');
-      if(k==='news'){r[0]=today();r[1]='기타';r[5]=today().slice(0,7);}else if(k==='notice')r[0]=today();else if(k==='award')r[3]='진행 중';else if(k==='mats'){r[0]='PDF';r[2]='자료';}
+      if(k==='news'){r[0]=today();r[1]='기타';r[5]=today().slice(0,7);}else if(k==='notice')r[0]=today();else if(k==='award')r[3]='진행 중';else if(k==='mats'){r[0]='PDF';r[2]='자료';}else if(BOARD[k])r[0]=today();
       W[key].unshift(r);cmRender();var f=document.querySelector('#cmList .smp-c .nu-x .in');if(f)f.focus();toast('맨 위에 빈 줄을 넣었습니다. 내용을 쓰면 저장됩니다.');}
   });
+  /* 메뉴 → 자료 올리기·자료 관리 탭 자동 구성: 메뉴 이름을 바꾸면 이름이 따라 바뀌고,
+     자기 화면이 없는 새 메뉴를 MENU에 넣으면 그 메뉴용 게시판(content.json boards[메뉴])이 자동으로 생겨 올리기·관리·FC 화면이 모두 붙는다. */
+  var BOARD={};
+  function menuName(id,def){var n='';MENU.forEach(function(g){g.items.forEach(function(it){if(it[0]===id)n=it[1];});});return n||def;}
+  function menuGroup(id){var n='';MENU.forEach(function(g){g.items.forEach(function(it){if(it[0]===id)n=g.g||'';});});return n;}
+  var MENU_FIXED={home:1,compare:1,ai:1,ai2:1,edu:1,car:1,sangjo:1,me:1,admin:1,cadmin:1,refadmin:1,news:1,award:1,concept:1,hypo:1};
+  function menuSync(){
+    BOARD={};MENU.forEach(function(g){if(g.admin||g.mobile)return;g.items.forEach(function(it){if(!MENU_FIXED[it[0]])BOARD[it[0]]=it[1];});});
+    var base=[['news',menuName('news','보험사 소식지')],['notice','본사 공지'],['award',menuName('award','시상 공지')],['concept',menuName('concept','이달의 컨셉')],['hypo',menuName('hypo','대표 상품 가설')],['mats','교육 자료']];
+    var bl=Object.keys(BOARD).map(function(b){return [b,BOARD[b]];});
+    KINDS.length=0;base.concat(bl).forEach(function(x){KINDS.push(x);});
+    CM_TABS.length=0;[['compare',menuName('compare','상품 비교')]].concat(base.filter(function(x){return x[0]==='hypo'||x[0]==='concept';}),base.filter(function(x){return x[0]!=='hypo'&&x[0]!=='concept';}),bl).forEach(function(x){CM_TABS.push(x);});
+    bl.forEach(function(x){var b=x[0];CM_KEY[b]='board:'+b;CM_COLS[b]=[[0,'날짜','96px'],[1,'제목','w'],[2,'설명','a']];CM_FI[b]=3;CM_LEN[b]=4;CM_HELP[b]='「'+x[1]+'」 메뉴에 보이는 자료입니다.';
+      if(!PAGES[b])PAGES[b]=function(){var L=((SITE&&SITE.boards)||{})[b]||[];
+        return head(menuGroup(b)||'자료',esc(BOARD[b]||b),'관리자가 올린 자료입니다. 제목을 누르면 열립니다.')+'<div class="panel"><ul class="list">'+(L.length?L.map(function(r){return '<li><span class="dt">'+esc(r[0]||'')+'</span><span class="t">'+fileA(r[3],'<b>'+esc(r[1]||'')+'</b>')+(r[2]?'<br><span class="note">'+esc(r[2])+'</span>':'')+'</span></li>';}).join(''):'<li class="note">아직 올라온 자료가 없습니다.</li>')+'</ul></div>';};});
+    if(KINDS.every(function(k){return k[0]!==CM.tab;})&&CM.tab!=='compare')CM.tab='compare';
+  }
+  menuSync();
   /* 상품 비교 화면 (FC): 목록 → 누르면 포털 안에서 바로 열림 */
   function cmpPage(){
     var x=CMP.open?cmpFind(CMP.open):null;
