@@ -208,6 +208,25 @@ async function officeText(buf){
   if(P.some(function(p){return /xl\/workbook\.xml$/.test(p);})){var wb=XLSX.read(u8,{type:'array'});return {type:'XLSX',text:wb.SheetNames.map(function(n){return '[시트] '+n+'\n'+XLSX.utils.sheet_to_csv(wb.Sheets[n]);}).join('\n')};}
   return null;
 }
+/* 글자 정보 없이 모양만 저장된 PDF: AI 없이 이 브라우저에서 문자 인식(OCR)으로 글자를 읽는다 (한국어+영어, 처음 한 번 인식 데이터 내려받기) */
+var TESS='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+async function ocrPdf(buf,maxPages,prog){
+  await loadLib(PDFJS,'pdfjsLib');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  try{await loadLib(TESS,'Tesseract');}catch(e){throw {code:'ocr_lib',message:'문자 인식 도구를 불러오지 못했습니다(인터넷 연결 확인).'};}
+  var doc=await pdfjsLib.getDocument({data:buf.slice(0)}).promise,n=Math.min(doc.numPages,maxPages||12),out=[];
+  prog&&prog('문자 인식 준비 중… (처음 한 번은 인식 데이터를 내려받아 조금 걸립니다)');
+  var w=await Tesseract.createWorker('kor+eng',1,{workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1'});
+  try{
+    for(var i=1;i<=n;i++){prog&&prog('문자 인식 중… '+i+'/'+n+'쪽');
+      var pg=await doc.getPage(i),v0=pg.getViewport({scale:1}),vp=pg.getViewport({scale:Math.min(3,2000/v0.width)}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;
+      var g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);await pg.render({canvasContext:g,viewport:vp}).promise;
+      var r=await w.recognize(cv),t=String(r.data.text||'');
+      /* 한글 글자 사이에 끼는 띄어쓰기 정리 (OCR이 음절마다 띄우는 경우) */
+      t=t.split('\n').map(function(l){var parts=l.trim().split(/\s+/),one=parts.filter(function(x){return /^[가-힣]$/.test(x);}).length;return parts.length>3&&one/parts.length>0.6?l.replace(/([가-힣])\s(?=[가-힣])/g,'$1'):l.trim();}).filter(Boolean).join('\n');
+      out.push('[p.'+i+'] '+t);}
+  }finally{try{await w.terminate();}catch(e){}}
+  return {pages:out,numPages:doc.numPages};
+}
 async function read(files){
   var out={text:'',images:[],scanned:[]};
   for(var i=0;i<files.length;i++){
@@ -331,5 +350,5 @@ function err(e){
 }
 if(document.readyState!=='loading')addCss();else document.addEventListener('DOMContentLoaded',addCss);
 window.addEventListener('storage',function(e){if(e.key===AIK)fire();});
-window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,err:err,migrateClaudeKey:migrateClaudeKey,onChange:function(f){subs.push(f);}};
+window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,err:err,migrateClaudeKey:migrateClaudeKey,onChange:function(f){subs.push(f);}};
 })();

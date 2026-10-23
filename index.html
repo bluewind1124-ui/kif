@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.16">
+<meta name="kif-build" content="2026-10-23.17">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -578,6 +578,8 @@ tr.dup td{background:#fff3c4}tr.dup.ok td{background:#eef1f6}
 .optc.on .ck{background:var(--kgold);border-color:var(--kgold)}
 .optc .on-n{font-size:.72rem;font-weight:700;color:var(--gold)}
 .smpl{display:grid;gap:6px;margin-top:10px}
+.smp-bad{margin:10px 0 6px;padding:12px 14px;border:2px solid #b42318;border-radius:8px;background:#fdecea;color:#7a1a12}.smp-bad ul{margin:6px 0;padding-left:1.2em}.smp-bad li{margin:3px 0}
+.smp-ocr{margin:10px 0 6px;padding:10px 14px;border:1px solid #cb9c3a;border-radius:8px;background:#fbf6ea}
 .smpi{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:9px 11px;background:var(--surface);cursor:pointer}
 .smpi.on{border-color:var(--kgold);background:var(--gold-soft)}.smpi.off{opacity:.6;cursor:default}
 .smpk{display:flex;gap:6px;align-items:center;flex:none;cursor:pointer}.smpi.off .smpk{cursor:default}.smpi input{flex:none;width:18px;height:18px}.smpn{flex:none;min-width:44px;font-size:.75rem;font-weight:700;color:var(--gold)}.smpb{flex:1;min-width:0}
@@ -4336,15 +4338,19 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function optBoxes(name,sel,attr){return '<div class="chips2"><label><input type="checkbox" '+attr+' data-all="1"'+(sel.length?'':' checked')+'><b>모든 옵션 공통</b></label>'+st.opts.map(function(o,i){return '<label><input type="checkbox" '+attr+' value="'+o.id+'"'+(sel.indexOf(o.id)>-1?' checked':'')+'>'+(i+1)+'. '+esc(o.title)+'</label>';}).join('')+'</div>';}
   /* ---- ① AI 보장분석 샘플 관리 (관리자만) ---- */
   var SMPST={msg:''};
+  function smpBadBox(){var B=SMPST.bad||[],O=SMPST.ocr||[];if(!B.length&&!O.length)return '';
+    return (B.length?'<div class="smp-bad" id="smBad" role="alert"><b>⚠ 인식하지 못한 파일 '+B.length+'건 — 등록되지 않았습니다</b><ul>'+B.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul><p class="note">원본 PPT·엑셀·워드 파일을 올리거나, 내용을 「파일 없이 글로 직접 추가」로 넣어 주세요.</p></div>':'')+
+      (O.length?'<div class="smp-ocr" role="status"><b>ⓘ 문자 인식(OCR)으로 읽은 파일 '+O.length+'건</b> — '+O.map(esc).join(', ')+'<br><span class="note">글자 정보 없이 모양만 저장된 PDF라 그림에서 글자를 읽었습니다. 아래 목록의 「AI가 받는 내용 보기·고치기」에서 틀린 글자가 없는지 확인해 주세요.</span></div>':'')+
+      '<div class="row"><button class="btn sm ghost" data-a="smpBadX">이 안내 닫기</button></div>';}
   function smpMsg(t){SMPST.msg=t;var e=document.getElementById('smPub');if(e)e.innerHTML=t;}
   function viewSamples(){
     var on=SMP.filter(function(s){return s.on!==false;}).length;
     var h='<h2 class="smp-h">① AI가 따라 쓰는 보장분석 샘플 <span class="note">'+SMP.length+'건 · AI에 보내는 중 '+on+'건</span></h2>'+
       '<div class="panel"><h3>샘플 올리기</h3><p class="note">보장분석 제안서(PDF·PPTX)나 분석 엑셀(XLSX)을 올리면 글자와 표 구성을 읽어 샘플로 등록합니다. 읽은 내용은 아래 목록에서 확인·수정할 수 있고, 그 내용이 그대로 모든 FC의 AI에 전달됩니다. <b>고객 실명·연락처는 지우고 올려 주세요.</b> (읽은 글은 AI용으로 저장하고, 아래를 켜 두면 원본 파일도 함께 올립니다)</p>'+
-      '<label class="smp-drop" id="smDrop"><input type="file" id="smFile" accept=".pdf,.pptx,.xlsx,.xls,.docx,.hwpx,.txt,application/pdf" multiple hidden><b>＋ 샘플 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>PDF · PPTX · XLSX · DOCX(워드) · HWPX(한글) · TXT · 여러 개 한 번에 · 글자가 든 파일은 AI 없이 바로 등록 (모양만 저장된 PDF만 AI가 그림으로 읽음)</em></label>'+
+      '<label class="smp-drop" id="smDrop"><input type="file" id="smFile" accept=".pdf,.pptx,.xlsx,.xls,.docx,.hwpx,.txt,application/pdf" multiple hidden><b>＋ 샘플 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>PDF · PPTX · XLSX · DOCX(워드) · HWPX(한글) · TXT · 여러 개 한 번에 · 모두 AI 없이 바로 등록 (모양만 저장된 PDF는 문자 인식으로 읽음)</em></label>'+
       '<div class="fgrid"><label class="f">샘플 제목 <span class="note">한 개 올릴 때만 · 비우면 파일 이름</span><input class="in" id="smTitle" placeholder="예: 박OO님 암 보장 강화 제안서"></label></div>'+
       '<label class="row note" style="margin-top:8px;gap:6px"><input type="checkbox" id="smKeep" checked> <span><b>원본 파일도 함께 올려</b>(PDF·엑셀·워드·PPT) 홈 「AI 보장분석 샘플」 카드에 첫 장을 보이고 「보기」로 원본을 그 모양 그대로 엽니다. <b>고객 이름·연락처·설계사 정보를 가린 파일만</b> 올려 주세요(사이트 주소를 아는 사람은 열어 볼 수 있습니다).</span></label>'+
-      '<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="smpAdd">파일 없이 글로 직접 추가</button><span class="note" id="smMsg"></span></div>'+
+      '<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="smpAdd">파일 없이 글로 직접 추가</button><span class="note" id="smMsg"></span></div>'+smpBadBox()+
       '<div class="row"><b>올리기 상태</b><span class="note" id="smPub">'+(SMPST.msg||(window.KIFPUB&&KIFPUB.ready()?'GitHub 연결됨 · 바꾸거나 파일을 올린 뒤 「저장」을 누르면 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장해야 올라갑니다.'))+'</span></div></div>';
     h+='<div class="panel"><h3 style="display:flex;align-items:center;gap:8px">등록된 샘플 <span class="note">'+SMP.length+'건</span><label class="btn sm" style="margin-left:auto">＋ 샘플 추가<input type="file" data-smf="1" accept=".pdf,.pptx,.xlsx,.xls,.txt,application/pdf" multiple hidden></label></h3>'+(SMP.length?'<div class="smp-l">'+SMP.map(function(s){
       return '<div class="smp-c'+(s.on===false?' off':'')+'"><div class="row"><span class="pill'+(s.on===false?'':' new')+'">'+esc(s.type||'글')+'</span><input class="in" data-smt="'+s.id+'" value="'+esc(s.title)+'" aria-label="샘플 제목"><label class="note" style="white-space:nowrap"><input type="checkbox" data-smo="'+s.id+'"'+(s.on===false?'':' checked')+'> AI에 보냄</label><button class="btn sm ghost danger" data-a="smpDel" data-id="'+s.id+'">삭제</button></div>'+
@@ -4379,13 +4385,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(ext==='pdf'){var L=window.pdfjsLib;if(L)L.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';if(!L)throw new Error('PDF 읽기 도구를 불러오지 못했습니다');var d=await L.getDocument({data:buf,cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',cMapPacked:true}).promise,out=[];
       for(var i=1;i<=Math.min(d.numPages,12);i++){var pg=await d.getPage(i),tc=await pg.getTextContent(),ln='',lastY=null;tc.items.forEach(function(it){var y=Math.round(it.transform[5]);if(lastY!==null&&Math.abs(y-lastY)>4)ln+='\n';else if(ln&&!/\s$/.test(ln))ln+=' ';ln+=it.str;lastY=y;});out.push('[p.'+i+'] '+tidy(ln));}
       var pt={type:'PDF',text:out.join('\n')};if(smpOk(pt))return pt;
-      /* 글자 정보 없이 모양만 저장된 PDF(Type3 글꼴 등): 등록한 AI가 페이지 그림을 읽어 옮겨 적는다 */
-      var why='「'+nm+'」은 화면에는 글자로 보이지만 파일 안에 글자 정보가 없고 모양만 저장된 PDF입니다(일부 PDF 변환기가 이렇게 저장합니다). 그래서 등록한 AI가 페이지 그림을 보고 글자를 옮겨 적어야 합니다.';
-      if(window.KIFAI&&KIFAI.chosen()&&KIFAI.cfg().mode==='ai'&&!confirm(why+'\n\n지금 AI로 읽을까요? (취소하면 이 파일은 건너뜁니다. 원본 PPT·엑셀·워드 파일을 올리면 AI 없이 바로 등록됩니다)'))throw new Error('AI로 읽기를 취소해 건너뛰었습니다. 원본 PPT·엑셀·워드 파일을 올리면 AI 없이 바로 등록됩니다');
-      if(!(window.KIFAI&&KIFAI.chosen()&&KIFAI.cfg().mode==='ai'))throw new Error('이 PDF는 글자 정보 없이 모양만 저장된 파일이라 글자를 뽑을 수 없습니다. 홈의 「내 AI 등록」을 하면 AI가 페이지 그림을 읽어 등록합니다(또는 원본 PPT·엑셀·워드 파일을 올려 주세요)');
-      var mat=await KIFAI.read([f]);if(!mat.images.length&&mat.text&&smpOk({text:mat.text}))return {type:'PDF',text:tidy(mat.text)};
-      var ar=await KIFAI.ask('아래 그림은 보험 보장분석 샘플 문서의 페이지들이다. 보이는 글자를 페이지 순서대로 빠짐없이 옮겨 적어라. 페이지 앞에 [p.번호]를 붙이고, 표는 한 행을 한 줄로 칸은 " | "로 구분한다. 고객 이름은 성+OO으로, 전화번호는 010-****-****로 가린다. 요약하거나 지어내지 마라. JSON 하나로만 답하라: {"text":"옮겨 적은 내용"}',mat);
-      return {type:'PDF',text:tidy(ar&&ar.text||'')};}
+      /* 글자 정보 없이 모양만 저장된 PDF(Type3 글꼴 등): AI 화면으로 넘기지 않고 이 브라우저에서 문자 인식(OCR)으로 읽는다 */
+      if(!(window.KIFAI&&KIFAI.ocrPdf))throw new Error('글자 정보 없이 모양만 저장된 PDF인데, 문자 인식 도구를 불러오지 못했습니다. 새로고침(Ctrl+F5) 후 다시 올려 주세요');
+      var oc=await KIFAI.ocrPdf(await f.arrayBuffer(),12,function(t){var e=document.getElementById('smMsg');if(e)e.textContent='"'+nm+'" '+t;});
+      var ot={type:'PDF',text:tidy(oc.pages.join('\n')),how:'ocr'};
+      if(!smpOk(ot))throw new Error('글자 정보 없이 모양만 저장된 PDF라 문자 인식(OCR)으로 읽어 봤지만 글자를 충분히 읽지 못했습니다. 원본 PPT·엑셀·워드 파일을 올리거나, 원본에서 「PDF로 저장」으로 다시 만들어 올려 주세요');
+      return ot;}
     if(ext==='xlsx'||ext==='xls'){var wb=XLSX.read(buf,{type:'array'});return {type:'XLSX',text:wb.SheetNames.map(function(n){var rows=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:''}).filter(function(r){return r.some(function(v){return String(v).trim();});}).slice(0,25);return '[시트] '+n+'\n'+rows.map(function(r){return r.filter(function(v){return String(v).trim();}).join(' | ');}).join('\n');}).join('\n')};}
     if(ext==='pptx'){var z=XLSX.CFB.read(new Uint8Array(buf),{type:'array'}),sl=[];z.FullPaths.forEach(function(p,i){var m=p.match(/ppt\/slides\/slide(\d+)\.xml$/);if(m)sl.push([+m[1],z.FileIndex[i]]);});sl.sort(function(a,b){return a[0]-b[0];});
       return {type:'PPT',text:sl.map(function(s){var x=new TextDecoder().decode(s[1].content);var ps=x.split(/<\/a:p>/).map(function(q){return (q.match(/<a:t>([^<]*)<\/a:t>/g)||[]).map(function(t){return t.replace(/<\/?a:t>/g,'');}).join('');}).filter(function(q){return q.trim();});return '[장 '+s[0]+'] '+ps.join(' / ');}).join('\n').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"')};}
@@ -4402,7 +4407,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     z.FullPaths.forEach(function(p,i){var f=z.FileIndex[i];if(!/\.xml$/i.test(p)||!f.content)return;var t=TD.decode(f.content),t2=piiMask(t,N);if(t2!==t){f.content=TE2.encode(t2);f.size=f.content.length;n++;}});
     if(!n)return buf;var o=XLSX.CFB.write(z,{type:'array',fileType:'zip',compression:true});return o instanceof ArrayBuffer?o:new Uint8Array(o).buffer;}catch(e){return buf;}}
   async function onSmpFiles(fs){
-    var msg=function(t){var e=document.getElementById('smMsg');if(e)e.innerHTML=t;},ti=document.getElementById('smTitle'),one=fs.length===1&&ti&&ti.value.trim(),ok=[],bad=[];
+    var msg=function(t){var e=document.getElementById('smMsg');if(e)e.innerHTML=t;},ti=document.getElementById('smTitle'),one=fs.length===1&&ti&&ti.value.trim(),ok=[],bad=[],ocr=[];
     for(var i=0;i<fs.length;i++){var f=fs[i];msg((fs.length>1?(i+1)+'/'+fs.length+' ':'')+'"'+esc(f.name)+'" 읽는 중…');
       try{var r=await smpFileText(f);if(!r.text||r.text.length<20)throw new Error('글자를 거의 읽지 못함(그림 파일일 수 있음)');if(!smpOk(r))throw new Error('글자가 깨져서 읽혔습니다. 원본 PPT·엑셀·워드 파일이나 다른 방식으로 저장한 PDF를 올려 주세요');
         var title=one||f.name.replace(/\.[^.]+$/,''),nid='s'+Date.now().toString(36)+i,NM=piiNames(title+' '+f.name);
@@ -4411,10 +4416,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         var key=function(t){return String(t||'').replace(/\.[^.]+$/,'').replace(/_\d{8}(_\d+)?$/,'').replace(/([가-힣])[가-힣O]{1,3}님/g,'$1OO님').replace(/[\s_]+/g,'');},old=SMP.filter(function(z){return key(z.title)===key(title);})[0];
         if(old){nid=old.id;old.text=r.text.slice(0,6000);old.type=r.type;old.at=new Date().toISOString().slice(0,10);old.on=true;}
         if(/\.(pdf|xlsx?|pptx?|docx?)$/i.test(f.name)&&(document.getElementById('smKeep')||{}).checked){window.SMPBUF=window.SMPBUF||{};window.SMPBUF[nid]={name:piiMask(f.name,NM),buf:/\.(xlsx|pptx|docx)$/i.test(f.name)?piiZip(await f.arrayBuffer(),NM):await f.arrayBuffer()};}
-        if(!old)SMP.push({id:nid,title:title,type:r.type,on:true,opts:suggestOpts(title+' '+r.text.slice(0,2000)).slice(0,3),stage:'all',text:r.text.slice(0,6000),at:new Date().toISOString().slice(0,10)});ok.push(title);}
-      catch(e){bad.push(f.name+' — '+(e&&e.message||e));}}
+        if(r.how==='ocr')ocr.push(title);if(!old)SMP.push({id:nid,title:title,type:r.type,on:true,opts:suggestOpts(title+' '+r.text.slice(0,2000)).slice(0,3),stage:'all',text:r.text.slice(0,6000),at:new Date().toISOString().slice(0,10)});ok.push(title);}
+      catch(e){var em=String(e&&e.message||e);if(/password/i.test(em+(e&&e.name||'')))em='비밀번호가 걸린 PDF입니다. 비밀번호를 풀고 다시 올려 주세요';else if(/Invalid PDF|Missing PDF|corrupt|Unexpected/i.test(em))em='파일이 손상됐거나 이름만 .pdf인 다른 파일입니다. 원본에서 다시 저장해 올려 주세요';else if(!/[가-힣]/.test(em))em='파일을 읽지 못했습니다('+em+'). 원본에서 다시 저장해 올려 주세요';bad.push(f.name+' — '+em);}}
     if(ok.length){await smpSave(ok.length===1?'"'+ok[0]+'" 샘플 등록':'샘플 '+ok.length+'건 등록');toast('샘플 '+ok.length+'건을 읽었습니다. 확인한 뒤 「저장」을 누르면 모든 FC에게 올라갑니다.');}
-    if(bad.length)msg('⚠ 못 읽은 파일: '+bad.map(esc).join(' / ')+' — "파일 없이 글로 직접 추가"로 넣어 주세요.');
+    SMPST.bad=(SMPST.bad||[]).concat(bad);SMPST.ocr=(SMPST.ocr||[]).concat(ocr);var y0=window.scrollY;render();window.scrollTo(0,y0);
+    if(bad.length){toast('⚠ 인식하지 못한 파일 '+bad.length+'건 — 화면의 빨간 상자에서 이유를 확인하세요.');var bx=document.getElementById('smBad');if(bx)bx.scrollIntoView({block:'center'});}
   }
   function viewRefs(){
     var adm=isAdm(),c=cust(),cur=c?selIds(c):[];
@@ -4955,6 +4961,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var a=b.dataset.a,c=cust();
     if(a==='pubRefs'){pubNow();return;}
     if(a==='smpAdd'){if(!isAdm())return;var ti=document.getElementById('smTitle');SMP.push({id:'s'+Date.now().toString(36),title:(ti&&ti.value.trim())||'새 샘플',type:'글',on:true,text:'',at:new Date().toISOString().slice(0,10)});smpSave('새 샘플 추가');setTimeout(function(){var d=root.querySelectorAll('.smp-c details');if(d.length){d[d.length-1].open=true;d[d.length-1].querySelector('textarea').focus();}},50);return;}
+    if(a==='smpBadX'){SMPST.bad=[];SMPST.ocr=[];render();return;}
     if(a==='smpDel'){if(!isAdm())return;var sd=SMP.filter(function(s){return s.id===b.dataset.id;})[0];if(!sd||!confirm('"'+sd.title+'" 샘플을 지울까요?'))return;SMP=SMP.filter(function(s){return s!==sd;});smpSave('"'+sd.title+'" 삭제');return;}
     if(a==='smpReset'){if(!isAdm()||!confirm('등록된 샘플을 지우고 기본 샘플 3건으로 되돌릴까요?'))return;SMP=JSON.parse(JSON.stringify(SMP_DEF));smpSave('기본 샘플로 되돌림');return;}
     if(a==='step'){st.refAdm=false;gather();if(c)touch(c);var ns=+b.dataset.s;if(isSide(ns)&&!isSide(st.step))st.from5=st.step;st.step=ns;render();window.scrollTo(0,root.offsetTop-80);return;}
