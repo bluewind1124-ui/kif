@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.7">
+<meta name="kif-build" content="2026-10-23.8">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -558,6 +558,11 @@ tr.dup td{background:#fff3c4}tr.dup.ok td{background:#eef1f6}
 .optc .ck{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:.72rem;font-weight:700;color:#fff}
 .optc.on .ck{background:var(--kgold);border-color:var(--kgold)}
 .optc .on-n{font-size:.72rem;font-weight:700;color:var(--gold)}
+.smpl{display:grid;gap:6px;margin-top:10px}
+.smpi{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:9px 11px;background:var(--surface);cursor:pointer}
+.smpi.on{border-color:var(--kgold);background:var(--gold-soft)}.smpi.off{opacity:.6;cursor:default}
+.smpk{display:flex;gap:6px;align-items:center;flex:none;cursor:pointer}.smpi.off .smpk{cursor:default}.smpi input{flex:none;width:18px;height:18px}.smpn{flex:none;min-width:44px;font-size:.75rem;font-weight:700;color:var(--gold)}.smpb{flex:1;min-width:0}
+.smpv{white-space:pre-wrap;font:inherit;font-size:.8rem;max-height:220px;overflow:auto;background:var(--bg,#f6f6f6);padding:8px;border-radius:4px;margin:6px 0 0}
 .optc b{font-size:.98rem}
 .optc .d{font-size:.8rem;color:var(--muted);line-height:1.45}
 .kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -3481,6 +3486,24 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var ids=selIds(c);
     return '<div class="optg" id="aiOptg">'+st.opts.map(function(o,i){var on=ids.indexOf(o.id)>-1,k=ids.indexOf(o.id)+1;return '<label class="optc'+(on?' on':'')+'"><input type="checkbox" name="aiOpt" value="'+o.id+'"'+(on?' checked':'')+'><span class="ck" aria-hidden="true">'+(on?(ids.length>1?k:'✓'):'')+'</span><span class="on-n">옵션 '+(i+1)+'</span><b>'+esc(o.title)+'</b><span class="d">'+esc(o.desc)+'</span>'+(function(){var n=allRefs().filter(function(x){return x.opts&&x.opts.indexOf(o.id)>-1;}).length;return n?'<span class="pill">참고자료 '+n+'건 연결</span>':'';})()+'</label>';}).join('')+'</div>';
   }
+  /* 제안서에 쓸 보장분석 샘플: 맡기기 / 직접 고르기 / 사용 안 함 */
+  function smpSum(c){var m=smpMode(c),L=smpChosen(c);return m==='none'?'사용 안 함':m==='pick'&&L.length?'직접 고름 · '+esc(L[0].title)+(L.length>1?' 외 '+(L.length-1)+'개':''):'맡기기 (자동)';}
+  function smpPanel(c){
+    var m=smpMode(c),rec=smpPick(selIds(c),2).map(function(s){return s.id;}),sel=(c.smpIds||[]);
+    var M=[['auto','맡기기 (자동)','지정하지 않으면 포털이 고른 옵션에 맞는 샘플 후보를 골라 주고, AI가 이 고객에게 가장 맞는 형식을 골라 씁니다.'],
+      ['pick','샘플 직접 고르기','아래에서 고른 샘플의 형식·포맷(구성 순서, 장 제목, 문장 길이)을 기준으로 씁니다. 최대 3개, 먼저 고른 것이 기준(샘플 1)입니다.'],
+      ['none','샘플 사용 안 함','샘플 없이 포털 기본 규칙만으로 씁니다.']];
+    var h='<div class="panel" id="smpPanel"><h3>보장분석 샘플 사용 <span class="note">제안서 문장을 쓸 때 AI가 따를 형식</span></h3><div class="optg smpm">'+M.map(function(x){var on=m===x[0];return '<label class="optc'+(on?' on':'')+'"><input type="radio" name="smpMode" value="'+x[0]+'"'+(on?' checked':'')+'><span class="ck" aria-hidden="true">'+(on?'✓':'')+'</span><b>'+x[1]+'</b><span class="d">'+x[2]+'</span></label>';}).join('')+'</div>';
+    var L=SMP.filter(function(s){return s.on!==false&&String(s.text||'').trim();});
+    if(m==='auto'){var A=smpPick(selIds(c),2);h+='<p class="note" style="margin-top:8px">지금 옵션 기준 자동 후보: '+(A.length?A.map(function(s,i){return '<b>'+(i+1)+'. '+esc(s.title)+'</b>';}).join(' · '):'맞는 샘플이 없어 기본 규칙으로 씁니다')+'</p>';}
+    if(m==='pick'){
+      h+='<div class="smpl">'+(L.length?L.map(function(s){var ok=smpOk(s),k=sel.indexOf(s.id),on=k>-1&&ok,o=(s.opts||[]).map(optName).filter(Boolean).join(', ')||'모든 옵션 공통';
+        return '<div class="smpi'+(on?' on':'')+(ok?'':' off')+'"><label class="smpk"><input type="checkbox" name="smpSel" value="'+s.id+'"'+(on?' checked':'')+(ok?'':' disabled')+'><span class="smpn">'+(on?'샘플 '+(k+1):'고르기')+'</span></label><span class="smpb"><b>'+esc(s.title)+'</b> <span class="pill">'+esc(s.type||'')+'</span>'+(rec.indexOf(s.id)>-1&&ok?' <span class="pill ok">옵션에 맞음 · 추천</span>':'')+(ok?'':' <span class="pill warn">글자를 못 읽은 파일 · 선택 불가</span>')+'<br><span class="note">연결 옵션: '+esc(o)+'</span>'+
+          (ok?'<details><summary class="note">형식 미리보기</summary><pre class="smpv">'+esc(String(s.text).trim().slice(0,600))+'</pre></details>':'')+'</span></div>';}).join(''):'<p class="note">등록된 샘플이 없습니다.</p>')+'</div>'+
+        (smpChosen(c).length?'':'<p class="note" style="margin-top:6px;color:#b42318">아직 고른 샘플이 없어 지금은 「맡기기」처럼 자동으로 고릅니다.</p>');
+    }
+    return h+'</div>';
+  }
   function bars(R,focus){
     var mx=0;AREAS.forEach(function(a){mx=Math.max(mx,R.A[a].old+R.A[a].neu);});
     var h='<div class="map">';
@@ -3523,16 +3546,27 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* 샘플 고르기: 고객이 고른 분석 옵션·단계에 맞는 샘플을 점수로 골라 3건까지만 보낸다 (많이 올려도 AI에 가는 글은 짧게).
      옵션을 안 고른 샘플 = 모든 옵션 공통, 단계 all = 1·2단계 공통 */
   var SMP_STAGE={all:'1·2단계 공통','1':'1단계 기계약 분석','2':'2단계 Before/After'};
+  /* 글자를 제대로 읽지 못한 샘플(깨진 PDF·압축 파일 원문)은 AI에 보내지 않는다 */
+  function smpOk(s){var t=String(s&&s.text||'').slice(0,600);if(/^PK/.test(t))return false;var h=(t.match(/[가-힣]/g)||[]).length,k=(t.match(/[一-鿿]/g)||[]).length;return h>20&&h>k*2;}
   function smpPick(ids,stage){
-    var L=SMP.filter(function(s){return s.on!==false&&String(s.text||'').trim();});
+    var L=SMP.filter(function(s){return s.on!==false&&String(s.text||'').trim()&&smpOk(s);});
     if(!ids)return L;
     var sc=L.map(function(s,i){var o=s.opts||[],hit=o.filter(function(x){return ids.indexOf(x)>-1;}).length,sg=s.stage||'all';
       var v=(o.length?(hit?3+hit:-99):1)+(sg===String(stage)?2:sg==='all'?1:-99);return {s:s,v:v,i:i};}).filter(function(x){return x.v>0;});
     sc.sort(function(a,b){return b.v-a.v||a.i-b.i;});return sc.slice(0,3).map(function(x){return x.s;});
   }
-  function smpText(ids,stage){var L=smpPick(ids,stage);if(!L.length)return '';
-    return '[보장분석 샘플 — 이 형식·방법·표현을 그대로 따른다'+(ids?'. 포털이 이 고객의 분석 관점(옵션)·단계에 가장 가까운 샘플을 골랐다. 샘플 1을 이 고객 결과물의 기본 틀(구성 순서·장 제목 방식·문장 길이)로 쓰고, 나머지 샘플은 표현만 참고한다':'')+']\n'+L.map(function(s,i){return '■ 샘플 '+(i+1)+': '+s.title+' ('+s.type+(s.opts&&s.opts.length?' · '+s.opts.map(optName).filter(Boolean).join(', '):'')+')\n'+String(s.text).trim().slice(0,4000);}).join('\n')+'\n'+SMP_HOW;}
-  function aiGuide(ids,stage){var t=smpText(ids,stage);return AI_RULES+(t?'\n\n'+t:'');}
+  /* 고객별 샘플 사용 방식: auto(기본, 맡기기) / pick(FC가 직접 고름) / none(샘플 안 씀) */
+  function smpMode(c){var m=c&&c.smpMode;return m==='pick'||m==='none'?m:'auto';}
+  function smpChosen(c){var ids=(c&&c.smpIds)||[];return ids.map(function(id){return SMP.filter(function(s){return s.id===id&&s.on!==false&&smpOk(s);})[0];}).filter(Boolean).slice(0,3);}
+  function smpFor(c,stage){var m=smpMode(c);if(m==='none')return [];if(m==='pick'){var L=smpChosen(c);if(L.length)return L;}return smpPick(selIds(c),stage);}
+  function smpText(ids,stage,c){
+    if(c&&smpMode(c)==='none')return '[보장분석 샘플 없음 — FC가 이 고객은 샘플 없이 쓰기로 했다. 위 규칙만 따라 쉬운 말로 쓴다]';
+    var pick=c&&smpMode(c)==='pick'&&smpChosen(c).length,L=c?smpFor(c,stage):smpPick(ids,stage);if(!L.length)return '';
+    var head=pick?'[보장분석 샘플 — FC가 이 고객 제안서의 기준으로 직접 고른 샘플이다. 샘플 1의 형식·포맷(구성 순서·장 제목 방식·항목 수·문장 길이·표현)을 그대로 기준으로 삼아 쓴다'+(L.length>1?'. 샘플 2'+(L.length>2?'~3은':'는')+' 샘플 1과 어긋나지 않는 범위에서 표현만 참고한다':'')+']'
+      :'[보장분석 샘플 — 이 형식·방법·표현을 따른다'+(ids||c?'. FC가 샘플을 지정하지 않고 맡겼다. 포털이 이 고객의 분석 관점(옵션)·단계에 가까운 순서로 후보를 골랐다. 이 고객의 자료와 옵션에 가장 잘 맞는 샘플 하나를 골라 그 형식(구성 순서·장 제목 방식·문장 길이)을 기본 틀로 쓰고, 고르기 어려우면 샘플 1을 쓴다. 나머지는 표현만 참고한다':'')+']';
+    return head+'\n'+L.map(function(s,i){return '■ 샘플 '+(i+1)+': '+s.title+' ('+s.type+(s.opts&&s.opts.length?' · '+s.opts.map(optName).filter(Boolean).join(', '):'')+')\n'+String(s.text).trim().slice(0,4000);}).join('\n')+'\n'+SMP_HOW;}
+  function aiGuide(ids,stage,c){var t=smpText(ids,stage,c);return AI_RULES+(t?'\n\n'+t:'');}
+  function smpLead(c){return smpMode(c)==='none'?'아래 규칙을 반드시 지켜 써라':smpMode(c)==='pick'&&smpChosen(c).length?'아래 규칙을 반드시 지키고, FC가 고른 샘플 1의 형식·포맷을 기준으로 써라':'아래 규칙을 반드시 지키고, 샘플의 형식·방법·표현을 따라 써라';}
   /* API·회사 AI에는 올려 둔 샘플 슬라이드 그림도 2장까지 같이 보낸다 (복사·붙여넣기는 글로만) */
   async function refImgs(o){if(isPaste())return [];var L=SHREF.concat(MYREF).filter(function(r){return r.img;});L.sort(function(x,y){return ((y.opts||[]).indexOf(o.id)>-1)-((x.opts||[]).indexOf(o.id)>-1);});var out=[];for(var i=0;i<L.length&&out.length<2;i++){try{var rs=await fetch(L[i].img);if(rs.ok)out.push(await rs.blob());}catch(e){}}return out;}
   function provName(){var c=aiCfg();return (AIP[c.prov]||{}).name||'내 AI';}
@@ -3549,7 +3583,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       월보험료합계:R.prem.old,포털이먼저찾은유리:PC.P,포털이먼저찾은불리:PC.C};
     var IMG;
     try{
-      var r=await cap.sample.json('너는 한국보험금융 FC의 기계약 보장분석 조수다. 아래 규칙을 반드시 지키고, 샘플의 형식·방법·표현(따옴표 컨셉 한 줄, 숫자 근거를 붙인 짧은 강점·약점, 용어 풀이, 역할 분담 관점의 결론)을 그대로 따라 써라.\n'+aiGuide(selIds(c),1)+'\n\n아래 데이터만 근거로 기존 계약의 유리한 부분과 불리한 부분을 정리하라. 분석관점(옵션)의 중심 영역(관점중심=true)을 각 목록의 앞쪽에 두고 더 자세히 쓴다. 샘플의 고객·숫자는 문체 참고용일 뿐 이 고객 분석에 옮겨 쓰지 마라. "포털이먼저찾은" 항목은 참고하되 빠진 것이 있으면 보태고, 틀린 것은 빼라. JSON 하나로만 답하라: {"pros":[["제목","설명 1문장"], 최대 6개],"cons":[["제목","설명 1문장"], 최대 6개],"conclusion":"1단계 결론 2문장 (지금 보험의 중심 + 2단계에서 조정·보완할 점)"}\n\n데이터:\n'+JSON.stringify(data),Object.assign({modelTier:'default'},(IMG=await refImgs(o)).length?{images:IMG}:{}));
+      var r=await cap.sample.json('너는 한국보험금융 FC의 기계약 보장분석 조수다. '+smpLead(c)+(smpMode(c)==='none'?'':'(샘플의 고객·숫자는 문체 참고용)')+'.\n'+aiGuide(selIds(c),1,c)+'\n\n아래 데이터만 근거로 기존 계약의 유리한 부분과 불리한 부분을 정리하라. 분석관점(옵션)의 중심 영역(관점중심=true)을 각 목록의 앞쪽에 두고 더 자세히 쓴다. 샘플이 있으면 그 고객·숫자는 문체 참고용일 뿐 이 고객 분석에 옮겨 쓰지 마라. "포털이먼저찾은" 항목은 참고하되 빠진 것이 있으면 보태고, 틀린 것은 빼라. JSON 하나로만 답하라: {"pros":[["제목","설명 1문장"], 최대 6개],"cons":[["제목","설명 1문장"], 최대 6개],"conclusion":"1단계 결론 2문장 (지금 보험의 중심 + 2단계에서 조정·보완할 점)"}\n\n데이터:\n'+JSON.stringify(data),Object.assign({modelTier:'default'},(IMG=await refImgs(o)).length?{images:IMG}:{}));
       var ok=function(L){return Array.isArray(L)?L.filter(function(x){return Array.isArray(x)&&x[0];}).slice(0,6).map(function(x){return [String(x[0]),String(x[1]||'')];}):[];};
       var P=ok(r&&r.pros),C=ok(r&&r.cons);if(!P.length&&!C.length)throw {code:'bad_json'};
       c.ai1={opt:o.id,P:P.length?P:PC.P,C:C.length?C:PC.C,conclusion:String((r&&r.conclusion)||''),by:provName(),at:nowStr()};touch(c);render();toast(provName()+'가 포털 규칙으로 보장분석을 정리했습니다.');
@@ -3602,7 +3636,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function viewAnalysis1(c){
     var o=opt(c),v=vOld(c),R=analyze(v,o),PC=prosCons(v,o,R),K=useK(v);
     var h='<div class="aiwho"><b>1단계 · 기계약 보장분석</b> — 지금 가입한 보험만으로 무엇이 든든하고 무엇이 비어 있는지 정리합니다. 신계약은 2단계에서 붙입니다.</div>';
-    h+='<div class="panel"><h3>분석 관점(옵션) 선택 <span class="note">여러 개 선택 가능 · 지금 '+selIds(c).length+'개</span><span class="sp"></span><button class="btn sm ghost" data-a="step" data-s="5">옵션 내용 바꾸기</button></h3><p class="note">고른 옵션의 중심 영역을 더 자세히 봅니다. 2단계 제안서도 같은 옵션으로 만듭니다.</p>'+optCards(c)+'</div>';
+    h+='<div class="panel"><h3>분석 관점(옵션) 선택 <span class="note">여러 개 선택 가능 · 지금 '+selIds(c).length+'개</span><span class="sp"></span><button class="btn sm ghost" data-a="step" data-s="5">옵션 내용 바꾸기</button></h3><p class="note">고른 옵션의 중심 영역을 더 자세히 봅니다. 2단계 제안서도 같은 옵션으로 만듭니다.</p>'+optCards(c)+'</div>'+smpPanel(c);
     if(!K.length)return h+'<div class="panel"><h3>기존 계약이 없습니다</h3><p class="note">먼저 "기계약 자료"에 증권·보장분석표를 첨부하세요.</p><div class="row"><button class="btn" data-a="step" data-s="2">기계약 자료 첨부하기 ▸</button></div></div>';
     h+='<div class="kpis"><div><span>기존 월보험료</span><b>'+fmt(R.prem.old)+'<small>원</small></b><em>계약 '+K.length+'건</em></div><div><span>담보</span><b>'+R.cnt.old+'<small>개</small></b><em>'+AREAS.filter(function(a){return R.A[a].old;}).length+'개 영역</em></div><div class="t"><span>점검 결과</span><b>유리 '+PC.P.length+' · 불리 '+PC.C.length+'</b><em>아래 정리 참고</em></div></div>';
     h+='<div class="panel ai1"><div class="row"><b>내 AI로 보장분석</b><span class="note">'+(PC.ai?'✓ '+esc(PC.ai.by)+'가 포털 규칙으로 정리 ('+esc(PC.ai.at)+')':'지금은 포털 규칙으로 자동 정리한 결과입니다. 버튼을 누르면 내 AI('+esc(provName())+')가 같은 규칙으로 다시 정리합니다.')+'</span><span class="sp"></span><button class="btn sm" data-a="ai1" id="ai1Btn">'+(PC.ai?'다시 분석':'보장분석 실행')+'</button>'+(PC.ai?'<button class="btn sm ghost" data-a="ai1off">규칙 기본 결과로</button>':'')+'</div><p class="note" id="ai1Note">어떤 AI를 쓰든 숫자는 포털이 계산하고, 문장은 관리자가 정한 <b>보장분석 규칙</b>을 그대로 지켜 씁니다. 출력물 모양은 샘플 형식 그대로입니다.</p></div>';
@@ -3714,7 +3748,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function viewReport(c){
     var o=opt(c),v=vAfter(c),R=analyze(v,o),T=(c.ai&&c.ai.opt===o.id&&c.ai.s2)?c.ai:defText(v,o,R);
     var h='<div class="aiwho"><b>2단계 · Before / After 제안서</b> — 기존 계약은 이랬는데(Before), 컨설팅 후 조정 계약은 이렇게 됩니다(After).</div>'+rptBar(c,'Before/After 제안서',o.title)+
-      '<p class="note" id="rptNote">'+(c.ai&&c.ai.opt===o.id&&c.ai.s2?'AI가 다듬은 문구입니다. 숫자는 분석표에서 계산한 값입니다.':'기본 문구입니다. 숫자는 분석표에서 계산한 값입니다.')+' 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.</p></div>';
+      '<p class="note" id="rptNote">'+(c.ai&&c.ai.opt===o.id&&c.ai.s2?'AI가 다듬은 문구입니다. 숫자는 분석표에서 계산한 값입니다.':'기본 문구입니다. 숫자는 분석표에서 계산한 값입니다.')+' 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.<br>샘플: <b>'+smpSum(c)+'</b> <button class="chkgo" data-a="step" data-s="3">바꾸기 ▸</button></p></div>';
     h+=newsPanel(c,o);
     h+='<div class="rpt" id="rpt">'+reportHtml(v,o,R,T)+'</div>';
     return h;
@@ -4559,7 +4593,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       월보험료:{Before:vA._B.R0.prem.old,유지기존:R.prem.old,신규:R.prem.neu,After:R.prem.old+R.prem.neu},정리한담보:vA._B.drop.map(function(x){return x.it.name+' '+n(x.it.amt)+'만';}),동시지급:R.scen.length?{기존:R.sOld,신규:R.sNeu}:null,연간반복:(R.ann+R.ann10)?{연간:R.ann,십년한도:R.ann10,누적:R.years}:null,가족력:c.famHx,상담내용:c.memo,
       옵션별:(o.list||[o]).map(function(q){var S=spotInfo(q,R);return {옵션:q.title,보장공백:S.gap,기준미달:S.weak,점검포인트:q.points||[],관련기사:newsTxt(q)};})};
     try{
-      var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. 아래 규칙을 반드시 지키고, 샘플의 형식·방법·표현을 그대로 따라 써라(샘플의 고객·숫자는 옮겨 쓰지 마라).\n'+aiGuide(selIds(c),2)+'\n\nBefore(기존 그대로)와 After(조정한 기존 + 신계약)를 비교하는 관점으로 쓴다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션을 가장 강조한다: 포인트의 절반 이상은 고른 옵션의 중심 영역에 대한 것으로 옵션 순서대로 쓰고(옵션마다 최소 한 개), 결론에도 고른 옵션을 짚어라. 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 규칙 8대로만 쓴다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
+      var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. '+smpLead(c)+(smpMode(c)==='none'?'':'(샘플의 고객·숫자는 옮겨 쓰지 마라)')+'.\n'+aiGuide(selIds(c),2,c)+'\n\nBefore(기존 그대로)와 After(조정한 기존 + 신계약)를 비교하는 관점으로 쓴다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션을 가장 강조한다: 포인트의 절반 이상은 고른 옵션의 중심 영역에 대한 것으로 옵션 순서대로 쓰고(옵션마다 최소 한 개), 결론에도 고른 옵션을 짚어라. 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 규칙 8대로만 쓴다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
       if(r&&r.points&&r.points.length){c.ai={opt:o.id,s2:1,points:r.points.slice(0,6).map(String),conclusion:String(r.conclusion||'')};touch(c);render();toast('AI 문구로 바꿨습니다.');return;}
       throw {code:'x'};
     }catch(e){note.textContent=errMsg(e)+' 기본 문구를 그대로 씁니다.';btn.disabled=false;}
@@ -4644,6 +4678,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(t.dataset&&(t.dataset.kc!=null||t.dataset.kd)){var ca=cust();if(!ca)return;gatherDocs(ca);
       if(t.dataset.kc!=null){ca.contracts[+t.dataset.kc].cancel=!t.checked;}else{var pr=t.dataset.kd.split(':');ca.contracts[+pr[0]].items[+pr[1]].drop=!t.checked;}
       touch(ca);var yy=window.scrollY;render();window.scrollTo(0,yy);return;}
+    if(t.name==='smpMode'){var c3=cust();if(!c3)return;c3.smpMode=t.value;if(t.value==='pick'&&!(c3.smpIds&&c3.smpIds.length))c3.smpIds=smpPick(selIds(c3),2).slice(0,1).map(function(s){return s.id;});touch(c3);var y3=window.scrollY;render();window.scrollTo(0,y3);return;}
+    if(t.name==='smpSel'){var c4=cust();if(!c4)return;var si=(c4.smpIds||[]).filter(function(id){return SMP.some(function(s){return s.id===id;});}),j=si.indexOf(t.value);
+      if(t.checked&&j<0){if(si.length>=3){t.checked=false;toast('샘플은 3개까지 고를 수 있습니다.');return;}si.push(t.value);}else if(!t.checked&&j>-1)si.splice(j,1);
+      c4.smpIds=si;touch(c4);var y4=window.scrollY;render();window.scrollTo(0,y4);return;}
     if(t.name==='aiOpt'){var c=cust(),ids=selIds(c).slice(),i=ids.indexOf(t.value);
       if(t.checked&&i<0)ids.push(t.value);else if(!t.checked&&i>-1){if(ids.length===1){t.checked=true;toast('옵션은 최소 1개를 골라야 합니다.');return;}ids.splice(i,1);}
       c.options=ids;c.option=ids[0];touch(c);render();return;}
