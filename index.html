@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.13">
+<meta name="kif-build" content="2026-10-23.14">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -364,6 +364,7 @@ td.r,th.r{text-align:right}
 .smp-txt{max-width:900px;width:100%;background:var(--surface,#fff);border-radius:12px;padding:18px}.smp-txt pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;font-size:13.5px;line-height:1.7;margin:0}
 .mat .th.img{position:relative;padding:0;aspect-ratio:4/3!important;background:#e9edf2;overflow:hidden}.mat .th.img img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
 .mat .th.img span{position:absolute;left:8px;top:8px;background:rgba(15,34,64,.82);padding:2px 7px;border-radius:4px}.mat .mt .mtt{display:block;color:var(--ink);font-size:.86rem;margin-bottom:2px;line-height:1.35}
+.xv{background:#fff;border-radius:10px;padding:10px;max-width:1200px;margin:0 auto}.xv-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}.xv-tabs button{font:inherit;font-size:13px;border:1px solid #c9d2dc;background:#f3f6f9;border-radius:6px 6px 0 0;padding:5px 12px;cursor:pointer}.xv-tabs button.on{background:#1d6f42;color:#fff;border-color:#1d6f42;font-weight:700}.xv-sheet{overflow:auto;max-height:calc(100vh - 170px)}.xv-sheet table{border-collapse:collapse;font-size:13px;color:#1f2937}.xv-sheet td{border:1px solid #d5dbe3;padding:4px 8px;white-space:pre-wrap;vertical-align:top;min-width:40px}.xv-sheet tr:first-child td{background:#e7eef7;font-weight:700}
 .smp-card .th.img img{object-fit:contain;object-position:center;background:#e9edf2}
 .smp-home h3{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .mats4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
@@ -2040,10 +2041,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       /* 새로 올린 샘플 원본 PDF와 첫 장 그림 */
       var tree=[],B=window.SMPBUF||{};
       for(var bi=0;bi<list.length;bi++){var bx=B[list[bi].id];if(!bx)continue;
-        var d=new Date(),pth='files/samples/'+d.getFullYear()+'-'+pad2(d.getMonth()+1)+'/'+(bx.name.replace(/\.[^.]+$/,'').replace(/[\\\/:*?"<>|#%&{}\s]+/g,'_').slice(0,40)||'sample')+'_'+Math.random().toString(36).slice(2,7)+'.pdf';
+        var ext=((bx.name.match(/\.([a-z0-9]+)$/i)||['','pdf'])[1]).toLowerCase(),d=new Date(),pth='files/samples/'+d.getFullYear()+'-'+pad2(d.getMonth()+1)+'/'+(bx.name.replace(/\.[^.]+$/,'').replace(/[\\\/:*?"<>|#%&{}\s]+/g,'_').slice(0,40)||'sample')+'_'+Math.random().toString(36).slice(2,7)+'.'+ext;
         if(window.KSAVE)KSAVE.step('샘플 원본 올리는 중 '+bx.name);
         var fb=await gh('POST','/git/blobs',{content:b64(bx.buf),encoding:'base64'});tree.push({path:pth,mode:'100644',type:'blob',sha:fb.sha});
-        var tp=null;try{var tb=await pdfThumb(bx.buf);if(tb){tp=pth.replace(/\.pdf$/,'')+'_thumb.jpg';var tbl=await gh('POST','/git/blobs',{content:b64(tb),encoding:'base64'});tree.push({path:tp,mode:'100644',type:'blob',sha:tbl.sha});}}catch(e){}
+        var tp=null;try{var tb=await anyThumb(bx.name,bx.buf,list[bi].type,list[bi].title,list[bi].text);if(tb){tp=pth.replace(/\.[a-z0-9]+$/i,'')+'_thumb.jpg';var tbl=await gh('POST','/git/blobs',{content:b64(tb),encoding:'base64'});tree.push({path:tp,mode:'100644',type:'blob',sha:tbl.sha});}}catch(e){}
         list[bi]=Object.assign({},list[bi],{file:pth,thumb:tp||undefined});delete B[list[bi].id];}
       cur.aiSamples=list;cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
       var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
@@ -2686,6 +2687,48 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   /* 교육 자료 보기: 누르면 내려받지 않고 화면 위에 바로 펼친다.
      PDF는 pdf.js로 쪽마다 그림으로 보여 주고, 사진은 그대로, PPT는 같은 제목의 PDF가 있으면 그 PDF를, 없으면 Office 보기 화면을 쓴다. */
+  var isXls=function(f){return /\.xlsx?$/i.test(f||'');};
+  /* 엑셀 보기: 사이트에서 파일을 열 수 있으면 Office 보기 화면(엑셀 모양·시트 탭 그대로), 아니면 이 화면에서 시트별 표로 그린다. 두 방식은 위 단추로 바꿀 수 있다. */
+  function xlsTable(B,url,pg){
+    pg.textContent='불러오는 중…';B.classList.remove('full');
+    fetch(url).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();}).then(function(buf){
+      var wb=XLSX.read(new Uint8Array(buf),{type:'array'}),cur=0;
+      var draw=function(){var ws=wb.Sheets[wb.SheetNames[cur]],h=XLSX.utils.sheet_to_html(ws,{header:'',footer:''});
+        B.innerHTML='<div class="xv"><div class="xv-tabs">'+wb.SheetNames.map(function(n,i){return '<button type="button" class="'+(i===cur?'on':'')+'" data-xv="'+i+'">'+esc(n)+'</button>';}).join('')+'</div><div class="xv-sheet">'+h+'</div></div>';
+        pg.textContent=wb.SheetNames.length+'개 시트 · '+(cur+1)+'번째 「'+wb.SheetNames[cur]+'」';};
+      B.onclick=function(e){var t=e.target.closest&&e.target.closest('[data-xv]');if(t){e.stopPropagation();cur=+t.getAttribute('data-xv');draw();}};
+      draw();
+    }).catch(function(){B.innerHTML='<div class="mv-big"><b>엑셀 파일을 아직 불러올 수 없습니다.</b><p>방금 올린 자료라면 1~2분 뒤 다시 눌러 주세요.</p></div>';pg.textContent='';});
+  }
+  function xlsOffice(B,url,title,pg){B.classList.add('full');B.onclick=null;B.innerHTML='<iframe title="'+esc(title)+'" src="https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(url)+'"></iframe>';pg.textContent='엑셀 화면 · 아래쪽 시트 탭으로 이동';}
+  /* 엑셀 첫 시트를 카드용 그림(JPEG)으로 그린다 */
+  async function xlsThumb(buf){if(!window.XLSX)return null;var wb=XLSX.read(new Uint8Array(buf.slice(0)),{type:'array'}),ws=wb.Sheets[wb.SheetNames[0]];
+    var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false}).filter(function(r){return r.some(function(v){return String(v).trim();});}).slice(0,16);
+    var nc=Math.min(6,Math.max.apply(null,rows.map(function(r){var n=r.length;while(n&&!String(r[n-1]).trim())n--;return n;}).concat([1])));
+    var W=480,H=360,cv=document.createElement('canvas');cv.width=W;cv.height=H;var g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,W,H);
+    g.fillStyle='#1d6f42';g.fillRect(0,0,W,22);g.fillStyle='#fff';g.font='bold 12px sans-serif';g.fillText('XLSX · '+wb.SheetNames[0],8,15);
+    var top=26,rh=Math.min(22,Math.floor((H-top-4)/Math.max(rows.length,1))),cw=(W-8)/nc;g.textBaseline='middle';
+    rows.forEach(function(r,ri){var y=top+ri*rh;if(ri===0||r.filter(function(v){return String(v).trim();}).length===1){g.fillStyle=ri===0?'#e7eef7':'#f5f7fa';g.fillRect(4,y,W-8,rh);}
+      for(var ci=0;ci<nc;ci++){var x=4+ci*cw,t=String(r[ci]==null?'':r[ci]);g.strokeStyle='#d5dbe3';g.strokeRect(x,y,cw,rh);g.fillStyle='#1f2937';g.font=(ri===0?'bold ':'')+'11px sans-serif';
+        g.save();g.beginPath();g.rect(x+2,y,cw-4,rh);g.clip();g.fillText(t,x+4,y+rh/2);g.restore();}});
+    var bl=await new Promise(function(r){cv.toBlob(r,'image/jpeg',0.85);});return bl?await bl.arrayBuffer():null;}
+  /* PPT·워드·엑셀 파일 안에 저장된 첫 장 미리보기 그림(docProps/thumbnail)을 꺼내 카드용 JPEG로 */
+  async function zipThumb(buf){if(!(window.XLSX&&XLSX.CFB))return null;var z=XLSX.CFB.read(new Uint8Array(buf.slice(0)),{type:'array'}),hit=null;
+    z.FullPaths.forEach(function(p,i){if(/docProps\/thumbnail\.(jpe?g|png)$/i.test(p))hit=z.FileIndex[i];});if(!hit||!hit.content)return null;
+    var bm=await createImageBitmap(new Blob([hit.content]));if(bm.width<100)return null;var sc=480/bm.width,cv=document.createElement('canvas');cv.width=480;cv.height=Math.round(bm.height*sc);
+    var g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);g.drawImage(bm,0,0,cv.width,cv.height);var bl=await new Promise(function(r){cv.toBlob(r,'image/jpeg',0.85);});return bl?await bl.arrayBuffer():null;}
+  /* 그림을 꺼낼 수 없을 때: 제목과 첫 줄들로 표지 모양 그림을 그린다 */
+  async function textThumb(type,title,text){var W=480,H=360,cv=document.createElement('canvas');cv.width=W;cv.height=H;var g=cv.getContext('2d'),col={PPT:'#c4501b',DOCX:'#2b579a','워드':'#2b579a',XLSX:'#1d6f42',PDF:'#b42318'}[type]||'#14284b';
+    g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle=col;g.fillRect(0,0,W,8);g.font='bold 13px sans-serif';g.fillText(type||'',20,34);
+    g.fillStyle='#14284b';g.font='bold 22px sans-serif';var y=72,wrap=function(t,f,lh,max){g.font=f;var line='';for(var i=0;i<t.length&&y<H-14;i++){var nx=line+t[i];if(g.measureText(nx).width>W-40){g.fillText(line,20,y);y+=lh;line=t[i];if(--max<=0)return;}else line=nx;}if(line&&y<H-14){g.fillText(line,20,y);y+=lh;}};
+    wrap(String(title||''),'bold 22px sans-serif',30,3);y+=8;g.fillStyle='#475467';
+    String(text||'').replace(/\[(p\.\d+|시트|장 \d+)\]\s*/g,'').split('\n').map(function(l){return l.trim();}).filter(Boolean).slice(0,10).forEach(function(l){wrap(l,'13px sans-serif',19,2);});
+    var bl=await new Promise(function(r){cv.toBlob(r,'image/jpeg',0.85);});return bl?await bl.arrayBuffer():null;}
+  /* 샘플 원본 파일의 카드 그림: PDF는 첫 쪽, 엑셀은 첫 시트, PPT·워드는 파일 속 미리보기(없으면 제목 표지) */
+  async function anyThumb(name,buf,type,title,text){var e=(String(name).split('.').pop()||'').toLowerCase(),t=null;
+    try{if(e==='pdf')t=await pdfThumb(buf);else if(e==='xlsx'||e==='xls')t=await xlsThumb(buf);else if(/^(pptx|docx|ppt|doc)$/.test(e))t=await zipThumb(buf);}catch(x){t=null;}
+    return t||await textThumb(type,title,text);}
+  var isDoc=function(f){return /\.docx?$/i.test(f||'');};
   var isPdf=function(f){return /\.pdf$/i.test(f||'');},isPpt=function(f){return /\.pptx?$/i.test(f||'');},isImg=function(f){return /\.(png|jpe?g|gif|webp)$/i.test(f||'');};
   function matTwin(m,test){return MATS.filter(function(x){return x!==m&&x[4]&&x[1]===m[1]&&test(x[4]);})[0]||null;}
   function matsShown(){return MATS.filter(function(m){return !(isPpt(m[4])&&matTwin(m,isPdf));});}
@@ -2703,9 +2746,16 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var esck=function(e){if(e.key==='Escape')close();};document.addEventListener('keydown',esck);
     w.addEventListener('click',function(e){if(e.target.closest('[data-v="all"]')){close();openMat(m);return;}if(e.target.closest('[data-v="x"]')||e.target===B)close();});
     if(isImg(show)){B.innerHTML='<img alt="'+esc(m[1])+'" src="'+fileHref(show)+'">';return;}
-    if(isPpt(show)){
+    if(isXls(show)){
+      var tg=document.createElement('span');tg.innerHTML='<button class="btn sm ghost" type="button" data-xm="t">표로 보기</button><button class="btn sm ghost" type="button" data-xm="o">엑셀 화면으로 보기</button><a class="btn sm ghost" download href="'+fileHref(show)+'">엑셀 받기</a>';
+      w.querySelector('.mvh').insertBefore(tg,w.querySelector('.mvh .sp').nextSibling);
+      tg.addEventListener('click',function(e){var b=e.target.closest('[data-xm]');if(!b)return;if(b.getAttribute('data-xm')==='o')xlsOffice(B,abs(show),m[1],pg);else xlsTable(B,fileHref(show),pg);});
+      pg.textContent='불러오는 중…';
+      fetch(abs(show),{method:'HEAD'}).then(function(r){if(!alive)return;if(!r.ok)throw 0;xlsOffice(B,abs(show),m[1],pg);}).catch(function(){if(alive)xlsTable(B,fileHref(show),pg);});
+      return;}
+    if(isPpt(show)||isDoc(show)){
       /* Office 보기 화면은 10MB가 넘는 PPT를 열지 못하고 오류를 낸다 → 크기를 먼저 보고, 크면 안내와 내려받기 단추를 보여 준다 */
-      var big=function(){B.innerHTML='<div class="mv-big"><b>PPT 파일이 커서 화면에서 바로 열 수 없습니다.</b><p>아래 단추로 내려받아 PowerPoint에서 보세요. 관리자가 같은 제목의 PDF를 함께 올리면 여기서 바로 보입니다.</p><a class="btn gold" download href="'+fileHref(show)+'">PPT 내려받기</a></div>';pg.textContent='';};
+      var big=function(){B.innerHTML='<div class="mv-big"><b>파일이 커서 화면에서 바로 열 수 없습니다.</b><p>아래 단추로 내려받아 PowerPoint·Word에서 보세요. 관리자가 같은 제목의 PDF를 함께 올리면 여기서 바로 보입니다.</p><a class="btn gold" download href="'+fileHref(show)+'">원본 내려받기</a></div>';pg.textContent='';};
       var office=function(){B.classList.add('full');B.innerHTML='<iframe title="'+esc(m[1])+'" src="https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(abs(show))+'"></iframe>';
         pg.textContent='파일이 안 보이면 「새 창으로」를 눌러 내려받으세요.';};
       pg.textContent='불러오는 중…';
@@ -4290,10 +4340,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function viewSamples(){
     var on=SMP.filter(function(s){return s.on!==false;}).length;
     var h='<h2 class="smp-h">① AI가 따라 쓰는 보장분석 샘플 <span class="note">'+SMP.length+'건 · AI에 보내는 중 '+on+'건</span></h2>'+
-      '<div class="panel"><h3>샘플 올리기</h3><p class="note">보장분석 제안서(PDF·PPTX)나 분석 엑셀(XLSX)을 올리면 글자와 표 구성을 읽어 샘플로 등록합니다. 읽은 내용은 아래 목록에서 확인·수정할 수 있고, 그 내용이 그대로 모든 FC의 AI에 전달됩니다. <b>고객 실명·연락처는 지우고 올려 주세요.</b> (PPT·엑셀·워드는 읽은 글만 저장하고, PDF는 아래를 켜 두면 원본도 함께 올립니다)</p>'+
+      '<div class="panel"><h3>샘플 올리기</h3><p class="note">보장분석 제안서(PDF·PPTX)나 분석 엑셀(XLSX)을 올리면 글자와 표 구성을 읽어 샘플로 등록합니다. 읽은 내용은 아래 목록에서 확인·수정할 수 있고, 그 내용이 그대로 모든 FC의 AI에 전달됩니다. <b>고객 실명·연락처는 지우고 올려 주세요.</b> (읽은 글은 AI용으로 저장하고, 아래를 켜 두면 원본 파일도 함께 올립니다)</p>'+
       '<label class="smp-drop" id="smDrop"><input type="file" id="smFile" accept=".pdf,.pptx,.xlsx,.xls,.docx,.hwpx,.txt,application/pdf" multiple hidden><b>＋ 샘플 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>PDF · PPTX · XLSX · DOCX(워드) · HWPX(한글) · TXT · 여러 개 한 번에 · 개수 제한 없음</em></label>'+
       '<div class="fgrid"><label class="f">샘플 제목 <span class="note">한 개 올릴 때만 · 비우면 파일 이름</span><input class="in" id="smTitle" placeholder="예: 박OO님 암 보장 강화 제안서"></label></div>'+
-      '<label class="row note" style="margin-top:8px;gap:6px"><input type="checkbox" id="smKeep" checked> <span><b>PDF는 원본도 함께 올려</b> 홈 「AI 보장분석 샘플」 카드에 첫 화면을 보이고 「보기」로 실제 샘플을 엽니다. <b>고객 이름·연락처·설계사 정보를 가린 PDF만</b> 올려 주세요(사이트 주소를 아는 사람은 열어 볼 수 있습니다). PPT·엑셀은 PDF로 저장해 올리면 첫 화면이 보입니다.</span></label>'+
+      '<label class="row note" style="margin-top:8px;gap:6px"><input type="checkbox" id="smKeep" checked> <span><b>원본 파일도 함께 올려</b>(PDF·엑셀·워드·PPT) 홈 「AI 보장분석 샘플」 카드에 첫 장을 보이고 「보기」로 원본을 그 모양 그대로 엽니다. <b>고객 이름·연락처·설계사 정보를 가린 파일만</b> 올려 주세요(사이트 주소를 아는 사람은 열어 볼 수 있습니다).</span></label>'+
       '<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="smpAdd">파일 없이 글로 직접 추가</button><span class="note" id="smMsg"></span></div>'+
       '<div class="row"><b>올리기 상태</b><span class="note" id="smPub">'+(SMPST.msg||(window.KIFPUB&&KIFPUB.ready()?'GitHub 연결됨 · 바꾸거나 파일을 올린 뒤 「저장」을 누르면 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장해야 올라갑니다.'))+'</span></div></div>';
     h+='<div class="panel"><h3 style="display:flex;align-items:center;gap:8px">등록된 샘플 <span class="note">'+SMP.length+'건</span><label class="btn sm" style="margin-left:auto">＋ 샘플 추가<input type="file" data-smf="1" accept=".pdf,.pptx,.xlsx,.xls,.txt,application/pdf" multiple hidden></label></h3>'+(SMP.length?'<div class="smp-l">'+SMP.map(function(s){
@@ -4345,7 +4395,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     for(var i=0;i<fs.length;i++){var f=fs[i];msg((fs.length>1?(i+1)+'/'+fs.length+' ':'')+'"'+esc(f.name)+'" 읽는 중…');
       try{var r=await smpFileText(f);if(!r.text||r.text.length<20)throw new Error('글자를 거의 읽지 못함(그림 파일일 수 있음)');if(!smpOk(r))throw new Error('글자가 깨져서 읽혔습니다. 원본 PPT·엑셀·워드 파일이나 다른 방식으로 저장한 PDF를 올려 주세요');
         var title=one||f.name.replace(/\.[^.]+$/,''),nid='s'+Date.now().toString(36)+i;
-        if(/\.pdf$/i.test(f.name)&&(document.getElementById('smKeep')||{}).checked){window.SMPBUF=window.SMPBUF||{};window.SMPBUF[nid]={name:f.name,buf:await f.arrayBuffer()};}
+        if(/\.(pdf|xlsx?|pptx?|docx?)$/i.test(f.name)&&(document.getElementById('smKeep')||{}).checked){window.SMPBUF=window.SMPBUF||{};window.SMPBUF[nid]={name:f.name,buf:await f.arrayBuffer()};}
         SMP.push({id:nid,title:title,type:r.type,on:true,opts:suggestOpts(title+' '+r.text.slice(0,2000)).slice(0,3),stage:'all',text:r.text.slice(0,6000),at:new Date().toISOString().slice(0,10)});ok.push(title);}
       catch(e){bad.push(f.name+' — '+(e&&e.message||e));}}
     if(ok.length){await smpSave(ok.length===1?'"'+ok[0]+'" 샘플 등록':'샘플 '+ok.length+'건 등록');toast('샘플 '+ok.length+'건을 읽었습니다. 확인한 뒤 「저장」을 누르면 모든 FC에게 올라갑니다.');}
