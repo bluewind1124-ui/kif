@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.9">
+<meta name="kif-build" content="2026-10-23.10">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1816,6 +1816,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var ref=await gh('GET','/git/ref/heads/'+GH.branch),base=await gh('GET','/git/commits/'+ref.object.sha);
       var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'),have={};(all.tree||[]).forEach(function(t){have[t.path]=t.sha;});
       var cur={};if(have['content.json']){var bj=await gh('GET','/git/blobs/'+have['content.json']);cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(c){return c.charCodeAt(0);})));}
+      /* 이 화면이 예전 목록을 들고 있어도, 서버에서 이미 고쳐진(글자가 제대로 읽히는) 샘플 글을 깨진 글로 덮어쓰지 않는다 */
+      var okT=function(t){t=String(t||'').slice(0,600);if(/^PK/.test(t))return false;var h=(t.match(/[가-힣]/g)||[]).length,k=(t.match(/[一-鿿]/g)||[]).length;return h>20&&h>k*2;};
+      var sv={};(cur.aiSamples||[]).forEach(function(x){if(x&&x.id)sv[x.id]=x;});
+      list=list.map(function(x){var o=sv[x.id];return o&&!okT(x.text)&&okT(o.text)?Object.assign({},x,{text:o.text,type:o.type}):x;});
       cur.aiSamples=list;cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
       var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
       var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:[{path:'content.json',mode:'100644',type:'blob',sha:jb.sha}]});
