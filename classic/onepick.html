@@ -432,6 +432,9 @@ var CATS = [
 
 
 (function(){
+  /* 원픽 데이터: 관리자가 「자료 관리 › 이번 달의 원픽」에서 고친 내용(content.json의 onepick)을 먼저 쓰고, 없으면 위 기본값을 쓴다 */
+  var OP={month:'2026.10',title:'26년 10월 베스트 픽업 상품 비교 분석 가이드',upd:'2026.10.12',guide:''};
+  function lowIdx(c,row,s){var b=-1,bv=Infinity;row.mf.forEach(function(x,i){var n=parseFloat(String(x[s]).replace(/,/g,''));if(!isNaN(n)&&n<bv){bv=n;b=i;}});return b;}
   function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   var TYPES={life:'생명보험',nonlife:'손해보험'};
   var main=document.getElementById('main');
@@ -468,6 +471,7 @@ var CATS = [
         var b=(i===c.best?' best':'');
         if(row.hd){tr+='<td class="hd'+b+'" colspan="1">'+esc(row.hd[0])+'</td><td class="hd'+b+'">'+esc(row.hd[1])+'</td>';}
         else if(row.mf){
+          if(!row.lo&&c.kind==='value')row.lo=[lowIdx(c,row,0),lowIdx(c,row,1)]; /* 가성비 표: 남·여 각각 가장 싼 보험료 표시 */
           for(var s=0;s<2;s++){var lo=row.lo&&row.lo[s]===i?' lo':'';tr+='<td class="'+(b+lo).trim()+'">'+txt(row.mf[i][s])+'</td>';}
         }else{
           var v=row.v[i], cls=b.trim();
@@ -489,8 +493,9 @@ var CATS = [
   /* ── 화면 ── */
   function byId(id){for(var i=0;i<CATS.length;i++)if(CATS[i].id===id)return CATS[i];return null;}
   function home(){
-    var o='<div class="ph"><div class="kicker">2026.10 · 베스트 픽업</div><h1>이번 달의 원픽</h1>'+
-      '<p>이번 달에 뭐 팔지? 상품군을 선택하면 선정 상품의 타사 비교표와 선정 이유를 보여줍니다. 26년 10월 베스트 픽업 상품 비교 분석 가이드 기준 · 최종 업데이트 <b class="kif-upd">2026.10.12</b></p></div>';
+    var o='<div class="ph"><div class="kicker">'+esc(OP.month)+' · 베스트 픽업</div><h1>이번 달의 원픽</h1>'+
+      '<p>이번 달에 뭐 팔지? 상품군을 선택하면 선정 상품의 타사 비교표와 선정 이유를 보여줍니다. '+esc(OP.title)+' 기준 · 최종 업데이트 <b>'+esc(OP.upd||'')+'</b>'+
+      (OP.guide?' · <a class="op-guide" href="'+esc(guideHref())+'" target="_blank" rel="noopener" data-pg="1">원본 가이드 PDF 보기</a>':'')+'</p></div>';
     ['life','nonlife'].forEach(function(t){
       var best=CATS.filter(function(c){return c.type===t&&c.kind==='best';}), val=CATS.filter(function(c){return c.type===t&&c.kind==='value';});
       o+='<div class="sec-t">'+TYPES[t]+' <i>베스트 초이스</i></div><div class="cards">';
@@ -513,7 +518,7 @@ var CATS = [
   function detail(c){
     var idx=CATS.indexOf(c), prev=CATS[idx-1], next=CATS[idx+1];
     var o='<button class="back" data-id="">← 원픽 전체</button>'+
-      '<div class="ph"><div class="row"><div><div class="kicker">'+(c.kind==='best'?'베스트 초이스':'가성비 상품')+' · 2026.10</div><h1>'+esc(c.name)+'</h1></div>'+
+      '<div class="ph"><div class="row"><div><div class="kicker">'+(c.kind==='best'?'베스트 초이스':'가성비 상품')+' · '+esc(OP.month)+'</div><h1>'+esc(c.name)+'</h1></div>'+
       '<span class="badge'+(c.type==='life'?'':' g')+'">'+TYPES[c.type]+'</span></div>'+
       (c.lead?'<p>'+esc(c.lead)+'</p>':'')+'</div>';
     var hasBest=c.best>=0;
@@ -523,18 +528,20 @@ var CATS = [
     o+='<div class="sec-t">타사 비교표'+(hasBest?' <i>'+esc(c.cols[c.best].co)+' – '+esc(c.cols[c.best].prod)+'</i>':'')+'</div>';
     if(c.cond)o+='<div class="cond">'+esc(c.cond)+'</div>';
     o+=table(c);
-    if(c.reason){
+    if(c.reason&&c.cols[c.best]){
       var r=c.reason;
       o+='<div class="sec-t">선정 이유 <i>'+esc(c.cols[c.best].co)+' – '+esc(c.cols[c.best].prod)+'</i></div>';
       o+=rs('상품 특징',r.feat,'')+rs('선정 이유',r.why,' why')+rs('세일즈 포인트',r.sales,'');
     }
-    o+='<div class="src">원본: 26년 10월 베스트 픽업 상품 비교 분석 가이드 '+esc(c.src)+'쪽</div>';
+    o+='<div class="src">원본: '+esc(OP.title)+(c.src?' '+esc(c.src)+'쪽':'')+
+      (OP.guide?' · <a class="op-guide" href="'+esc(guideHref(c.pg))+'" target="_blank" rel="noopener" data-pg="'+(+c.pg||1)+'">원본 PDF에서 보기'+(c.pg?' (PDF '+(+c.pg)+'쪽)':'')+' ↗</a>':'')+'</div>';
     o+='<div class="pager"><button data-id="'+(prev?prev.id:'')+'"'+(prev?'':' style="visibility:hidden"')+'>← '+(prev?esc(prev.name):'')+'</button><button data-id="'+(next?next.id:'')+'"'+(next?'':' style="visibility:hidden"')+'>'+(next?esc(next.name):'')+' →</button></div>';
     o+=disc();
     return o;
   }
+  function guideHref(pg){return '../'+encodeURI(OP.guide)+(pg?'#page='+(+pg):'');}
   function rs(k,list,cls){
-    var l='<ul>';list.forEach(function(t){l+='<li>'+esc(t)+'</li>';});l+='</ul>';
+    list=list||[];var l='<ul>';list.forEach(function(t){l+='<li>'+esc(t)+'</li>';});l+='</ul>';
     return '<div class="rs'+cls+'"><div class="k">'+k+'</div><div class="v">'+l+'</div></div>';
   }
 
@@ -551,6 +558,9 @@ var CATS = [
   function fillUpd(){var v=window.KIF_VER;if(!v)return;var u=main.querySelectorAll('.kif-upd');for(var i=0;i<u.length;i++)u[i].textContent=String(v.updated).replace(/-/g,'.');}
   document.addEventListener('kifver',fillUpd);
   main.addEventListener('click',function(e){
+    /* 포털 안에서 열려 있으면 원본 PDF를 포털의 자료 보기 창으로 (해당 쪽부터) */
+    var g=e.target.closest&&e.target.closest('a.op-guide');
+    if(g){try{if(window.parent!==window&&window.parent.location.origin===location.origin){e.preventDefault();window.parent.postMessage({kif:'pdf',file:OP.guide,page:+g.getAttribute('data-pg')||1,title:OP.title},location.origin);}}catch(err){}return;}
     var b=e.target.closest&&e.target.closest('[data-id]');
     if(!b)return;
     var id=b.getAttribute('data-id');
@@ -558,7 +568,9 @@ var CATS = [
     show();
   });
   window.addEventListener('hashchange',show);
-  show();
+  fetch('../content.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    var o=j&&j.onepick;if(o&&Array.isArray(o.cats)&&o.cats.length){CATS=o.cats;['month','title','upd','guide'].forEach(function(k){if(o[k]!=null)OP[k]=o[k];});}
+  }).catch(function(){}).then(show);
 })();
 </script>
 <link rel="stylesheet" href="kif.css?v=20261023">
