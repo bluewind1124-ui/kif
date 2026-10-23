@@ -468,6 +468,7 @@ a.mat:hover{outline:2px solid var(--gold);outline-offset:1px}
 .nu-f .in{font-size:.9rem;color:var(--ink)}
 .nu-f.wide .in{width:100%}
 .nu-set summary{cursor:pointer;font-weight:700;margin-top:6px}
+.cm-tabs{margin:4px 0 12px}.cm-file{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}.cm-file a{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cm-ord{display:inline-flex;gap:2px}.smp-c .row .sp{flex:1}.smp-c .nu-x{margin-top:8px}.smp-c .nu-f.wide{flex:1 1 260px}.cm-km{gap:8px;align-items:flex-end;margin:4px 0}.cmp-tabs{margin:0 0 10px}
 /* ===== AI보장분석 고급형 (advanced/ 를 iframe으로 연결) ===== */
 .ai-adv-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-6px 0 10px}
 .ai-adv{width:100%;height:calc(100vh - 190px);min-height:640px;border:1px solid var(--line);border-radius:4px;background:var(--surface);display:block}
@@ -1112,10 +1113,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
     {g:'공지 · 시상',items:[['news','보험사 소식지'],['award','시상 공지']]},
     {g:'교육 · 연계',items:[['edu','온라인 교육센터'],['car','자동차 비교견적'],['sangjo','상조 서비스']]},
-    {g:'관리자',admin:true,items:[['admin','관리자 페이지'],['refadmin','보장분석 샘플 올리기']]},
+    {g:'관리자',admin:true,items:[['admin','관리자 페이지'],['cadmin','자료 관리','NEW'],['refadmin','보장분석 샘플 올리기']]},
     {g:'내 정보',mobile:true,items:[['me','내 정보 · 자료 보관']]}
   ];
-  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',award:'cup',edu:'cap',car:'car',sangjo:'heart',me:'user',admin:'gear'};
+  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',award:'cup',edu:'cap',car:'car',sangjo:'heart',me:'user',admin:'gear',cadmin:'doc'};
 
   var NEWS=[
     ['2026.10.14','삼성화재','간편건강보험 3.5.5 고지 개정, 11월 1일부터 적용'],
@@ -1257,18 +1258,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       h+='<footer class="pfoot">한국보험금융(주) 한보금on 활동지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
       return '<div class="hm">'+h+'</div>';
     },
-    compare:function(){
-      var t=[['01','이번 달의 원픽','onepick.html','상품군을 고르면 선정 상품의 타사 비교표와 선정 이유'],
-        ['02','생명보험 가이드북 비교','life.html','종신·정기·연금·CI 등 18개 구분'],
-        ['03','담보별 비교견적','nonlife.html','담보를 고르면 총납입보험료가 저렴한 3개사'],
-        ['04','단기납 종신보험 비교','wholelife.html','보험료·환급률·사망보장 기준 상위 3개'],
-        ['05','3대질병진단비 비교','critical3.html','합산 월 보험료가 가장 낮은 3개 상품'],
-        ['06','경영인 정기보험 비교','ceoterm.html','가입금액·연령·성별별 보험료·환급률']];
-      var h=head('영업 도구','상품 비교','지금 쓰고 계신 신채널 교육지원시스템 v1.0의 비교 도구 6종을 그대로 연결했습니다. 새 포털로 옮길 때 같은 화면 안에 들어오게 합칩니다.');
-      h+='<div class="grid">';
-      t.forEach(function(x){h+='<a class="tile" target="_blank" rel="noopener" href="'+V1+x[2]+'"><span class="no">'+x[0]+'</span><h3>'+x[1]+'</h3><span class="d">'+x[3]+'</span><span class="go">기존 도구 열기 ↗</span></a>';});
-      return h+'</div><p class="note">기존 도구는 접속코드 로그인이 한 번 더 나옵니다. 통합 후에는 포털 로그인 한 번으로 들어가게 바꿉니다.</p>';
-    },
+    compare:function(){return cmpPage();},
+    cadmin:function(){if(me.role!=='admin')return head('관리자','접근 권한 없음','관리자 계정으로 로그인해야 볼 수 있습니다.');if(!CM.keep&&!CM.busy&&!Object.keys(CM.dirty).length&&!CM.add.length)CM.w=null;CM.keep=false;return cmHtml();},
     ai:function(){return '<div id="aiApp"></div>';},
     refadmin:function(){if(me.role!=='admin')return head('관리자','접근 권한 없음','관리자 계정으로 로그인해야 볼 수 있습니다.');return '<div id="aiApp"></div>';},
     me:function(){return meHtml();},
@@ -1357,6 +1348,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     admin:function(){
       if(me.role!=='admin')return head('관리자','접근 권한 없음','관리자 계정으로 로그인해야 볼 수 있습니다.');
       var h=head('관리자','관리자 페이지','FC 계정, 공지, 메뉴 내용을 수정하고 접속 기록을 확인합니다.');
+      h+='<div class="panel"><div class="row" style="gap:10px;flex-wrap:wrap"><b>메뉴별 자료 관리</b><span class="note">상품 비교 · 대표 상품 가설 · 이달의 컨셉 · 소식지 · 시상 · 공지 · 교육 자료를 하나씩 올리고, 켜고 끄고, 고치고, 지웁니다.</span><button class="btn sm" type="button" data-go="cadmin">자료 관리 열기</button></div></div>';
       h+=acctHtml()+nuHtml()+sjHtml()+cmsHtml();
       return h;
     }
@@ -1374,10 +1366,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* 뒤로가기: 이동할 때마다 직전 메뉴를 쌓아 두고 「← 이전」으로 되돌린다.
      AI보장분석 고급형(iframe) 화면에서는 고급형 안의 단계부터 되돌리고, 더 없으면 포털의 이전 메뉴로 간다. */
   var PST=[], pBack=false;
-  function updPBack(){var b=document.getElementById('portalBack');if(b)b.disabled=!PST.length&&cur!=='ai2';}
+  function updPBack(){var b=document.getElementById('portalBack');if(b)b.disabled=!PST.length&&cur!=='ai2'&&!(cur==='compare'&&CMP.open);}
   function portalPop(){if(!PST.length)return;pBack=true;try{go(PST.pop());}finally{pBack=false;}}
   function portalBack(){
     if(cur==='ai2'){var f=document.querySelector('iframe.ai-adv');if(f&&f.contentWindow){try{f.contentWindow.postMessage({kif:'back-req'},location.origin);return;}catch(e){}}}
+    if(cur==='compare'&&CMP.open){CMP.open='';pBack=true;try{go('compare');}finally{pBack=false;}return;}
     portalPop();
   }
   window.addEventListener('message',function(e){if(e.origin!==location.origin||!e.data)return;if(e.data.kif==='back')portalPop();if(e.data.kif==='home')go('home');});
@@ -1428,6 +1421,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   function go(id){
     document.body.classList.remove('adv-full'); /* 고급형 「크게 보기」에서 나올 때 스크롤 잠금이 남지 않게 */
+    if(id!=='compare')CMP.open='';
     if(!pBack&&me&&cur&&cur!==id){PST.push(cur);if(PST.length>40)PST.shift();}
     cur=id;renderSide();updPBack();
     document.getElementById('view').innerHTML=PAGES[id]();
@@ -1448,9 +1442,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(Array.isArray(c.news))NEWS=c.news;if(Array.isArray(c.awards))AWARDS=c.awards;if(Array.isArray(c.mats))MATS=c.mats;
     if(Array.isArray(c.lect))LECT=c.lect;if(Array.isArray(c.hypo))HYPO=c.hypo;if(Array.isArray(c.notices))NOTICES=c.notices;
     if(c.concept)CONCEPT=Object.assign({},CONCEPT,c.concept);if(c.banner)BANNER=Object.assign({},BANNER,c.banner);if(c.sangjo)SANGJO=Object.assign({},SANGJO,c.sangjo);
+    if(Array.isArray(c.compare)&&c.compare.length)CMPL=c.compare;
     if(window.AIMOD&&AIMOD.content)AIMOD.content(c);
     if(!me)gateMode();
-    if(redraw!==false&&me&&cur!=='ai'&&cur!=='admin')go(cur);
+    if(redraw!==false&&me&&cur!=='ai'&&cur!=='admin'&&cur!=='cadmin'&&!(cur==='compare'&&CMP.open))go(cur);
   }
   (function loadContent(i){
     if(i>=CONTENT_URLS.length)return;
@@ -1498,6 +1493,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
       aiProxy:v('mProxy'),aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
+    ['compare','off','concepts','aiSamples'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
     var ck=document.getElementById('cOpts');
     if(ck&&ck.checked&&window.AIMOD&&AIMOD.getOpts){c.opts=AIMOD.getOpts();c.optsVer=c.ver;}
     else if(SITE&&SITE.opts){c.opts=SITE.opts;c.optsVer=SITE.optsVer||SITE.ver;}
@@ -1583,7 +1579,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       .sort(function(a,b){return b.h-a.h;}).map(function(b){return cut(b.s);}).filter(function(s){if(seen[s])return false;seen[s]=1;return true;});
     if(pts.length<2)pts=pts.concat(heads.slice(pts.length?0:1));
     var heading=heads[0]&&heads[0].length<=36?heads[0]:'';
-    var kind=guessKind(name,p1)||store('kif_up_kind')||'news';
+    var kind=NU.force||guessKind(name,p1)||store('kif_up_kind')||'news';
     var it={file:file, ext:ext, kind:kind, co:co||'기타', y:y, mo:mo, wk:wk, period:period, status:status, product:'', cat:'자료', date:today(),
       heading:heading, base:base, bullets:bulls, summary:pts.slice(0,4).join(' · '),
       size:file.size, pages:r?r.numPages:0, buf:buf, url:URL.createObjectURL(file)};
@@ -1655,13 +1651,15 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var arr=function(k,def){return Array.isArray(c[k])?c[k].slice():def.slice();};
     var news=arr('news',NEWS),notices=arr('notices',NOTICES),awards=arr('awards',AWARDS),hypo=arr('hypo',HYPO),mats=arr('mats',MATS);
     var cp=Object.assign({},CONCEPT,c.concept||{});cp.mats=(cp.mats||[]).slice();
+    var arch=false;
     list.slice().reverse().forEach(function(x){var it=x.it,p=x.path;
       if(it.kind==='news')news.unshift([it.date,it.co,it.summary,p,it.title,it.y+'.'+it.mo,it.wk]);
       else if(it.kind==='notice')notices.unshift([it.date,it.title,p]);
       else if(it.kind==='award')awards.unshift([it.title,it.period,it.summary,it.status,p]);
       else if(it.kind==='hypo')hypo.unshift([it.title,it.product,it.summary,p]);
       else if(it.kind==='mats')mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,it.cat,it.summary,p]);
-      else if(it.kind==='concept'){cp.month=it.y+'.'+it.mo;cp.title=it.title;if(it.summary)cp.desc=it.summary;cp.file=p;
+      else if(it.kind==='concept'){if(!arch&&cp.title&&cp.title!==it.title){arch=true;c.concepts=Array.isArray(c.concepts)?c.concepts:[];c.concepts.unshift(JSON.parse(JSON.stringify(cp)));cp.mats=[];}
+        cp.month=it.y+'.'+it.mo;cp.title=it.title;if(it.summary)cp.desc=it.summary;cp.file=p;
         if(it.bullets.length>=2)cp.steps=it.bullets.slice(0,5);cp.mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,p]);}
     });
     c.news=news;c.notices=notices;c.awards=awards;c.hypo=hypo;c.mats=mats;c.concept=cp;
@@ -1770,6 +1768,279 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     document.getElementById('nuTokSave').onclick=function(){var v=document.getElementById('nuTok').value.trim();ghTok(v);document.getElementById('nuMsg').textContent=v?'토큰을 이 브라우저에 저장했습니다.':'토큰 칸이 비어 있습니다.';};
     document.getElementById('nuTokDel').onclick=function(){ghTok('');document.getElementById('nuTok').value='';document.getElementById('nuMsg').textContent='토큰을 지웠습니다.';};
   }
+  /* ---------- 자료 관리 (관리자 › 자료 관리): 메뉴별로 「＋ 추가」 · 목록 · 켜기/끄기 · 고치기 · 파일 바꾸기 · 지우기 ----------
+     보장분석 샘플 올리기와 같은 방식이다. 바꾸면 잠시 뒤 GitHub(content.json + 파일)에 바로 커밋되어 모든 FC에게 보인다.
+     꺼 둔 자료는 content.json의 off[메뉴]에 {r:줄, at:원래 위치}로 보관한다(지우지 않음).
+     상품 비교 목록은 content.json의 compare: [{id,title,desc,file,kind:'tool'|'file',on,base}] — tool(HTML)은 포털 안 화면에서 바로 열린다. */
+  var CMP_BASE=[['onepick','이번 달의 원픽','상품군을 고르면 선정 상품의 타사 비교표와 선정 이유'],['life','생명보험 가이드북 비교','종신·정기·연금·CI 등 18개 구분'],
+    ['nonlife','담보별 비교견적','담보를 고르면 총납입보험료가 저렴한 3개사'],['wholelife','단기납 종신보험 비교','보험료·환급률·사망보장 기준 상위 3개'],
+    ['critical3','3대질병진단비 비교','합산 월 보험료가 가장 낮은 3개 상품'],['ceoterm','경영인 정기보험 비교','가입금액·연령·성별별 보험료·환급률']]
+    .map(function(x){return {id:x[0],title:x[1],desc:x[2],file:'classic/'+x[0]+'.html',kind:'tool',on:true,base:true};});
+  var CMPL=CMP_BASE.slice(), CMP={open:''};
+  function cmpOn(){return CMPL.filter(function(x){return x.on!==false;});}
+  function cmpFind(id){return CMPL.filter(function(x){return x.id===id;})[0]||null;}
+  function cmpSrc(x){return fileHref(x.file)+(x.kind==='tool'?(x.file.indexOf('?')>-1?'&':'?')+'embed=1':'');}
+  function cmpOpen(x){
+    if(!x)return;
+    if(x.kind==='tool'){CMP.open=x.id;if(cur==='compare'){pBack=true;try{go('compare');}finally{pBack=false;}}else go('compare');return;}
+    openMat([(x.file.match(/\.([a-z0-9]+)$/i)||['',''])[1].toUpperCase(),x.title,'',x.desc||'',x.file]);
+  }
+  /* 포털 어디서든(홈 타일·검색·4칸 메뉴) 비교 도구 링크(classic/….html)를 누르면 새 창 대신 포털 안에서 연다 */
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a[href]');if(!a||e.ctrlKey||e.metaKey||e.shiftKey||a.hasAttribute('data-cmpnew'))return;
+    var u;try{u=new URL(a.getAttribute('href'),location.href);}catch(x){return;}
+    if(u.origin!==location.origin||!/\/classic\/([^\/]*)$/.test(u.pathname))return;
+    var nm=u.pathname.split('/').pop()||'index.html';e.preventDefault();
+    var x=CMPL.filter(function(t){return t.file==='classic/'+nm;})[0];
+    if(x&&x.on!==false)cmpOpen(x);else{CMP.open='';go('compare');}
+  },true);
+
+  var CM={tab:store('kif_cm_tab')||'compare',w:null,dirty:{},add:[],del:[],t:null,busy:false,again:false,msg:'',ask:''};
+  var CM_TABS=[['compare','상품 비교'],['hypo','대표 상품 가설'],['concept','이달의 컨셉'],['news','보험사 소식지'],['award','시상 공지'],['notice','본사 공지'],['mats','교육 자료']];
+  var CM_KEY={news:'news',award:'awards',hypo:'hypo',mats:'mats',notice:'notices'};
+  var CM_LEN={news:7,award:5,hypo:4,mats:5,notice:3}, CM_FI={news:3,award:4,hypo:3,mats:4,notice:2};
+  var CM_COLS={
+    news:[[0,'날짜','96px'],[1,'보험사','120px'],[5,'연월','80px'],[6,'주차 (비우면 월간)','110px'],[4,'제목','w'],[2,'요약','a']],
+    award:[[0,'제목','w'],[1,'기간','200px'],[3,'상태','s:진행 중,발표'],[2,'내용','a']],
+    hypo:[[0,'고객 유형','w'],[1,'대표 상품','w'],[2,'첫 화법','a']],
+    mats:[[0,'종류','80px'],[2,'분류','100px'],[1,'제목','w'],[3,'설명','a']],
+    notice:[[0,'날짜','96px'],[1,'내용','w']]};
+  var CM_HELP={compare:'비교 프로그램(HTML)을 올리면 포털 안 화면에서 바로 돌아갑니다. PDF·엑셀·PPT·그림은 비교 자료로 올라가 누르면 화면 위에 펼쳐집니다.',
+    hypo:'고객 유형별 대표 상품과 첫 화법입니다. 파일(PDF·PPT)을 붙이면 FC가 제목을 눌러 엽니다.',
+    concept:'이달의 컨셉은 한 번에 하나만 보입니다. 새 컨셉을 올리면 지금 컨셉은 아래 「지난 컨셉」으로 옮겨지고, 언제든 다시 꺼내 쓸 수 있습니다.',
+    news:'보험사 소식지 PDF를 올리면 회사·연월·주차를 읽어 제목을 만듭니다.',award:'시상·시책 자료를 올리면 기간을 읽어 진행 중/발표를 정합니다.',
+    notice:'홈 화면 본사 공지입니다.',mats:'홈 화면 교육 자료와 교육 자료실에 보입니다.'};
+  function cmName(k){for(var i=0;i<CM_TABS.length;i++)if(CM_TABS[i][0]===k)return CM_TABS[i][1];return k;}
+  function cmClone(x){return JSON.parse(JSON.stringify(x));}
+  function cmW(){
+    if(CM.w)return CM.w;var S=SITE||{};
+    CM.w={news:cmClone(NEWS),awards:cmClone(AWARDS),hypo:cmClone(HYPO),mats:cmClone(MATS),notices:cmClone(NOTICES),
+      off:cmClone(S.off||{}),compare:cmClone(CMPL),concept:cmClone(CONCEPT),concepts:cmClone(S.concepts||[])};
+    return CM.w;
+  }
+  function cmPath(kind,name){
+    var d=new Date(),ym=d.getFullYear()+'-'+pad2(d.getMonth()+1),r=Math.random().toString(36).slice(2,7),ext=((name.match(/\.([a-z0-9]+)$/i)||['',''])[1]||'bin').toLowerCase();
+    var nm=name.replace(/\.[^.]+$/,'').replace(/[\\\/:*?"<>|#%&{}\s]+/g,'_').slice(0,40)||'file';
+    if(kind==='compare'&&/^html?$/.test(ext))return 'classic/cmp_'+r+'.html';
+    return (kind==='news'?'news/':'files/'+kind+'/')+ym+'/'+nm+'_'+r+'.'+ext;
+  }
+  function cmIsRepo(p){return /^(news|files|refs)\//.test(p||'')||/^classic\/cmp_[a-z0-9]+\.html$/.test(p||'');}
+  async function cmStage(kind,file,path){
+    if(file.size>50*1048576)throw new Error(file.name+': 50MB를 넘습니다');
+    var p=path||cmPath(kind,file.name);CM.add=CM.add.filter(function(a){return a.path!==p;});CM.add.push({path:p,b64:b64(await file.arrayBuffer()),url:URL.createObjectURL(file)});return p;
+  }
+  function cmLocal(p){var a=CM.add.filter(function(x){return x.path===p;})[0];return a?a.url:p;}
+  function cmMsg(t){CM.msg=t;var e=document.getElementById('cmPub');if(e)e.innerHTML=t;}
+  function cmTouch(k){CM.dirty[k]=1;clearTimeout(CM.t);cmMsg('바뀐 내용을 저장하는 중…');CM.t=setTimeout(cmSave,1200);}
+  async function cmSave(){
+    if(CM.busy){CM.again=true;return;}
+    if(!ghTok()){cmMsg('⚠ 이 기기에서만 바뀌었습니다. 위 「GitHub 연결 설정」에서 토큰을 저장하면 모든 FC에게 올라갑니다.');return;}
+    var W=cmW(),keys=Object.keys(CM.dirty),add=CM.add.slice(),del=CM.del.slice();if(!keys.length&&!add.length&&!del.length)return;
+    CM.busy=true;CM.dirty={};cmMsg('모든 FC에게 올리는 중…');
+    try{
+      var cur=await KIFPUB.patch(function(c){
+        keys.forEach(function(k){
+          if(k==='concept'){c.concept=cmClone(W.concept);c.concepts=cmClone(W.concepts);return;}
+          if(k==='compare'){c.compare=cmClone(W.compare);return;}
+          var key=CM_KEY[k];c[key]=cmClone(W[key]);c.off=c.off||{};c.off[k]=cmClone(W.off[k]||[]);
+        });
+      },add,del,'자료 관리: '+(keys.map(cmName).join(', ')||'파일 정리'));
+      CM.add=CM.add.filter(function(a){return add.indexOf(a)<0;});CM.del=CM.del.filter(function(d){return del.indexOf(d)<0;});
+      var keepW=CM.w;applyContent(cur,false);CM.w=keepW;
+      cmMsg('✓ 모든 FC에게 반영했습니다 ('+new Date().toLocaleTimeString('ko-KR')+'). 1~2분 뒤 FC 화면에 보입니다.');
+    }catch(e){keys.forEach(function(k){CM.dirty[k]=1;});cmMsg('⚠ 올리지 못했습니다: '+esc(e.message||String(e))+' · 이 기기에는 남아 있습니다. <button class="btn sm" type="button" data-cm="retry">다시 올리기</button>');}
+    CM.busy=false;if(CM.again){CM.again=false;cmSave();}
+  }
+  KIFPUB.patch=async function(fn,add,del,message){
+    if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다');
+    var ref=await gh('GET','/git/ref/heads/'+GH.branch),base=await gh('GET','/git/commits/'+ref.object.sha);
+    var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'),have={};(all.tree||[]).forEach(function(t){have[t.path]=t.sha;});
+    var cur={};if(have['content.json']){var bj=await gh('GET','/git/blobs/'+have['content.json']);cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(c){return c.charCodeAt(0);})));}
+    var tree=[];
+    for(var i=0;i<add.length;i++){cmMsg('파일 올리는 중… ('+(i+1)+'/'+add.length+')');var bl=await gh('POST','/git/blobs',{content:add[i].b64,encoding:'base64'});tree.push({path:add[i].path,mode:'100644',type:'blob',sha:bl.sha});}
+    del.forEach(function(p){if(have[p])tree.push({path:p,mode:'100644',type:'blob',sha:null});});
+    fn(cur);cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
+    var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
+    tree.push({path:'content.json',mode:'100644',type:'blob',sha:jb.sha});
+    var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:tree});
+    var cm=await gh('POST','/git/commits',{message:message,tree:nt.sha,parents:[ref.object.sha]});
+    await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});
+    return cur;
+  };
+
+  function cmIn(attr,v,w,lab){
+    if(w==='a')return '<label class="nu-f wide">'+lab+'<textarea class="in" rows="2" '+attr+'>'+esc(v||'')+'</textarea></label>';
+    if(/^s:/.test(w))return '<label class="nu-f">'+lab+'<select class="in" '+attr+'>'+w.slice(2).split(',').map(function(o){return '<option'+(o===v?' selected':'')+'>'+o+'</option>';}).join('')+'</select></label>';
+    return '<label class="nu-f'+(w==='w'?' wide':'')+'">'+lab+'<input class="in" '+attr+' value="'+esc(v||'')+'"'+(w==='w'?'':' style="width:'+w+'"')+'></label>';
+  }
+  function cmFileBtns(f,attr){
+    return '<span class="cm-file">'+(f?'<a class="flink" target="_blank" rel="noopener" href="'+fileHref(cmLocal(f))+'">📎 '+esc(String(f).split('/').pop())+'</a>':'<span class="note">파일 없음</span>')+
+      '<label class="btn sm ghost">'+(f?'파일 바꾸기':'파일 붙이기')+'<input type="file" hidden '+attr+'></label></span>';
+  }
+  function cmDelBtn(attr){return CM.ask===attr?'<button class="btn sm danger" type="button" data-cmdel="'+attr+'">정말 지우기</button><button class="btn sm ghost" type="button" data-cm="nodel">취소</button>':'<button class="btn sm ghost danger" type="button" data-cmdel="'+attr+'">삭제</button>';}
+  function cmRows(k){
+    var W=cmW(),key=CM_KEY[k],L=W[key]||[],O=(W.off[k]||[]),C=CM_COLS[k],fi=CM_FI[k];
+    var card=function(r,i,off){var id=(off?'o':'v')+i;
+      return '<div class="smp-c'+(off?' off':'')+'"><div class="row"><span class="pill'+(off?'':' new')+'">'+(off?'꺼 둠':'보이는 중')+'</span>'+
+        '<label class="note" style="white-space:nowrap"><input type="checkbox" data-cmon="'+id+'"'+(off?'':' checked')+'> FC에게 보이기</label>'+
+        (off?'':'<span class="cm-ord"><button class="btn sm ghost" type="button" data-cmmv="'+i+'" data-d="-1" aria-label="위로"'+(i?'':' disabled')+'>▲</button><button class="btn sm ghost" type="button" data-cmmv="'+i+'" data-d="1" aria-label="아래로"'+(i<L.length-1?'':' disabled')+'>▼</button></span>')+
+        '<span class="sp"></span>'+cmFileBtns(r[fi],'data-cmf="'+id+'"')+cmDelBtn(id)+'</div>'+
+        '<div class="nu-x">'+C.map(function(c){return cmIn('data-cmr="'+id+'" data-c="'+c[0]+'"',r[c[0]],c[2],c[1]);}).join('')+'</div></div>';};
+    return '<div class="smp-l">'+(L.length?L.map(function(r,i){return card(r,i,false);}).join(''):'<p class="note">보이는 자료가 없습니다.</p>')+'</div>'+
+      (O.length?'<h3 style="margin-top:16px">꺼 둔 자료 <span class="note">'+O.length+'건 · FC에게 안 보임 · 체크하면 다시 보입니다</span></h3><div class="smp-l">'+O.map(function(o,i){return card(o.r,i,true);}).join('')+'</div>':'');
+  }
+  function cmCompare(){
+    var L=cmW().compare;
+    return '<div class="smp-l">'+L.map(function(x,i){var id='p'+i;
+      return '<div class="smp-c'+(x.on===false?' off':'')+'"><div class="row"><span class="pill'+(x.on===false?'':' new')+'">'+(x.kind==='tool'?'비교 프로그램':'비교 자료')+'</span>'+
+        '<label class="note" style="white-space:nowrap"><input type="checkbox" data-cmon="'+id+'"'+(x.on===false?'':' checked')+'> FC에게 보이기</label>'+
+        '<span class="cm-ord"><button class="btn sm ghost" type="button" data-cmmv="'+i+'" data-d="-1" aria-label="위로"'+(i?'':' disabled')+'>▲</button><button class="btn sm ghost" type="button" data-cmmv="'+i+'" data-d="1" aria-label="아래로"'+(i<L.length-1?'':' disabled')+'>▼</button></span>'+
+        '<span class="sp"></span><button class="btn sm ghost" type="button" data-cmview="'+i+'">포털에서 열어 보기</button>'+cmFileBtns(x.file,'data-cmf="'+id+'"')+(x.base?'':cmDelBtn(id))+'</div>'+
+        '<div class="nu-x">'+cmIn('data-cmr="'+id+'" data-c="title"',x.title,'w','이름')+cmIn('data-cmr="'+id+'" data-c="desc"',x.desc,'w','설명 (타일 아래 글)')+'</div>'+
+        (x.base?'<p class="note" style="margin:4px 0 0">기본 도구입니다. 내용(보험료·상품)을 바꾸려면 새로 만든 HTML 파일로 <b>파일 바꾸기</b>를 하세요. 주소는 그대로라 홈 화면 바로가기도 그대로 맞습니다.</p>':'')+'</div>';}).join('')+'</div>';
+  }
+  function cmConcept(){
+    var W=cmW(),c=W.concept,f=function(k,lab,w){return cmIn('data-cmk="'+k+'"',c[k],w,lab);};
+    var h='<div class="smp-c"><div class="row"><span class="pill new">지금 보이는 컨셉</span><span class="sp"></span>'+cmFileBtns(c.file,'data-cmf="k"')+'</div>'+
+      '<div class="nu-x">'+f('month','달','90px')+f('title','제목','w')+f('target','대상','w')+f('product','핵심 상품','w')+f('desc','한 줄 설명','a')+
+      '<label class="nu-f wide">상담 순서 <span class="note">한 줄에 하나</span><textarea class="in" rows="3" data-cmk="steps">'+esc((c.steps||[]).join('\n'))+'</textarea></label></div>'+
+      '<h3 style="margin:12px 0 6px;font-size:.95rem">컨셉 교육 자료 <button class="btn sm ghost" type="button" data-cm="kmat">＋ 한 줄 추가</button></h3>'+
+      ((c.mats||[]).length?(c.mats||[]).map(function(m,i){return '<div class="row cm-km">'+cmIn('data-cmkm="'+i+'" data-c="0"',m[0],'70px','종류')+cmIn('data-cmkm="'+i+'" data-c="1"',m[1],'w','제목')+cmFileBtns(m[2],'data-cmf="km'+i+'"')+cmDelBtn('km'+i)+'</div>';}).join(''):'<p class="note">자료가 없습니다.</p>')+'</div>';
+    h+='<h3 style="margin-top:16px">지난 컨셉 <span class="note">'+W.concepts.length+'건 · 「이걸로 바꾸기」를 누르면 다시 이달의 컨셉이 됩니다</span></h3><div class="smp-l">'+
+      (W.concepts.length?W.concepts.map(function(x,i){return '<div class="smp-c off"><div class="row"><span class="pill">'+esc(x.month||'')+'</span><b>'+esc(x.title||'(제목 없음)')+'</b><span class="sp"></span>'+
+        '<button class="btn sm" type="button" data-cmkuse="'+i+'">이걸로 바꾸기</button>'+cmDelBtn('ka'+i)+'</div><p class="note" style="margin:4px 0 0">'+esc(x.desc||'')+'</p></div>';}).join(''):'<p class="note">아직 지난 컨셉이 없습니다.</p>')+'</div>';
+    return h;
+  }
+  function cmHtml(){
+    var T=ghTok(),k=CM.tab;
+    var h=head('관리자','자료 관리','메뉴별 자료를 올리고, FC에게 보일지 켜고 끄고, 고치고, 지웁니다. 바꾸면 잠시 뒤 바로 모든 FC 화면에 반영됩니다(1~2분).');
+    h+='<div class="panel"><div class="row"><b>올리기 상태</b><span class="note" id="cmPub">'+(CM.msg||(T?'GitHub 연결됨 · 바꾸면 바로 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 아래 「GitHub 연결 설정」에서 토큰을 저장해야 모든 FC에게 올라갑니다.'))+'</span></div>'+
+      '<details class="nu-set"'+(T?'':' open')+'><summary>GitHub 연결 설정 '+(T?'<span class="pill ok">연결됨</span>':'<span class="pill warn">처음 한 번 필요</span>')+'</summary><p class="note">토큰 만드는 법은 <button class="btn sm ghost" type="button" data-go="admin">관리자 페이지 › 자료 올리기</button>의 같은 칸에 적혀 있습니다. 같은 토큰을 씁니다.</p>'+
+      '<div class="row" style="gap:8px"><input class="in" id="cmTok" type="password" autocomplete="off" placeholder="github_pat_..." value="'+esc(T)+'" style="flex:1;min-width:200px"><button class="btn sm" type="button" data-cm="tok">저장</button></div></details></div>';
+    h+='<div class="nchips cm-tabs" role="tablist">'+CM_TABS.map(function(t){var n=t[0]==='compare'?cmW().compare.length:t[0]==='concept'?1+cmW().concepts.length:(cmW()[CM_KEY[t[0]]]||[]).length+((cmW().off[t[0]]||[]).length);
+      return '<button type="button" role="tab" class="tg'+(t[0]===k?' on':'')+'" aria-selected="'+(t[0]===k)+'" data-cmtab="'+t[0]+'">'+t[1]+' <span class="note">'+n+'</span></button>';}).join('')+'</div>';
+    var acc=k==='compare'?'.html,.htm,.pdf,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg':'.pdf,.ppt,.pptx,.xls,.xlsx,.doc,.docx,.hwp,.hwpx,.png,.jpg,.jpeg';
+    h+='<div class="panel"><h3>'+cmName(k)+' 올리기</h3><p class="note">'+CM_HELP[k]+'</p>'+
+      '<label class="smp-drop" id="cmDrop"><input type="file" id="cmFile" accept="'+acc+'" multiple hidden><b>＋ '+cmName(k)+' 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>'+(k==='compare'?'HTML(비교 프로그램) · PDF · 엑셀 · PPT · 그림':'PDF · PPT · 엑셀 · 워드 · 한글 · 그림')+' · 여러 개 한 번에 · 파일당 50MB 이하</em></label>'+
+      (k==='compare'||k==='concept'?'':'<div class="row"><button class="btn sm ghost" type="button" data-cm="addrow">파일 없이 글로 한 줄 추가</button></div>')+
+      (k==='compare'?'':'<div id="nuList"></div><div class="row" style="margin-top:8px;gap:8px"><button class="btn" type="button" id="nuPub" disabled>확인한 자료 모든 FC에게 올리기</button><button class="btn ghost" type="button" id="nuPrev" disabled>이 기기에서 미리보기</button></div>')+
+      '<p class="note" id="nuMsg" role="status"></p></div>';
+    h+='<div class="panel"><h3>'+(k==='concept'?'이달의 컨셉':'등록된 '+cmName(k))+' <span class="note">고친 뒤 칸 밖을 누르면 저장됩니다</span></h3><div id="cmList">'+(k==='compare'?cmCompare():k==='concept'?cmConcept():cmRows(k))+'</div></div>';
+    return h;
+  }
+  function cmRender(){var v=document.getElementById('view');if(cur!=='cadmin'||!v)return;var y=window.scrollY;CM.keep=true;v.innerHTML=PAGES.cadmin();bindCm();window.scrollTo(0,y);}
+  function cmLoc(id){ /* 'v3' 보이는 줄, 'o1' 꺼 둔 줄, 'p2' 상품 비교 */
+    var W=cmW(),t=id[0],i=+id.slice(1),k=CM.tab;
+    if(t==='p')return {obj:W.compare[i],list:W.compare,i:i};
+    if(t==='o')return {row:W.off[k][i].r,list:W.off[k],i:i};
+    return {row:W[CM_KEY[k]][i],list:W[CM_KEY[k]],i:i};
+  }
+  async function cmFiles(files){
+    var k=CM.tab,msg=document.getElementById('nuMsg');
+    if(k!=='compare'){NU.force=k;try{await nuAdd(files);}finally{NU.force='';}return;}
+    var W=cmW(),n=0;
+    for(var i=0;i<files.length;i++){var f=files[i];
+      try{msg.textContent=(i+1)+'/'+files.length+' '+f.name+' 준비 중…';var p=await cmStage('compare',f),tool=/\.html?$/i.test(f.name),nm=f.name.replace(/\.[^.]+$/,'').replace(/_/g,' ');
+        if(tool){try{var tt=(await f.text()).match(/<title>([^<]{2,60})<\/title>/i);if(tt)nm=tt[1].trim();}catch(e){}}
+        W.compare.push({id:'c'+Date.now().toString(36)+i,title:nm,desc:'',file:p,kind:tool?'tool':'file',on:true});n++;}
+      catch(e){msg.textContent=f.name+': '+(e.message||e);}}
+    if(n){msg.textContent=n+'건을 목록 맨 아래에 넣었습니다. 이름·설명을 확인하세요.';cmTouch('compare');cmRender();}
+  }
+  function bindCm(){
+    var v=document.getElementById('view');if(!v||!document.getElementById('cmList'))return;
+    if(document.getElementById('nuList')){nuRender();
+      document.getElementById('nuPub').onclick=async function(){await nuPublish();var nm=document.getElementById('nuMsg'),mt=nm?nm.textContent:'';if(!CM.busy&&!Object.keys(CM.dirty).length)CM.w=null;cmRender();nm=document.getElementById('nuMsg');if(nm)nm.textContent=mt;};
+      document.getElementById('nuPrev').onclick=function(){var c=nuMerge(SITE?cmClone(SITE):{},NU.items.map(function(it){return {it:it,path:it.url};}));applyContent(c,false);document.getElementById('nuMsg').textContent='이 기기에서만 보이게 바꿨습니다. 메뉴에서 확인한 뒤 「모든 FC에게 올리기」를 누르세요.';};
+      var L=document.getElementById('nuList');
+      var ed=function(e){var t=e.target,i=t.getAttribute('data-nu');if(i==null)return;var it=NU.items[+i],kk=t.getAttribute('data-k'),val=t.value;
+        if(kk==='kind'){it.kind=val;nuRetitle(it);nuRender();return;}
+        if(kk==='ym'){var m=val.match(/(20\d{2})\D*(\d{1,2})/);if(m){it.y=m[1];it.mo=pad2(+m[2]);if(it.kind==='news'){nuRetitle(it);nuRender();}}return;}
+        if(kk==='co'||kk==='wk'){it[kk]=kk==='co'?(val.trim()||'기타'):val;nuRetitle(it);return;}
+        it[kk]=val;};
+      L.addEventListener('change',ed);L.addEventListener('input',function(e){if(e.target.tagName!=='SELECT'&&e.target.getAttribute('data-k')!=='ym')ed(e);});
+      L.addEventListener('click',function(e){var d=e.target.getAttribute&&e.target.getAttribute('data-nudel');if(d==null)return;URL.revokeObjectURL(NU.items[+d].url);NU.items.splice(+d,1);nuRender();});
+    }
+    var fi=document.getElementById('cmFile'),dr=document.getElementById('cmDrop');
+    fi.onchange=function(){cmFiles(Array.prototype.slice.call(fi.files));fi.value='';};
+    dr.addEventListener('dragover',function(e){e.preventDefault();dr.classList.add('over');});
+    dr.addEventListener('dragleave',function(){dr.classList.remove('over');});
+    dr.addEventListener('drop',function(e){e.preventDefault();dr.classList.remove('over');cmFiles(Array.prototype.slice.call(e.dataTransfer.files));});
+    var box=document.getElementById('cmList'),W=cmW(),k=CM.tab;
+    box.addEventListener('change',async function(e){
+      var t=e.target,a;
+      if((a=t.getAttribute('data-cmr'))!=null){var l=cmLoc(a),c=t.getAttribute('data-c');if(l.obj)l.obj[c]=t.value;else l.row[+c]=t.value;cmTouch(k);return;}
+      if((a=t.getAttribute('data-cmk'))!=null){W.concept[a]=a==='steps'?t.value.split('\n').map(function(x){return x.trim();}).filter(Boolean):t.value;cmTouch('concept');return;}
+      if((a=t.getAttribute('data-cmkm'))!=null){W.concept.mats[+a][+t.getAttribute('data-c')]=t.value;cmTouch('concept');return;}
+      if((a=t.getAttribute('data-cmon'))!=null){
+        if(a[0]==='p'){W.compare[+a.slice(1)].on=t.checked;}
+        else{var key=CM_KEY[k],off=W.off[k]=W.off[k]||[],i=+a.slice(1);
+          if(a[0]==='v'){off.unshift({r:W[key][i],at:i});W[key].splice(i,1);}else{var o=off.splice(i,1)[0];W[key].splice(Math.min(o.at||0,W[key].length),0,o.r);}}
+        cmTouch(k);cmRender();return;}
+      if((a=t.getAttribute('data-cmf'))!=null&&t.files&&t.files[0]){
+        var f=t.files[0],old,np;
+        try{
+          if(a==='k'){old=W.concept.file;np=await cmStage('concept',f);W.concept.file=np;cmTouch('concept');}
+          else if(/^km/.test(a)){var m=W.concept.mats[+a.slice(2)];old=m[2];np=await cmStage('concept',f);m[2]=np;cmTouch('concept');}
+          else{var lc=cmLoc(a);
+            if(lc.obj){old=lc.obj.file;var keep=lc.obj.base&&/\.html?$/i.test(f.name);np=await cmStage('compare',f,keep?lc.obj.file:null);if(!keep){lc.obj.file=np;lc.obj.kind=/\.html?$/i.test(f.name)?'tool':'file';}else old='';}
+            else{var fx=CM_FI[k];old=lc.row[fx];np=await cmStage(k,f);while(lc.row.length<CM_LEN[k])lc.row.push('');lc.row[fx]=np;if(k==='mats'){var ex=(f.name.match(/\.([a-z0-9]+)$/i)||['',''])[1].toUpperCase();lc.row[0]=/^PPT/.test(ex)?'PPT':ex;}}
+            cmTouch(k);}
+          if(old&&old!==np&&cmIsRepo(old))CM.del.push(old);
+          cmRender();
+        }catch(err){toast(err.message||String(err));}
+      }
+    });
+    box.addEventListener('click',function(e){
+      var b=e.target.closest&&e.target.closest('button');if(!b)return;var a;
+      if((a=b.getAttribute('data-cmmv'))!=null){var L=k==='compare'?W.compare:W[CM_KEY[k]],i=+a,j=i+(+b.getAttribute('data-d'));if(j<0||j>=L.length)return;var x=L[i];L[i]=L[j];L[j]=x;cmTouch(k);cmRender();return;}
+      if((a=b.getAttribute('data-cmview'))!=null){var it=W.compare[+a];if(!it)return;if(/^blob:/.test(cmLocal(it.file))){toast('저장이 끝난 뒤(1~2분) 열어 볼 수 있습니다.');return;}cmOpenPreview(it);return;}
+      if((a=b.getAttribute('data-cmkuse'))!=null){var i2=+a,old=W.concept;W.concept=W.concepts.splice(i2,1)[0];if(old&&old.title)W.concepts.unshift(old);cmTouch('concept');cmRender();toast('이달의 컨셉을 바꿨습니다.');return;}
+      if((a=b.getAttribute('data-cmdel'))!=null){
+        if(CM.ask!==a){CM.ask=a;cmRender();return;}CM.ask='';
+        var gone=[];
+        if(a[0]==='p'){var it2=W.compare.splice(+a.slice(1),1)[0];gone.push(it2.file);cmTouch('compare');}
+        else if(/^km/.test(a)){var m=W.concept.mats.splice(+a.slice(2),1)[0];gone.push(m[2]);cmTouch('concept');}
+        else if(/^ka/.test(a)){var cx=W.concepts.splice(+a.slice(2),1)[0];gone.push(cx.file);(cx.mats||[]).forEach(function(mm){gone.push(mm[2]);});cmTouch('concept');}
+        else{var lc=cmLoc(a);lc.list.splice(lc.i,1);gone.push(lc.row[CM_FI[k]]);cmTouch(k);}
+        /* 다른 곳(지난 컨셉 등)에서 같은 파일을 쓰면 파일은 남긴다 */
+        var used=JSON.stringify([W.news,W.awards,W.hypo,W.mats,W.notices,W.off,W.compare,W.concept,W.concepts]);
+        gone.forEach(function(p){if(p&&cmIsRepo(p)&&used.indexOf(JSON.stringify(p))<0)CM.del.push(p);});
+        cmRender();return;}
+    });
+  }
+  function cmOpenPreview(x){if(x.kind==='tool'){CMP.open=x.id;go('compare');}else openMat([(x.file.match(/\.([a-z0-9]+)$/i)||['',''])[1].toUpperCase(),x.title,'','',x.file]);}
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-cmtab],[data-cm]');if(!b||cur!=='cadmin')return;
+    var t=b.getAttribute('data-cmtab');
+    if(t){if(NU.items.length&&t!==CM.tab){NU.items.forEach(function(x){URL.revokeObjectURL(x.url);});NU.items=[];}CM.tab=t;CM.ask='';store('kif_cm_tab',t);cmRender();return;}
+    var a=b.getAttribute('data-cm'),W=cmW(),k=CM.tab;
+    if(a==='tok'){var v=document.getElementById('cmTok').value.trim();ghTok(v);CM.msg=v?'토큰을 이 브라우저에 저장했습니다.':'토큰 칸이 비어 있습니다.';cmRender();if(v&&Object.keys(CM.dirty).length)cmSave();}
+    else if(a==='retry')cmSave();
+    else if(a==='nodel'){CM.ask='';cmRender();}
+    else if(a==='kmat'){W.concept.mats=W.concept.mats||[];W.concept.mats.push(['PDF','새 자료','']);cmRender();}
+    else if(a==='addrow'){var key=CM_KEY[k],r=[];for(var i=0;i<CM_LEN[k];i++)r.push('');
+      if(k==='news'){r[0]=today();r[1]='기타';r[5]=today().slice(0,7);}else if(k==='notice')r[0]=today();else if(k==='award')r[3]='진행 중';else if(k==='mats'){r[0]='PDF';r[2]='자료';}
+      W[key].unshift(r);cmRender();var f=document.querySelector('#cmList .smp-c .nu-x .in');if(f)f.focus();toast('맨 위에 빈 줄을 넣었습니다. 내용을 쓰면 저장됩니다.');}
+  });
+  /* 상품 비교 화면 (FC): 목록 → 누르면 포털 안에서 바로 열림 */
+  function cmpPage(){
+    var x=CMP.open?cmpFind(CMP.open):null;
+    if(x&&x.kind==='tool'){
+      var h=head('영업 도구 · 상품 비교',esc(x.title),esc(x.desc||''));
+      h+='<div class="nchips cmp-tabs">'+cmpOn().filter(function(t){return t.kind==='tool';}).map(function(t){return '<button type="button" class="tg'+(t.id===x.id?' on':'')+'" data-cmpo="'+esc(t.id)+'">'+esc(t.title)+'</button>';}).join('')+'</div>';
+      h+='<div class="ai-adv-bar"><button class="btn sm ghost" type="button" data-cmpo="">◂ 비교 목록</button><button class="btn sm" type="button" id="cmpFull">크게 보기 (전체 화면)</button><a class="btn sm ghost pc-only" style="text-decoration:none" target="_blank" rel="noopener" data-cmpnew="1" href="'+cmpSrc(x)+'">새 창으로 열기 ↗</a></div>';
+      return h+'<button class="adv-close" id="cmpClose" type="button" hidden>✕ 작게 보기</button><iframe class="ai-adv cmp-fr" src="'+cmpSrc(x)+'" title="'+esc(x.title)+'"></iframe>';
+    }
+    CMP.open='';
+    var L=cmpOn(),h2=head('영업 도구','상품 비교','비교 도구를 누르면 이 화면 안에서 바로 열립니다. 로그인은 포털 로그인 한 번으로 됩니다.');
+    h2+='<div class="grid">'+L.map(function(t,i){return '<a class="tile" href="#" data-cmpo="'+esc(t.id)+'"><span class="no">'+pad2(i+1)+(t.kind==='file'?' · 자료':'')+'</span><h3>'+esc(t.title)+'</h3><span class="d">'+esc(t.desc||'')+'</span><span class="go">'+(t.kind==='tool'?'열기 ›':'자료 보기 ›')+'</span></a>';}).join('')+'</div>';
+    return h2+(L.length?'':'<p class="note">관리자가 아직 비교 도구를 켜 두지 않았습니다.</p>')+(me&&me.role==='admin'?'<p class="note">목록·이름·파일은 <button class="btn sm ghost" type="button" data-go="cadmin">관리자 › 자료 관리 › 상품 비교</button>에서 바꿉니다.</p>':'');
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-cmpo]');if(!b)return;e.preventDefault();
+    var id=b.getAttribute('data-cmpo');if(!id){CMP.open='';pBack=true;try{go('compare');}finally{pBack=false;}return;}
+    cmpOpen(cmpFind(id));
+  });
   /* FC 화면: 소식지 한 줄 [날짜, 회사, 요약, 파일, 제목] — 파일이 있으면 제목을 눌러 연다 */
   /* 소식지 줄의 회사·연월·주차 — 새 줄은 저장된 값, 예전 줄은 제목·날짜에서 읽는다 */
   function newsMeta(n){
@@ -1800,7 +2071,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function matTwin(m,test){return MATS.filter(function(x){return x!==m&&x[4]&&x[1]===m[1]&&test(x[4]);})[0]||null;}
   function matsShown(){return MATS.filter(function(m){return !(isPpt(m[4])&&matTwin(m,isPdf));});}
   function openMat(i){
-    var m=MATS[i];if(!m||!m[4])return;var f=m[4],pdfM=isPpt(f)?matTwin(m,isPdf):null,show=pdfM?pdfM[4]:f,orig=isPdf(show)?(matTwin(m,isPpt)||(isPpt(f)?m:null)):null;
+    var m=Array.isArray(i)?i:MATS[i];if(!m||!m[4])return;var f=m[4],pdfM=isPpt(f)?matTwin(m,isPdf):null,show=pdfM?pdfM[4]:f,orig=isPdf(show)?(matTwin(m,isPpt)||(isPpt(f)?m:null)):null;
     var abs=function(x){return new URL(fileHref(x),location.href).href;};
     var w=document.createElement('div');w.className='mview';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label',m[1]);
     w.innerHTML='<div class="mvh"><b>'+esc(m[1])+'</b><span class="note" data-v="pg"></span><span class="sp"></span>'+
@@ -2131,6 +2402,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       ['nYm','nWk'].forEach(function(k){document.getElementById(k).onchange=nf;});document.getElementById('nQ').oninput=nf;
     }
     if(id==='me')bindMe();
+    if(id==='cadmin'&&me.role==='admin')bindCm();
+    if(id==='compare'){var cf=document.getElementById('cmpFull'),cr=document.querySelector('iframe.cmp-fr'),cx=document.getElementById('cmpClose');
+      if(cf&&cr){var setC=function(on){cr.classList.toggle('full',on);cx.hidden=!on;document.body.classList.toggle('adv-full',on);};cf.onclick=function(){setC(true);};cx.onclick=function(){setC(false);};}}
     if(id==='ai2'){var fb=document.getElementById('advFull'),fr=document.querySelector('iframe.ai-adv'),fx=document.getElementById('advClose');
       var setF=function(on){fr.classList.toggle('full',on);fx.hidden=!on;document.body.classList.toggle('adv-full',on);};
       if(fb)fb.onclick=function(){setF(true);};if(fx)fx.onclick=function(){setF(false);};}

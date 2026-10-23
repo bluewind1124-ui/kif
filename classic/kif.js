@@ -102,6 +102,16 @@
       }
     }).catch(function(){});
   }
-  function start(){build();checkVer();}
+  /* 포털 안(같은 사이트의 iframe)에서 열리면 위 막대·왼쪽 메뉴를 빼고 내용만 보여 준다.
+     「포털 홈」 링크는 포털 화면을 홈으로 돌리고, 다른 비교 도구 링크는 이 칸 안에서 바로 열린다. */
+  var EMB=false;try{EMB=window.self!==window.top&&window.parent.location.origin===location.origin;}catch(e){EMB=false;}
+  function embed(){
+    root.classList.add('kif-embed');document.body.classList.add('kif-embed');
+    var st=document.createElement('style');st.textContent='body.kif-embed{padding:0!important}.kif-embed .kif-top,.kif-embed .kif-side,.kif-embed .kif-open{display:none!important}';document.head.appendChild(st);
+    document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href')||'';
+      if(/(^|\/)\.\.\/index\.html|^\.\.\/?$/.test(h)){e.preventDefault();try{parent.postMessage({kif:'home'},location.origin);}catch(x){}}
+      else if(a.target==='_blank'&&/^[a-z0-9_]+\.html/i.test(h)){a.removeAttribute('target');}},true);
+  }
+  function start(){if(EMB)embed();else build();checkVer();}
   if(document.body)start();else document.addEventListener('DOMContentLoaded',start);
 })();
