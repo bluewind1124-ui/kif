@@ -36,12 +36,14 @@
     top.innerHTML=
       '<a class="brand" href="index.html"><img src="emblem.png" alt="">'+
       '<span><span class="tt">한국보험금융(주) <em>신채널 교육지원시스템</em></span><span class="sub">보험상품 비교 도구</span></span></a>'+
+      '<span class="kif-go"><button type="button" class="kif-back">← 이전</button><a class="kif-home" href="../index.html">⌂ 포털 홈</a></span>'+
       '<span class="sp"></span><span class="who">전략채널본부 · <b>보험상품 비교 도구</b></span>'+
       '<div class="kif-seg"><button data-t="light">라이트</button><button data-t="dark">다크</button></div>'+
       '<button class="kif-out">로그아웃</button>'+
       '<button class="kif-moon" aria-label="화면 테마 전환">☾</button>';
     var side=document.createElement('nav');side.className='kif-side';
-    var h='<button class="kif-fold"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>메뉴 접기</button>';
+    var h='<a class="nv kif-portal" href="../index.html"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>포털 홈으로</a>';
+    h+='<button class="kif-fold"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>메뉴 접기</button>';
     for(var i=0;i<NAV.length;i++){
       h+='<a class="nv'+(NAV[i][0]===page?' on':'')+'" href="'+NAV[i][0]+'"><svg viewBox="0 0 24 24">'+NAV[i][2]+'</svg>'+NAV[i][1]+'</a>';
       if(i===0)h+='<hr>';
@@ -56,6 +58,7 @@
     top.querySelector('.kif-seg').addEventListener('click',function(e){var t=e.target.getAttribute&&e.target.getAttribute('data-t');if(t)setTheme(t);});
     top.querySelector('.kif-moon').addEventListener('click',function(){setTheme(theme==='dark'?'light':'dark');});
     top.querySelector('.kif-out').addEventListener('click',logout);
+    top.querySelector('.kif-back').addEventListener('click',function(){var r='';try{r=new URL(document.referrer).origin;}catch(e){}if(history.length>1&&r===location.origin)history.back();else location.href='../index.html';});
     function side_(off){document.body.classList.toggle('side-off',off);set(KEY_SIDE,off?'off':'on');}
     side.querySelector('.kif-fold').addEventListener('click',function(){side_(true);});
     open.addEventListener('click',function(){side_(false);});

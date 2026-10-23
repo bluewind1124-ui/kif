@@ -100,3 +100,11 @@ table th,table.cmp thead th{letter-spacing:0}
 .hist:empty{display:none}
 .hist b{display:block;color:var(--ink);margin-bottom:2px}
 .hist div span{display:inline-block;min-width:78px;color:var(--gold);font-weight:700}
+
+/* 포털로 돌아가기: 맨 위 막대와 왼쪽 메뉴 맨 위 */
+.kif-top .kif-go{display:flex;gap:6px;margin-left:14px}
+.kif-top .kif-go button,.kif-top .kif-go a{border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;white-space:nowrap;font-family:inherit}
+.kif-top .kif-go a{background:#cb9c3a;border-color:#cb9c3a;color:#0f2240}
+.kif-side .kif-portal{background:#cb9c3a;color:#0f2240!important;font-weight:800;border-radius:8px;margin-bottom:8px}
+@media (max-width:760px){.kif-top .kif-go{display:none}}
+@media print{.kif-top .kif-go{display:none}}
