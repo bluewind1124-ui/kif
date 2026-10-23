@@ -339,6 +339,17 @@ td.r,th.r{text-align:right}
 .two .panel h3{display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:6px}
 .two .panel h3 .more{margin-left:auto}
 .hi3{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.smp-rail{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 32px)/5);gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:4px}
+.smp-rail .smp-card{scroll-snap-align:start;text-align:left;padding:0;display:flex;flex-direction:column;justify-content:flex-start;font:inherit;cursor:pointer;background:none}
+.smp-rail .smp-card .th{aspect-ratio:4/3;padding:10px;min-height:0;overflow:hidden}.smp-rail .smp-card .th.paper{background:#fff;color:#334;border-bottom:1px solid var(--line);position:relative;overflow:hidden;justify-content:flex-start}
+.smp-rail .th.paper span{color:var(--kgold,#a87b22);margin-bottom:4px}.smp-rail .th.paper pre{margin:0;font-family:inherit;font-size:9.5px;line-height:1.45;white-space:pre-wrap;word-break:break-all;color:#3a4352}
+.smp-rail .th.paper::after{content:'';position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(transparent,#fff)}.smp-rail .smp-card .th b{font-size:.92rem}.smp-rail .smp-card .mt{font-size:.76rem;padding:6px 8px}
+@media (max-width:900px){.smp-rail{grid-auto-columns:calc((100% - 16px)/3)}}@media (max-width:600px){.smp-rail{grid-auto-columns:calc((100% - 8px)/2)}}
+.smp-nav{display:inline-flex;gap:4px;margin-left:6px;vertical-align:middle}
+.smp-txt{max-width:900px;width:100%;background:var(--surface,#fff);border-radius:12px;padding:18px}.smp-txt pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;font-size:13.5px;line-height:1.7;margin:0}
+.mat .th.img{position:relative;padding:0;aspect-ratio:4/3!important;background:#e9edf2;overflow:hidden}.mat .th.img img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.mat .th.img span{position:absolute;left:8px;top:8px;background:rgba(15,34,64,.82);padding:2px 7px;border-radius:4px}.mat .mt .mtt{display:block;color:var(--ink);font-size:.86rem;margin-bottom:2px;line-height:1.35}
+.smp-home h3{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .mats4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .mats4 .mat .th{aspect-ratio:3/4;padding:10px}
 .mats4 .mat .th b{font-size:.92rem}
@@ -1280,8 +1291,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       h+='<section class="hm-two"><div class="panel"><h3>보험사 소식지 <button class="more" data-go="news">전체 '+NEWS.length+'건 보기 ›</button></h3>'+
         '<div class="tbl hm-tbl"><table><thead><tr><th>보험사</th><th>자료명</th><th>구분</th><th class="r">등록일</th></tr></thead><tbody>'+nr+'</tbody></table></div></div>'+
         '<div class="panel"><h3>시상 · 공지 <button class="more" data-go="award">전체 보기 ›</button></h3><ul class="hm-aw">'+ar+'</ul><div class="hm-nt"><b>본사 공지</b><ul class="list noticeList"></ul></div></div></section>';
-      h+='<section class="hm-two"><div class="panel"><h3>교육 자료 <span class="note">상담·교육용 PT와 비교 자료</span> <button class="more" data-go="mats">교육 자료실 ›</button></h3><div class="mats4">'+matsShown().slice(0,8).map(function(m){return matCard(m,false);}).join('')+'</div></div>'+
+      h+='<section class="hm-two"><div class="panel"><h3>교육 자료 <span class="note">상담·교육용 PT와 비교 자료</span> <button class="more" data-go="mats">교육 자료실 ›</button></h3><div class="mats4">'+matsShown().filter(function(m){return m[4];}).slice(0,8).map(function(m){return matCard(m,false);}).join('')+'</div></div>'+
         '<div class="panel"><h3>교육센터 새 강의 <button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E(l[2])+'</i></div></a>';}).join('')+'</div></div></section>';
+      h+='<section class="panel smp-home">'+smpHome()+'</section>';
       h+='<footer class="pfoot">한국보험금융(주) 한보금on 활동지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
       return '<div class="hm">'+h+'</div>';
     },
@@ -1554,7 +1566,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
       aiProxy:v('mProxy'),aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,car:(SITE&&SITE.car)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
-    ['compare','off','concepts','aiSamples','boards','onepick','onepicks'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
+    ['compare','off','concepts','aiSamples','boards','onepick','onepicks','thumbs'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
     (c.hypo||[]).forEach(function(r){var o=(HYPO||[]).filter(function(x){return x[0]===r[0]&&Array.isArray(x[4]);})[0];if(o){while(r.length<4)r.push('');r[4]=o[4];}});
     var ck=document.getElementById('cOpts');
     if(ck&&ck.checked&&window.AIMOD&&AIMOD.getOpts){c.opts=AIMOD.getOpts();c.optsVer=c.ver;}
@@ -1779,6 +1791,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     c.news=news;c.notices=notices;c.awards=awards;c.hypo=hypo;c.mats=mats;c.concept=cp;
     return c;
   }
+  /* PDF 첫 장 → 작은 JPG (카드 미리보기용) */
+  async function pdfThumb(buf){var L=pdfLib();if(!L)return null;var doc=await L.getDocument({data:new Uint8Array(buf.slice(0))}).promise,pg=await doc.getPage(1),v0=pg.getViewport({scale:1}),v=pg.getViewport({scale:480/v0.width}),cv=document.createElement('canvas');
+    cv.width=Math.round(v.width);cv.height=Math.round(v.height);var cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);await pg.render({canvasContext:cx,viewport:v}).promise;
+    var bl=await new Promise(function(r){cv.toBlob(r,'image/jpeg',0.8);});return bl?await bl.arrayBuffer():null;}
   function b64(buf){var b=new Uint8Array(buf),s='',CH=0x8000;for(var i=0;i<b.length;i+=CH)s+=String.fromCharCode.apply(null,b.subarray(i,i+CH));return btoa(s);}
   function keepCut(){var d=new Date();d.setMonth(d.getMonth()-nuMonths());return d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());}
   async function gh(method,path,body){
@@ -1832,8 +1848,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       else cur=SITE?JSON.parse(JSON.stringify(SITE)):{};
       var tree=[], list=[];
       for(var i=0;i<NU.items.length;i++){var it=NU.items[i];msg.textContent=(i+1)+'/'+NU.items.length+' '+it.file.name+' 올리는 중…';
-        var bl=await gh('POST','/git/blobs',{content:b64(it.buf),encoding:'base64'}),p=nuPath(it);tree.push({path:p,mode:'100644',type:'blob',sha:bl.sha});list.push({it:it,path:p});}
+        var bl=await gh('POST','/git/blobs',{content:b64(it.buf),encoding:'base64'}),p=nuPath(it);tree.push({path:p,mode:'100644',type:'blob',sha:bl.sha});list.push({it:it,path:p});
+        if(it.ext==='pdf'){try{var tb=await pdfThumb(it.buf);if(tb){var tp=p.replace(/\.pdf$/i,'')+'_thumb.jpg',tbl=await gh('POST','/git/blobs',{content:b64(tb),encoding:'base64'});tree.push({path:tp,mode:'100644',type:'blob',sha:tbl.sha});list[list.length-1].thumb=tp;}}catch(e){}}}
       nuMerge(cur,list);
+      cur.thumbs=cur.thumbs||{};list.forEach(function(x){if(x.thumb)cur.thumbs[x.path]=x.thumb;});
       /* 보관 기간이 지난 소식지·공지 정리 (올린 파일이 있는 줄만) */
       var cutD=keepCut(), del=0;
       ['news','notices'].forEach(function(k){var fi=k==='news'?3:2;
@@ -2370,6 +2388,35 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var main=title?fileA(n[3],'<b>'+esc(title)+'</b>'):(grouped?'':'<b>'+esc(n[1]||'')+'</b>');
     return '<li><span class="dt">'+esc(n[0]||'')+'</span><span class="t">'+main+' '+(title?'<span class="note">'+esc(sumText(n[2]))+'</span>':esc(sumText(n[2])))+'</span></li>';
   }
+  /* 홈 「AI 보장분석 샘플」: 관리자가 보장분석 샘플로 등록한 자료(content.json aiSamples)를 카드로 보여 주고, 많으면 좌우 화살표로 넘긴다.
+     고객 이름은 화면에 그대로 내보내지 않는다(제목에 나온 이름은 본문에서도 가림). */
+  function smpList(){return (((SITE&&SITE.aiSamples)||[]).filter(function(x){return x&&x.on!==false&&x.title;}));}
+  function smpNames(t){var N=[];String(t||'').replace(/([가-힣]{2,4})님/g,function(a,n){if(!/O/.test(n)&&N.indexOf(n)<0)N.push(n);return a;});String(t||'').replace(/^([가-힣]{2,4})_/,function(a,n){if(N.indexOf(n)<0)N.push(n);return a;});return N;}
+  function smpMask(t,N){t=String(t||'');(N||[]).forEach(function(n){t=t.replace(new RegExp(n.split('').join('\\s*'),'g'),n[0]+'OO');});t=t.replace(/01\d[-\s.]*\d{3,4}[-\s./]*\d{0,4}/g,'010-****-****');return t.replace(/([가-힣])[가-힣]{1,3}님/g,function(a,f){return /OO님$/.test(a)?a:f+'OO님';});}
+  function smpTitle(x){return smpMask(String(x.title).replace(/_\d{8}(_\d+)?$/,'').replace(/_/g,' '),smpNames(x.title));}
+  function smpReadable(t){t=String(t||'').slice(0,400);if(/^PK/.test(t))return false;var h=(t.match(/[가-힣]/g)||[]).length,c=(t.match(/[一-鿿]/g)||[]).length;return h>20&&h>c*2;}
+  function smpHome(){
+    var L=smpList(),stg={all:'1·2단계 공통','1':'1단계 기계약 분석','2':'2단계 Before/After'};
+    var h='<h3>AI 보장분석 샘플 <span class="note">AI가 따라 쓰는 분석·제안서 견본 '+L.length+'건</span>'+(L.length>5?'<span class="smp-nav"><button class="btn sm ghost" type="button" data-smpmv="-1" aria-label="이전 샘플">◀</button><button class="btn sm ghost" type="button" data-smpmv="1" aria-label="다음 샘플">▶</button></span>':'')+'</h3>';
+    if(!L.length)return h+'<p class="note">아직 등록된 샘플이 없습니다. 관리자 › 보장분석 샘플 올리기에서 올리면 여기에 보입니다.</p>';
+    return h+'<div class="smp-rail" id="smpRail">'+L.map(function(x,i){var o=(x.opts||[]).map(function(id){return window.AIMOD&&AIMOD.optTitle?AIMOD.optTitle(id):'';}).filter(Boolean);
+      var pv=smpReadable(x.text)?smpMask(x.text,smpNames(x.title)).replace(/\[(p\.\d+|시트)\]\s*/g,'').split('\n').map(function(l){return l.trim();}).filter(Boolean).slice(0,9).join('\n').slice(0,320):'';
+      return '<button type="button" class="mat smp-card" data-smpv="'+i+'">'+(pv?'<div class="th paper"><span>'+esc(x.type||'')+'</span><pre>'+esc(pv)+'</pre></div><div class="mt"><b class="mtt">'+esc(smpTitle(x))+'</b>':'<div class="th '+esc(x.type||'')+'"><span>'+esc(x.type||'')+'</span><b>'+esc(smpTitle(x))+'</b></div><div class="mt">')+esc(stg[x.stage||'all']||'')+(o.length?' · '+esc(o.join(', ')):'')+' <span class="pill new">보기</span></div></button>';}).join('')+'</div>';
+  }
+  function smpView(i){
+    var x=smpList()[i];if(!x)return;var N=smpNames(x.title),ok=smpReadable(x.text);
+    var w=document.createElement('div');w.className='mview';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label',smpTitle(x));
+    w.innerHTML='<div class="mvh"><b>'+esc(smpTitle(x))+'</b><span class="note">AI 보장분석 샘플 · '+esc(x.type||'')+'</span><span class="sp"></span><button class="btn sm" type="button" data-go="ai" data-v="x">AI 보장분석 하러 가기</button><button class="btn sm ghost" type="button" data-v="x">닫기 ✕</button></div>'+
+      '<div class="mvb"><div class="smp-txt">'+(ok?'<p class="note">AI가 분석·제안서를 쓸 때 형식과 문장을 따라 하는 견본입니다. 고객 이름은 가렸습니다.</p><pre>'+esc(smpMask(x.text,N))+'</pre>':'<p>이 샘플은 글자를 읽을 수 없는 형식(그림·암호화 문서 등)으로 등록되어 미리보기가 없습니다.</p><p class="note">관리자 › 보장분석 샘플 올리기에서 PDF로 다시 올리면 여기서 볼 수 있습니다.</p>')+'</div></div>';
+    document.body.appendChild(w);var prev=document.body.style.overflow;document.body.style.overflow='hidden';
+    var close=function(){w.remove();document.body.style.overflow=prev;document.removeEventListener('keydown',ek);},ek=function(e){if(e.key==='Escape')close();};
+    document.addEventListener('keydown',ek);w.addEventListener('click',function(e){if(e.target.closest('[data-v="x"]')||e.target.classList.contains('mvb'))close();});
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-smpv],[data-smpmv]');if(!b)return;
+    if(b.hasAttribute('data-smpv')){smpView(+b.getAttribute('data-smpv'));return;}
+    var r=document.getElementById('smpRail');if(r)r.scrollBy({left:(+b.getAttribute('data-smpmv'))*Math.max(200,r.clientWidth*0.9),behavior:'smooth'});
+  });
   var MATF={q:'',c:''};
   function matMonth(m){var x=String(m[3]||'').match(/^(20\d{2})\.(\d{2})/)||String(m[4]||'').match(/\/(20\d{2})-(\d{2})\//);return x?x[1]+'.'+x[2]:'';}
   function matLib(){
@@ -2382,8 +2429,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   document.addEventListener('input',function(e){if(e.target&&e.target.id==='matQ'){MATF.q=e.target.value;var b=document.getElementById('matBox');if(b)b.innerHTML=matLib();}});
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-matcat]');if(!b)return;MATF.c=b.getAttribute('data-matcat');document.querySelectorAll('[data-matcat]').forEach(function(x){x.classList.toggle('on',x===b);});var bx=document.getElementById('matBox');if(bx)bx.innerHTML=matLib();});
+  /* 카드 미리보기: 그림 파일은 그대로, PDF는 올릴 때 만든 첫 장 그림(content.json thumbs), PPT는 같은 제목 PDF의 첫 장 */
+  function matThumb(m){var f=m&&m[4];if(!f)return '';if(isImg(f))return f;var T=(SITE&&SITE.thumbs)||{};if(T[f])return T[f];if(isPpt(f)){var tw=matTwin(m,isPdf);if(tw&&T[tw[4]])return T[tw[4]];}return '';}
   function matCard(m,full){
-    var inner='<div class="th '+esc(m[0])+'"><span>'+esc(m[0])+'</span><b>'+esc(m[1])+'</b></div><div class="mt">'+(full?'<span class="pill">'+esc(m[2])+'</span> ':'')+esc(m[3]||'')+(m[4]?' <span class="pill new">열기</span>':'')+'</div>';
+    var th=matThumb(m);
+    var inner=(th?'<div class="th img '+esc(m[0])+'"><img loading="lazy" alt="" src="'+fileHref(th)+'"><span>'+esc(m[0])+'</span></div><div class="mt"><b class="mtt">'+esc(m[1])+'</b>':'<div class="th '+esc(m[0])+'"><span>'+esc(m[0])+'</span><b>'+esc(m[1])+'</b></div><div class="mt">')+
+      (full?'<span class="pill">'+esc(m[2])+'</span> ':'')+esc(m[3]||'')+(m[4]?' <span class="pill new">열기</span>':'')+'</div>';
     return m[4]?'<a class="mat" target="_blank" rel="noopener" href="'+fileHref(m[4])+'" data-mview="'+MATS.indexOf(m)+'">'+inner+'</a>':'<div class="mat">'+inner+'</div>';
   }
   /* 교육 자료 보기: 누르면 내려받지 않고 화면 위에 바로 펼친다.
@@ -4625,6 +4676,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(root&&document.body.contains(root)){applyAiCfg();render();}
   },
   getOpts:function(){return JSON.parse(JSON.stringify(st.opts));},
+  optTitle:function(id){var o=(st.opts||[]).concat(DEF_OPTS).filter(function(x){return x.id===id;})[0];return o?o.title:'';},
   getRules:function(){return AI_RULES;},defRules:function(){return AI_RULES_DEF;},
   getRefs:function(){return {refs:SHREF.map(function(x){return {id:x.id,title:x.title,opts:x.opts||[],src:x.src||'',img:x.img,ts:x.ts};}),ver:SHVER};},
   openRefs:function(adm){st.from5=!isSide(st.step)?st.step:3;st.step=6;st.refAdm=!!adm;},

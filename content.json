@@ -1,5 +1,5 @@
 {
- "ver": 1792738336203,
+ "ver": 1792739615529,
  "updated": "2026. 10. 23. 오후 2:34:34",
  "notices": [
   [
@@ -2540,5 +2540,9 @@
    }
   ]
  },
- "onepicks": []
+ "onepicks": [],
+ "thumbs": {
+  "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm.pdf": "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm_thumb.jpg",
+  "files/mats/2026-10/10월_한국보험금융_상품전략_1001_0i65r.pdf": "files/mats/2026-10/10월_한국보험금융_상품전략_1001_0i65r_thumb.jpg"
+ }
 }
