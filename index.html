@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.18">
+<meta name="kif-build" content="2026-10-23.19">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -361,6 +361,9 @@ td.r,th.r{text-align:right}
 .smp-rail .th.paper::after{content:'';position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(transparent,#fff)}.smp-rail .smp-card .th b{font-size:.92rem}.smp-rail .smp-card .mt{font-size:.76rem;padding:6px 8px}
 @media (max-width:900px){.smp-rail{grid-auto-columns:calc((100% - 16px)/3)}}@media (max-width:600px){.smp-rail{grid-auto-columns:calc((100% - 8px)/2)}}
 .smp-nav{display:inline-flex;gap:4px;margin-left:6px;vertical-align:middle}
+.smd{font-size:13.5px;line-height:1.65;color:var(--ink,#1d2433)}.smd h2,.smd h3,.smd h4{margin:14px 0 6px;color:#14284b;line-height:1.35}.smd h2{font-size:1.25rem;border-bottom:2px solid #c9a24a;padding-bottom:4px}.smd h3{font-size:1.06rem}.smd h4{font-size:.98rem}.smd p{margin:5px 0}.smd ul,.smd ol{margin:5px 0;padding-left:20px}.smd blockquote{margin:8px 0;padding:6px 10px;border-left:3px solid #c9a24a;background:#faf6ec;color:#4a4130}.smd hr{border:0;border-top:1px dashed #cfd6e0;margin:12px 0}.smd code{background:#eef1f5;padding:0 4px;border-radius:3px}
+.smd-tw{overflow-x:auto;margin:8px 0}.smd table{border-collapse:collapse;width:100%;font-size:12.5px}.smd th,.smd td{border:1px solid #d5dbe4;padding:4px 7px;text-align:left;vertical-align:top;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;min-width:3em}.smd sub,.smd small{font-size:.85em;color:#667085}.smd thead th{background:#14284b;color:#fff;font-weight:600}.smd tbody tr:nth-child(even) td{background:#f6f8fb}
+.smp-rail .smd-mini{font-size:7px;line-height:1.4;pointer-events:none;color:#3a4352}.smp-rail .smd-mini h2{font-size:10px;margin:0 0 3px;padding-bottom:2px;border-width:1px}.smp-rail .smd-mini h3,.smp-rail .smd-mini h4{font-size:8.5px;margin:4px 0 2px}.smp-rail .smd-mini p{margin:2px 0}.smp-rail .smd-mini table{font-size:6.5px}.smp-rail .smd-mini th,.smp-rail .smd-mini td{padding:1px 3px;min-width:0;word-break:break-all}.smp-rail .smd-mini .smd-tw{margin:3px 0;overflow:hidden}.smp-rail .smd-mini blockquote{margin:3px 0;padding:2px 5px}.smp-rail .smd-mini ul,.smp-rail .smd-mini ol{margin:2px 0;padding-left:10px}.smp-rail .smd-mini hr{margin:4px 0}
 .smp-txt{max-width:900px;width:100%;background:var(--surface,#fff);border-radius:12px;padding:18px}.smp-txt pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;font-size:13.5px;line-height:1.7;margin:0}
 .mat .th.img{position:relative;padding:0;aspect-ratio:4/3!important;background:#e9edf2;overflow:hidden}.mat .th.img img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
 .mat .th.img span{position:absolute;left:8px;top:8px;background:rgba(15,34,64,.82);padding:2px 7px;border-radius:4px}.mat .mt .mtt{display:block;color:var(--ink);font-size:.86rem;margin-bottom:2px;line-height:1.35}
@@ -2640,10 +2643,28 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* 홈 「AI 보장분석 샘플」: 관리자가 보장분석 샘플로 등록한 자료(content.json aiSamples)를 카드로 보여 주고, 많으면 좌우 화살표로 넘긴다.
      고객 이름은 화면에 그대로 내보내지 않는다(제목에 나온 이름은 본문에서도 가림). */
   function smpList(){return (((SITE&&SITE.aiSamples)||[]).filter(function(x){return x&&x.on!==false&&x.title;}));}
-  function smpNames(t){var N=[];String(t||'').replace(/([가-힣]{2,4})님/g,function(a,n){if(!/O/.test(n)&&N.indexOf(n)<0)N.push(n);return a;});String(t||'').replace(/^([가-힣]{2,4})_/,function(a,n){if(N.indexOf(n)<0)N.push(n);return a;});return N;}
+  function smpNames(t){var N=[];String(t||'').replace(/([가-힣]{2,4})님/g,function(a,n){if(!/O/.test(n)&&N.indexOf(n)<0)N.push(n);return a;});String(t||'').replace(/^([가-힣]{2,4})_/,function(a,n){if(N.indexOf(n)<0&&!/^(보장|보험|상품|실손|간편|종합|가입|설계|분석|비교|암|건강|운전|치아|연금|저축|종신|정기)/.test(n))N.push(n);return a;});return N;}
   function smpMask(t,N){t=String(t||'');(N||[]).forEach(function(n){t=t.replace(new RegExp(n.split('').join('\\s*'),'g'),n[0]+'OO');});t=t.replace(/01\d[-\s.]*\d{3,4}[-\s./]*\d{0,4}/g,'010-****-****');return t.replace(/([가-힣])[가-힣]{1,3}님/g,function(a,f){return /OO님$/.test(a)?a:f+'OO님';});}
   function smpTitle(x){return smpMask(String(x.title).replace(/_\d{8}(_\d+)?$/,'').replace(/_/g,' '),smpNames(x.title));}
   function smpReadable(t){t=String(t||'').slice(0,400);if(/^PK/.test(t))return false;var h=(t.match(/[가-힣]/g)||[]).length,c=(t.match(/[一-鿿]/g)||[]).length;return h>20&&h>c*2;}
+  /* 샘플 글을 문서 모양으로: 마크다운(.md)은 제목·표·목록으로, 엑셀 글([시트])은 시트별 표로, PDF 글은 쪽별 문단으로 그린다 */
+  function mdInline(t){return esc(t).replace(/&lt;br\s*\/?&gt;/gi,'<br>').replace(/&lt;(\/?)(sub|sup|b|strong|u|i|em|small|mark)&gt;/gi,'<$1$2>').replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*([^*\s][^*]*)\*/g,'$1<i>$2</i>').replace(/`([^`]+)`/g,'<code>$1</code>');}
+  function mdHtml(src){var L=String(src||'').replace(/\r\n?/g,'\n').split('\n'),h='',i=0,cells=function(l){return l.trim().replace(/^\||\|$/g,'').split('|').map(function(c){return c.trim();});};
+    while(i<L.length){var l=L[i],m;
+      if(!l.trim()){i++;continue;}
+      if((m=l.match(/^(#{1,6})\s+(.*)$/))){var n=Math.min(m[1].length+1,6);h+='<h'+n+'>'+mdInline(m[2])+'</h'+n+'>';i++;continue;}
+      if(/^\s*([-*_])\s*\1\s*\1[\s\-*_]*$/.test(l)){h+='<hr>';i++;continue;}
+      if(/^\s*\|/.test(l)){var rows=[];while(i<L.length&&/^\s*\|/.test(L[i])){rows.push(L[i]);i++;}
+        var hd=rows.length>1&&/^[\s|:\-]+$/.test(rows[1])?cells(rows[0]):null,body=rows.slice(hd?2:0).filter(function(r){return !/^[\s|:\-]+$/.test(r);});
+        h+='<div class="smd-tw"><table>'+(hd?'<thead><tr>'+hd.map(function(c){return '<th>'+mdInline(c)+'</th>';}).join('')+'</tr></thead>':'')+'<tbody>'+body.map(function(r){return '<tr>'+cells(r).map(function(c){return '<td>'+mdInline(c)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';continue;}
+      if(/^\s*>/.test(l)){var q=[];while(i<L.length&&/^\s*>/.test(L[i])){q.push(L[i].replace(/^\s*>\s?/,''));i++;}h+='<blockquote>'+q.map(mdInline).join('<br>')+'</blockquote>';continue;}
+      if(/^\s*([-*+•·]|\d+[.)])\s+/.test(l)){var ol=/^\s*\d/.test(l),it=[];while(i<L.length&&/^\s*([-*+•·]|\d+[.)])\s+/.test(L[i])){it.push(L[i].replace(/^\s*([-*+•·]|\d+[.)])\s+/,''));i++;}h+='<'+(ol?'ol':'ul')+'>'+it.map(function(x){return '<li>'+mdInline(x)+'</li>';}).join('')+'</'+(ol?'ol':'ul')+'>';continue;}
+      var pg=[];while(i<L.length&&L[i].trim()&&!/^(#{1,6}\s|\s*\||\s*>|\s*([-*+•·]|\d+[.)])\s+)/.test(L[i])){pg.push(L[i]);i++;}if(!pg.length){pg.push(l);i++;}h+='<p>'+pg.map(mdInline).join('<br>')+'</p>';}
+    return h;}
+  function smpDocHtml(x,N){var t=smpMask(x.text,N);
+    if(x.textFrom==='md'||x.type==='MD'||/^#\s/.test(t))return mdHtml(t);
+    if(/\[시트\]/.test(t))return t.split(/\[시트\]\s*/).filter(function(b){return b.trim();}).map(function(b){var r=b.split('\n'),nm=r.shift();return '<h3>'+esc(nm.trim())+'</h3><div class="smd-tw"><table><tbody>'+r.filter(function(z){return z.trim();}).map(function(z,k){var c=z.split(' | ');return '<tr>'+c.map(function(v){v=/^\d{4,}$/.test(v)?(+v).toLocaleString('ko-KR'):/^0\.\d{5,}$/.test(v)?(v*100).toFixed(1)+'%':v;return (c.length===1&&k<2?'<th colspan="4">':'<td>')+esc(v)+(c.length===1&&k<2?'</th>':'</td>');}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}).join('');
+    return t.split(/\[(?:p\.|장 )\d+\]\s*/).filter(function(b){return b.trim();}).map(function(b){return '<section>'+b.split('\n').filter(function(z){return z.trim();}).map(function(z){return '<p>'+esc(z.trim())+'</p>';}).join('')+'</section>';}).join('<hr>');}
   function smpHome(){
     var L=smpList(),stg={all:'1·2단계 공통','1':'1단계 기계약 분석','2':'2단계 Before/After'};
     var h='<h3>AI 보장분석 샘플 <span class="note">AI가 따라 쓰는 분석·제안서 견본 '+L.length+'건</span>'+(L.length>5?'<span class="smp-nav"><button class="btn sm ghost" type="button" data-smpmv="-1" aria-label="이전 샘플">◀</button><button class="btn sm ghost" type="button" data-smpmv="1" aria-label="다음 샘플">▶</button></span>':'')+'</h3>';
@@ -2651,13 +2672,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return h+'<div class="smp-rail" id="smpRail">'+L.map(function(x,i){var o=(x.opts||[]).map(function(id){return window.AIMOD&&AIMOD.optTitle?AIMOD.optTitle(id):'';}).filter(Boolean);
       var pv=smpReadable(x.text)?smpMask(x.text,smpNames(x.title)).replace(/\[(p\.\d+|시트)\]\s*/g,'').split('\n').map(function(l){return l.trim();}).filter(Boolean).slice(0,9).join('\n').slice(0,320):'';
       if(x.thumb)return '<button type="button" class="mat smp-card" data-smpv="'+i+'"><div class="th img"><img loading="lazy" alt="" src="'+fileHref(x.thumb)+'"><span>'+esc(x.type||'')+'</span></div><div class="mt"><b class="mtt">'+esc(smpTitle(x))+'</b>'+esc(stg[x.stage||'all']||'')+(o.length?' · '+esc(o.join(', ')):'')+' <span class="pill new">보기</span></div></button>';
-      return '<button type="button" class="mat smp-card" data-smpv="'+i+'">'+(pv?'<div class="th paper"><span>'+esc(x.type||'')+'</span><pre>'+esc(pv)+'</pre></div><div class="mt"><b class="mtt">'+esc(smpTitle(x))+'</b>':'<div class="th '+esc(x.type||'')+'"><span>'+esc(x.type||'')+'</span><b>'+esc(smpTitle(x))+'</b></div><div class="mt">')+esc(stg[x.stage||'all']||'')+(o.length?' · '+esc(o.join(', ')):'')+' <span class="pill new">보기</span></div></button>';}).join('')+'</div>';
+      return '<button type="button" class="mat smp-card" data-smpv="'+i+'">'+(pv?'<div class="th paper"><span>'+esc(x.type||'')+'</span><div class="smd smd-mini">'+smpDocHtml({text:String(x.text).slice(0,1600),type:x.type,textFrom:x.textFrom},smpNames(x.title))+'</div></div><div class="mt"><b class="mtt">'+esc(smpTitle(x))+'</b>':'<div class="th '+esc(x.type||'')+'"><span>'+esc(x.type||'')+'</span><b>'+esc(smpTitle(x))+'</b></div><div class="mt">')+esc(stg[x.stage||'all']||'')+(o.length?' · '+esc(o.join(', ')):'')+' <span class="pill new">보기</span></div></button>';}).join('')+'</div>';
   }
   function smpView(i){
     var x=smpList()[i];if(!x)return;var N=smpNames(x.title),ok=smpReadable(x.text);
     var w=document.createElement('div');w.className='mview';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label',smpTitle(x));
     w.innerHTML='<div class="mvh"><b>'+esc(smpTitle(x))+'</b><span class="note">AI 보장분석 샘플 · '+esc(x.type||'')+'</span><span class="sp"></span><button class="btn sm" type="button" data-go="ai" data-v="x">AI 보장분석 하러 가기</button><button class="btn sm ghost" type="button" data-v="x">닫기 ✕</button></div>'+
-      '<div class="mvb"><div class="smp-txt">'+(ok?'<p class="note">AI가 분석·제안서를 쓸 때 형식과 문장을 따라 하는 견본입니다. 고객 이름은 가렸습니다.</p><pre>'+esc(smpMask(x.text,N))+'</pre>':'<p>이 샘플은 글자를 읽을 수 없는 형식(그림·암호화 문서 등)으로 등록되어 미리보기가 없습니다.</p><p class="note">관리자 › 보장분석 샘플 올리기에서 PDF로 다시 올리면 여기서 볼 수 있습니다.</p>')+'</div></div>';
+      '<div class="mvb"><div class="smp-txt">'+(ok?'<p class="note">AI가 분석·제안서를 쓸 때 형식과 문장을 따라 하는 견본입니다. 고객 이름은 가렸습니다.'+(x.textFrom==='md'||x.type==='MD'?' 마크다운 글을 문서 모양으로 정리해 보여 줍니다. 원본 PDF를 같은 이름으로 올리면 원본 모양으로 바뀝니다.':' 원본 파일이 함께 저장되지 않은 샘플이라 읽은 글을 표·문단으로 정리해 보여 줍니다.')+'</p><div class="smd">'+smpDocHtml(x,N)+'</div>':'<p>이 샘플은 글자를 읽을 수 없는 형식(그림·암호화 문서 등)으로 등록되어 미리보기가 없습니다.</p><p class="note">관리자 › 보장분석 샘플 올리기에서 PDF로 다시 올리면 여기서 볼 수 있습니다.</p>')+'</div></div>';
     document.body.appendChild(w);var prev=document.body.style.overflow;document.body.style.overflow='hidden';
     var close=function(){w.remove();document.body.style.overflow=prev;document.removeEventListener('keydown',ek);},ek=function(e){if(e.key==='Escape')close();};
     document.addEventListener('keydown',ek);w.addEventListener('click',function(e){if(e.target.closest('[data-v="x"]')||e.target.classList.contains('mvb'))close();});
@@ -4352,9 +4373,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<label class="row note" style="margin-top:8px;gap:6px"><input type="checkbox" id="smKeep" checked> <span><b>원본 파일도 함께 올려</b>(PDF·엑셀·워드·PPT) 홈 「AI 보장분석 샘플」 카드에 첫 장을 보이고 「보기」로 원본을 그 모양 그대로 엽니다. <b>고객 이름·연락처·설계사 정보를 가린 파일만</b> 올려 주세요(사이트 주소를 아는 사람은 열어 볼 수 있습니다).</span></label>'+
       '<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="smpAdd">파일 없이 글로 직접 추가</button><span class="note" id="smMsg"></span></div>'+smpBadBox()+
       '<div class="row"><b>올리기 상태</b><span class="note" id="smPub">'+(SMPST.msg||(window.KIFPUB&&KIFPUB.ready()?'GitHub 연결됨 · 바꾸거나 파일을 올린 뒤 「저장」을 누르면 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장해야 올라갑니다.'))+'</span></div></div>';
-    h+='<div class="panel"><h3 style="display:flex;align-items:center;gap:8px">등록된 샘플 <span class="note">'+SMP.length+'건</span><label class="btn sm" style="margin-left:auto">＋ 샘플 추가<input type="file" data-smf="1" accept=".pdf,.pptx,.xlsx,.xls,.txt,application/pdf" multiple hidden></label></h3>'+(SMP.length?'<div class="smp-l">'+SMP.map(function(s){
+    h+='<div class="panel"><h3 style="display:flex;align-items:center;gap:8px">등록된 샘플 <span class="note">'+SMP.length+'건</span><label class="btn sm" style="margin-left:auto">＋ 샘플 추가<input type="file" data-smf="1" accept=".pdf,.pptx,.xlsx,.xls,.docx,.hwpx,.md,.markdown,.txt,application/pdf" multiple hidden></label></h3>'+(SMP.length?'<div class="smp-l">'+SMP.map(function(s){
       return '<div class="smp-c'+(s.on===false?' off':'')+'"><div class="row"><span class="pill'+(s.on===false?'':' new')+'">'+esc(s.type||'글')+'</span><input class="in" data-smt="'+s.id+'" value="'+esc(s.title)+'" aria-label="샘플 제목"><label class="note" style="white-space:nowrap"><input type="checkbox" data-smo="'+s.id+'"'+(s.on===false?'':' checked')+'> AI에 보냄</label><button class="btn sm ghost danger" data-a="smpDel" data-id="'+s.id+'">삭제</button></div>'+
-        '<div class="row smp-w"><span class="note">쓰는 경우</span><select class="in" data-sst="'+s.id+'">'+Object.keys(SMP_STAGE).map(function(k){return '<option value="'+k+'"'+((s.stage||'all')===k?' selected':'')+'>'+SMP_STAGE[k]+'</option>';}).join('')+'</select><span class="pill">'+esc(refWhere(s))+'</span></div>'+
+        '<div class="row smp-w"><span class="note">쓰는 경우</span><select class="in" data-sst="'+s.id+'">'+Object.keys(SMP_STAGE).map(function(k){return '<option value="'+k+'"'+((s.stage||'all')===k?' selected':'')+'>'+SMP_STAGE[k]+'</option>';}).join('')+'</select><span class="pill">'+esc(refWhere(s))+'</span>'+(s.file?'<span class="pill">원본 있음</span>':'<span class="pill" style="background:#fff4e0;color:#8a5a00" title="같은 이름의 원본 파일(PDF·엑셀·워드·PPT)을 다시 올리면 홈 카드와 「보기」가 원본 모양으로 바뀝니다">원본 없음 · 같은 이름으로 원본을 다시 올리면 원본 모양으로 보임</span>')+(s.textFrom==='md'?'<span class="pill">AI 글: 마크다운</span>':'')+'</div>'+
         '<details><summary class="note">연결할 분석 옵션 바꾸기</summary>'+optBoxes('',s.opts||[],'data-sop="'+s.id+'"')+'</details>'+
         '<details><summary class="note">AI가 받는 내용 보기·고치기 ('+String(s.text||'').length+'자)</summary><textarea class="in" rows="10" data-smx="'+s.id+'">'+esc(s.text||'')+'</textarea><p class="note">고친 뒤 칸 밖을 누르고 「저장」을 누르면 모든 FC에게 반영됩니다.</p></details></div>';}).join('')+'</div>':'<p class="note">등록된 샘플이 없습니다. 위에서 올려 주세요.</p>')+
       '<p class="note" style="margin-top:10px">샘플은 몇 건이든 올려도 됩니다. FC가 분석할 때 포털이 그 고객의 <b>분석 옵션</b>과 <b>단계</b>에 맞는 샘플을 골라 <b>3건까지만</b> AI에 보냅니다. 옵션을 안 고른 샘플은 모든 고객에 공통으로 쓰입니다.</p><details><summary class="note">AI에게 보내는 전체 글 미리보기 (규칙 + 켜 둔 샘플 전체)</summary><textarea class="in" rows="14" readonly>'+esc(aiGuide())+'</textarea></details>'+
@@ -4415,6 +4436,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     for(var i=0;i<fs.length;i++){var f=fs[i];msg((fs.length>1?(i+1)+'/'+fs.length+' ':'')+'"'+esc(f.name)+'" 읽는 중…');
       try{var r=await smpFileText(f);if(!r.text||r.text.length<20)throw new Error('글자를 거의 읽지 못함(그림 파일일 수 있음)');if(!smpOk(r))throw new Error('글자가 깨져서 읽혔습니다. 원본 PPT·엑셀·워드 파일이나 다른 방식으로 저장한 PDF를 올려 주세요');
         var title=one||f.name.replace(/\.[^.]+$/,''),nid='s'+Date.now().toString(36)+i,NM=piiNames(title+' '+f.name);
+        /* 본문 속 이름도 찾는다: 「홍길동 (여, 58세)」 같은 피보험자 표기, 「모집인·설계사·담당 홍길동」 */
+        String(r.text).replace(/([가-힣]{2,4})\s*\(\s*(?:여|남)\s*[,·\/]\s*(?:만\s*)?\d/g,function(a,n){if(!/O/.test(n)&&NM.indexOf(n)<0&&!/^(보장|보험|상품|실손|간편|종합|가입|설계|분석|비교|고객|피보)/.test(n))NM.push(n);return a;}).replace(/(?:모집인|설계사|담당자?|FC)\s*[:：|·]?\s*\|?\s*([가-힣]{2,4})(?=\s|$|[·,|(])/g,function(a,n){if(!/O/.test(n)&&NM.indexOf(n)<0&&!/^(정보|확인|없음|기준|지점|본부)/.test(n))NM.push(n);return a;});
         title=piiMask(title,NM);r.text=piiMask(r.text,NM);
         /* 같은 샘플(이름을 가린 제목이 같음)을 다시 올리면 새로 늘리지 않고 그 샘플의 글과 원본 파일을 바꾼다 */
         var key=function(t){return String(t||'').replace(/\.[^.]+$/,'').replace(/_\d{8}(_\d+)?$/,'').replace(/([가-힣])[가-힣O]{1,3}님/g,'$1OO님').replace(/[\s_]+/g,'');},old=SMP.filter(function(z){return key(z.title)===key(title);})[0];
