@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-22.5">
+<meta name="kif-build" content="2026-10-23.1">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -844,6 +844,10 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .hm-hd h1{font-size:1.9rem;font-weight:800;color:var(--navy-ink);margin-top:4px}
 .hm-srch{flex:0 1 420px;min-width:260px}
 .hm-srch .tags{font-size:.8rem}
+.hm-ai{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--line);background:var(--card,#fff);border-radius:8px;padding:12px 16px}
+.hm-ai.first{border:2px solid var(--gold);background:var(--gold-soft)}
+.hm-ai .t{font-weight:700;white-space:nowrap}.hm-ai .s{flex:1;min-width:200px;font-size:13px;color:var(--ink)}
+.hm-ai .s small{display:block;color:var(--ink-3,#6b7380);font-size:12px;margin-top:2px}
 .hm-strip{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:var(--gold-soft);border-radius:8px;padding:10px 16px;color:var(--gold)}
 .hm-strip b{font-weight:700;white-space:nowrap}
 .hm-strip span{flex:1;color:var(--ink)}
@@ -1092,6 +1096,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
 
 <div class="toast" id="toast" hidden></div>
 <div class="scr" id="scrBtns" hidden><button type="button" id="scrUp" aria-label="맨 위로" title="맨 위로">▲<span>맨 위로</span></button><button type="button" id="scrDown" aria-label="아래로" title="아래로 한 화면">▼<span>아래로</span></button></div>
+<script src="ai-connect.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
@@ -1219,6 +1224,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<div class="tags">인기 검색어 '+['암','간편건강','단기납 종신','3대질병','실손','경영인 정기'].map(function(t){return '<button type="button" class="tg" data-q="'+t+'">#'+t+'</button>';}).join('')+'</div><div class="srchRes"></div>';
   }
   /* ---------- 화면별 내용 ---------- */
+  /* 홈 「내 AI 등록」: 기본형·고급형이 함께 쓰는 AI 설정 (ai-connect.js) */
+  function hmAi(){
+    var K=window.KIFAI;if(!K)return '';var first=!K.chosen();
+    return '<section class="hm-ai'+(first?' first':'')+'" id="hmAi"><span class="t">'+(first?'처음 한 번: 내 AI 등록':'내 AI')+'</span><div class="s">'+(first?'AI보장분석에서 쓸 AI를 먼저 정해 주세요. 한 번 등록하면 <b>기본형</b>과 <b>고급형</b>이 같은 AI를 씁니다.':K.statusHTML())+
+      '<small>기본형은 등록된 기준·샘플대로 분석하고, 고급형은 고급형 계산 규칙대로 제안서를 만듭니다.</small></div><button type="button" class="btn'+(first?' gold':'')+'" data-kai-open>'+(first?'내 AI 등록하기':'내 AI 바꾸기')+'</button></section>';
+  }
+  if(window.KIFAI)KIFAI.onChange(function(){var el=document.getElementById('hmAi');if(el)el.outerHTML=hmAi();});
   var PAGES={
     home:function(){
       var d=new Date(),W='일월화수목금토',E=esc;
@@ -1233,6 +1245,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var h='<section class="hm-hero"><p class="hh-k">한국보험금융 FC 활동지원</p><h1 class="hh-w">한보금 <em>ON</em></h1><p class="hh-s">사람을 위한 <em>따뜻한</em> 보험</p>'+
         '<div class="hh-cards">'+P.map(function(c){return '<div class="hh-card"><b>'+c[0]+'</b><span>'+c[1]+'</span><button type="button" data-go="'+c[2]+'">바로가기</button></div>';}).join('')+'</div></section>';
       h+='<section class="hm-hd"><div><div class="hm-date">'+ds+'</div><h1>'+E(me.name)+'님, 오늘 할 일부터 보세요</h1></div><div class="hm-srch">'+srchBox(false)+'</div></section>';
+      h+=hmAi();
       if(BANNER&&BANNER.title)h+='<button class="hm-strip" data-go="news"><b>이달의 상품 개정 일정</b><span>'+E(BANNER.title)+'</span><em>일정 보기 ›</em></button>';
       h+='<section class="hm-kpi">'+
         '<button data-go="news">'+ic('news','ki')+'<div><span>이번 주 새 소식지</span><b>'+nn+'<small>건</small></b><em>보험사 소식지 전체 '+NEWS.length+'건</em></div></button>'+
@@ -2901,11 +2914,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!c.keys[c.prov]){cap.why='no_key';capMsg=AIP[c.prov].name+' 키가 없습니다. <b>AI 연결 설정</b>에서 키를 넣어 주세요.';return;}
     cap.sample=apiAdapter(c);capMsg='연결된 AI: <b>'+AIP[c.prov].name+'</b> ('+esc(aiModel(c,c.prov))+')';
   }
+  if(window.KIFAI)KIFAI.onChange(function(){if(root&&document.body.contains(root)){applyAiCfg();render();}});
   function aiChosen(){var r=load(KEY_AI,null);return !!(r&&(r.prov||r.mode));}
   function aiBar(){
-    var c=aiCfg(),on=c.mode==='ai',first=!aiChosen();if(first)st.aiOpen=true;
-    var h=(first?'<div class="panel aifirst"><h3>처음 한 번: 내 AI를 정해 주세요</h3><p class="note">아래에서 이 포털에서 쓸 AI를 고르고 <b>저장</b>을 누르면, 다음부터는 묻지 않고 그 AI로 자료를 읽고 분석합니다. 나중에 "AI 연결 설정"에서 바꿀 수 있습니다.</p></div>':'')+'<div class="panel aibar"><div class="row"><b>보장분석 방식</b><div class="seg"><button data-a="aimode" data-v="ai" class="'+(on?'on':'')+'">AI 연결해서 분석</button><button data-a="aimode" data-v="manual" class="'+(on?'':'on')+'">AI 없이 쓰기</button></div>'+
-      '<span class="sp"></span><button class="btn sm ghost" data-a="aicfg">AI 연결 설정 '+(st.aiOpen?'▴':'▾')+'</button></div><p class="note" style="margin:6px 0 0">'+capMsg+'</p>';
+    var c=aiCfg(),on=c.mode==='ai',first=!aiChosen();if(first&&!window.KIFAI)st.aiOpen=true;
+    var h=(first?'<div class="panel aifirst"><h3>처음 한 번: 내 AI를 정해 주세요</h3><p class="note">'+(window.KIFAI?'<button type="button" class="btn sm gold" data-kai-open>내 AI 등록하기</button> 를 눌러 쓸 AI를 고르고 <b>저장</b>하면, 다음부터는 묻지 않고 그 AI로 자료를 읽고 분석합니다. 여기서 등록한 AI는 <b>고급형</b>에서도 그대로 쓰입니다(포털 홈의 「내 AI」에서도 바꿀 수 있습니다).':'아래에서 이 포털에서 쓸 AI를 고르고 <b>저장</b>을 누르면, 다음부터는 묻지 않고 그 AI로 자료를 읽고 분석합니다. 나중에 "AI 연결 설정"에서 바꿀 수 있습니다.')+'</p></div>':'')+'<div class="panel aibar"><div class="row"><b>보장분석 방식</b><div class="seg"><button data-a="aimode" data-v="ai" class="'+(on?'on':'')+'">AI 연결해서 분석</button><button data-a="aimode" data-v="manual" class="'+(on?'':'on')+'">AI 없이 쓰기</button></div>'+
+      '<span class="sp"></span><button class="btn sm ghost" data-a="aicfg">'+(window.KIFAI?'내 AI 등록 (기본형·고급형 공통)':'AI 연결 설정 '+(st.aiOpen?'▴':'▾'))+'</button></div><p class="note" style="margin:6px 0 0">'+capMsg+'</p>';
     if(st.aiOpen){
       var p=st.aiProv||c.prov;
       var card=function(k){var x=AIP[k];return '<button class="optc'+(k===p?' on':'')+'" data-a="aiprov" data-v="'+k+'"><span class="ck">'+(k===p?'✓':'')+'</span><b>'+x.name+(k==='company'&&!AI_PROXY?' <span class="note">(관리자 설정 전)</span>':'')+'</b><span class="d">'+x.help+'</span></button>';};
@@ -2930,6 +2944,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function aiCfgClick(a,b){
     var c=aiCfg();
     if(a==='aimode'){c.mode=b.dataset.v;save(KEY_AI,c);applyAiCfg();if(c.mode==='ai'&&((AIP[c.prov].key&&!c.keys[c.prov])||(c.prov==='company'&&!AI_PROXY)))st.aiOpen=true;render();toast(c.mode==='ai'?'AI 연결해서 분석합니다.':'AI 없이 직접 입력합니다.');return;}
+    if(a==='aicfg'&&window.KIFAI){KIFAI.open();return;}
     if(a==='aicfg'){st.aiOpen=!st.aiOpen;st.aiProv=null;render();return;}
     if(a==='aiprov'){st.aiProv=b.dataset.v;render();return;}
     var p=st.aiProv||c.prov,kE=document.getElementById('aiKey'),mE=document.getElementById('aiModelIn'),cE=document.getElementById('aiCode');

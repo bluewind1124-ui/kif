@@ -31,6 +31,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="../ai-connect.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <!--
   보장분석 플래너 (프로토타입 v0.1)
@@ -492,6 +493,7 @@ body.pp-presenting .top{display:none}
       <div class="client-bar no-print">
         <label for="clientSel" class="small muted">고객</label>
         <select id="clientSel" aria-label="고객 선택"></select>
+        <button class="btn sm" id="btnAiCfg" type="button" data-kai-open title="기본형·고급형이 함께 쓰는 AI 설정">내 AI</button>
         <button class="btn sm" id="btnNewClient" type="button">+ 새 고객</button>
         <button class="btn sm ghost danger" id="btnDelClient" type="button">삭제</button>
       </div>
@@ -543,7 +545,7 @@ body.pp-presenting .top{display:none}
             <h2>가입 계약</h2><span class="sub" id="polCount"></span>
             <div class="act">
               <button class="btn sm" type="button" id="btnPaste">내보험찾아줌 붙여넣기</button>
-              <button class="btn sm" type="button" id="btnScan">증권 사진 판독</button>
+              <button class="btn sm" type="button" id="btnScan">증권·설계서 AI 판독</button>
               <button class="btn sm primary" type="button" id="btnAddPol">+ 계약 추가</button>
             </div>
           </div>
@@ -558,10 +560,13 @@ body.pp-presenting .top{display:none}
           </div>
           <div id="scanBox" hidden>
             <div class="drop">
-              <p><b>증권 사진·PDF 자동 판독</b></p>
-              <p class="small" style="margin-top:4px">이 기능은 AI 판독 서버를 연결해야 동작합니다. 포탈 이식 단계에서 연결할 자리를 만들어 두었습니다.</p>
-              <input type="file" id="scanFile" accept="image/*,application/pdf" multiple style="margin-top:10px;max-width:100%">
+              <p><b>증권·가입설계서 AI 판독</b></p>
+              <p class="small" style="margin-top:4px">보험증권, 가입설계서, 내보험찾아줌·보장분석 조회 화면(사진·PDF·엑셀)을 올리면 <b>내 AI</b>가 계약과 담보를 읽어 표로 보여 줍니다. 확인한 것만 가져옵니다.</p>
+              <p class="small muted" style="margin-top:4px" data-aistat></p>
+              <input type="file" id="scanFile" accept="image/*,application/pdf,.xlsx,.xls,.csv,.txt" multiple style="margin-top:10px;max-width:100%">
+              <p class="small" id="scanStatus" role="status" style="margin-top:6px"></p>
             </div>
+            <div id="scanPreview" style="margin-top:10px"></div>
           </div>
           <div id="polList"></div>
         </div>
@@ -636,6 +641,8 @@ body.pp-presenting .top{display:none}
         <label class="f">연락처<input type="tel" id="fc-phone"></label>
       </div>
       <label class="f" style="margin-top:12px">컨설턴트 의견<textarea id="rp-comment" rows="4" placeholder="예) 사망보장을 먼저 보완하고, 뇌혈관 진단비는 기존 계약 특약 추가로 검토하겠습니다."></textarea></label>
+      <div class="ai-row" style="margin-top:8px"><button type="button" class="btn sm" id="btnCmtAI">AI 의견 초안 받기</button><span class="small muted">위 리포트의 계산 결과만 바탕으로 씁니다 · <span data-aistat></span></span></div>
+      <p class="small" id="cmtStatus" role="status"></p><div id="cmtDraft"></div>
     </div>
   </section>
 
@@ -700,6 +707,17 @@ body.pp-presenting .top{display:none}
   <div class="lm-box">
     <div class="lm-head"><h2>법령·세법 점검</h2><span class="small muted">제안서를 만들기 전에 개정 여부를 확인하고, 바뀐 값을 세법 기준표에 적용합니다</span><button type="button" class="btn sm ghost" id="lawClose" aria-label="닫기">✕</button></div>
     <div id="lawBody"></div>
+  </div>
+</div>
+
+<div class="lm-overlay" id="aiFillModal" hidden role="dialog" aria-modal="true" aria-labelledby="aiFillTitle">
+  <div class="lm-box" style="max-width:760px">
+    <div class="lm-head"><h2 id="aiFillTitle">입력칸 채우기 (AI)</h2><span class="small muted" data-aistat></span><button type="button" class="btn sm ghost" id="aiFillClose" aria-label="닫기">✕</button></div>
+    <p class="small muted">상담 메모를 쓰거나 자료(가입설계서·증권, 국민연금 예상연금 조회, 퇴직연금·연금저축 내역, 금융자산·대출 내역 등)를 올리면 내 AI가 읽어 입력칸 값을 찾아 줍니다. 계산과 제안서는 고급형 규칙대로 만들어집니다.</p>
+    <label class="f" style="margin-top:10px">상담 메모<textarea id="aiFillText" rows="4" placeholder="예) 52세 남, 60세 은퇴 예정. 국민연금 예상 월 125만(65세). DC 적립금 9천만, 월 55만 납입. 연금저축 2,400만, 월 25만. 은퇴 후 생활비 월 350 희망."></textarea></label>
+    <label class="f" style="margin-top:10px">자료 파일 <span class="hint">사진·PDF·엑셀 · 여러 개 가능</span><input type="file" id="aiFillFiles" multiple accept="image/*,application/pdf,.xlsx,.xls,.csv,.txt"></label>
+    <div class="ai-row" style="margin-top:10px"><button type="button" class="btn primary" id="aiFillRun">AI로 읽기</button><span class="small" id="aiFillStatus" role="status"></span></div>
+    <div id="aiFillPreview" style="margin-top:10px"></div>
   </div>
 </div>
 
@@ -1311,12 +1329,6 @@ $('#btnPaste').addEventListener('click',()=>{ $('#pasteBox').hidden=!$('#pasteBo
 $('#btnPasteClose').addEventListener('click',()=>{ $('#pasteBox').hidden=true; });
 $('#btnScan').addEventListener('click',()=>{ $('#scanBox').hidden=!$('#scanBox').hidden; $('#pasteBox').hidden=true; });
 $('#scanFile').addEventListener('change',e=>analyzePolicyFiles(e.target.files));
-function analyzePolicyFiles(files){
-  // 포탈 연동 지점: 파일을 AI 판독 서버로 보내고 {company, product, premium, start, coverEnd, renew, covers:[{cat,amt}]} 배열을 받아
-  // cur().policies 에 추가한 뒤 renderPolicies(); renderAnalysis(); 를 호출하면 됩니다.
-  if(!files||!files.length) return;
-  toast(files.length+'개 파일 선택됨 · 판독 서버가 아직 연결되지 않았습니다');
-}
 function guessType(prod){
   const s=prod||'';
   if(/실손|실비|의료비보험/.test(s)) return '실손';
@@ -2023,7 +2035,7 @@ function renderPlan(){
   if(!P.field){ body.innerHTML='<div class="panel" style="max-width:780px;margin:0 auto"><div class="empty"><b>분야를 먼저 고르세요</b>보장설계·연금설계·자산설계 중 하나를 고르면 입력칸이 열립니다. 한 고객에게 세 분야를 모두 입력해 둘 수 있습니다.</div></div>'; return; }
   const F=PLAN_FORMS[P.field], v=pv(P.field), filled=Object.keys(v).filter(k=>v[k]!==''&&v[k]!=null&&v[k]!==false).length;
   let h=(P.field==='coverage'?covStepBar('covform'):'')+'<div class="pl-grid"><div class="panel" id="plForm"><div class="panel-h"><h2>'+F.name+' 입력</h2><span class="sub">'+esc(cur().customer.name||'')+' · '+filled+'개 입력됨</span>';
-  h+='<div class="act"><button type="button" class="btn sm" id="plSample">예시로 채우기</button><button type="button" class="btn sm ghost danger" id="plClear">비우기</button></div></div>';
+  h+='<div class="act"><button type="button" class="btn sm primary" id="plAI" title="상담 메모·자료를 내 AI가 읽어 칸을 채웁니다">자료로 채우기 (AI)</button><button type="button" class="btn sm" id="plSample">예시로 채우기</button><button type="button" class="btn sm ghost danger" id="plClear">비우기</button></div></div>';
   F.sections.forEach(s=>{
     h+='<div class="pl-sec"><h3>'+esc(s.t)+(s.sub?'<small>'+esc(s.sub)+'</small>':'')+'</h3><div class="grid pl-f">';
     s.f.forEach(x=>{ h+=planFieldHTML(P.field,x,v[x.k]); });
@@ -2101,6 +2113,7 @@ $('#plBody').addEventListener('change',e=>{ if(e.target.tagName==='SELECT') e.ta
 let plClearArm=0;
 $('#plBody').addEventListener('click',e=>{
   const P=plans();
+  if(e.target.id==='plAI'){ openFill(); return; }
   if(e.target.id==='plSample'){ P[P.field]=clone(PLAN_SAMPLES[P.field]); touch(); renderPlan(); toast(PLAN_FORMS[P.field].name+' 예시 값을 채웠습니다'); }
   if(e.target.id==='plClear'){
     const b=e.target;
@@ -2174,9 +2187,9 @@ function productsHTML(v){
   const L=v.products||[];
   let h='<h3>추천 연금상품 (설계안) <small>상담 시점에 입력 · 「추천안 추가해서 제안서」에 반영됩니다</small></h3>';
   h+='<div class="pp-add">'+PROD_TYPES.map(t=>'<button type="button" class="btn sm" data-pact="add" data-i="'+t+'">+ '+t+'</button>').join('')+'</div>';
-  h+='<div class="ai-box"><div class="ai-row"><b>설계서로 자동 입력 (AI)</b><span class="small muted">설계서 PDF·사진을 올리면 Claude가 읽어 상품 칸을 채웁니다. 결과를 꼭 확인하세요.</span></div>'
+  h+='<div class="ai-box"><div class="ai-row"><b>설계서로 자동 입력 (AI)</b><span class="small muted">연금 설계서 PDF·사진을 올리면 내 AI가 읽어 상품 칸을 채웁니다. 결과를 꼭 설계서와 대조하세요.</span></div>'
     +'<div class="ai-row"><input type="file" id="aiFiles" accept="application/pdf,image/png,image/jpeg,image/webp" multiple><button type="button" class="btn sm primary" data-pact="ai">읽어서 채우기</button><span class="small" id="aiStatus"></span></div>'
-    +'<details class="small"><summary>AI 설정 (Claude API 키)</summary><div class="ai-row" style="margin-top:6px"><input type="password" id="aiKey" value="'+esc(store.aiKey||'')+'" placeholder="sk-ant-..." autocomplete="off" style="max-width:320px"><button type="button" class="btn sm" data-pact="aikey">저장</button></div><p class="muted" style="margin-top:4px">키는 이 브라우저에만 저장되고 Anthropic API로만 전송됩니다. 공용 PC에서는 쓰지 마세요.</p></details></div>';
+    +'<p class="small muted" data-aistat>'+KAI.statusHTML()+'</p></div>';
   if(!L.length) h+='<p class="small muted">아직 추천 상품이 없습니다. 위에서 유형을 골라 추가하거나 설계서를 읽혀 주세요.</p>';
   L.forEach((p,i)=>{
     const usd=p.currency==='USD', var_=p.type==='변액연금형';
@@ -2206,54 +2219,16 @@ function productAction(act, i, el){
   const v=pv('pension'); v.products=v.products||[];
   if(act==='add'){ v.products.push(newProduct(i, v)); touch(); refreshProducts(); toast(i+' 상품을 추가했습니다. 설계서 값을 넣어 주세요'); }
   if(act==='del'){ if(prodDelArm!==n(i)){ prodDelArm=n(i); el.textContent='한 번 더 누르면 삭제'; setTimeout(()=>{ prodDelArm=-1; if(el.isConnected) el.textContent='삭제'; },3000); return; } prodDelArm=-1; v.products.splice(n(i),1); touch(); refreshProducts(); }
-  if(act==='aikey'){ store.aiKey=$('#aiKey').value.trim(); save(); toast('API 키를 이 브라우저에 저장했습니다'); }
   if(act==='ai') aiReadDesign();
 }
 
-/* 설계서 AI 판독 — Claude API (브라우저 직접 호출, 공식 SDK) */
-const AI_SCHEMA={type:'object',additionalProperties:false,required:['products'],properties:{products:{type:'array',items:{type:'object',additionalProperties:false,
-  required:['insurer','product','type','currency','monthly','payYears','sumInsured','issueAge','startAge','payout','rate','minRate','fee','gmab','fxIssue','designMonthly','designTotal','refund','memo'],
-  properties:{insurer:{type:'string'},product:{type:'string'},type:{type:'string',enum:PROD_TYPES},currency:{type:'string',enum:['KRW','USD']},
-    monthly:{type:'number'},payYears:{type:'number'},sumInsured:{type:'number'},issueAge:{type:'number'},startAge:{type:'number'},payout:{type:'string',enum:PAYOUTS},
-    rate:{type:'number'},minRate:{type:'number'},fee:{type:'number'},gmab:{type:'number'},fxIssue:{type:'number'},designMonthly:{type:'number'},designTotal:{type:'number'},
-    refund:{type:'array',items:{type:'object',additionalProperties:false,required:['year','rate'],properties:{year:{type:'number'},rate:{type:'number'}}}},memo:{type:'string'}}}}}};
+/* 설계서 AI 판독 — 내 AI(공통 설정)로 읽는다. 판독 지시문(AI_PROMPT)은 아래, 실행은 aiReadDesign() */
 const AI_PROMPT='첨부한 보험사 연금보험 가입설계서를 읽고 상품 정보를 추출하세요.\n'
  +'- 금액 단위: 원화 상품은 만원(예: 500,000원 → 50), 달러 상품은 USD 그대로.\n'
  +'- type: 공시이율형 / 확정금리형 / 변액연금형 / 달러연금 중 하나. 이율: 적용·공시이율(또는 확정이율, 변액은 예시 수익률 중 중간값) %, minRate: 최저보증이율 %, fee: 변액 펀드 운용보수 %, gmab: 변액 최저보증 비율 %(없으면 0).\n'
  +'- payout: 10년 / 20년 / 30년 / 종신 중 설계서 기본 예시에 가까운 값. designMonthly: 그 예시의 월 연금액(연액만 있으면 12로 나눔), designTotal: 예시 총 수령액(없으면 0).\n'
  +'- refund: 해지환급금 예시표의 경과연수별 환급률(%)을 현재 공시이율(또는 중간 수익률) 기준으로.\n'
  +'- 설계서에 없는 숫자는 0, 문자열은 빈 문자열. 추측하지 말고 문서에 있는 값만 쓰세요. 특이사항(갱신·특약·보증 조건)은 memo에 짧게.';
-async function fileToBlock(f){
-  const b64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=rej; r.readAsDataURL(f); });
-  return f.type==='application/pdf' ? {type:'document', source:{type:'base64', media_type:'application/pdf', data:b64}} : {type:'image', source:{type:'base64', media_type:f.type, data:b64}};
-}
-async function aiReadDesign(){
-  const st=$('#aiStatus'), files=[...($('#aiFiles').files||[])], key=(store.aiKey||$('#aiKey').value||'').trim();
-  if(!files.length){ st.textContent='설계서 파일을 먼저 고르세요'; return; }
-  if(!key){ st.textContent='「AI 설정」에 Claude API 키를 넣고 저장하세요'; return; }
-  st.textContent='설계서를 읽는 중… (30초~1분)';
-  try{
-    const {default: Anthropic} = await import('https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.131.0/+esm');
-    const client=new Anthropic({apiKey:key, dangerouslyAllowBrowser:true});
-    const blocks=[]; for(const f of files) blocks.push(await fileToBlock(f));
-    const resp=await client.beta.messages.create({
-      model:'claude-opus-5-5', max_tokens:16000,
-      betas:['server-side-fallback-2026-07-01'], fallbacks:'default',
-      output_config:{effort:'medium', format:{type:'json_schema', schema:AI_SCHEMA}},
-      messages:[{role:'user', content:blocks.concat([{type:'text', text:AI_PROMPT}])}]
-    });
-    if(resp.stop_reason==='refusal'){ st.textContent='AI가 이 문서 처리를 거절했습니다. 값을 직접 입력해 주세요.'; return; }
-    const txt=(resp.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-    const data=JSON.parse(txt), v=pv('pension'); v.products=v.products||[];
-    (data.products||[]).forEach(x=>{ const p=Object.assign(newProduct(x.type,v),{insurer:x.insurer,product:x.product,currency:x.currency,monthly:x.monthly||'',payYears:x.payYears||'',sumInsured:x.sumInsured||'',
-      issueAge:x.issueAge||v.age||'',startAge:x.startAge||'',payout:x.payout,rate:x.rate||'',minRate:x.minRate||'',fee:x.fee||0,gmab:x.gmab||0,fxIssue:x.fxIssue||'',fxPayout:x.fxIssue||'',
-      designMonthly:x.designMonthly||'',designTotal:x.designTotal||'',refund:(x.refund||[]).map(r=>r.year+'년:'+r.rate).join(', '),memo:x.memo||''}); v.products.push(p); });
-    touch(); refreshProducts(); $('#aiStatus').textContent=(data.products||[]).length+'개 상품을 채웠습니다. 숫자를 설계서와 대조해 주세요.';
-  }catch(e){
-    st.textContent = e instanceof TypeError ? '이 화면에서는 외부 호출이 막혀 있습니다. 파일을 브라우저로 직접 열거나 포탈에서 실행하세요.' : 'AI 판독 실패: '+(e.message||e);
-  }
-}
-
 /* ════════════════ 2-2. 제안서 출력 ════════════════
    상담 설계 입력값 → 섹션(태그·제목·리드·블록) 배열 → 문서 렌더.
    판단 문장은 계산값 비교 규칙으로 생성(AI 없이 동작). 시뮬레이션은 PP.sims 에 상태를 두고 슬라이더로 재계산. */
@@ -3192,6 +3167,165 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('#lawModal').hi
 
 /* ════════════════ 시작 ════════════════ */
 store = load();
+/* ════════════════ 내 AI 연결 (../ai-connect.js 공통 「내 AI 등록」) ════════════════
+   기본형·고급형이 같은 AI 설정을 쓴다. 고급형에서 AI는 ① 증권·설계서 → 계약·담보 ② 상담 자료 → 입력칸
+   ③ 연금 설계서 → 추천 상품 ④ 계산 결과 → 컨설턴트 의견 초안 에만 쓴다.
+   계산과 제안서 문장은 지금처럼 고급형 규칙으로 만든다. AI가 읽은 값은 FC가 미리보기에서 고른 것만 반영한다. */
+const KAI = window.KIFAI || {cfg:()=>({mode:'off'}),statusHTML:()=>'AI 연결 도구를 불러오지 못했습니다(인터넷 연결 확인).',open:()=>{},ask:()=>Promise.reject({code:'lib'}),read:()=>Promise.reject({code:'lib'}),err:e=>(e&&e.message)||'AI 연결 도구를 불러오지 못했습니다.',onChange:()=>{},migrateClaudeKey:()=>{},AIP:{}};
+if(store.aiKey){ KAI.migrateClaudeKey(store.aiKey); delete store.aiKey; save(); }
+const aiAsk=(p,m)=>KAI.ask(p,m), readForAI=f=>KAI.read(f), aiErr=e=>KAI.err(e);
+function aiBadges(){
+  document.querySelectorAll('[data-aistat]').forEach(el=>el.innerHTML=KAI.statusHTML());
+  const b=$('#btnAiCfg'); if(b){ const c=KAI.cfg(), a=KAI.AIP[c.prov]; b.textContent='내 AI: '+(c.mode!=='ai'||!a?'꺼짐':a.name.replace(/ \(.*\)$/,'')); }
+}
+KAI.onChange(aiBadges); aiBadges();
+
+/* ---------- ① 증권·설계서 → 보장분석표 계약·담보 ---------- */
+let scanned=[];
+function policyPrompt(){
+  const cu=cur().customer;
+  return '너는 보험 계약 자료(보험증권, 가입설계서, 내보험찾아줌·보장분석 조회 화면)를 읽어 보장분석표로 옮기는 도우미다.\n'
+   +'고객: '+(cu.name||'고객')+(cu.age?', '+cu.age+'세':'')+(cu.sex?' '+cu.sex:'')+'\n'
+   +'규칙:\n- 계약마다 하나씩 적는다. company 보험사, product 상품명, type은 '+POL_TYPES.join('|')+' 중 하나, insured 피보험자(본인/배우자/자녀 또는 이름), premium 월 보험료(원, 숫자. 연납이면 12로 나눔), start 계약일 YYYY-MM-DD, coverEnd 보장 만기 나이(숫자, 종신이면 100), renew 갱신형이면 true.\n'
+   +'- covers: 담보마다 {"cat":코드,"amt":금액}. cat은 아래 목록에서 가장 맞는 코드 하나. 목록에 없는 담보는 others 배열에 "담보명 금액" 글자로 적는다.\n'
+   +'- amt 단위는 만원(예: 3,000만원→3000, 1억→10000). 일당 담보는 하루 금액(만원), 회당 담보는 1회 금액(만원). 실손의료비는 가입이면 1.\n'
+   +'- 한 계약에 같은 코드 담보가 여러 개면 금액을 더한다. 문서에 없는 값은 추측하지 말고 숫자 0, 글자 ""로 둔다.\n'
+   +'담보 코드 목록:\n'+CATS.map(c=>c.k+' = '+c.n+(c.per==='일'?' (만원/일)':c.per==='회'?' (만원/회)':c.yn?' (가입이면 1)':' (만원)')).join('\n')
+   +'\n\n답은 JSON 하나만: {"policies":[{"company":"","product":"","type":"","insured":"","premium":0,"start":"","coverEnd":0,"renew":false,"covers":[{"cat":"cancer","amt":3000}],"others":[""]}]}';
+}
+async function analyzePolicyFiles(files){
+  files=[...(files||[])]; if(!files.length) return;
+  const st=$('#scanStatus'), pv_=$('#scanPreview'); pv_.innerHTML='';
+  try{
+    st.textContent='자료를 준비하는 중…'; const mat=await readForAI(files);
+    st.textContent='AI가 계약과 담보를 읽는 중… (30초~2분)';
+    const r=await aiAsk(policyPrompt(), mat);
+    scanned=(r&&r.policies||[]).map(p=>{
+      const covers=[]; (p.covers||[]).forEach(cv=>{ if(!CAT[cv.cat]) return; const a=n(cv.amt); if(!a) return; const ex=covers.find(x=>x.cat===cv.cat); if(ex) ex.amt+=a; else covers.push({cat:cv.cat,amt:a}); });
+      if(/실손/.test(p.type||p.product||'')&&!covers.some(x=>x.cat==='medical')) covers.push({cat:'medical',amt:1});
+      return {sel:true, company:String(p.company||''), product:String(p.product||''), type:POL_TYPES.includes(p.type)?p.type:guessType(p.product), insured:String(p.insured||'본인'),
+        premium:n(p.premium)||'', start:/^\d{4}-\d{2}-\d{2}$/.test(p.start||'')?p.start:'', coverEnd:n(p.coverEnd)||'', renew:!!p.renew||/갱신/.test(p.product||''), covers, others:(p.others||[]).filter(Boolean)};
+    }).filter(p=>p.company||p.product||p.covers.length);
+    if(!scanned.length){ st.textContent='계약을 찾지 못했습니다. 증권·설계서가 맞는지, 글자가 잘 보이는지 확인하세요.'; return; }
+    st.textContent=scanned.length+'건을 읽었습니다. 아래에서 확인하고 가져오세요.';
+    let h='<div class="tbl-wrap"><table class="t"><tr><th></th><th>보험사 · 상품</th><th>종류</th><th>계약일</th><th>만기</th><th class="r">월 보험료</th><th>담보</th></tr>';
+    scanned.forEach((p,i)=>{ h+='<tr><td><input type="checkbox" data-si="'+i+'" checked aria-label="가져오기"></td><td><b>'+esc(p.company)+'</b><br>'+esc(p.product)+(p.renew?' <span class="tag warn">갱신</span>':'')+'</td><td>'+esc(p.type)+'<br><span class="small muted">'+esc(p.insured)+'</span></td><td class="num">'+esc(p.start||'-')+'</td><td class="num">'+(p.coverEnd?p.coverEnd+'세':'-')+'</td><td class="r num">'+(p.premium!==''?comma(p.premium)+'원':'-')+'</td>'
+      +'<td class="small">'+(p.covers.map(cv=>esc(CAT[cv.cat].n)+' '+(CAT[cv.cat].yn?'가입':comma(cv.amt)+unitOf(cv.cat))).join(' · ')||'-')+(p.others.length?'<br><span class="muted">목록 밖 담보(가져오지 않음): '+esc(p.others.join(', '))+'</span>':'')+'</td></tr>'; });
+    h+='</table></div><p class="small muted" style="margin:6px 0">AI가 읽은 값입니다. 증권과 대조한 뒤 가져오세요. 가져온 뒤에도 고칠 수 있습니다.</p><button type="button" class="btn sm primary" id="btnScanAdd">선택한 '+scanned.length+'건 가져오기</button>';
+    pv_.innerHTML=h;
+  }catch(e){ st.textContent='✕ '+aiErr(e); }
+  finally{ const f=$('#scanFile'); if(f) f.value=''; }
+}
+$('#scanPreview').addEventListener('change',e=>{ if(e.target.dataset.si!=null){ scanned[n(e.target.dataset.si)].sel=e.target.checked; const b=$('#btnScanAdd'); if(b) b.textContent='선택한 '+scanned.filter(p=>p.sel).length+'건 가져오기'; } });
+$('#scanPreview').addEventListener('click',e=>{
+  if(e.target.id!=='btnScanAdd') return;
+  const c=cur(), sel=scanned.filter(p=>p.sel);
+  sel.forEach(p=>c.policies.push({id:uid(), company:p.company, product:p.product, type:p.type, insured:p.insured, premium:p.premium, start:p.start, coverEnd:p.coverEnd, renew:p.renew, covers:p.covers.map(x=>({cat:x.cat,amt:x.amt}))}));
+  touch(); $('#scanPreview').innerHTML=''; $('#scanStatus').textContent=''; $('#scanBox').hidden=true; scanned=[];
+  renderPolicies(); renderAnalysis(); toast(sel.length+'건을 보장분석표에 넣었습니다. 숫자를 한 번 더 확인하세요');
+});
+
+/* ---------- ② 상담 메모·자료 → 보장·연금·자산 입력칸 ---------- */
+let fillRes=null;
+function fieldSpec(x){ return x.t==='chk'?'true/false':x.t==='sel'?'다음 중 하나: '+x.o.join(' | '):(x.t==='text'||x.t==='area')?'글자':'숫자'+(x.u?' ('+x.u+')':''); }
+function fillPrompt(field){
+  const F=PLAN_FORMS[field], cu=cur().customer;
+  let t='너는 보험 상담 자료(상담 메모, 가입설계서, 증권, 국민연금 예상액, 퇴직연금·연금저축 내역, 금융자산·대출 내역 등)를 읽어 「'+F.name+'」 입력칸을 채우는 도우미다.\n'
+   +'규칙:\n- 자료에 분명히 나온 값만 적는다. 추측하거나 계산해서 만들지 말고, 없는 칸은 빼고 답한다.\n- 금액 단위를 칸에 맞춘다(만원: 5,000,000원→500, 1억→10000 / 만원/월: 월 금액). 비율은 % 숫자(4.5% → 4.5).\n- 선택칸은 주어진 보기 글자 중 하나로만 답한다.\n'
+   +'\n고객 기본 정보(참고): '+[cu.name, cu.age&&cu.age+'세', cu.sex, cu.job, cu.income&&'연소득 '+cu.income+'만원', cu.memo].filter(Boolean).join(', ')+'\n\n입력칸 목록 (코드: 이름 · 형식):\n';
+  F.sections.forEach(s=>{ t+='['+s.t+']\n'; s.f.forEach(x=>{ t+=x.k+': '+x.l+' · '+fieldSpec(x)+'\n'; }); });
+  return t+'\n답은 JSON 하나만: {"fields":{"코드":값}, "missing":"자료에서 찾지 못한 중요한 항목(짧게)"}';
+}
+function cleanVal(x,v){
+  if(v==null||v==='') return undefined;
+  if(x.t==='chk') return v===true||v==='true'||v==='예';
+  if(x.t==='sel'){ const s=String(v).trim(); return x.o.includes(s)?s:(x.o.find(o=>o.startsWith(s)||s.startsWith(o.split(' ')[0]))); }
+  if(x.t==='text'||x.t==='area') return String(v).trim()||undefined;
+  const num=Number(String(v).replace(/[^\d.\-]/g,'')); return isFinite(num)&&String(v).match(/\d/)?num:undefined;
+}
+function showVal(x,v){ if(v===''||v==null||v===false) return '<span class="muted">비어 있음</span>'; if(v===true) return '✓'; return esc(typeof v==='number'?comma(v)===String(v)?v:(Math.round(v)===v?comma(v):v):v)+(x.u&&typeof v==='number'?' '+esc(x.u):''); }
+function openFill(){
+  const P=plans(); if(!P.field) return;
+  $('#aiFillTitle').textContent=PLAN_FORMS[P.field].name+' 입력칸 채우기 (AI)';
+  $('#aiFillText').value=''; $('#aiFillFiles').value=''; $('#aiFillStatus').textContent=''; $('#aiFillPreview').innerHTML=''; fillRes=null;
+  aiBadges(); $('#aiFillModal').hidden=false;
+}
+async function runFill(){
+  const P=plans(), field=P.field, st=$('#aiFillStatus'), memo=$('#aiFillText').value.trim(), files=[...($('#aiFillFiles').files||[])];
+  if(!memo&&!files.length){ st.textContent='상담 메모를 쓰거나 자료 파일을 골라 주세요.'; return; }
+  const btn=$('#aiFillRun'); btn.disabled=true; $('#aiFillPreview').innerHTML='';
+  try{
+    st.textContent='자료를 준비하는 중…'; const mat=await readForAI(files);
+    if(memo) mat.text='===== 상담 메모 =====\n'+memo+'\n'+mat.text;
+    st.textContent='AI가 자료를 읽는 중… (30초~2분)';
+    const r=await aiAsk(fillPrompt(field), mat), got=(r&&r.fields)||{}, v=pv(field);
+    fillRes={field, rows:Object.keys(got).filter(k=>PF[field][k]).map(k=>({k, x:PF[field][k], val:cleanVal(PF[field][k],got[k])})).filter(r=>r.val!==undefined), missing:String(r&&r.missing||'')};
+    if(!fillRes.rows.length){ st.textContent='채울 값을 찾지 못했습니다. 자료에 숫자가 보이는지 확인하세요.'; return; }
+    st.textContent=fillRes.rows.length+'칸을 읽었습니다. 맞는 것만 골라 반영하세요.';
+    let h='<div class="tbl-wrap"><table class="t"><tr><th></th><th>항목</th><th class="r">지금 값</th><th class="r">AI가 읽은 값</th></tr>';
+    fillRes.rows.forEach((r,i)=>{ const same=String(v[r.k]??'')===String(r.val); h+='<tr><td><input type="checkbox" data-fi="'+i+'"'+(same?'':' checked')+' aria-label="반영"></td><td>'+esc(r.x.l)+'</td><td class="r num">'+showVal(r.x,v[r.k])+'</td><td class="r num"><b>'+showVal(r.x,r.val)+'</b>'+(same?' <span class="small muted">같음</span>':'')+'</td></tr>'; });
+    h+='</table></div>'+(fillRes.missing?'<p class="small muted" style="margin-top:6px">자료에 없던 항목: '+esc(fillRes.missing)+'</p>':'')+'<div class="ai-row" style="margin-top:10px"><button type="button" class="btn primary" id="aiFillApply">고른 값 반영</button></div>';
+    $('#aiFillPreview').innerHTML=h;
+  }catch(e){ st.textContent='✕ '+aiErr(e); }
+  finally{ btn.disabled=false; }
+}
+$('#aiFillModal').addEventListener('click',e=>{
+  if(e.target.id==='aiFillModal'||e.target.closest('#aiFillClose')){ $('#aiFillModal').hidden=true; return; }
+  if(e.target.id==='aiFillRun'){ runFill(); return; }
+  if(e.target.id==='aiFillApply'&&fillRes){
+    const v=pv(fillRes.field); let k=0;
+    $('#aiFillPreview').querySelectorAll('[data-fi]').forEach(cb=>{ if(cb.checked){ const r=fillRes.rows[n(cb.dataset.fi)]; v[r.k]=r.val; k++; } });
+    touch(); $('#aiFillModal').hidden=true; renderPlan(); toast(k+'칸을 채웠습니다. 계산 미리보기를 확인하세요');
+  }
+});
+
+/* ---------- ③ 연금 설계서 → 추천 연금상품 (모든 AI 방식) ---------- */
+const DESIGN_FMT='\n\n답은 JSON 하나만: {"products":[{"insurer":"","product":"","type":"'+PROD_TYPES.join('|')+'","currency":"KRW|USD","monthly":0,"payYears":0,"sumInsured":0,"issueAge":0,"startAge":0,"payout":"'+PAYOUTS.join('|')+'","rate":0,"minRate":0,"fee":0,"gmab":0,"fxIssue":0,"designMonthly":0,"designTotal":0,"refund":[{"year":1,"rate":0}],"memo":""}]}';
+async function aiReadDesign(){
+  const st=$('#aiStatus'), files=[...($('#aiFiles').files||[])];
+  if(!files.length){ st.textContent='설계서 파일을 먼저 고르세요'; return; }
+  try{
+    st.textContent='자료를 준비하는 중…'; const mat=await readForAI(files);
+    st.textContent='설계서를 읽는 중… (30초~2분)';
+    const data=await aiAsk(AI_PROMPT+DESIGN_FMT, mat), v=pv('pension'); v.products=v.products||[];
+    const list=(data&&data.products)||[];
+    list.forEach(x=>{ const ty=PROD_TYPES.includes(x.type)?x.type:'공시이율형';
+      const p=Object.assign(newProduct(ty,v),{insurer:x.insurer||'',product:x.product||'',currency:x.currency==='USD'?'USD':'KRW',monthly:x.monthly||'',payYears:x.payYears||'',sumInsured:x.sumInsured||'',
+        issueAge:x.issueAge||v.age||'',startAge:x.startAge||'',payout:PAYOUTS.includes(x.payout)?x.payout:'20년',rate:x.rate||'',minRate:x.minRate||'',fee:x.fee||0,gmab:x.gmab||0,fxIssue:x.fxIssue||'',fxPayout:x.fxIssue||'',
+        designMonthly:x.designMonthly||'',designTotal:x.designTotal||'',refund:(x.refund||[]).filter(r=>r&&r.year).map(r=>r.year+'년:'+r.rate).join(', '),memo:x.memo||''});
+      v.products.push(p); });
+    touch(); refreshProducts(); const s2=$('#aiStatus'); if(s2) s2.textContent=list.length?list.length+'개 상품을 채웠습니다. 숫자를 설계서와 대조해 주세요.':'상품을 찾지 못했습니다. 연금보험 설계서가 맞는지 확인하세요.';
+  }catch(e){ const s2=$('#aiStatus'); if(s2) s2.textContent='✕ '+aiErr(e); }
+}
+
+/* ---------- ④ 컨설턴트 의견 초안 (고급형 계산 결과 → AI가 문장만) ---------- */
+let cmtDraft='';
+async function draftComment(){
+  const st=$('#cmtStatus'), box=$('#cmtDraft'), btn=$('#btnCmtAI'), c=cur(), cu=c.customer;
+  const rep=($('#reportRoot').innerText||'').replace(/\n{3,}/g,'\n\n').slice(0,12000);
+  btn.disabled=true; box.innerHTML=''; st.textContent='AI가 의견 초안을 쓰는 중… (30초~1분)';
+  try{
+    const prompt='너는 보험 컨설턴트의 상담 리포트 「컨설턴트 의견」 초안을 쓰는 도우미다.\n'
+      +'아래 리포트는 고급형 프로그램이 정해진 계산 규칙으로 만든 결과다. 이 결과만 근거로 쓴다.\n규칙:\n'
+      +'- 리포트에 있는 숫자·판정만 쓴다. 새 숫자를 계산하거나 만들지 않는다. 특정 보험사·상품명은 리포트에 있는 경우만.\n'
+      +'- 고객에게 직접 말하는 존댓말(~습니다). 3~5문장, 400자 안팎. 가장 급한 부족 1~2가지 → 우선 보완 방향 → 다음 상담 약속 순서.\n'
+      +'- 수익·보장을 확정적으로 약속하는 표현(무조건, 반드시 이득 등)은 쓰지 않는다.\n'
+      +'고객: '+[cu.name,cu.age&&cu.age+'세',cu.sex,cu.job].filter(Boolean).join(', ')+'\n'
+      +(c.comment?'FC가 써 둔 메모(반영할 것): '+c.comment+'\n':'')
+      +'\n답은 JSON 하나만: {"comment":"의견 문장"}\n\n리포트:\n'+rep;
+    const r=await aiAsk(prompt), t=String(r&&r.comment||'').trim();
+    if(!t){ st.textContent='초안을 받지 못했습니다. 한 번 더 눌러 보세요.'; return; }
+    cmtDraft=t; st.textContent='초안이 왔습니다. 읽어 보고 맞으면 「이 초안 쓰기」를 누르세요. 쓴 뒤에도 고칠 수 있습니다.';
+    box.innerHTML='<div class="rp-comment" style="margin-top:8px">'+esc(t)+'</div><div class="ai-row" style="margin-top:8px"><button type="button" class="btn sm primary" id="btnCmtUse">이 초안 쓰기</button><button type="button" class="btn sm ghost" id="btnCmtDrop">버리기</button></div>';
+  }catch(e){ st.textContent='✕ '+aiErr(e); }
+  finally{ btn.disabled=false; }
+}
+$('#v-report').addEventListener('click',e=>{
+  if(e.target.id==='btnCmtAI'){ draftComment(); return; }
+  if(e.target.id==='btnCmtUse'&&cmtDraft){ const c=cur(); c.comment=cmtDraft; touch(); $('#rp-comment').value=cmtDraft; cmtDraft=''; $('#cmtDraft').innerHTML=''; $('#cmtStatus').textContent=''; renderReport(); toast('의견 초안을 넣었습니다. 필요하면 고쳐 주세요'); return; }
+  if(e.target.id==='btnCmtDrop'){ cmtDraft=''; $('#cmtDraft').innerHTML=''; $('#cmtStatus').textContent=''; }
+});
+
 renderClientSel(); updateInboxCnt(); renderDiag();
 let startView = (location.hash||'').slice(1);
 if(!VIEWS.includes(startView)){ try{ startView = sessionStorage.getItem(KEY+'-view')||''; }catch(e){} }
