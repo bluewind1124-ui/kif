@@ -3547,4 +3547,12 @@ refresh();
 
 <link rel="stylesheet" href="kif.css">
 <script src="kif.js"></script>
+<!-- 포털로 돌아가기: 모든 화면 왼쪽 아래 '← 이전' '⌂ 포털 홈' -->
+<style>#kifNav{position:fixed;left:14px;bottom:14px;z-index:2147483000;display:flex;gap:6px;font-family:"Noto Sans KR","Malgun Gothic",sans-serif}#kifNav button{border:0;border-radius:999px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(15,34,64,.28);background:#0f2240;color:#fff}#kifNav button.h{background:#cb9c3a;color:#0f2240}#kifNav button:hover{filter:brightness(1.12)}body{padding-bottom:64px}@media print{#kifNav{display:none}}</style>
+<div id="kifNav" role="navigation" aria-label="포털 이동"><button type="button" id="kifBack">← 이전</button><button type="button" class="h" id="kifHome">⌂ 포털 홈</button></div>
+<script>(function(){var HOME=new URL('../index.html',location.href).href;
+if(window.top!==window){var n=document.getElementById('kifNav');if(n)n.remove();return;}
+function same(u){try{return new URL(u).origin===location.origin;}catch(e){return false;}}
+document.getElementById('kifHome').onclick=function(){location.href=HOME;};
+document.getElementById('kifBack').onclick=function(){if(history.length>1&&same(document.referrer))history.back();else location.href=HOME;};})();</script>
 </body></html>
