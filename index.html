@@ -692,6 +692,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .sa{list-style:none;margin:0;padding:0;display:grid;gap:3px;font-size:.82rem}.sa li{display:flex;justify-content:space-between;gap:8px}.sa li em{font-style:normal;font-variant-numeric:tabular-nums}.sa li.z em{color:#c0392b;font-weight:700}
 .newsm{display:grid;gap:2px;font-size:.8rem;border-top:1px dashed var(--line);padding-top:6px;color:var(--ink);text-decoration:none}.newsm span{color:var(--muted);font-size:.74rem}
 .smp-drop{display:grid;gap:4px;justify-items:center;text-align:center;border:2px dashed #cb9c3a;border-radius:12px;background:#fbf6ea;padding:22px 14px;margin:10px 0;cursor:pointer}.smp-drop b{font-size:1.15rem;color:#8f6510}.smp-drop span{font-size:.9rem}.smp-drop em{font-style:normal;font-size:.8rem;color:var(--muted)}.smp-drop.over,.smp-drop:hover{background:#f5ead0}
+.pendbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;padding:10px;border:1px dashed #cb9c3a;border-radius:10px;background:#fbf6ea}.pendbar .bad{color:#b42318}
 .nwf{border-top:1px dashed var(--line);padding-top:8px}.npick .nrow{border-top:1px solid var(--line);padding:10px 0;display:grid;gap:6px}.npick .nhd{display:flex;gap:8px;align-items:center}.npick .ncur{font-size:.86rem}.npick .ncur em{font-style:normal;color:var(--muted)}.npick .ncur.bad{color:#b42318}.npick .row.wide{grid-column:1/-1}.nwf .wide{grid-column:1/-1}
 .aibar .optc{text-align:left;font:inherit;color:var(--ink)}.aig{margin:12px 0 0;font-size:.9rem}
 .pmodal{position:fixed;inset:0;z-index:95;background:rgba(10,20,40,.55);display:grid;place-items:center;padding:16px}
@@ -2782,7 +2783,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<ul class="list flist">'+(L.length?L.map(function(f){var k=c.contracts.filter(function(x){return x.src===f.id;}).length,bad=/보관만/.test(f.read||'');
         return '<li><span class="pill">'+esc(f.type)+'</span><span class="t">'+esc(f.name)+' <span class="note">'+esc(f.at)+'</span><br><span class="note '+(bad?'bad':'')+'">'+esc(f.read||'')+'</span>'+(f.warn?'<br><span class="note bad">⚠ '+esc(f.warn)+'</span>':'')+'</span>'+
           (bad?'<button class="btn sm ghost" data-a="reFile" data-id="'+f.id+'">다시 읽기</button>':'')+
-          '<button class="btn sm ghost danger" data-a="delFile" data-id="'+f.id+'" data-n="'+k+'">삭제</button></li>';}).join(''):'<li class="note">첨부한 자료가 없습니다.</li>')+'</ul></div>';
+          '<button class="btn sm ghost danger" data-a="delFile" data-id="'+f.id+'" data-n="'+k+'">삭제</button></li>';}).join(''):'<li class="note">첨부한 자료가 없습니다.</li>')+'</ul>'+pendBar(L,kind)+'</div>';
+  }
+  function pendBar(L,kind){
+    var P=L.filter(function(f){return f.pend;}),ok=P.filter(function(f){return MEM[f.id];});if(!P.length)return '';
+    return '<div class="pendbar"><button class="btn" data-a="aiReadAll" data-kind="'+kind+'"'+(ok.length?'':' disabled')+'>AI에게 읽히기 ('+ok.length+'건 한 번에)</button>'+
+      '<span class="note">자료를 모두 올린 뒤 누르세요. AI 창이 한 번만 뜹니다. 잘못 올린 자료는 먼저 삭제하세요.'+(P.length>ok.length?' <b class="bad">'+(P.length-ok.length)+'건은 새로고침으로 원본이 사라져 다시 첨부해야 합니다.</b>':'')+'</span></div>';
   }
   function tySel(ki,ii,it){var a=injType(it.name),v=TYS.indexOf(it.ty)>-1?it.ty:'';return '<select class="in tysel '+tyCls(v||a)+'" data-k="'+ki+'" data-i="'+ii+'" data-g="ty" aria-label="상해·질병 구분"><option value="">자동: '+a+'</option>'+TYS.map(function(x){return '<option'+(x===v?' selected':'')+'>'+x+'</option>';}).join('')+'</select>';}
   function sortSeg(){return '<span class="seg" role="group" aria-label="담보 정렬"><span class="note">정렬</span>'+[['orig','자료 순서'],['area','보장 종류별'],['ty','상해·질병별'],['amt','금액 큰 순']].map(function(m){return '<button class="'+(st.sort===m[0]?'on':'')+'" data-a="sortK" data-m="'+m[0]+'" aria-pressed="'+(st.sort===m[0])+'">'+m[1]+'</button>';}).join('')+'</span>';}
@@ -3538,7 +3544,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var prompt=AI_RULE+AI_FMT+(kind?'\n지정값: 모든 계약의 kind는 "'+kind+'".':'')+(part?'\n이 자료는 한 문서의 '+part+' 부분이다. 이 부분에 보이는 계약·담보만 적는다.':'')+'\n\n자료:\n'+(text||'(이미지 참조)');
     var o={modelTier:'default',part:part||''};if(images&&images.length)o.images=images;
     var r=await cap.sample.json(prompt,o);
-    return (r&&r.contracts||[]).map(function(k){return {id:uid(),kind:/신규/.test(k.kind)?'신규':'기존',insured:k.insured||'',insurer:k.insurer||'',product:k.product||'',period:k.period||'',term:k.term||'',premium:n(k.premium),nature:'',
+    return (r&&r.contracts||[]).map(function(k){return {file:k.file==null?null:+k.file,id:uid(),kind:/신규/.test(k.kind)?'신규':'기존',insured:k.insured||'',insurer:k.insurer||'',product:k.product||'',period:k.period||'',term:k.term||'',premium:n(k.premium),nature:'',
       items:(k.items||[]).map(function(it){if(Array.isArray(it))it={name:it[0],amt:it[1],prem:it[2],term:it[3],cycle:it[4]};return {area:classify(it.name||''),name:String(it.name||''),amt:it.amt==null||it.amt===''?null:n(it.amt),prem:it.prem==null||it.prem===''?null:n(it.prem),term:String(it.term||''),cycle:String(it.cycle||'')};}).filter(function(i){return i.name;}),confirmed:false};});
   }
   /* 같은 계약 안에서 담보명·금액이 같은 담보 = 중복 확인 대상 (지우지 않고 표시만) */
@@ -3578,7 +3584,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     no_proxy:'관리자가 아직 회사 AI를 켜지 않았습니다. 위의 "AI 연결 설정"에서 복사·붙여넣기를 고르세요.',
     need_code:'회사 접속코드가 맞지 않습니다. "AI 연결 설정 › 회사 AI"에서 관리자가 알려준 코드를 넣으세요.',
     relay_down:'회사 AI 서버에 연결하지 못했습니다. 인터넷 연결을 확인하거나 관리자에게 알려 주세요.',
-    paste_cancel:'붙여넣기를 취소했습니다. "다시 읽기"로 다시 할 수 있습니다.',
+    paste_cancel:'아직 AI가 읽지 않았습니다 — AI 답을 가져오기 전에 창이 닫혔습니다. "다시 읽기"를 누르세요.',
     no_key:'AI 키가 없습니다. 위의 "AI 연결 설정"에서 키를 넣어 주세요.',
     bad_key:'AI 키가 맞지 않거나 사용 권한이 없습니다. AI 연결 설정에서 키를 확인하세요.',
     bad_model:'모델 이름을 찾지 못했습니다. AI 연결 설정의 모델 이름을 확인하세요.',
@@ -3617,11 +3623,43 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   async function onFiles(files,kind){
     var c=cust();gatherDocs(c);var prog=document.getElementById('aiProg');
     root.querySelectorAll('[data-upkind]').forEach(function(x){x.disabled=true;});
+    if(!cap.sample&&cap.sampleP)await cap.sampleP;
+    var queue=isPaste(),q=0;
     for(var i=0;i<files.length;i++){
       var f=files[i],rec={id:uid(),kind:kind,name:f.name,size:f.size,type:(f.name.split('.').pop()||'').toLowerCase(),at:nowStr(),read:''};c.files.push(rec);MEM[rec.id]=f;
+      /* 복사·붙여넣기 방식: AI 창을 파일마다 띄우지 않고, 다 올린 뒤 'AI에게 읽히기'로 한 번에 읽힌다 (엑셀 양식은 바로 읽음) */
+      if(queue){
+        if(/xlsx|xls|csv/.test(rec.type)&&window.XLSX){try{var wb=XLSX.read(await f.arrayBuffer(),{type:'array'}),res=parseWB(wb,kind);if(res.contracts.length){var mx=res.contracts.some(function(k){return k.kind==='신규';})&&res.contracts.some(function(k){return k.kind!=='신규';});addParsed(c,res.contracts,rec,'엑셀 읽기 완료('+res.how+')',kind,false,mx);continue;}}catch(e){}}
+        rec.pend=1;rec.read=PEND_TXT;q++;continue;}
       prog.textContent='"'+f.name+'" 읽는 중…';await readOne(c,f,rec,kind,prog);
     }
-    touch(c);render();toast(kind+' 자료 '+files.length+'개를 처리했습니다.');
+    touch(c);render();
+    var n=c.files.filter(function(x){return x.kind===kind&&x.pend;}).length;
+    toast(q?'자료 '+files.length+'개를 첨부했습니다. 다 올렸으면 "AI에게 읽히기 ('+n+'건)"을 누르세요.':kind+' 자료 '+files.length+'개를 처리했습니다.');
+  }
+  var PEND_TXT='AI 읽기 대기 — 자료를 다 올린 뒤 아래 "AI에게 읽히기"를 누르면 한 번에 읽습니다.';
+  /* 대기 중인 자료를 한 번의 질문으로 묶어 AI에게 보낸다 (복사·붙여넣기 창 1번) */
+  async function readAll(c,kind){
+    var recs=c.files.filter(function(f){return f.kind===kind&&f.pend&&MEM[f.id];}),prog=document.getElementById('aiProg');if(!recs.length)return;
+    var texts=[],imgs=[],imgNames=[];
+    try{
+      for(var i=0;i<recs.length;i++){var rec=recs[i],f=MEM[rec.id],no=i+1,t='';
+        if(prog)prog.textContent='"'+f.name+'" 준비 중… ('+no+'/'+recs.length+')';
+        if(/xlsx|xls|csv/.test(rec.type)){if(!window.XLSX)throw {code:'x'};t=parseWB(XLSX.read(await f.arrayBuffer(),{type:'array'}),kind).text;}
+        else if(rec.type==='pdf'){var pr=await pdfRead(f);if(pr.pages)t=pr.pages.join('\n');else{t='(글자를 꺼낼 수 없는 스캔 PDF — 함께 첨부한 파일 "'+f.name+'"의 모든 쪽을 직접 보고 읽어라.)';imgs=imgs.concat(pr.images);imgNames.push(f.name);}}
+        else{t='(사진 자료 — 함께 첨부한 파일 "'+f.name+'"을 직접 보고 읽어라.)';imgs.push(f);imgNames.push(f.name);}
+        texts.push('===== 파일 '+no+': '+f.name+' =====\n'+t);}
+      PASTE_FILE=imgNames.join(', ');
+      if(prog)prog.textContent='자료 '+recs.length+'건을 한 번에 AI에게 보내는 중…';
+      var head='여러 파일을 한 번에 보낸다(파일 '+recs.length+'개). 모든 파일의 계약·담보를 빠짐없이 적고, 각 계약 객체에 "file":파일번호(숫자)를 꼭 넣어라.\n\n';
+      var got=await aiCall(head+texts.join('\n\n'),imgs,kind,'');
+      recs.forEach(function(rec,i){var no=i+1,L=got.filter(function(k){return k.file===no||(recs.length===1)||(i===0&&!(k.file>=1&&k.file<=recs.length));});
+        L=mergeK(L);L.forEach(function(k){delete k.file;});delete rec.pend;
+        if(L.length)addParsed(c,L,rec,'AI 판독(확인 필요) · '+recs.length+'건 한 번에 읽음',kind,true);
+        else rec.read='보관만 됨 — 계약·담보를 찾지 못했습니다. 가입설계서의 담보 표가 있는 자료인지 확인하세요.';});
+      toast('자료 '+recs.length+'건을 읽었습니다. 아래 계약·담보를 확인하세요.');
+    }catch(e){recs.forEach(function(rec){rec.read=PEND_TXT+' (지난번: '+errMsg(e)+')';});toast(errMsg(e));}
+    if(prog)prog.textContent='';
   }
 
   /* ---------------- 저장·출력 ---------------- */
@@ -3876,6 +3914,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       gatherDocs(c);c.contracts=c.contracts.filter(function(k){return k.src!==rf.id;});b.disabled=true;var pg=document.getElementById('aiProg');readOne(c,MEM[rf.id],rf,rf.kind,pg).then(function(){touch(c);render();toast('다시 읽었습니다.');});return;}
     if(a==='addLog'){gatherInfo(c);if(!c.name){toast('이름을 먼저 입력하세요.');return;}touch(c);render();toast('상담 기록을 추가했습니다.');return;}
     if(a==='delLog'){if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='삭제?';return;}gatherInfo(c);c.logs.splice(+b.dataset.i,1);c.memo=logText(c);touch(c);render();return;}
+    if(a==='aiReadAll'){gatherDocs(c);b.disabled=true;b.textContent='AI에게 보내는 중…';readAll(c,b.dataset.kind).then(function(){touch(c);render();});return;}
     if(a==='delFam'){gatherInfo(c);c.family.splice(+b.dataset.i,1);render();return;}
     if(a==='addHx'){gatherInfo(c);c.history.push({date:'',type:'통원',dx:'',days:'',visits:'',surg:'',note:''});render();return;}
     if(a==='delHx'){gatherInfo(c);c.history.splice(+b.dataset.i,1);render();return;}
