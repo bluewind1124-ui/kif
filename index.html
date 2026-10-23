@@ -444,6 +444,10 @@ a.mat{color:inherit;text-decoration:none;display:block}
 .mview .mvh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:var(--surface,#fff);border-bottom:1px solid var(--line,#ddd)}
 .mview .mvh .sp{flex:1}
 .mview .mv-big{max-width:460px;margin:60px auto;text-align:center;background:var(--surface,#fff);border-radius:12px;padding:24px;line-height:1.6}
+.op-cols{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0}.op-col{flex:1 1 200px;border:1px solid var(--line,#ddd);border-radius:10px;padding:8px}.op-col.best{border-color:#cb9c3a;background:rgba(203,156,58,.08)}.op-col.add{display:flex;flex-direction:column;gap:6px;justify-content:center;border-style:dashed}
+.op-h{margin:12px 0 4px;font-size:.92rem}.op-rows{width:100%;font-family:ui-monospace,Consolas,"D2Coding",monospace;font-size:12.5px;white-space:pre;overflow-x:auto;tab-size:24}
+.op-cat>summary{cursor:pointer;list-style:none;display:flex;gap:6px;align-items:center;flex-wrap:wrap}.op-cat>summary::before{content:'▸';color:var(--muted,#888)}.op-cat[open]>summary::before{content:'▾'}
+.op-pend{border-color:#e0b862;background:rgba(224,184,98,.1)}.op-ai{border-style:dashed}.op-draft{margin-top:8px;padding:10px;border-radius:10px;background:var(--surface-2,#f6f8fa)}.op-draft ul{margin:6px 0 8px;padding-left:18px;font-size:13px}
 .mview .mv-big p{margin:8px 0 16px;color:var(--muted,#666)}
 .mview .mvb{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px}
 .mview .mvb canvas,.mview .mvb img{max-width:100%;height:auto;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.35)}
@@ -1389,7 +1393,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(cur==='compare'&&CMP.open){CMP.open='';pBack=true;try{go('compare');}finally{pBack=false;}return;}
     portalPop();
   }
-  window.addEventListener('message',function(e){if(e.origin!==location.origin||!e.data)return;if(e.data.kif==='back')portalPop();if(e.data.kif==='home')go('home');});
+  window.addEventListener('message',function(e){if(e.origin!==location.origin||!e.data)return;if(e.data.kif==='back')portalPop();if(e.data.kif==='home')go('home');
+    /* 비교 도구(원픽)의 「원본 PDF에서 보기」: 포털 자료 보기 창으로 해당 쪽부터 */
+    if(e.data.kif==='pdf'&&typeof e.data.file==='string'&&/^files\//.test(e.data.file))openMat(['PDF',String(e.data.title||'원본 자료'),'','',e.data.file],+e.data.page||1);});
   /* 최근 7일 안에 올라온 소식지 수 (사이드바 「새 글」·홈 숫자) */
   function newsNew(){var d=new Date(Date.now()-7*864e5),c=d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());return NEWS.filter(function(n){return String(n[0]||'')>=c;}).length;}
   /* 이달의 컨셉: 커튼이 열린 뒤 제목을 한 글자씩 친다 (움직임 줄이기 설정이면 바로 보여 줌) */
@@ -1511,7 +1517,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
       aiProxy:v('mProxy'),aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
-    ['compare','off','concepts','aiSamples','boards'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
+    ['compare','off','concepts','aiSamples','boards','onepick','onepicks'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
     (c.hypo||[]).forEach(function(r){var o=(HYPO||[]).filter(function(x){return x[0]===r[0]&&Array.isArray(x[4]);})[0];if(o){while(r.length<4)r.push('');r[4]=o[4];}});
     var ck=document.getElementById('cOpts');
     if(ck&&ck.checked&&window.AIMOD&&AIMOD.getOpts){c.opts=AIMOD.getOpts();c.optsVer=c.ver;}
@@ -1562,7 +1568,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return {pages:pages, big:big, numPages:doc.numPages};
   }
   function guessKind(name,p1){
-    var R=[['news',/소식지|매거진|MAGAZINE|뉴스레터|NEWS/i],['award',/시상|시책|프로모션|캠페인|포상/],['concept',/컨셉|콘셉트/],['hypo',/가설|화법|스크립트/],['notice',/공지|안내|일정|알림/],['mats',/교육|PT|발표|비교|자료/i]];
+    var R=[['onepick',/원픽|베스트\s*픽업/],['news',/소식지|매거진|MAGAZINE|뉴스레터|NEWS/i],['award',/시상|시책|프로모션|캠페인|포상/],['concept',/컨셉|콘셉트/],['hypo',/가설|화법|스크립트/],['notice',/공지|안내|일정|알림/],['mats',/교육|PT|발표|비교|자료/i]];
     for(var s=0;s<2;s++){var t=s?p1.slice(0,400):name;for(var i=0;i<R.length;i++)if(R[i][1].test(t))return R[i][0];}
     return '';
   }
@@ -1635,7 +1641,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(it.kind==='news')return nuField(i,'co',it.co,'110px','회사')+nuField(i,'ym',it.y+'.'+it.mo,'76px','연월')+nuSel(i,'wk',it.wk,[['','월간'],['1','1주차'],['2','2주차'],['3','3주차'],['4','4주차'],['5','5주차']],'주차');
     if(it.kind==='notice')return nuField(i,'date',it.date,'100px','날짜');
     if(it.kind==='award')return nuField(i,'period',it.period,'190px','기간')+nuSel(i,'status',it.status,[['진행 중','진행 중'],['발표','발표']],'상태');
-    if(it.kind==='concept')return nuField(i,'ym',it.y+'.'+it.mo,'76px','연월');
+    if(it.kind==='concept'||it.kind==='onepick')return nuField(i,'ym',it.y+'.'+it.mo,'76px','연월');
     if(it.kind==='hypo')return nuSel(i,'into',it.into||'',[['','새 고객 유형으로 올리기']].concat(HYPO.map(function(r,j){return ['h'+j,'「'+String(r[0]).slice(0,24)+'」에 파일 추가'];})),'넣을 곳')+nuField(i,'product',it.product,'200px','대표 상품');
     if(BOARD[it.kind])return nuField(i,'date',it.date,'100px','날짜');
     return nuField(i,'cat',it.cat,'90px','분류');
@@ -1668,6 +1674,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(k==='hypo')return R(HYPO,function(h){var F=hypoFiles(h);return {t:h[0]||'',s:(h[1]||'')+(F.length>1?' · 파일 '+F.length+'개':''),f:F[0]};});
     if(k==='mats')return R(MATS,function(m){return {t:m[1]||'',s:(m[0]||'')+' · '+(m[2]||''),f:m[4]};});
     if(BOARD[k])return R(((SITE&&SITE.boards)||{})[k],function(n){return {t:n[1]||'',s:n[0]||'',f:n[3]};});
+    if(k==='onepick'){var O=SITE&&SITE.onepick;if(!O)return [];return [{t:O.title||'',s:(O.month||'')+' · 지금 FC에게 보이는 원픽 · 상품군 '+((O.cats||[]).length)+'개',f:O.guide}].concat(O.pend?[{t:O.pend.title||'',s:(O.pend.month||'')+' · 새 가이드 (표 반영 전)',f:O.pend.guide}]:[]);}
     if(k==='concept')return [{t:CONCEPT.title||'',s:(CONCEPT.month||'')+' · 지금 보이는 컨셉',f:CONCEPT.file}].concat(R(CONCEPT.mats,function(m){return {t:m[1]||'',s:'컨셉 교육 자료 · '+(m[0]||''),f:cptMatFile(m)};}));
     return [];
   }
@@ -1725,6 +1732,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       else if(it.kind==='hypo'){var tn=it.into?(HYPO[+it.into.slice(1)]||[])[0]:'',hr=tn?hypo.filter(function(r){return r[0]===tn;})[0]:null;
         if(hr)hypoSetFiles(hr,hypoFiles(hr).concat([p]));else hypo.unshift([it.title,it.product,it.summary,p]);}
       else if(it.kind==='mats')mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,it.cat,it.summary,p]);
+      else if(it.kind==='onepick'){var op=c.onepick?JSON.parse(JSON.stringify(c.onepick)):{month:'',title:'',upd:'',guide:'',cats:[]};
+        op.pend={guide:p,month:it.y+'.'+it.mo,title:it.title};if(!op.cats||!op.cats.length){op.guide=p;op.month=op.pend.month;op.title=it.title;op.upd=today();delete op.pend;}c.onepick=op;}
       else if(it.kind==='concept'){if(!arch&&cp.title&&cp.title!==it.title){arch=true;c.concepts=Array.isArray(c.concepts)?c.concepts:[];c.concepts.unshift(JSON.parse(JSON.stringify(cp)));cp.mats=[];}
         cp.month=it.y+'.'+it.mo;cp.title=it.title;if(it.summary)cp.desc=it.summary;cp.file=p;
         if(it.bullets.length>=2)cp.steps=it.bullets.slice(0,5);cp.mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,p]);
@@ -1877,13 +1886,14 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     hypo:'고객 유형별 대표 상품과 첫 화법입니다. 파일(PDF·PPT)을 붙이면 FC가 제목을 눌러 엽니다.',
     concept:'이달의 컨셉은 한 번에 하나만 보입니다. 새 컨셉을 올리면 지금 컨셉은 아래 「지난 컨셉」으로 옮겨지고, 언제든 다시 꺼내 쓸 수 있습니다.',
     news:'보험사 소식지 PDF를 올리면 회사·연월·주차를 읽어 제목을 만듭니다.',award:'시상·시책 자료를 올리면 기간을 읽어 진행 중/발표를 정합니다.',
-    notice:'홈 화면 본사 공지입니다.',mats:'홈 화면 교육 자료와 교육 자료실에 보입니다.'};
+    notice:'홈 화면 본사 공지입니다.',mats:'홈 화면 교육 자료와 교육 자료실에 보입니다.',
+    onepick:'매달 「베스트 픽업 상품 비교 분석 가이드」 PDF를 여기에 올리세요. 원본으로 등록되고, 아래 「AI로 읽기」로 상품 비교 › 이번 달의 원픽 화면의 비교표를 새로 만듭니다. ⚠ 이 사이트에 올린 파일은 로그인 없이도 주소만 알면 열 수 있습니다. 외부 유출 금지 자료는 올리기 전에 한 번 더 판단하세요.'};
   function cmName(k){for(var i=0;i<CM_TABS.length;i++)if(CM_TABS[i][0]===k)return CM_TABS[i][1];return k;}
   function cmClone(x){return JSON.parse(JSON.stringify(x));}
   function cmW(){
     if(CM.w)return CM.w;var S=SITE||{};
     CM.w={news:cmClone(NEWS),awards:cmClone(AWARDS),hypo:cmClone(HYPO),mats:cmClone(MATS),notices:cmClone(NOTICES),
-      off:cmClone(S.off||{}),compare:cmClone(CMPL),concept:cmClone(CONCEPT),concepts:cmClone(S.concepts||[])};
+      off:cmClone(S.off||{}),compare:cmClone(CMPL),concept:cmClone(CONCEPT),concepts:cmClone(S.concepts||[]),onepick:cmClone(S.onepick||null),onepicks:cmClone(S.onepicks||[])};
     Object.keys(BOARD).forEach(function(b){CM.w['board:'+b]=cmClone(((S.boards||{})[b])||[]);});
     return CM.w;
   }
@@ -1911,6 +1921,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         keys.forEach(function(k){
           if(k==='concept'){c.concept=cmClone(W.concept);c.concepts=cmClone(W.concepts);return;}
           if(k==='compare'){c.compare=cmClone(W.compare);return;}
+          if(k==='onepick'){c.onepick=cmClone(W.onepick);c.onepicks=cmClone(W.onepicks);return;}
           var key=CM_KEY[k];if(/^board:/.test(key)){c.boards=c.boards||{};c.boards[k]=cmClone(W[key]||[]);}else c[key]=cmClone(W[key]);c.off=c.off||{};c.off[k]=cmClone(W.off[k]||[]);
         });
       },add,del,'자료 관리: '+(keys.map(cmName).join(', ')||'파일 정리'));
@@ -1987,21 +1998,138 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return '<label class="nu-f">교육 자료에서 연결<select class="in" data-cmkl="'+i+'"><option value="">— 고르기 —</option>'+L.map(function(r){return '<option value="'+esc(r[4])+'"'+(r[4]===m[2]?' selected':'')+'>'+esc('['+r[0]+'] '+r[1])+'</option>';}).join('')+'</select></label>';}
   /* 컨셉에 붙인 파일은 교육 자료(자료실)에도 같이 올려 둔다 */
   function cmMatAdd(type,title,p){var W=cmW();if(!p||W.mats.some(function(r){return r[4]===p;}))return;W.mats.unshift([type,title,'이달의 컨셉',(W.concept.month||'')+' 이달의 컨셉 자료',p]);cmTouch('mats');}
+  /* ---------- 이번 달의 원픽 (classic/onepick.html이 content.json의 onepick을 읽어 그린다) ----------
+     onepick = {month, title, upd, guide(원본 PDF), cats[상품군], pend?{guide,month,title}(새로 올린 가이드, 아직 표에 반영 전)}
+     onepicks = 지난 달 원픽 보관 [onepick, …] */
+  var OP_ENC=function(x){return String(x==null?'':x).replace(/\t/g,' ').replace(/\n/g,' ⏎ ');};
+  var OP_DEC=function(x){return String(x==null?'':x).replace(/\s*⏎\s*/g,'\n').trim();};
+  function opRowsText(c){
+    return (c.rows||[]).map(function(r){
+      var pre=r.hd?'[구분] ':r.mf?'[남/여] ':r.feat?'[특징] ':r.sum?'[합계] ':'';
+      var lab=r.g!=null?r.g+' > '+(r.l||''):(r.l||'');
+      var cells=r.hd?r.hd:r.mf?r.mf.map(function(p){return OP_ENC(p[0])+' / '+OP_ENC(p[1]);}):(r.v||[]);
+      return pre+OP_ENC(lab)+'\t'+cells.map(function(x){return r.mf?x:OP_ENC(x);}).join('\t');
+    }).join('\n');
+  }
+  function opRowsParse(t,c){
+    var n=(c.cols||[]).length,old=c.rows||[];
+    return String(t||'').split('\n').filter(function(x){return x.trim();}).map(function(line){
+      var m=line.match(/^\s*\[(구분|남\/여|특징|합계)\]\s*/),kind=m?m[1]:'',parts=line.slice(m?m[0].length:0).split('\t'),lab=OP_DEC(parts[0]),cells=parts.slice(1);
+      while(cells.length<n)cells.push('');if(kind!=='구분')cells=cells.slice(0,n);
+      var r={},gi=lab.indexOf(' > ');if(gi>-1){r.g=lab.slice(0,gi).trim();var l=lab.slice(gi+3).trim();if(l)r.l=l;}else if(/ >$/.test(lab)){r.g=lab.slice(0,-2).trim();}else r.l=lab;
+      if(kind==='구분')r.hd=cells.map(OP_DEC).slice(0,2);
+      else if(kind==='남/여'){r.mf=cells.map(function(x){var i=x.indexOf(' / ');return i<0?[OP_DEC(x),'']:[OP_DEC(x.slice(0,i)),OP_DEC(x.slice(i+3))];});
+        var o=old.filter(function(y){return y.mf&&y.lo&&y.g===r.g&&y.l===r.l;})[0];if(o)r.lo=o.lo;}
+      else{r.v=cells.map(OP_DEC);if(kind==='특징')r.feat=1;if(kind==='합계')r.sum=1;}
+      return r;
+    });
+  }
+  function opCols(c,i){
+    return '<div class="op-cols">'+(c.cols||[]).map(function(k,j){
+      return '<div class="op-col'+(j===c.best?' best':'')+'"><label class="note"><input type="radio" name="opb'+i+'" data-cmoc="'+i+'" data-c="best" value="'+j+'"'+(j===c.best?' checked':'')+'> 원픽(선정)</label>'+
+        cmIn('data-cmocol="'+i+':'+j+'" data-c="co"',k.co,'w','보험사')+cmIn('data-cmocol="'+i+':'+j+'" data-c="prod"',k.prod,'w','상품명')+'</div>';}).join('')+
+      '<div class="op-col add"><label class="note"><input type="radio" name="opb'+i+'" data-cmoc="'+i+'" data-c="best" value="-1"'+(c.best<0?' checked':'')+'> 선정 없음 (가성비 비교)</label>'+
+      '<button class="btn sm ghost" type="button" data-cm="opcoladd" data-i="'+i+'">＋ 회사 추가</button>'+((c.cols||[]).length>1?'<button class="btn sm ghost" type="button" data-cm="opcoldel" data-i="'+i+'">마지막 회사 빼기</button>':'')+'</div></div>';
+  }
+  function opSel(attr,v,opts,lab){return '<label class="nu-f">'+lab+'<select class="in" '+attr+'>'+opts.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===v?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></label>';}
+  function opCat(c,i){
+    var a=function(k){return 'data-cmoc="'+i+'" data-c="'+k+'"';},R=c.reason||{};
+    return '<details class="smp-c op-cat"'+(CM.opOpen===i?' open':'')+' data-opi="'+i+'"><summary><span class="pill'+(c.kind==='best'?' new':'')+'">'+(c.type==='life'?'생명':'손해')+' · '+(c.kind==='best'?'베스트':'가성비')+'</span> <b>'+esc(c.name||'(이름 없음)')+'</b> <span class="note">'+
+      esc((c.cols||[]).map(function(k){return k.co;}).join(' · '))+(c.pg?' · PDF '+(+c.pg)+'쪽':'')+'</span></summary>'+
+      '<div class="row" style="margin-top:8px"><span class="cm-ord"><button class="btn sm ghost" type="button" data-cm="opmv" data-i="'+i+'" data-d="-1"'+(i?'':' disabled')+'>▲</button><button class="btn sm ghost" type="button" data-cm="opmv" data-i="'+i+'" data-d="1"'+(i<cmW().onepick.cats.length-1?'':' disabled')+'>▼</button></span><span class="sp"></span>'+cmDelBtn('oc'+i)+'</div>'+
+      '<div class="nu-x">'+cmIn(a('name'),c.name,'w','상품군 이름')+opSel(a('type'),c.type,[['life','생명보험'],['nonlife','손해보험']],'구분')+opSel(a('kind'),c.kind,[['best','베스트 초이스'],['value','가성비 상품']],'종류')+
+        cmIn(a('pg'),c.pg,'70px','원본 PDF 쪽')+cmIn(a('src'),c.src,'80px','인쇄된 쪽')+cmIn(a('lead'),c.lead,'a','한 줄 문구')+cmIn(a('cond'),c.cond,'a','표 위 조건 (없으면 비움)')+'</div>'+
+      '<h4 class="op-h">비교 상품</h4>'+opCols(c,i)+
+      '<h4 class="op-h">비교표 <span class="note">한 줄이 표 한 줄 · 칸은 탭(엑셀에서 복사·붙여넣기 가능) · 맨 앞 [남/여] [구분] [특징] 표시 · 「묶음 > 항목」 · 칸 안 줄바꿈은 ⏎</span></h4>'+
+      '<textarea class="in op-rows" rows="'+Math.min(18,(c.rows||[]).length+2)+'" spellcheck="false" '+a('rows')+'>'+esc(opRowsText(c))+'</textarea>'+
+      (c.best>=0?'<h4 class="op-h">선정 이유 <span class="note">한 줄에 하나</span></h4><div class="nu-x">'+
+        ['feat:상품 특징','why:선정 이유','sales:세일즈 포인트'].map(function(x){var k=x.split(':');return '<label class="nu-f wide">'+k[1]+'<textarea class="in" rows="3" '+a('r_'+k[0])+'>'+esc((R[k[0]]||[]).join('\n'))+'</textarea></label>';}).join('')+'</div>':'')+
+      '</details>';
+  }
+  function cmOnepick(){
+    var W=cmW(),o=W.onepick;if(!o)return '<p class="note">원픽 데이터가 없습니다.</p>';
+    var P=o.pend,D=CM.opDraft;
+    var h='<div class="smp-c"><div class="row"><span class="pill new">지금 FC에게 보이는 원픽</span><b>'+esc(o.month||'')+'</b><span class="sp"></span>'+
+      '<button class="btn sm ghost" type="button" data-cmview-op="1">포털에서 열어 보기</button>'+cmFileBtns(P?'':o.guide,'data-cmf="op"')+'</div>'+
+      '<div class="nu-x">'+cmIn('data-cmop="month"',o.month,'90px','기준월')+cmIn('data-cmop="title"',o.title,'w','가이드 이름 (FC 화면 「원본」 표시)')+cmIn('data-cmop="upd"',o.upd,'110px','최종 업데이트')+'</div>'+
+      (o.guide?'':'<p class="note" style="margin:4px 0 0">원본 가이드 PDF가 아직 없습니다. 위 「＋ 이번 달의 원픽 추가」에 PDF를 올리면 「원본 PDF에서 보기」가 FC 화면에 생깁니다.</p>')+'</div>';
+    if(P)h+='<div class="smp-c op-pend"><div class="row"><span class="pill warn">새 가이드 · 표 반영 전</span><b>'+esc(P.title||'')+'</b><span class="note">'+esc(P.month||'')+'</span><span class="sp"></span>'+cmFileBtns(P.guide,'data-cmf="op"')+'</div>'+
+      '<p class="note" style="margin:6px 0 0">FC 화면은 아직 '+esc(o.month||'')+' 표 그대로입니다. 아래 「AI로 표 새로 만들기」를 누르거나, 표를 직접 고친 뒤 「새 가이드로 바꾸기」를 누르면 새 달로 바뀌고 지금 원픽은 「지난 원픽」에 보관됩니다.</p>'+
+      '<div class="row" style="margin-top:6px;gap:8px"><button class="btn sm" type="button" data-cm="oppend">지금 표 그대로 새 가이드로 바꾸기</button><button class="btn sm ghost danger" type="button" data-cm="oppendx">새 가이드 취소</button></div></div>';
+    h+='<div class="smp-c op-ai"><div class="row"><b>🤖 AI로 가이드 읽어 표 새로 만들기</b><span class="sp"></span><button class="btn sm" type="button" data-cm="opai"'+(CM.opBusy?' disabled':'')+'>'+(CM.opBusy?'읽는 중…':'AI로 읽기')+'</button></div>'+
+      '<p class="note" style="margin:4px 0 0">'+(P?'새 가이드':'원본 가이드')+' PDF의 글자를 읽어, 상품군별 비교표·선정 이유·세일즈 포인트·쪽 번호를 지금 화면과 같은 모양으로 만듭니다. 「내 AI 등록」에 연결한 AI를 씁니다. 바로 바뀌지 않고, 아래에서 확인한 뒤 적용합니다.</p>'+
+      '<p class="note" id="opAiMsg" role="status" style="margin:4px 0 0">'+esc(CM.opMsg||'')+'</p>'+
+      (D?'<div class="op-draft"><b>AI가 읽은 결과: 상품군 '+D.cats.length+'개'+(D.month?' · '+esc(D.month):'')+'</b><ul>'+D.cats.map(function(c){return '<li>'+(c.type==='life'?'생명':'손해')+' · '+(c.kind==='best'?'베스트':'가성비')+' · <b>'+esc(c.name)+'</b> — '+esc((c.cols||[]).map(function(k,j){return (j===c.best?'★':'')+k.co;}).join(', '))+' · 표 '+(c.rows||[]).length+'줄'+(c.pg?' · PDF '+c.pg+'쪽':'')+'</li>';}).join('')+'</ul>'+
+        '<div class="row" style="gap:8px"><button class="btn sm" type="button" data-cm="opok">이 내용으로 바꾸기</button><button class="btn sm ghost" type="button" data-cm="opno">버리기</button></div><p class="note">바꾼 뒤에도 아래에서 한 칸씩 고칠 수 있습니다. 숫자는 꼭 원본과 한 번 더 맞춰 보세요.</p></div>':'')+'</div>';
+    h+='<h3 style="margin-top:16px">상품군 '+o.cats.length+'개 <span class="note">누르면 펼쳐서 고칩니다 · 칸 밖을 누르면 저장</span> <button class="btn sm ghost" type="button" data-cm="opcat">＋ 상품군 추가</button></h3><div class="smp-l">'+o.cats.map(opCat).join('')+'</div>';
+    var A=W.onepicks||[];
+    h+='<h3 style="margin-top:16px">지난 원픽 <span class="note">'+A.length+'건 · 「이걸로 되돌리기」를 누르면 다시 FC 화면에 보입니다</span></h3><div class="smp-l">'+
+      (A.length?A.map(function(x,i){return '<div class="smp-c off"><div class="row"><span class="pill">'+esc(x.month||'')+'</span><b>'+esc(x.title||'')+'</b><span class="note">상품군 '+((x.cats||[]).length)+'개</span><span class="sp"></span>'+
+        (x.guide?'<a class="flink" target="_blank" rel="noopener" href="'+fileHref(x.guide)+'">📎 원본</a>':'')+'<button class="btn sm" type="button" data-cmopuse="'+i+'">이걸로 되돌리기</button>'+cmDelBtn('oa'+i)+'</div></div>';}).join(''):'<p class="note">아직 보관된 지난 원픽이 없습니다.</p>')+'</div>';
+    return h;
+  }
+  function opArchive(W){var o=W.onepick,c=cmClone(o);delete c.pend;W.onepicks=W.onepicks||[];if(c.cats&&c.cats.length)W.onepicks.unshift(c);}
+  function opApplyPend(W){var o=W.onepick,P=o.pend;if(!P)return;opArchive(W);o.guide=P.guide;o.month=P.month||o.month;o.title=P.title||o.title;o.upd=today();delete o.pend;}
+  async function opPdfText(url){
+    var L=pdfLib();if(!L)throw new Error('PDF 읽기 도구를 불러오지 못했습니다(인터넷 연결 확인)');
+    var doc=await L.getDocument(url).promise,out=[];
+    for(var n=1;n<=doc.numPages;n++){
+      var tc=await (await doc.getPage(n)).getTextContent(),rows=[];
+      tc.items.forEach(function(it){if(!it.str||!it.str.trim())return;var y=it.transform[5],x=it.transform[4],r=rows.filter(function(q){return Math.abs(q.y-y)<3;})[0];if(!r){r={y:y,t:[]};rows.push(r);}r.t.push({x:x,s:it.str,w:it.width||0});});
+      rows.sort(function(a,b){return b.y-a.y;});
+      out.push('[PDF '+n+'쪽]\n'+rows.map(function(r){r.t.sort(function(a,b){return a.x-b.x;});var s='',px=null;r.t.forEach(function(q){if(px!=null)s+=(q.x-px>12?' | ':' ');s+=q.s.trim();px=q.x+q.w;});return s;}).join('\n'));
+    }
+    return out.join('\n\n');
+  }
+  async function opAi(){
+    var W=cmW(),o=W.onepick,g=o.pend?o.pend.guide:o.guide,msg=function(t){CM.opMsg=t;var e=document.getElementById('opAiMsg');if(e)e.textContent=t;};
+    if(!g){msg('먼저 원본 가이드 PDF를 올려 주세요 (위 「＋ 이번 달의 원픽 추가」).');return;}
+    if(!window.KIFAI){msg('AI 연결 도구를 불러오지 못했습니다. 새로고침해 주세요.');return;}
+    if(!KIFAI.chosen()||KIFAI.cfg().mode!=='ai'){msg('먼저 쓸 AI를 연결해 주세요. 열린 「내 AI 등록」 창에서 고르면 됩니다.');KIFAI.open();return;}
+    CM.opBusy=true;CM.opDraft=null;cmRender();
+    try{
+      msg('가이드 PDF의 글자를 읽는 중…');
+      var text=await opPdfText(new URL(fileHref(cmLocal(g)),location.href).href);
+      if(text.replace(/\[PDF \d+쪽\]|\s/g,'').length<200)throw new Error('PDF에서 글자를 거의 읽지 못했습니다(그림으로 된 PDF). 표를 직접 고쳐 주세요.');
+      var P=o.pend||o,ex={month:o.month,upd:o.upd,cats:o.cats};
+      var prompt='너는 보험 GA(한국보험금융) 교육자료 편집자다. 아래 「자료」는 「'+(P.title||'베스트 픽업 상품 비교 분석 가이드')+'」 PDF에서 뽑은 글자다([PDF n쪽]은 PDF 쪽 번호, | 는 표의 칸 경계). 이 가이드의 상품군별 비교표를 읽어 FC 포털 「이번 달의 원픽」 화면 데이터로 만들어라.\n'+
+        '규칙:\n- 답은 JSON 하나: {"month":"YYYY.MM","upd":"YYYY.MM.DD","cats":[…]}. month는 가이드의 기준월, upd는 가이드에 적힌 작성·기준일(없으면 빈 문자열).\n'+
+        '- cats 각 항목은 아래 「지난 달 데이터」와 같은 구조: id(영문 짧게. 같은 상품군이면 지난 달 id 그대로), type("life" 생명보험 | "nonlife" 손해보험), kind("best" 베스트 초이스 | "value" 가성비), name(상품군 이름), src(가이드에 인쇄된 쪽 표시, 예 "8–9"), pg(그 상품군 비교표가 시작되는 PDF 쪽 번호, 숫자), lead(한 줄 문구), cond(표 위 조건 문구, 없으면 생략), best(선정 상품의 cols 번호, 0부터. 가성비는 -1), cols([{co:보험사,prod:상품명}]), rows, reason({feat:[상품 특징],why:[선정 이유],sales:[세일즈 포인트]}, 가성비는 생략).\n'+
+        '- rows 한 줄 모양: 일반 {"l":"항목","v":[회사별 값]} · 묶음 {"g":"묶음 이름","l":"세부 항목","v":[…]} · 남녀 보험료 머리줄 {"l":"보험료","hd":["남성","여성"]} · 남녀 보험료 {"l":"표준체","mf":[["남","여"],…회사별]} · 주요 특징 {"l":"주요 특징","feat":1,"v":[…]}. v와 mf는 cols 개수와 같게.\n'+
+        '- 숫자·금액·상품명·보험사 이름은 자료에 적힌 그대로 옮기고, 자료에 없는 내용은 절대 지어내지 마라. 읽을 수 없는 칸은 "-". 칸 안 줄바꿈은 \\n.\n'+
+        '- 가이드에 나오는 상품군 순서대로 빠짐없이.\n\n지난 달 데이터(구조 참고용, 값은 새 자료로 바꿀 것):\n'+JSON.stringify(ex);
+      msg('AI가 표를 만드는 중… (1~3분 걸릴 수 있습니다)');
+      var r=await KIFAI.ask(prompt,{text:text,images:[],scanned:[]});
+      var cats=(r&&Array.isArray(r.cats))?r.cats:null;if(!cats||!cats.length)throw new Error('AI 답에 상품군이 없습니다. 한 번 더 읽혀 보세요.');
+      cats=cats.filter(function(c){return c&&c.name&&Array.isArray(c.cols)&&c.cols.length;}).map(function(c,i){
+        var n=c.cols.length;c.id=String(c.id||('c'+i)).replace(/[^\w-]/g,'')||('c'+i);c.type=c.type==='nonlife'?'nonlife':'life';c.kind=c.kind==='value'?'value':'best';
+        c.best=(typeof c.best==='number'&&c.best<n)?c.best:(c.kind==='value'?-1:0);if(c.pg)c.pg=+c.pg||'';
+        c.rows=(Array.isArray(c.rows)?c.rows:[]).filter(function(x){return x&&typeof x==='object';}).map(function(x){
+          if(x.v){x.v=[].concat(x.v).map(function(y){return y==null?'':String(y);});while(x.v.length<n)x.v.push('');x.v.length=n;}
+          if(x.mf){x.mf=[].concat(x.mf).map(function(y){return Array.isArray(y)?[String(y[0]==null?'':y[0]),String(y[1]==null?'':y[1])]:[String(y),''];});while(x.mf.length<n)x.mf.push(['','']);x.mf.length=n;}
+          if(!x.v&&!x.mf&&!x.hd)x.v=new Array(n).fill('');return x;});
+        if(c.best<0)delete c.reason;return c;});
+      if(!cats.length)throw new Error('AI 답의 모양이 맞지 않습니다. 한 번 더 읽혀 보세요.');
+      CM.opDraft={cats:cats,month:/^20\d{2}\.\d{2}$/.test(r.month||'')?r.month:'',upd:String(r.upd||'')};
+      msg('✓ 다 읽었습니다. 아래 결과를 확인하고 「이 내용으로 바꾸기」를 누르세요.');
+    }catch(e){msg('⚠ '+(e&&e.code&&KIFAI.err?KIFAI.err(e):(e&&e.message)||String(e)));}
+    CM.opBusy=false;cmRender();
+  }
   function cmHtml(){
     var T=ghTok(),k=CM.tab;
     var h=head('관리자','자료 관리','메뉴별 자료를 올리고, FC에게 보일지 켜고 끄고, 고치고, 지웁니다. 바꾸면 잠시 뒤 바로 모든 FC 화면에 반영됩니다(1~2분).');
     h+='<div class="panel"><div class="row"><b>올리기 상태</b><span class="note" id="cmPub">'+(CM.msg||(T?'GitHub 연결됨 · 바꾸면 바로 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 아래 「GitHub 연결 설정」에서 토큰을 저장해야 모든 FC에게 올라갑니다.'))+'</span></div>'+
       '<details class="nu-set"'+(T?'':' open')+'><summary>GitHub 연결 설정 '+(T?'<span class="pill ok">연결됨</span>':'<span class="pill warn">처음 한 번 필요</span>')+'</summary><p class="note">토큰 만드는 법은 <button class="btn sm ghost" type="button" data-go="admin">관리자 페이지 › 자료 올리기</button>의 같은 칸에 적혀 있습니다. 같은 토큰을 씁니다.</p>'+
       '<div class="row" style="gap:8px"><input class="in" id="cmTok" type="password" autocomplete="off" placeholder="github_pat_..." value="'+esc(T)+'" style="flex:1;min-width:200px"><button class="btn sm" type="button" data-cm="tok">저장</button></div></details></div>';
-    h+='<div class="nchips cm-tabs" role="tablist">'+CM_TABS.map(function(t){var n=t[0]==='compare'?cmW().compare.length:t[0]==='concept'?1+cmW().concepts.length:((cmW()[CM_KEY[t[0]]])||[]).length+((cmW().off[t[0]]||[]).length);
+    h+='<div class="nchips cm-tabs" role="tablist">'+CM_TABS.map(function(t){var n=t[0]==='compare'?cmW().compare.length:t[0]==='onepick'?((cmW().onepick||{}).cats||[]).length:t[0]==='concept'?1+cmW().concepts.length:((cmW()[CM_KEY[t[0]]])||[]).length+((cmW().off[t[0]]||[]).length);
       return '<button type="button" role="tab" class="tg'+(t[0]===k?' on':'')+'" aria-selected="'+(t[0]===k)+'" data-cmtab="'+t[0]+'">'+t[1]+' <span class="note">'+n+'</span></button>';}).join('')+'</div>';
     var acc=k==='compare'?'.html,.htm,.pdf,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg':'.pdf,.ppt,.pptx,.xls,.xlsx,.doc,.docx,.hwp,.hwpx,.png,.jpg,.jpeg';
     h+='<div class="panel"><h3>'+cmName(k)+' 올리기</h3><p class="note">'+CM_HELP[k]+'</p>'+
       '<label class="smp-drop" id="cmDrop"><input type="file" id="cmFile" accept="'+acc+'" multiple hidden><b>＋ '+cmName(k)+' 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>'+(k==='compare'?'HTML(비교 프로그램) · PDF · 엑셀 · PPT · 그림':'PDF · PPT · 엑셀 · 워드 · 한글 · 그림')+' · 여러 개 한 번에 · 파일당 50MB 이하</em></label>'+
-      (k==='compare'||k==='concept'?'':'<div class="row"><button class="btn sm ghost" type="button" data-cm="addrow">파일 없이 글로 한 줄 추가</button></div>')+
+      (k==='compare'||k==='concept'||k==='onepick'?'':'<div class="row"><button class="btn sm ghost" type="button" data-cm="addrow">파일 없이 글로 한 줄 추가</button></div>')+
       (k==='compare'?'':'<div id="nuList"></div><div class="row" style="margin-top:8px;gap:8px"><button class="btn" type="button" id="nuPub" disabled>확인한 자료 모든 FC에게 올리기</button><button class="btn ghost" type="button" id="nuPrev" disabled>이 기기에서 미리보기</button></div>')+
       '<p class="note" id="nuMsg" role="status"></p></div>';
-    h+='<div class="panel"><h3>'+(k==='concept'?'이달의 컨셉':'등록된 '+cmName(k))+' <span class="note">고친 뒤 칸 밖을 누르면 저장됩니다</span></h3><div id="cmList">'+(k==='compare'?cmCompare():k==='concept'?cmConcept():cmRows(k))+'</div></div>';
+    h+='<div class="panel"><h3>'+(k==='concept'?'이달의 컨셉':k==='onepick'?'이번 달의 원픽':'등록된 '+cmName(k))+' <span class="note">고친 뒤 칸 밖을 누르면 저장됩니다</span></h3><div id="cmList">'+(k==='compare'?cmCompare():k==='concept'?cmConcept():k==='onepick'?cmOnepick():cmRows(k))+'</div></div>';
     return h;
   }
   function cmRender(){var v=document.getElementById('view');if(cur!=='cadmin'||!v)return;var y=window.scrollY;CM.keep=true;v.innerHTML=PAGES.cadmin();bindCm();window.scrollTo(0,y);}
@@ -2045,6 +2173,15 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     box.addEventListener('change',async function(e){
       var t=e.target,a;
       if((a=t.getAttribute('data-cmr'))!=null){var l=cmLoc(a),c=t.getAttribute('data-c');if(l.obj)l.obj[c]=t.value;else l.row[+c]=t.value;cmTouch(k);return;}
+      if((a=t.getAttribute('data-cmop'))!=null){W.onepick[a]=t.value.trim();cmTouch('onepick');return;}
+      if((a=t.getAttribute('data-cmoc'))!=null){var oc=W.onepick.cats[+a],ck=t.getAttribute('data-c');if(!oc)return;CM.opOpen=+a;
+        if(ck==='rows')oc.rows=opRowsParse(t.value,oc);
+        else if(/^r_/.test(ck)){oc.reason=oc.reason||{};oc.reason[ck.slice(2)]=t.value.split('\n').map(function(x){return x.trim();}).filter(Boolean);}
+        else if(ck==='best'){oc.best=+t.value;if(oc.best>=0&&!oc.reason)oc.reason={feat:[],why:[],sales:[]};cmTouch('onepick');cmRender();return;}
+        else if(ck==='pg')oc.pg=+t.value||'';
+        else{oc[ck]=t.value;if(ck==='name'||ck==='type'||ck==='kind'){cmTouch('onepick');cmRender();return;}}
+        cmTouch('onepick');return;}
+      if((a=t.getAttribute('data-cmocol'))!=null){var ij=a.split(':'),cc=W.onepick.cats[+ij[0]];CM.opOpen=+ij[0];cc.cols[+ij[1]][t.getAttribute('data-c')]=t.value.trim();cmTouch('onepick');return;}
       if((a=t.getAttribute('data-cmk'))!=null){W.concept[a]=a==='steps'?t.value.split('\n').map(function(x){return x.trim();}).filter(Boolean):t.value;cmTouch('concept');return;}
       if((a=t.getAttribute('data-cmhf'))!=null&&t.files&&t.files.length){var hl=cmLoc(a),F=hypoFiles(hl.row),fs=Array.prototype.slice.call(t.files);
         try{for(var q=0;q<fs.length;q++)F.push(await cmStage('hypo',fs[q]));hypoSetFiles(hl.row,F);cmTouch(k);cmRender();}catch(err){toast(err.message||String(err));}return;}
@@ -2059,7 +2196,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         var f=t.files[0],old,np;
         try{
           var fx2=(f.name.match(/\.([a-z0-9]+)$/i)||['',''])[1].toUpperCase();fx2=/^PPT/.test(fx2)?'PPT':fx2;
-          if(a==='k'){old=W.concept.file;np=await cmStage('concept',f);W.concept.file=np;cmTouch('concept');cmMatAdd(fx2,W.concept.title||f.name,np);}
+          if(a==='op'){var O=W.onepick;if(O.pend){old=O.pend.guide;np=await cmStage('onepick',f);O.pend.guide=np;}else{old=O.guide;np=await cmStage('onepick',f);O.guide=np;}cmTouch('onepick');}
+          else if(a==='k'){old=W.concept.file;np=await cmStage('concept',f);W.concept.file=np;cmTouch('concept');cmMatAdd(fx2,W.concept.title||f.name,np);}
           else if(/^km/.test(a)){var m=W.concept.mats[+a.slice(2)];old=m[2];np=await cmStage('concept',f);m[2]=np;m[0]=fx2||m[0];cmTouch('concept');cmMatAdd(m[0],m[1]||f.name,np);}
           else{var lc=cmLoc(a);
             if(lc.obj){old=lc.obj.file;var keep=lc.obj.base&&/\.html?$/i.test(f.name);np=await cmStage('compare',f,keep?lc.obj.file:null);if(!keep){lc.obj.file=np;lc.obj.kind=/\.html?$/i.test(f.name)?'tool':'file';}else old='';}
@@ -2074,17 +2212,21 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var b=e.target.closest&&e.target.closest('button');if(!b)return;var a;
       if((a=b.getAttribute('data-cmmv'))!=null){var L=k==='compare'?W.compare:W[CM_KEY[k]],i=+a,j=i+(+b.getAttribute('data-d'));if(j<0||j>=L.length)return;var x=L[i];L[i]=L[j];L[j]=x;cmTouch(k);cmRender();return;}
       if((a=b.getAttribute('data-cmview'))!=null){var it=W.compare[+a];if(!it)return;if(/^blob:/.test(cmLocal(it.file))){toast('저장이 끝난 뒤(1~2분) 열어 볼 수 있습니다.');return;}cmOpenPreview(it);return;}
+      if(b.getAttribute('data-cmview-op')){CMP.open='onepick';go('compare');return;}
+      if((a=b.getAttribute('data-cmopuse'))!=null){var ob=W.onepicks.splice(+a,1)[0],cur0=cmClone(W.onepick),pd=cur0.pend;delete cur0.pend;if(cur0.cats&&cur0.cats.length)W.onepicks.unshift(cur0);if(pd)ob.pend=pd;W.onepick=ob;cmTouch('onepick');cmRender();toast(ob.month+' 원픽으로 되돌렸습니다.');return;}
       if((a=b.getAttribute('data-cmkuse'))!=null){var i2=+a,old=W.concept;W.concept=W.concepts.splice(i2,1)[0];if(old&&old.title)W.concepts.unshift(old);cmTouch('concept');cmRender();toast('이달의 컨셉을 바꿨습니다.');return;}
       if((a=b.getAttribute('data-cmdel'))!=null){
         if(CM.ask!==a){CM.ask=a;cmRender();return;}CM.ask='';
         var gone=[];
         if(a[0]==='p'){var it2=W.compare.splice(+a.slice(1),1)[0];gone.push(it2.file);cmTouch('compare');}
         else if(/^km/.test(a)){var m=W.concept.mats.splice(+a.slice(2),1)[0];gone.push(m[2]);cmTouch('concept');}
+        else if(/^oc/.test(a)){W.onepick.cats.splice(+a.slice(2),1);CM.opOpen=-1;cmTouch('onepick');}
+        else if(/^oa/.test(a)){var oa=W.onepicks.splice(+a.slice(2),1)[0];gone.push(oa.guide);cmTouch('onepick');}
         else if(/^ka/.test(a)){var cx=W.concepts.splice(+a.slice(2),1)[0];gone.push(cx.file);(cx.mats||[]).forEach(function(mm){gone.push(mm[2]);});cmTouch('concept');}
         else if(/^hf/.test(a)){var mm=a.match(/^hf([vo]\d+):(\d+)$/),hl2=cmLoc(mm[1]),F2=hypoFiles(hl2.row);gone.push(F2.splice(+mm[2],1)[0]);hypoSetFiles(hl2.row,F2);cmTouch(k);}
         else{var lc=cmLoc(a);lc.list.splice(lc.i,1);gone.push(lc.row[CM_FI[k]]);if(k==='hypo')hypoFiles(lc.row).forEach(function(f){gone.push(f);});cmTouch(k);}
         /* 다른 곳(지난 컨셉 등)에서 같은 파일을 쓰면 파일은 남긴다 */
-        var used=JSON.stringify([W.news,W.awards,W.hypo,W.mats,W.notices,W.off,W.compare,W.concept,W.concepts]);
+        var used=JSON.stringify([W.news,W.awards,W.hypo,W.mats,W.notices,W.off,W.compare,W.concept,W.concepts,W.onepick,W.onepicks]);
         gone.forEach(function(p){if(p&&cmIsRepo(p)&&used.indexOf(JSON.stringify(p))<0)CM.del.push(p);});
         cmRender();return;}
     });
@@ -2098,6 +2240,16 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(a==='tok'){var v=document.getElementById('cmTok').value.trim();ghTok(v);CM.msg=v?'토큰을 이 브라우저에 저장했습니다.':'토큰 칸이 비어 있습니다.';cmRender();if(v&&Object.keys(CM.dirty).length)cmSave();}
     else if(a==='retry')cmSave();
     else if(a==='nodel'){CM.ask='';cmRender();}
+    else if(a==='opai')opAi();
+    else if(a==='opno'){CM.opDraft=null;CM.opMsg='';cmRender();}
+    else if(a==='opok'){var D=CM.opDraft;if(!D)return;var O=W.onepick;if(O.pend)opApplyPend(W);else opArchive(W);O.cats=D.cats;if(D.month)O.month=D.month;O.upd=D.upd||today();CM.opDraft=null;CM.opMsg='✓ 새 표로 바꿨습니다. 1~2분 뒤 FC 화면에 보입니다.';cmTouch('onepick');cmRender();}
+    else if(a==='oppend'){opApplyPend(W);CM.opMsg='새 가이드로 바꿨습니다. 지난 달 원픽은 아래 「지난 원픽」에 보관했습니다.';cmTouch('onepick');cmRender();}
+    else if(a==='oppendx'){var pg0=W.onepick.pend;delete W.onepick.pend;if(pg0&&cmIsRepo(pg0.guide)&&JSON.stringify([W.onepick,W.onepicks]).indexOf(JSON.stringify(pg0.guide))<0)CM.del.push(pg0.guide);cmTouch('onepick');cmRender();}
+    else if(a==='opcat'){var nn=(W.onepick.cats[0]&&W.onepick.cats[0].cols.length)||3,cols=[];for(var q=0;q<nn;q++)cols.push({co:'',prod:''});W.onepick.cats.push({id:'c'+Date.now().toString(36),type:'life',kind:'best',name:'새 상품군',src:'',pg:'',lead:'',best:0,cols:cols,rows:[{l:'가입한도',v:cols.map(function(){return '';})}],reason:{feat:[],why:[],sales:[]}});CM.opOpen=W.onepick.cats.length-1;cmTouch('onepick');cmRender();}
+    else if(a==='opmv'){var L2=W.onepick.cats,i3=+b.getAttribute('data-i'),j3=i3+(+b.getAttribute('data-d'));if(j3<0||j3>=L2.length)return;var x3=L2[i3];L2[i3]=L2[j3];L2[j3]=x3;CM.opOpen=j3;cmTouch('onepick');cmRender();}
+    else if(a==='opcoladd'||a==='opcoldel'){var c3=W.onepick.cats[+b.getAttribute('data-i')],add3=a==='opcoladd';CM.opOpen=+b.getAttribute('data-i');
+      if(add3)c3.cols.push({co:'',prod:''});else{c3.cols.pop();if(c3.best>=c3.cols.length)c3.best=c3.cols.length-1;}
+      c3.rows.forEach(function(r){if(r.v){if(add3)r.v.push('');else r.v.pop();}if(r.mf){if(add3)r.mf.push(['','']);else r.mf.pop();delete r.lo;}});cmTouch('onepick');cmRender();}
     else if(a==='kmat'){W.concept.mats=W.concept.mats||[];W.concept.mats.push(['PDF','새 자료','']);cmRender();}
     else if(a==='addrow'){var key=CM_KEY[k],r=[];for(var i=0;i<CM_LEN[k];i++)r.push('');
       if(k==='news'){r[0]=today();r[1]='기타';r[5]=today().slice(0,7);}else if(k==='notice')r[0]=today();else if(k==='award')r[3]='진행 중';else if(k==='mats'){r[0]='PDF';r[2]='자료';}else if(BOARD[k])r[0]=today();
@@ -2111,10 +2263,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var MENU_FIXED={home:1,compare:1,ai:1,ai2:1,edu:1,car:1,sangjo:1,me:1,admin:1,cadmin:1,refadmin:1,news:1,award:1,concept:1,hypo:1};
   function menuSync(){
     BOARD={};MENU.forEach(function(g){if(g.admin||g.mobile)return;g.items.forEach(function(it){if(!MENU_FIXED[it[0]])BOARD[it[0]]=it[1];});});
-    var base=[['news',menuName('news','보험사 소식지')],['notice','본사 공지'],['award',menuName('award','시상 공지')],['concept',menuName('concept','이달의 컨셉')],['hypo',menuName('hypo','대표 상품 가설')],['mats','교육 자료']];
+    var base=[['news',menuName('news','보험사 소식지')],['notice','본사 공지'],['award',menuName('award','시상 공지')],['concept',menuName('concept','이달의 컨셉')],['hypo',menuName('hypo','대표 상품 가설')],['mats','교육 자료'],['onepick','이번 달의 원픽']];
     var bl=Object.keys(BOARD).map(function(b){return [b,BOARD[b]];});
     KINDS.length=0;base.concat(bl).forEach(function(x){KINDS.push(x);});
-    CM_TABS.length=0;[['compare',menuName('compare','상품 비교')]].concat(base.filter(function(x){return x[0]==='hypo'||x[0]==='concept';}),base.filter(function(x){return x[0]!=='hypo'&&x[0]!=='concept';}),bl).forEach(function(x){CM_TABS.push(x);});
+    CM_TABS.length=0;[['compare',menuName('compare','상품 비교')],['onepick','이번 달의 원픽']].concat(base.filter(function(x){return x[0]==='hypo'||x[0]==='concept';}),base.filter(function(x){return x[0]!=='hypo'&&x[0]!=='concept'&&x[0]!=='onepick';}),bl).forEach(function(x){CM_TABS.push(x);});
     bl.forEach(function(x){var b=x[0];CM_KEY[b]='board:'+b;CM_COLS[b]=[[0,'날짜','96px'],[1,'제목','w'],[2,'설명','a']];CM_FI[b]=3;CM_LEN[b]=4;CM_HELP[b]='「'+x[1]+'」 메뉴에 보이는 자료입니다.';
       if(!PAGES[b])PAGES[b]=function(){var L=((SITE&&SITE.boards)||{})[b]||[];
         return head(menuGroup(b)||'자료',esc(BOARD[b]||b),'관리자가 올린 자료입니다. 제목을 누르면 열립니다.')+'<div class="panel"><ul class="list">'+(L.length?L.map(function(r){return '<li><span class="dt">'+esc(r[0]||'')+'</span><span class="t">'+fileA(r[3],'<b>'+esc(r[1]||'')+'</b>')+(r[2]?'<br><span class="note">'+esc(r[2])+'</span>':'')+'</span></li>';}).join(''):'<li class="note">아직 올라온 자료가 없습니다.</li>')+'</ul></div>';};});
@@ -2169,19 +2321,19 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var isPdf=function(f){return /\.pdf$/i.test(f||'');},isPpt=function(f){return /\.pptx?$/i.test(f||'');},isImg=function(f){return /\.(png|jpe?g|gif|webp)$/i.test(f||'');};
   function matTwin(m,test){return MATS.filter(function(x){return x!==m&&x[4]&&x[1]===m[1]&&test(x[4]);})[0]||null;}
   function matsShown(){return MATS.filter(function(m){return !(isPpt(m[4])&&matTwin(m,isPdf));});}
-  function openMat(i){
+  function openMat(i,from){
     var m=Array.isArray(i)?i:MATS[i];if(!m||!m[4])return;var f=m[4],pdfM=isPpt(f)?matTwin(m,isPdf):null,show=pdfM?pdfM[4]:f,orig=isPdf(show)?(matTwin(m,isPpt)||(isPpt(f)?m:null)):null;
     var abs=function(x){return new URL(fileHref(x),location.href).href;};
     var w=document.createElement('div');w.className='mview';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label',m[1]);
     w.innerHTML='<div class="mvh"><b>'+esc(m[1])+'</b><span class="note" data-v="pg"></span><span class="sp"></span>'+
       '<a class="btn sm ghost" target="_blank" rel="noopener" href="'+fileHref(show)+'">새 창으로 ↗</a>'+
-      (orig?'<a class="btn sm ghost" download href="'+fileHref(orig[4])+'">원본 PPT 받기</a>':'')+
+      (orig?'<a class="btn sm ghost" download href="'+fileHref(orig[4])+'">원본 PPT 받기</a>':'')+(from>1&&isPdf(show)?'<button class="btn sm ghost" type="button" data-v="all">처음부터 보기</button>':'')+
       '<button class="btn sm" type="button" data-v="x">닫기 ✕</button></div><div class="mvb" data-v="b"></div>';
     document.body.appendChild(w);var prevOv=document.body.style.overflow;document.body.style.overflow='hidden';
     var B=w.querySelector('[data-v="b"]'),pg=w.querySelector('[data-v="pg"]'),alive=true;
     var close=function(){alive=false;w.remove();document.body.style.overflow=prevOv;document.removeEventListener('keydown',esck);};
     var esck=function(e){if(e.key==='Escape')close();};document.addEventListener('keydown',esck);
-    w.addEventListener('click',function(e){if(e.target.closest('[data-v="x"]')||e.target===B)close();});
+    w.addEventListener('click',function(e){if(e.target.closest('[data-v="all"]')){close();openMat(m);return;}if(e.target.closest('[data-v="x"]')||e.target===B)close();});
     if(isImg(show)){B.innerHTML='<img alt="'+esc(m[1])+'" src="'+fileHref(show)+'">';return;}
     if(isPpt(show)){
       /* Office 보기 화면은 10MB가 넘는 PPT를 열지 못하고 오류를 낸다 → 크기를 먼저 보고, 크면 안내와 내려받기 단추를 보여 준다 */
@@ -2196,10 +2348,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     pg.textContent='불러오는 중…';
     pdfLib().getDocument(abs(show)).promise.then(async function(doc){
       var W=Math.min(B.clientWidth-32,1100),dpr=Math.min(window.devicePixelRatio||1,2);
-      for(var n=1;n<=doc.numPages&&alive;n++){
+      var n0=from>1&&from<=doc.numPages?from:1;if(n0>1)pg.textContent=n0+'쪽부터 보여 줍니다…';
+      for(var n=n0;n<=doc.numPages&&alive;n++){
         var page=await doc.getPage(n),v0=page.getViewport({scale:1}),sc=W/v0.width,v=page.getViewport({scale:sc*dpr}),cv=document.createElement('canvas');
         cv.width=v.width;cv.height=v.height;cv.style.width=W+'px';B.appendChild(cv);
-        await page.render({canvasContext:cv.getContext('2d'),viewport:v}).promise;pg.textContent=n+' / '+doc.numPages+'쪽';
+        await page.render({canvasContext:cv.getContext('2d'),viewport:v}).promise;pg.textContent=(n0>1?n0+'쪽부터 · ':'')+n+' / '+doc.numPages+'쪽';
       }
     }).catch(function(){B.classList.add('full');B.innerHTML='<iframe title="'+esc(m[1])+'" src="'+fileHref(show)+'"></iframe>';pg.textContent='';});
   }
