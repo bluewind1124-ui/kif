@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.14">
+<meta name="kif-build" content="2026-10-23.15">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -3858,7 +3858,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
      옵션을 안 고른 샘플 = 모든 옵션 공통, 단계 all = 1·2단계 공통 */
   var SMP_STAGE={all:'1·2단계 공통','1':'1단계 기계약 분석','2':'2단계 Before/After'};
   /* 글자를 제대로 읽지 못한 샘플(깨진 PDF·압축 파일 원문)은 AI에 보내지 않는다 */
-  function smpOk(s){var t=String(s&&s.text||'').slice(0,600);if(/^PK/.test(t))return false;var h=(t.match(/[가-힣]/g)||[]).length,k=(t.match(/[一-鿿]/g)||[]).length;return h>20&&h>k*2;}
+  function smpOk(s){var t=String(s&&s.text||'').slice(0,8000);if(/^PK/.test(t))return false;var h=(t.match(/[가-힣]/g)||[]).length,k=(t.match(/[一-鿿]/g)||[]).length;return h>=30&&h>k*2;}
   function smpPick(ids,stage){
     var L=SMP.filter(function(s){return s.on!==false&&String(s.text||'').trim()&&smpOk(s);});
     if(!ids)return L;
@@ -4341,7 +4341,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var on=SMP.filter(function(s){return s.on!==false;}).length;
     var h='<h2 class="smp-h">① AI가 따라 쓰는 보장분석 샘플 <span class="note">'+SMP.length+'건 · AI에 보내는 중 '+on+'건</span></h2>'+
       '<div class="panel"><h3>샘플 올리기</h3><p class="note">보장분석 제안서(PDF·PPTX)나 분석 엑셀(XLSX)을 올리면 글자와 표 구성을 읽어 샘플로 등록합니다. 읽은 내용은 아래 목록에서 확인·수정할 수 있고, 그 내용이 그대로 모든 FC의 AI에 전달됩니다. <b>고객 실명·연락처는 지우고 올려 주세요.</b> (읽은 글은 AI용으로 저장하고, 아래를 켜 두면 원본 파일도 함께 올립니다)</p>'+
-      '<label class="smp-drop" id="smDrop"><input type="file" id="smFile" accept=".pdf,.pptx,.xlsx,.xls,.docx,.hwpx,.txt,application/pdf" multiple hidden><b>＋ 샘플 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>PDF · PPTX · XLSX · DOCX(워드) · HWPX(한글) · TXT · 여러 개 한 번에 · 개수 제한 없음</em></label>'+
+      '<label class="smp-drop" id="smDrop"><input type="file" id="smFile" accept=".pdf,.pptx,.xlsx,.xls,.docx,.hwpx,.txt,application/pdf" multiple hidden><b>＋ 샘플 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>PDF · PPTX · XLSX · DOCX(워드) · HWPX(한글) · TXT · 여러 개 한 번에 · 글자가 든 파일은 AI 없이 바로 등록 (모양만 저장된 PDF만 AI가 그림으로 읽음)</em></label>'+
       '<div class="fgrid"><label class="f">샘플 제목 <span class="note">한 개 올릴 때만 · 비우면 파일 이름</span><input class="in" id="smTitle" placeholder="예: 박OO님 암 보장 강화 제안서"></label></div>'+
       '<label class="row note" style="margin-top:8px;gap:6px"><input type="checkbox" id="smKeep" checked> <span><b>원본 파일도 함께 올려</b>(PDF·엑셀·워드·PPT) 홈 「AI 보장분석 샘플」 카드에 첫 장을 보이고 「보기」로 원본을 그 모양 그대로 엽니다. <b>고객 이름·연락처·설계사 정보를 가린 파일만</b> 올려 주세요(사이트 주소를 아는 사람은 열어 볼 수 있습니다).</span></label>'+
       '<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="smpAdd">파일 없이 글로 직접 추가</button><span class="note" id="smMsg"></span></div>'+
@@ -4380,6 +4380,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       for(var i=1;i<=Math.min(d.numPages,12);i++){var pg=await d.getPage(i),tc=await pg.getTextContent(),ln='',lastY=null;tc.items.forEach(function(it){var y=Math.round(it.transform[5]);if(lastY!==null&&Math.abs(y-lastY)>4)ln+='\n';else if(ln&&!/\s$/.test(ln))ln+=' ';ln+=it.str;lastY=y;});out.push('[p.'+i+'] '+tidy(ln));}
       var pt={type:'PDF',text:out.join('\n')};if(smpOk(pt))return pt;
       /* 글자 정보 없이 모양만 저장된 PDF(Type3 글꼴 등): 등록한 AI가 페이지 그림을 읽어 옮겨 적는다 */
+      var why='「'+nm+'」은 화면에는 글자로 보이지만 파일 안에 글자 정보가 없고 모양만 저장된 PDF입니다(일부 PDF 변환기가 이렇게 저장합니다). 그래서 등록한 AI가 페이지 그림을 보고 글자를 옮겨 적어야 합니다.';
+      if(window.KIFAI&&KIFAI.chosen()&&KIFAI.cfg().mode==='ai'&&!confirm(why+'\n\n지금 AI로 읽을까요? (취소하면 이 파일은 건너뜁니다. 원본 PPT·엑셀·워드 파일을 올리면 AI 없이 바로 등록됩니다)'))throw new Error('AI로 읽기를 취소해 건너뛰었습니다. 원본 PPT·엑셀·워드 파일을 올리면 AI 없이 바로 등록됩니다');
       if(!(window.KIFAI&&KIFAI.chosen()&&KIFAI.cfg().mode==='ai'))throw new Error('이 PDF는 글자 정보 없이 모양만 저장된 파일이라 글자를 뽑을 수 없습니다. 홈의 「내 AI 등록」을 하면 AI가 페이지 그림을 읽어 등록합니다(또는 원본 PPT·엑셀·워드 파일을 올려 주세요)');
       var mat=await KIFAI.read([f]);if(!mat.images.length&&mat.text&&smpOk({text:mat.text}))return {type:'PDF',text:tidy(mat.text)};
       var ar=await KIFAI.ask('아래 그림은 보험 보장분석 샘플 문서의 페이지들이다. 보이는 글자를 페이지 순서대로 빠짐없이 옮겨 적어라. 페이지 앞에 [p.번호]를 붙이고, 표는 한 행을 한 줄로 칸은 " | "로 구분한다. 고객 이름은 성+OO으로, 전화번호는 010-****-****로 가린다. 요약하거나 지어내지 마라. JSON 하나로만 답하라: {"text":"옮겨 적은 내용"}',mat);
