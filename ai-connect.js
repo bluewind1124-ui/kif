@@ -46,7 +46,7 @@ function statusHTML(){
 
 /* ---------- 스타일 (어느 화면에 붙어도 같은 모양) ---------- */
 var css='.kai-ov{position:fixed;inset:0;background:rgba(10,18,26,.55);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto;font-family:inherit}'+
-'.kai-box{background:#fff;color:#1b2430;border-radius:14px;width:100%;max-width:680px;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.3);font-size:14px;line-height:1.6}'+
+'.kai-box{background:#fff;color:#1b2430;border-radius:14px;width:100%;max-width:680px;box-sizing:border-box;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.3);font-size:14px;line-height:1.6}'+
 '.kai-box h2{font-size:18px;margin:0;color:#0f2240}.kai-box h3{font-size:14px;margin:16px 0 8px;color:#0f2240}'+
 '.kai-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}.kai-hd .kai-x{margin-left:auto}'+
 '.kai-note{font-size:12.5px;color:#5b6573;margin:4px 0}.kai-warn{background:#fbf1dd;color:#7a4f0e;border-radius:10px;padding:10px 12px;font-size:12.5px;margin-top:12px}'+
@@ -60,48 +60,126 @@ var css='.kai-ov{position:fixed;inset:0;background:rgba(10,18,26,.55);z-index:99
 '.kai-btn.p{background:#0f2240;border-color:#0f2240;color:#fff}.kai-btn.g{border-color:transparent;background:transparent}.kai-btn.d{color:#b3261e}.kai-btn[disabled]{opacity:.5;cursor:default}'+
 '.kai-link{appearance:none;border:0;background:none;padding:0;font:inherit;color:#b07d1c;font-weight:700;text-decoration:underline;cursor:pointer}'+
 '.kai-steps{padding-left:20px;margin:6px 0 0}.kai-steps li{margin-bottom:14px}'+
+'.kai-wrap{width:100%;max-width:880px;display:flex;flex-direction:column;gap:12px}.kai-wrap .kai-box{max-width:none}'+
+'.kai-ttl{font-size:13px;color:#5b6573;font-weight:700}.kai-pill{font-size:12px;font-weight:700;background:#0f2240;color:#fff;border-radius:6px;padding:3px 10px}.kai-pill.off{background:#eef1f5;color:#5b6573}'+
+'.kai-grid{display:grid;grid-template-columns:170px 1fr;gap:22px}.kai-main{min-width:0;border-left:1px solid #e3e7ec;padding-left:22px}.kai-main h2{margin-bottom:6px}'+
+'.kai-nav{list-style:none;margin:6px 0 0;padding:0}.kai-nav li{display:flex;align-items:center;gap:10px;padding:8px 0;color:#9aa3ae;font-size:13.5px}.kai-nav li i{font-style:normal;font-weight:700;width:18px}'+
+'.kai-nav li.on{color:#0f2240;font-weight:700}.kai-nav li.on i{color:#b07d1c}.kai-nav li.done{color:#1d7f47}.kai-nav li.dim{opacity:.45}'+
+'.kai-ol{margin:8px 0 14px;padding-left:20px}.kai-ol li{margin:6px 0}.kai-ol a,.kai-note a{color:#b07d1c}'+
+'.kai-btn.gold{display:inline-block;background:#cb9c3a;border-color:#cb9c3a;color:#1b1206;text-decoration:none;padding:11px 18px}'+
+'.kai-tip{background:#fbf3e3;color:#5a4416;border-radius:10px;padding:12px 14px;font-size:13px;margin-top:14px}'+
+'.kai-opt em{display:block;font-style:normal;font-size:12px;font-weight:700;color:#b07d1c;margin-top:6px}'+
+'.kai-krow{display:flex;gap:6px;margin-top:4px}.kai-krow input{margin-top:0!important;flex:1;font-family:ui-monospace,monospace}'+
+'.kai-done{background:#e6f4ec;border-radius:10px;padding:14px 16px;margin:8px 0}.kai-done b{display:block;color:#1d7f47;font-size:16px}.kai-done span{font-size:13px}'+
+'.kai-ul{padding-left:20px;font-size:13px}.kai-faq h3{margin-top:0;font-size:16px}.kai-faq p{font-size:13px;margin:10px 0}'+
+'@media (max-width:640px){.kai-grid{grid-template-columns:1fr;gap:8px}.kai-main{border-left:0;padding-left:0}.kai-nav{display:flex;gap:4px;overflow-x:auto}.kai-nav li{flex:none;padding:4px 8px;border-radius:6px;background:#f2f4f7;font-size:12px}.kai-nav li.on{background:#fdf7ea}}'+
 '@media (max-width:560px){.kai-box{padding:16px}.kai-opts{grid-template-columns:1fr}}';
 function addCss(){if(document.getElementById('kai-css'))return;var s=document.createElement('style');s.id='kai-css';s.textContent=css;(document.head||document.documentElement).appendChild(s);}
 
-/* ---------- 내 AI 등록 창 ---------- */
-var sel='',ov=null;
-function open(){addCss();sel=cfg().prov;if(!ov){ov=document.createElement('div');ov.className='kai-ov';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label','내 AI 등록');ov.addEventListener('click',onClick);document.body.appendChild(ov);}ov.hidden=false;render();}
+/* ---------- 내 AI 등록 창 ----------
+   1 AI 고르기 → (API 키 방식이면) 2 키 발급받기 → 3 붙여넣고 확인 → 4 완료.  키 없이 쓰는 방식은 1단계에서 바로 저장 */
+var GUIDE={
+  claude:{site:'Anthropic 콘솔',url:'https://console.anthropic.com/settings/keys',bill:'https://console.anthropic.com/settings/billing',pre:/^sk-ant-/,preTxt:'sk-ant-',
+    steps:['아래 <b>[발급 페이지 열기]</b>를 누르고 Anthropic 계정으로 로그인합니다. 계정이 없으면 이메일로 가입합니다(Claude 앱 계정과 같은 이메일을 써도 됩니다).',
+      '처음이면 <b>결제 정보</b>를 등록하고 크레딧을 충전합니다. (<a href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener">결제 페이지 열기</a>)',
+      '<b>Create Key</b>(키 만들기)를 누르고 이름을 적습니다. 예: 한보금 보장분석',
+      '만들어진 키(<b>sk-ant-</b>로 시작) 옆의 <b>복사</b> 버튼을 누릅니다.'],
+    tip:'Claude API는 미리 충전한 크레딧에서 쓴 만큼 빠집니다. Claude Pro 구독과는 결제가 따로입니다. 콘솔에서 월 사용 한도를 정해 두면 안심입니다.'},
+  openai:{site:'OpenAI 플랫폼',url:'https://platform.openai.com/api-keys',bill:'https://platform.openai.com/settings/organization/billing/overview',pre:/^sk-/,preTxt:'sk-',
+    steps:['아래 <b>[발급 페이지 열기]</b>를 누르고 로그인합니다. ChatGPT에서 쓰는 계정으로 그대로 로그인할 수 있습니다.',
+      '처음이면 <b>결제 수단</b>을 등록하고 크레딧을 충전합니다. (<a href="https://platform.openai.com/settings/organization/billing/overview" target="_blank" rel="noopener">결제 페이지 열기</a>)',
+      '<b>Create new secret key</b>(새 키 만들기)를 누르고 이름을 적은 뒤 <b>Create secret key</b>를 누릅니다.',
+      '만들어진 키(<b>sk-</b>로 시작) 옆의 <b>복사</b> 버튼을 누릅니다. 이 창을 닫으면 키를 다시 볼 수 없습니다.'],
+    tip:'ChatGPT Plus 구독과 API 결제는 따로입니다. 구독만으로는 키를 쓸 수 없고, 충전한 크레딧에서 쓴 만큼 빠집니다.'},
+  gemini:{site:'Google AI Studio',url:'https://aistudio.google.com/apikey',bill:'',pre:/^AIza/,preTxt:'AIza',
+    steps:['아래 <b>[발급 페이지 열기]</b>를 누르고 구글 계정으로 로그인합니다.',
+      '처음이면 이용약관에 동의합니다.',
+      '<b>Create API key</b>(API 키 만들기)를 누릅니다.',
+      '만들어진 키(<b>AIza</b>로 시작) 옆의 <b>복사</b> 버튼을 누릅니다.'],
+    tip:'무료 사용량이 있지만 하루 사용 횟수 제한이 있습니다. 실제 업무에서는 결제 계정을 연결해 두는 것이 안정적입니다.'}
+};
+var FAQ=[
+  ['ChatGPT Plus나 Claude Pro를 쓰고 있는데 왜 또 결제가 필요한가요?','월 구독(채팅용)과 API(프로그램 연결용)는 결제가 따로입니다. 구독만으로는 키가 나오지 않습니다. API는 쓴 만큼만 나갑니다. 결제 없이 쓰려면 1단계에서 <b>복사·붙여넣기</b>를 고르세요.'],
+  ['키를 잃어버렸어요.','키는 발급할 때 한 번만 보입니다. 발급 페이지에서 새 키를 만들어 3단계부터 다시 하면 됩니다. 예전 키는 발급 페이지에서 지워 두세요.'],
+  ['PC를 바꿨어요.','키는 PC(브라우저)마다 따로 저장됩니다. 새 PC에서 같은 키를 다시 붙여넣으면 됩니다.'],
+  ['키를 다른 사람에게 알려 줘도 되나요?','안 됩니다. 키를 아는 사람은 내 결제로 AI를 쓸 수 있습니다. 공용 PC에서는 등록하지 말고, 새어 나간 것 같으면 발급 페이지에서 그 키를 지우세요.'],
+  ['요금이 걱정돼요.','자료 양만큼 나갑니다. 발급 페이지에서 월 사용 한도를 정해 두면 그 이상은 나가지 않습니다.']
+];
+var sel='',ov=null,step=1,draft='';
+function open(){addCss();var c=cfg();sel=c.prov;step=1;draft='';if(!ov){ov=document.createElement('div');ov.className='kai-ov';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label','내 AI 등록');ov.addEventListener('click',onClick);ov.addEventListener('input',onInput);document.body.appendChild(ov);}ov.hidden=false;render();}
 function close(){if(ov){ov.remove();ov=null;}}
+function connectedPill(){var c=cfg(),p=c.prov;if(!chosen()||c.mode!=='ai'||(AIP[p].key&&!c.keys[p]))return '<span class="kai-pill off">아직 연결 안 됨</span>';return '<span class="kai-pill">● '+esc(AIP[p].name.replace(/ \(.*\)$/,''))+' 연결됨</span>';}
+function stepNav(){var L=['AI 고르기','키 발급받기','붙여넣고 확인','완료'],api=AIP[sel]&&AIP[sel].key;
+  return '<ol class="kai-nav">'+L.map(function(t,i){var n=i+1,cls=n===step?'on':n<step?'done':'';if(!api&&n>1)cls+=' dim';return '<li class="'+cls+'"><i>'+(n<step?'✓':n)+'</i>'+t+'</li>';}).join('')+'</ol>';}
 function render(){
-  var c=cfg(),p=sel||c.prov,host=!!claudeHost();
-  var card=function(k){return '<button type="button" class="kai-opt'+(k===p?' on':'')+'" data-kai-p="'+k+'"><b>'+(k===p?'✓ ':'')+AIP[k].name+'</b><span>'+AIP[k].help+'</span></button>';};
-  var easy=['company','paste','claudeapp'].filter(function(k){return (k!=='company'||AI_PROXY)&&(k!=='claudeapp'||host);});
-  var h='<div class="kai-box"><div class="kai-hd"><h2>내 AI 등록</h2><button type="button" class="kai-btn g kai-x" data-kai="x" aria-label="닫기">✕</button></div>'+
-    '<p class="kai-note">한 번 등록하면 <b>AI보장분석 기본형</b>과 <b>고급형</b>이 같은 AI를 씁니다. 기본형은 등록된 기준·샘플대로 분석하고, 고급형은 고급형 계산 규칙대로 제안서를 만듭니다(고급형의 AI는 자료를 읽어 입력칸을 채우는 데 씁니다).</p>'+
-    '<h3>키 없이 쓰기 <span class="kai-note">추천</span></h3><div class="kai-opts">'+easy.map(card).join('')+'</div>'+
-    '<h3>고급 · 내 API 키</h3><div class="kai-opts">'+['claude','openai','gemini'].map(card).join('')+'</div>';
-  if(AIP[p].key)h+='<label class="kai-f">'+AIP[p].name+' API 키<input type="password" id="kaiKey" autocomplete="off" value="'+esc(c.keys[p]||'')+'" placeholder="키를 붙여넣기"></label>'+
-    '<label class="kai-f">모델 <span class="kai-note">비워 두면 기본값</span><input type="text" id="kaiModel" value="'+esc(c.models[p]||'')+'" placeholder="'+esc(AI_MODELS[p]||AIP[p].model)+'"></label>'+
-    '<p class="kai-note">키 만드는 곳: <a href="'+AIP[p].url+'" target="_blank" rel="noopener">'+AIP[p].url+'</a> · 키는 이 기기 브라우저에만 저장되고, AI를 부를 때 그 회사로만 보내집니다. 사용량에 따라 그 회사에서 요금이 나옵니다.</p>';
-  else if(p==='company')h+='<label class="kai-f">회사 접속코드 <span class="kai-note">관리자가 알려준 경우만</span><input type="password" id="kaiCode" autocomplete="off" value="'+esc(c.code||'')+'"></label>';
-  else if(p==='paste')h+='<p class="kai-note" style="margin-top:10px">자료를 올리면 「AI에게 읽히기」 창이 뜹니다. <b>ChatGPT로 보내기</b> → 열린 창에 붙여넣고 보내기 → AI 답의 <b>복사</b> 아이콘 → 포털로 돌아오면 자동으로 들어갑니다.</p>';
-  h+='<div class="kai-warn">고객 증권·병력·재무 자료가 고른 AI 회사로 보내집니다. 개인정보 동의를 받은 고객 자료만 AI로 읽히세요.</div>'+
-    '<div class="kai-row"><button type="button" class="kai-btn p" data-kai="save">저장</button>'+(AIP[p].key||p==='company'?'<button type="button" class="kai-btn" data-kai="test">연결 시험</button>':'')+
-    (AIP[p].key&&c.keys[p]?'<button type="button" class="kai-btn g d" data-kai="del">이 키 지우기</button>':'')+
-    (raw().mode==='manual'?'':'<button type="button" class="kai-btn g" data-kai="off">AI 없이 쓰기</button>')+'<span class="kai-note" id="kaiMsg" role="status"></span></div></div>';
-  ov.innerHTML=h;
+  var c=cfg(),p=sel||c.prov,host=!!claudeHost(),h='';
+  if(step===1){
+    var card=function(k){return '<button type="button" class="kai-opt'+(k===p?' on':'')+'" data-kai-p="'+k+'"><b>'+(k===p?'✓ ':'')+AIP[k].name+'</b><span>'+AIP[k].help+'</span>'+(AIP[k].key?'<em>'+(c.keys[k]?'키 등록됨 · 바꾸기':'키 발급 안내 따라 하기 ›')+'</em>':'')+'</button>';};
+    var easy=['company','paste','claudeapp'].filter(function(k){return (k!=='company'||AI_PROXY)&&(k!=='claudeapp'||host);});
+    h='<h2>1. 쓸 AI 고르기</h2><p class="kai-note">한 번 등록하면 <b>AI보장분석 기본형</b>과 <b>고급형</b>이 같은 AI를 씁니다. 기본형은 등록된 기준·샘플대로 분석하고, 고급형은 고급형 계산 규칙대로 제안서를 만듭니다.</p>'+
+      '<h3>키 없이 쓰기 <span class="kai-note">추천 · 바로 시작</span></h3><div class="kai-opts">'+easy.map(card).join('')+'</div>'+
+      '<h3>내 API 키로 쓰기 <span class="kai-note">더 빠르고 자동 · 발급 안내가 이어집니다</span></h3><div class="kai-opts">'+['claude','openai','gemini'].map(card).join('')+'</div>';
+    if(p==='company')h+='<label class="kai-f">회사 접속코드 <span class="kai-note">관리자가 알려준 경우만</span><input type="password" id="kaiCode" autocomplete="off" value="'+esc(c.code||'')+'"></label>';
+    else if(p==='paste')h+='<div class="kai-tip"><b>쓰는 법</b> 자료를 올리면 「AI에게 읽히기」 창이 뜹니다. <b>ChatGPT로 보내기</b> → 열린 창에 붙여넣고 보내기 → AI 답의 <b>복사</b> 아이콘 → 포털로 돌아오면 자동으로 들어갑니다. 무료 계정도 됩니다.</div>';
+    h+='<div class="kai-warn">고객 증권·병력·재무 자료가 고른 AI 회사로 보내집니다. 개인정보 동의를 받은 고객 자료만 AI로 읽히세요.</div>';
+    if(AIP[p].key)h+='<div class="kai-row"><button type="button" class="kai-btn p" data-kai="next">다음: 키 발급받기 ›</button>'+(c.keys[p]?'<button type="button" class="kai-btn" data-kai="have">이미 받은 키가 있어요</button>':'<button type="button" class="kai-btn" data-kai="have">키가 이미 있어요</button>')+'</div>';
+    else h+='<div class="kai-row"><button type="button" class="kai-btn p" data-kai="save">이 방식으로 저장</button>'+(p==='company'?'<button type="button" class="kai-btn" data-kai="test">연결 시험</button>':'')+(raw().mode==='manual'?'':'<button type="button" class="kai-btn g" data-kai="off">AI 없이 쓰기</button>')+'<span class="kai-note" id="kaiMsg" role="status"></span></div>';
+  }else if(step===2){
+    var G=GUIDE[p];
+    h='<h2>2. '+esc(AIP[p].name.replace(/ \(.*\)$/,''))+' 키 발급받기</h2><p class="kai-note">'+G.site+'에서 내 키를 만듭니다. 처음 한 번만 하면 됩니다.</p><ol class="kai-ol">'+G.steps.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ol>'+
+      '<a class="kai-btn gold" href="'+G.url+'" target="_blank" rel="noopener" data-kai="opened">발급 페이지 열기 (새 창) ↗</a>'+
+      '<div class="kai-tip">'+G.tip+'</div>'+
+      '<div class="kai-row"><button type="button" class="kai-btn" data-kai="prev">이전</button><button type="button" class="kai-btn p" data-kai="copied">키를 복사했어요 ›</button></div>';
+  }else if(step===3){
+    var G3=GUIDE[p],k=draft||c.keys[p]||'';
+    h='<h2>3. 키 붙여넣고 확인</h2><p class="kai-note">복사한 키를 아래 칸에 붙여넣으세요(Ctrl+V, 휴대폰은 길게 눌러 붙여넣기). <b>확인</b>을 누르면 연결이 되는지 시험한 뒤 저장합니다.</p>'+
+      '<label class="kai-f">'+esc(AIP[p].name)+' API 키<div class="kai-krow"><input type="password" id="kaiKey" autocomplete="off" spellcheck="false" value="'+esc(k)+'" placeholder="'+G3.preTxt+'… 로 시작하는 키"><button type="button" class="kai-btn" data-kai="clip">붙여넣기</button><button type="button" class="kai-btn g" data-kai="eye" aria-label="키 보기">👁</button></div></label>'+
+      '<p class="kai-note" id="kaiFmt"></p>'+
+      '<details class="kai-adv"><summary class="kai-note">고급: 모델 바꾸기 (보통은 그대로 두세요)</summary><label class="kai-f">모델 <span class="kai-note">비워 두면 기본값</span><input type="text" id="kaiModel" value="'+esc(c.models[p]||'')+'" placeholder="'+esc(AI_MODELS[p]||AIP[p].model)+'"></label></details>'+
+      '<p class="kai-note">키는 이 기기 브라우저에만 저장되고, AI를 부를 때 '+G3.site.replace(/ .*/,'')+' 쪽으로만 보내집니다.</p>'+
+      '<div class="kai-row"><button type="button" class="kai-btn" data-kai="prev">이전</button><button type="button" class="kai-btn p" data-kai="check">확인</button><span class="kai-note" id="kaiMsg" role="status"></span></div>'+
+      (c.keys[p]?'<div class="kai-row"><button type="button" class="kai-btn g d" data-kai="del">이 기기에서 키 지우기</button></div>':'');
+  }else{
+    h='<h2>4. 완료</h2><div class="kai-done"><b>✓ '+esc(AIP[p].name)+' 연결됨</b><span>이제 AI보장분석 <b>기본형</b>과 <b>고급형</b>에서 자료를 올리면 이 AI가 읽습니다.</span></div>'+
+      '<ul class="kai-ul"><li>기본형: 증권·가입설계서를 올리면 등록된 기준·샘플대로 분석합니다.</li><li>고급형: 「증권·설계서 AI 판독」, 「자료로 채우기 (AI)」, 「AI 의견 초안 받기」에서 씁니다.</li><li>바꾸고 싶으면 홈의 「내 AI」 칸에서 언제든 다시 엽니다.</li></ul>'+
+      '<div class="kai-row"><button type="button" class="kai-btn p" data-kai="x">닫기</button></div>';
+  }
+  var faq=(step===2||step===3)?'<div class="kai-box kai-faq"><h3>자주 묻는 것</h3>'+FAQ.map(function(f){return '<p><b>'+f[0]+'</b><br>'+f[1]+'</p>';}).join('')+'</div>':'';
+  ov.innerHTML='<div class="kai-wrap"><div class="kai-box"><div class="kai-hd"><b class="kai-ttl">내 AI 등록</b>'+connectedPill()+'<button type="button" class="kai-btn g kai-x" data-kai="x" aria-label="닫기">✕</button></div>'+
+    '<div class="kai-grid">'+stepNav()+'<div class="kai-main">'+h+'</div></div></div>'+faq+'</div>';
+  if(step===3)fmtCheck();
 }
-function commit(){
-  var c=raw(),p=sel||cfg().prov,k=document.getElementById('kaiKey'),m=document.getElementById('kaiModel'),cd=document.getElementById('kaiCode');
-  c.keys=c.keys||{};c.models=c.models||{};
-  if(k)c.keys[p]=k.value.trim();if(m)c.models[p]=m.value.trim();if(cd)c.code=cd.value.trim();
-  c.prov=p;c.mode='ai';saveRaw(c);return p;
-}
+function fmtCheck(){var i=document.getElementById('kaiKey'),m=document.getElementById('kaiFmt');if(!i||!m)return;var v=i.value.trim(),G=GUIDE[sel];draft=i.value;
+  m.textContent=!v?'':G.pre.test(v)?'✓ 키 모양이 맞습니다.':'⚠ '+AIP[sel].name+' 키는 보통 "'+G.preTxt+'"로 시작합니다. 다른 회사 키를 넣지 않았는지 확인하세요.';m.style.color=!v?'':G.pre.test(v)?'#1d7f47':'#a86a12';}
+function onInput(e){if(e.target&&e.target.id==='kaiKey')fmtCheck();}
+function saveKey(p,key,mdl){var c=raw();c.keys=c.keys||{};c.models=c.models||{};c.keys[p]=key;if(mdl!=null)c.models[p]=mdl;c.prov=p;c.mode='ai';saveRaw(c);}
 function onClick(e){
-  if(e.target===ov){close();return;}
-  var o=e.target.closest('[data-kai-p]');if(o){sel=o.dataset.kaiP;render();return;}
+  if(e.target===ov||e.target.classList&&e.target.classList.contains('kai-wrap')){close();return;}
+  var o=e.target.closest('[data-kai-p]');if(o){sel=o.dataset.kaiP;draft='';render();return;}
   var b=e.target.closest('[data-kai]');if(!b)return;var a=b.dataset.kai;
+  if(a==='opened')return;   /* 링크는 새 창으로 열린다 */
   if(a==='x'){close();return;}
-  if(a==='save'){var p=commit();close();note('내 AI를 저장했습니다 ('+AIP[p].name+')');return;}
-  if(a==='off'){var c=raw();c.mode='manual';saveRaw(c);close();note('AI 없이 쓰기로 바꿨습니다');return;}
-  if(a==='del'){var r=raw();if(r.keys)delete r.keys[sel];saveRaw(r);render();return;}
-  if(a==='test'){commit();var m=document.getElementById('kaiMsg');m.textContent='시험 중…';b.disabled=true;
-    ask('연결 시험이다. JSON 하나로만 답하라: {"ok":true}').then(function(r){m.textContent=r&&r.ok?'✓ 연결됐습니다.':'답은 왔지만 형식이 다릅니다. 모델 이름을 확인하세요.';},function(er){m.textContent='✕ '+err(er);}).then(function(){b.disabled=false;});}
+  if(a==='next'){step=2;render();return;}
+  if(a==='have'||a==='copied'){step=3;render();var ki=document.getElementById('kaiKey');if(ki&&!ki.value)ki.focus();return;}
+  if(a==='prev'){step=step===3&&!GUIDE[sel]?1:step-1;render();return;}
+  if(a==='eye'){var kk=document.getElementById('kaiKey');kk.type=kk.type==='password'?'text':'password';return;}
+  if(a==='clip'){var km=document.getElementById('kaiMsg');if(!(navigator.clipboard&&navigator.clipboard.readText)){km.textContent='이 브라우저는 자동 붙여넣기를 막습니다. 칸을 누르고 Ctrl+V 하세요.';return;}
+    navigator.clipboard.readText().then(function(t){var ki=document.getElementById('kaiKey');ki.value=String(t||'').trim();fmtCheck();km.textContent='';},function(){km.textContent='붙여넣기 허용이 필요합니다. 칸을 누르고 Ctrl+V 하세요.';});return;}
+  if(a==='check'){
+    var p=sel,key=document.getElementById('kaiKey').value.trim(),me=document.getElementById('kaiModel'),mdl=me?me.value.trim():null,m=document.getElementById('kaiMsg');
+    if(!key){m.textContent='키를 먼저 붙여넣으세요.';return;}
+    if(/[^\x21-\x7e]/.test(key)){m.textContent='✕ 키에 한글·빈칸 같은 다른 글자가 섞였습니다. 발급 페이지에서 복사 버튼으로 다시 복사하세요.';return;}
+    m.textContent='연결 시험 중…';b.disabled=true;
+    var c0=cfg();c0.models[p]=mdl||'';
+    apiCall(p,key,model(c0,p),'연결 시험이다. JSON 하나로만 답하라: {"ok":true}',[]).then(pickJson).then(function(){saveKey(p,key,mdl);step=4;render();note('내 AI를 저장했습니다 ('+AIP[p].name+')');},
+      function(er){m.innerHTML='✕ '+esc(er&&er.code==='bad_key'?'키가 맞지 않거나 아직 사용할 수 없는 키입니다. 발급 페이지에서 복사 버튼으로 다시 복사해 붙여넣으세요(결제 등록이 필요한 회사는 결제부터 확인).':err(er))+' <button type="button" class="kai-link" data-kai="force">시험 없이 저장</button>';b.disabled=false;});
+    return;}
+  if(a==='force'){var kf=document.getElementById('kaiKey').value.trim(),mf=document.getElementById('kaiModel');if(!kf)return;saveKey(sel,kf,mf?mf.value.trim():null);step=4;render();return;}
+  if(a==='save'){var cd=document.getElementById('kaiCode'),c=raw();if(cd)c.code=cd.value.trim();c.prov=sel;c.mode='ai';saveRaw(c);close();note('내 AI를 저장했습니다 ('+AIP[sel].name+')');return;}
+  if(a==='off'){var r0=raw();r0.mode='manual';saveRaw(r0);close();note('AI 없이 쓰기로 바꿨습니다');return;}
+  if(a==='del'){var r=raw();if(r.keys)delete r.keys[sel];saveRaw(r);draft='';render();return;}
+  if(a==='test'){var cd2=document.getElementById('kaiCode'),c2=raw();if(cd2)c2.code=cd2.value.trim();c2.prov=sel;c2.mode='ai';saveRaw(c2);var m2=document.getElementById('kaiMsg');m2.textContent='시험 중…';b.disabled=true;
+    ask('연결 시험이다. JSON 하나로만 답하라: {"ok":true}').then(function(r){m2.textContent=r&&r.ok?'✓ 연결됐습니다.':'답은 왔지만 형식이 다릅니다.';},function(er){m2.textContent='✕ '+err(er);}).then(function(){b.disabled=false;});}
 }
 function note(t){addCss();var d=document.createElement('div');d.textContent=t;d.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0f2240;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;z-index:10000;box-shadow:0 8px 20px rgba(0,0,0,.25)';document.body.appendChild(d);setTimeout(function(){d.remove();},2600);}
 document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('[data-kai-open]')){e.preventDefault();open();}});
