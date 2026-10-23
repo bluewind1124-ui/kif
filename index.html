@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.11">
+<meta name="kif-build" content="2026-10-23.12">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -402,6 +402,8 @@ body.adv-full{overflow:hidden}
 @media (max-width:520px){#meBtn{display:none}.top .zoom{display:none}}
 /* ===== 상조 서비스 (제휴사 소개서) ===== */
 .sj{display:grid;gap:22px}
+.sch-t td{vertical-align:top}.sch-t td.d{white-space:nowrap;font-weight:700}.sch-t tr.past{opacity:.5}
+.nu-sch{margin-top:8px;padding:8px 10px;border:1px dashed #cb9c3a;border-radius:6px;background:#fffaf0}.nu-sr{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}.nu-sr .in{width:auto;padding:4px 6px;font-size:.85rem}.nu-sr input[type=checkbox]{width:18px;height:18px}
 .sj-hero{background:linear-gradient(135deg,#0f2240 0%,#1b3561 100%);color:#fff;border-radius:6px;padding:28px 26px;position:relative;overflow:hidden}
 .sj-hero:after{content:'';position:absolute;right:-60px;top:-60px;width:260px;height:260px;border:2px solid rgba(203,156,58,.35);border-radius:50%}
 .sj-hl{position:relative;z-index:1;max-width:640px}
@@ -1218,12 +1220,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var MENU=[
     {g:null,items:[['home','홈']]},
     {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
-    {g:'공지 · 시상',items:[['news','보험사 소식지'],['award','시상 공지']]},
+    {g:'공지 · 시상',items:[['news','보험사 소식지'],['sched','상품 개정 일정','NEW'],['award','시상 공지']]},
     {g:'교육 · 연계',items:[['edu','온라인 교육센터'],['car','자동차 비교견적'],['sangjo','상조 서비스']]},
     {g:'관리자',admin:true,items:[['admin','관리자 페이지'],['cadmin','자료 관리','NEW'],['refadmin','보장분석 샘플 올리기']]},
     {g:'내 정보',mobile:true,items:[['me','내 정보 · 자료 보관']]}
   ];
-  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',award:'cup',edu:'cap',car:'car',sangjo:'heart',me:'user',admin:'gear',cadmin:'doc'};
+  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',sched:'cal',award:'cup',edu:'cap',car:'car',sangjo:'heart',me:'user',admin:'gear',cadmin:'doc'};
 
   var NEWS=[
     ['2026.10.14','삼성화재','간편건강보험 3.5.5 고지 개정, 11월 1일부터 적용'],
@@ -1235,7 +1237,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     ['상품 비교',[['이번 달의 원픽',V1+'onepick.html','Hot'],['생명보험 가이드북 비교',V1+'life.html'],['담보별 비교견적',V1+'nonlife.html','Best'],['단기납 종신보험 비교',V1+'wholelife.html'],['3대질병진단비 비교',V1+'critical3.html'],['경영인 정기보험 비교',V1+'ceoterm.html']]],
     ['보장분석 · 설계',[['AI보장분석 기본형','ai'],['AI보장분석 고급형','ai2','New'],['대표 상품 가설','hypo'],['이달의 컨셉','concept','Hot']]],
     ['교육 · 연계',[['온라인 교육센터','edu','New'],['AI보장분석 고급형','ai2','New'],['자동차 비교견적','car'],['상조 서비스','sangjo']]],
-    ['공지 · 시상',[['보험사 소식지','news'],['시상 공지','award','Hot'],['상품 개정 일정','news','New']]]
+    ['공지 · 시상',[['보험사 소식지','news'],['시상 공지','award','Hot'],['상품 개정 일정','sched','New']]]
   ];
   var MATS=[
     ['PPT','보험비교분석 발표자료','사례','김OO님 항암 강화·동시지급·매년 반복'],
@@ -1319,6 +1321,49 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     check:['견적은 입력 정보 기준의 예상 보험료입니다. 실제 보험료는 보험사 심사 후 확정됩니다.','고객 개인정보는 동의를 받은 뒤 입력하고, 상담이 끝나면 화면을 닫으세요.','보험료만이 아니라 대물 한도·자기차량손해·긴급출동 등 담보 차이도 함께 설명하세요.','만기일 30일 전부터 갱신 견적이 가능하니 미리 안내하세요.'],
     perf:'자동차보험 실적 반영 기준은 본사 공지를 확인하세요.'};
   var BANNER={title:'11월 1일 간편건강 고지 개정 외 3건',sub:'보험사 소식지에서 일정을 확인하세요.'};
+  /* 상품 개정 일정: content.json의 sched [{d:'2026.10.14' 또는 '2026.10', co, k(개정·출시·판매종료…), t, src}]
+     관리자가 자료를 올릴 때 소식지·공지에서 일정을 찾아(글자 규칙 + 등록된 AI) 확인 후 더하고, 한 달 지난 일정은 정리한다. */
+  var SCHED=[];
+  var SCH_KINDS=['개정','출시','판매종료','보험료 인하','보험료 인상','시행'];
+  function schedEnd(d){d=String(d||'');return d.length<=7?d+'.31':d;}
+  function schedCut(){var x=new Date();x.setDate(x.getDate()-31);return x.getFullYear()+'.'+pad2(x.getMonth()+1)+'.'+pad2(x.getDate());}
+  function schedMerge(old,add){
+    var seen={},out=[],cutD=schedCut();
+    (old||[]).concat(add||[]).forEach(function(x){if(!x||!x.d||!x.t)return;var key=x.d+'|'+(x.co||'')+'|'+String(x.t).replace(/\s+/g,'').slice(0,18);if(seen[key])return;seen[key]=1;
+      if(schedEnd(x.d)<cutD)return;out.push({d:String(x.d),co:x.co||'기타',k:x.k||'개정',t:String(x.t),src:x.src||''});});
+    return out.sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:0;});
+  }
+  function schedLive(){var c=schedCut();return SCHED.filter(function(x){return schedEnd(x.d)>=c;});}
+  function schedDay(d){return d.length<=7?(+d.slice(5,7))+'월 중':(+d.slice(5,7))+'.'+(+d.slice(8,10));}
+  function schedBanner(){
+    var L=schedLive();if(!L.length)return BANNER;var td=today(),up=L.filter(function(x){return schedEnd(x.d)>=td;});
+    var nx=up.filter(function(x){return x.d.length>7;})[0]||up[0];
+    return {go:'sched',title:(up.length?'다가오는 일정 '+up.length+'건':'이번 달 일정 '+L.length+'건')+(nx?' · '+schedDay(nx.d)+' '+nx.co+' '+(nx.t.length>26?nx.t.slice(0,25)+'…':nx.t):'')};
+  }
+  /* 소식지·공지 글에서 개정·출시·판매종료 일정 뽑기: 날짜(10월 14일 · 10/14 · 10월 중 · 2026년 11월) 가까이에 일정 낱말이 있는 곳만 */
+  var SCH_K=[['판매종료',/판매\s*종료|판매\s*중지|절판|종료/],['보험료 인하',/보험료\s*인하|요율\s*인하/],['보험료 인상',/보험료\s*인상/],['개정',/개정|변경|상향|하향|조정/],['출시',/출시|신상품|예고|오픈/],['시행',/시행|적용/]];
+  var SCH_X=/될\s*수\s*있|갱신\s*시|갱신시|보험나이|매년|약관|상품설명서|심의|준법|유효기간|교육용|배포|이후\s*보험가입/;
+  function schedFind(text,co,y,mo,src){
+    text=String(text||'').replace(/\s+/g,' ');var out=[],seen={},fy=+y||new Date().getFullYear(),fm=+mo||new Date().getMonth()+1;
+    var R=/(?:(20\d{2}|\d{2})\s*[.년]\s*)?(\d{1,2})\s*월\s*(?:(\d{1,2})\s*일|(중|초|말|부터|로|에|까지))|(?:^|[^\d\/.])(\d{1,2})\s*\/\s*(\d{1,2})\s*일?(?![\d\/%회])|(20\d{2}|\d{2})\s*년\s*(\d{1,2})\s*월(?!\s*\d)/g,m;
+    while((m=R.exec(text))){
+      var yy=m[1]||m[7]||'',M=+(m[2]||m[5]||m[8]),D=+(m[3]||m[6]||0),dd=!!(m[3]||m[6]);
+      if(!M||M>12||D>31||(dd&&!D))continue;
+      if(/^\s*[~∼\-–]/.test(text.slice(R.lastIndex,R.lastIndex+3)))continue; /* 9/4~10/30 같은 기간은 끝 날짜만 */
+      var a=Math.max(0,m.index-30),b=Math.min(text.length,R.lastIndex+50),w=text.slice(a,b),after=text.slice(R.lastIndex,b),near=text.slice(R.lastIndex,R.lastIndex+28)+' '+text.slice(Math.max(0,m.index-10),m.index);
+      var k='';for(var i=0;i<SCH_K.length&&!k;i++)if(SCH_K[i][1].test(near))k=SCH_K[i][0];
+      if(!k||SCH_X.test(w))continue;
+      var Y=yy?(yy.length===2?2000+(+yy):+yy):fy;if(!yy&&M<fm-6)Y++;if(!yy&&M>fm+6)Y--;
+      if(Y*12+M<fy*12+fm-1||Y*12+M>fy*12+fm+8)continue; /* 지난달보다 앞선 일정(예전 자료 소개)은 뺀다 */
+      var d=Y+'.'+pad2(M)+(D?'.'+pad2(D):'');
+      var bt=text.slice(Math.max(0,m.index-40),m.index).split(/[.!?]\s|\d+\.\s|[▶►■●※*|]/).pop().replace(/^\S{0,3}\s/,'').trim();if(bt.length>28)bt=bt.slice(-28).replace(/^\S*\s/,'');
+      var at=after.replace(/^[\s,!·:)\]」~]+/,'').split(/\s\d+\.\s|[!?]|[※*▶►■●|]/)[0].trim();if(at.length>32)at=at.slice(0,31)+'…';
+      var t=((bt.length>=4&&/[가-힣A-Za-z]/.test(bt)?bt+' ':'')+at).trim();t=t.length>60?t.slice(0,59)+'…':t;if(t.length<4)t=w.trim().slice(0,60);
+      var key=d+'|'+k;if(seen[key])continue;seen[key]=1;
+      out.push({d:d,co:co||'기타',k:k,t:t,src:src||''});
+    }
+    return out;
+  }
   var HYPO=[['30대 맞벌이 · 자녀 1','태아·어린이 종합 + 부부 3대질병','"아이 보험 보실 때 부모님 진단비도 같이 점검해 볼까요?"'],
     ['50대 · 고혈압 약 복용','간편건강보험(3.5.5)','"약 드시는 분도 고지 3가지만 확인하면 가입됩니다."'],
     ['법인 대표','경영인 정기보험','"대표님 유고 시 회사 운영자금 대비, 보험료 비용처리 여부부터 보시죠."'],
@@ -1354,7 +1399,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<div class="hh-cards">'+P.map(function(c){return '<div class="hh-card"><b>'+c[0]+'</b><span>'+c[1]+'</span><button type="button" data-go="'+c[2]+'">바로가기</button></div>';}).join('')+'</div></section>';
       h+='<section class="hm-hd"><div><div class="hm-date">'+ds+'</div><h1>'+E(me.name)+'님, 오늘 할 일부터 보세요</h1></div><div class="hm-srch">'+srchBox(false)+'</div></section>';
       h+=hmAi();
-      if(BANNER&&BANNER.title)h+='<button class="hm-strip" data-go="news"><b>이달의 상품 개정 일정</b><span>'+E(BANNER.title)+'</span><em>일정 보기 ›</em></button>';
+      var BN=schedBanner();if(BN&&BN.title)h+='<button class="hm-strip" data-go="'+(BN.go||'news')+'"><b>이달의 상품 개정 일정</b><span>'+E(BN.title)+'</span><em>일정 보기 ›</em></button>';
       h+='<section class="hm-kpi">'+
         '<button data-go="news">'+ic('news','ki')+'<div><span>이번 주 새 소식지</span><b>'+nn+'<small>건</small></b><em>보험사 소식지 전체 '+NEWS.length+'건</em></div></button>'+
         '<button data-go="award" class="hot">'+ic('cup','ki')+'<div><span>진행 중 시상</span><b>'+(near?dd(near.n):'없음')+'</b><em>'+(near?E(near.a[0])+(near.n>0?' 마감':''):'새 시상을 기다려 주세요')+'</em></div></button>'+
@@ -1415,6 +1460,26 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
           return '<li><span class="pill">'+(k+1)+'</span><span class="t"><b>'+esc(q[0])+'</b>'+(q[1]?'<br><span class="note">'+esc(q[1])+'</span>':'')+'</span>'+
             (cmv&&pgn?'<a class="btn sm ghost" target="_blank" rel="noopener" href="'+fileHref(CONCEPT.file)+'"'+cmv+' data-pg="'+pgn+'">'+pgn+'쪽 보기</a>':'')+'</li>';}).join('')+'</ul></div>'+
         '<div class="panel"><h3>교육 자료 <button class="more" data-go="mats">교육 자료실 ›</button></h3><ul class="list">'+(CONCEPT.mats||[]).map(function(m){return '<li><span class="pill new">'+esc(m[0])+'</span><span class="t">'+cptMatLink(m)+'</span></li>';}).join('')+'</ul></div></div>';
+      return h;
+    },
+    sched:function(){
+      var E=esc,L=schedLive(),td=today(),adm=me&&me.role==='admin';
+      var h=head('공지','상품 개정 일정','보험사 소식지·공지에서 찾은 개정·출시·판매종료 일정입니다. 관리자가 자료를 올릴 때마다 새 일정이 더해지고, 지난 일정은 한 달 뒤 정리됩니다. 정확한 내용은 원본 자료로 확인하세요.');
+      var ks=[];L.forEach(function(x){if(ks.indexOf(x.k)<0)ks.push(x.k);});
+      h+='<div class="panel nfilter"><div class="nchips"><button type="button" class="tg on" data-schk="">전체 <span class="note">'+L.length+'</span></button>'+ks.map(function(k){return '<button type="button" class="tg" data-schk="'+E(k)+'">'+E(k)+' <span class="note">'+L.filter(function(x){return x.k===k;}).length+'</span></button>';}).join('')+'</div></div>';
+      if(!L.length)h+='<div class="panel"><p class="note" style="margin:0">아직 등록된 일정이 없습니다. 관리자가 소식지를 올리면 일정이 자동으로 채워집니다.</p></div>';
+      var ms=[];L.forEach(function(x){var m=x.d.slice(0,7);if(ms.indexOf(m)<0)ms.push(m);});
+      ms.forEach(function(m){
+        h+='<div class="panel sch-m"><h3>'+(+m.slice(0,4))+'년 '+(+m.slice(5,7))+'월</h3><div class="tbl"><table class="sch-t"><thead><tr><th>날짜</th><th>보험사</th><th>구분</th><th>내용</th><th>자료</th>'+(adm?'<th></th>':'')+'</tr></thead><tbody>'+
+          L.filter(function(x){return x.d.slice(0,7)===m;}).map(function(x){var past=schedEnd(x.d)<td,ix=SCHED.indexOf(x);
+            return '<tr data-schrow="'+E(x.k)+'"'+(past?' class="past"':'')+'><td class="d">'+schedDay(x.d)+(past?' <span class="pill">지남</span>':'')+'</td><td><b>'+E(x.co)+'</b></td><td><span class="pill '+(/종료|인상/.test(x.k)?'warn':/출시|인하/.test(x.k)?'new':'')+'">'+E(x.k)+'</span></td><td>'+E(x.t)+'</td><td>'+(x.src?fileA(x.src,'원본'):'')+'</td>'+(adm?'<td><button type="button" class="btn sm ghost" data-schdel="'+ix+'" title="이 일정 지우기">✕</button></td>':'')+'</tr>';}).join('')+'</tbody></table></div></div>';
+      });
+      if(adm)h+='<div class="panel form" id="schAdm"><h3>관리자: 일정 직접 더하기 · 지우기</h3><p class="note">소식지를 올리면 일정이 자동으로 찾아집니다. 빠진 일정은 여기서 더하고, 틀린 일정은 표의 ✕로 지운 뒤 「저장」을 누르세요.</p>'+
+        '<div class="fgrid"><label class="f">날짜<input class="in" id="schD" placeholder="2026.11.01 또는 2026.11"></label><label class="f">보험사<input class="in" id="schC" list="schCos"></label>'+
+        '<label class="f">구분<select class="in" id="schK">'+SCH_KINDS.map(function(k){return '<option>'+k+'</option>';}).join('')+'</select></label></div>'+
+        '<datalist id="schCos">'+INSURERS.map(function(k){return '<option value="'+E(k)+'">';}).join('')+'</datalist>'+
+        '<label class="f">내용<input class="in" id="schT" placeholder="상품명과 바뀌는 내용 (예: 간편건강보험 3.5.5 고지 개정)"></label>'+
+        '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn ghost" type="button" id="schAdd">표에 더하기</button><button class="btn" type="button" id="schSave">저장 (모든 FC에게 반영)</button></div><p class="note" id="schMsg" role="status"></p></div>';
       return h;
     },
     car:function(){
@@ -1597,7 +1662,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(Array.isArray(c.news))NEWS=c.news;if(Array.isArray(c.awards))AWARDS=c.awards;if(Array.isArray(c.mats))MATS=c.mats;
     if(Array.isArray(c.lect))LECT=c.lect;if(Array.isArray(c.hypo))HYPO=c.hypo;if(Array.isArray(c.notices))NOTICES=c.notices;
     if(c.concept)CONCEPT=Object.assign({},CONCEPT,c.concept);if(c.banner)BANNER=Object.assign({},BANNER,c.banner);if(c.sangjo)SANGJO=Object.assign({},SANGJO,c.sangjo);if(c.car)CARQ=Object.assign({},CARQ,c.car);
-    if(Array.isArray(c.compare)&&c.compare.length)CMPL=c.compare;
+    if(Array.isArray(c.compare)&&c.compare.length)CMPL=c.compare;if(Array.isArray(c.sched))SCHED=c.sched;
     if(window.AIMOD&&AIMOD.content)AIMOD.content(c);
     if(!me)gateMode();
     if(redraw!==false&&me&&cur!=='ai'&&cur!=='admin'&&cur!=='cadmin'&&!(cur==='compare'&&CMP.open))go(cur);
@@ -1830,7 +1895,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         nuSel(i,'kind',it.kind,KINDS,'메뉴')+(nuDup(it)?'<span class="pill warn">이 메뉴에 같은 제목이 이미 있음</span>':'')+'<button class="btn sm ghost" type="button" data-nudel="'+i+'">빼기</button></div>'+
         '<div class="nu-x">'+nuExtra(it,i)+'</div>'+
         '<label class="nu-f wide">'+(it.kind==='hypo'?'고객 유형 (제목)':'제목')+'<input class="in" data-nu="'+i+'" data-k="title" value="'+esc(it.title)+'" style="font-weight:700"></label>'+
-        '<label class="nu-f wide">'+(it.kind==='hypo'?'첫 화법 · 요약':'요약')+'<textarea class="in" data-nu="'+i+'" data-k="summary" rows="2" placeholder="'+(it.noText?'본문 글자를 읽지 못했습니다(스캔본일 수 있음). 비워 두면 회사·연월·주차·제목만 보입니다.':'비워 두어도 됩니다')+'">'+esc(it.summary)+'</textarea></label></div>';}).join('')+'</div>':'';
+        '<label class="nu-f wide">'+(it.kind==='hypo'?'첫 화법 · 요약':'요약')+'<textarea class="in" data-nu="'+i+'" data-k="summary" rows="2" placeholder="'+(it.noText?'본문 글자를 읽지 못했습니다(스캔본일 수 있음). 비워 두면 회사·연월·주차·제목만 보입니다.':'비워 두어도 됩니다')+'">'+esc(it.summary)+'</textarea></label>'+schHtml(it,i)+'</div>';}).join('')+'</div>':'';
+    if(NU.items.some(function(it){return it.ext==='pdf'&&(it.kind==='news'||it.kind==='notice');})){var nS=0;NU.items.forEach(function(it){(it.sched||[]).forEach(function(s){if(s.on!==false)nS++;});});
+      L.insertAdjacentHTML('afterbegin','<div class="nu-sch" style="margin:0 0 8px"><b>상품 개정 일정</b> <span class="note">올릴 일정 '+nS+'건 · 올리면 「상품 개정 일정」 화면과 홈 배너에 바로 반영되고, 한 달 지난 일정은 정리됩니다.</span> <button class="btn sm" type="button" data-scai'+(NU.schBusy?' disabled':'')+'>'+(NU.schBusy?'AI가 읽는 중…':'AI로 일정 읽기')+'</button></div>');}
     var C=document.getElementById('nuCur');if(C)C.innerHTML=nuCurHtml();
     var on=NU.items.length>0&&!NU.busy;document.getElementById('nuPub').disabled=!on;document.getElementById('nuPrev').disabled=!on;
     if(window.KSAVE&&!NU.busy){if(NU.items.length)KSAVE.pend('nu','자료 올리기: 파일 '+NU.items.length+'건',nuPublish);else KSAVE.unpend('nu');}
@@ -1841,13 +1908,58 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       if(!EXTS.test(f.name)){msg.textContent=f.name+': 올릴 수 없는 형식이라 건너뜁니다 (PDF·PPT·엑셀·워드·한글·사진).';continue;}
       if(f.size>50*1048576){msg.textContent=f.name+': 50MB를 넘어 올릴 수 없습니다.';continue;}
       msg.textContent=(i+1)+'/'+files.length+' '+f.name+' 읽는 중…';
-      try{var buf=await f.arrayBuffer(),r=null;
-        if(/\.pdf$/i.test(f.name)){try{r=await readPdf(buf);}catch(e){msg.textContent=f.name+': 글자를 읽지 못해 파일 이름으로 제목을 만듭니다.';}}
-        NU.items.push(detect(f,buf,r));}catch(e){msg.textContent=f.name+' 읽기 실패: '+(e.message||e);}
+      try{var buf=await f.arrayBuffer(),r=null,full='';
+        if(/\.pdf$/i.test(f.name)){try{r=await readPdf(buf);}catch(e){msg.textContent=f.name+': 글자를 읽지 못해 파일 이름으로 제목을 만듭니다.';}
+          if(r){try{full=await pdfAllText(buf);}catch(e){full=r.pages.join(' ');}}}
+        var it=detect(f,buf,r);it.schedTxt=full;it.sched=(it.kind==='news'||it.kind==='notice')?schedFind(full,it.co,it.y,it.mo).map(function(x){x.on=true;return x;}):[];
+        NU.items.push(it);}catch(e){msg.textContent=f.name+' 읽기 실패: '+(e.message||e);}
       nuRender();
     }
     if(NU.items.length)msg.textContent=NU.items.length+'개 준비됨. 메뉴·제목·요약을 확인하고 「모든 FC에게 올리기」를 누르세요.';
+    schedAi(true);
   }
+  /* PDF 전체 글자(개정 일정 찾기용, 최대 40쪽) */
+  async function pdfAllText(buf){var lib=pdfLib(),doc=await lib.getDocument({data:buf.slice(0)}).promise,out=[];
+    for(var i=1;i<=Math.min(doc.numPages,40);i++){var c=await (await doc.getPage(i)).getTextContent();out.push(c.items.map(function(x){return x.str;}).join(' '));}
+    return out.join('\n').replace(/[ \t]+/g,' ');}
+  async function pdfImgs(buf,n){var lib=pdfLib(),doc=await lib.getDocument({data:buf.slice(0)}).promise,out=[];
+    for(var i=1;i<=Math.min(doc.numPages,n);i++){var pg=await doc.getPage(i),v0=pg.getViewport({scale:1}),v=pg.getViewport({scale:1100/v0.width}),cv=document.createElement('canvas');
+      cv.width=Math.round(v.width);cv.height=Math.round(v.height);var cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);await pg.render({canvasContext:cx,viewport:v}).promise;
+      var bl=await new Promise(function(r){cv.toBlob(r,'image/jpeg',0.8);});if(bl)out.push(bl);}
+    return out;}
+  /* 등록된 AI로 개정 일정 읽기: 글자가 있으면 글로, 스캔본이면 앞쪽 그림으로. 자동(auto)은 복사·붙여넣기 방식이 아닐 때만 */
+  async function schedAi(auto){
+    var K=window.KIFAI,msg=document.getElementById('nuMsg'),say=function(t){if(msg)msg.textContent=t;};
+    var L=NU.items.filter(function(it){return it.ext==='pdf'&&(it.kind==='news'||it.kind==='notice')&&!(auto&&it.schAi);});
+    if(!L.length){if(!auto)say('일정을 읽을 소식지·공지 PDF가 없습니다.');return;}
+    if(!K||K.cfg().mode!=='ai'){if(!auto)say('「내 AI 등록」에서 AI를 먼저 고르면 스캔본 소식지의 일정도 읽습니다.');return;}
+    if(auto&&K.cfg().prov==='paste')return;
+    NU.schBusy=true;nuRender();
+    try{
+      var text='',imgs=[];
+      for(var i=0;i<L.length;i++){var it=L[i],tx=(it.schedTxt||'').replace(/\s+/g,' ');
+        text+='\n===== 파일 '+(i+1)+': '+it.co+' '+it.y+'.'+it.mo+' =====\n';
+        if(tx.replace(/[^가-힣]/g,'').length>80)text+=tx.slice(0,9000);
+        else if(imgs.length<8){say((i+1)+'/'+L.length+' 스캔본 그림 준비 중…');var im=await pdfImgs(it.buf,Math.min(4,8-imgs.length));text+='(글자 없는 스캔본: 첨부 그림 '+(imgs.length+1)+'~'+(imgs.length+im.length)+'번)';imgs=imgs.concat(im);}
+      }
+      say('AI가 개정 일정을 읽는 중… ('+L.length+'개 파일)');
+      var r=await K.ask('보험사 소식지·공지에서 "상품 개정 일정"만 뽑아라. 개정·신상품 출시·판매종료·보험료 인상/인하·인수기준 변경·한도 이벤트 마감처럼 날짜(일 또는 월)가 적힌 일정만. 날짜가 없는 일반 소개, 작성 월보다 2달 이상 지난 일정, 약관·심의 안내 문구는 빼라. 자료에 없는 내용은 절대 지어내지 마라. '+
+        'JSON 하나로만 답하라: {"items":[{"file":파일번호,"d":"YYYY.MM.DD (일을 모르면 YYYY.MM)","k":"개정|출시|판매종료|보험료 인하|보험료 인상|시행 중 하나","t":"상품명과 바뀌는 내용 한 줄, 45자 이내"}]}',{text:text,images:imgs,scanned:[]});
+      var A=(r&&r.items)||[],got=0;
+      L.forEach(function(it,i){var mine=A.filter(function(x){return +x.file===i+1&&x.d&&x.t;}).map(function(x){var d=String(x.d).replace(/[\/\-\s년월일]+/g,'.').replace(/\.+$/,''),mm=d.match(/^(20\d{2})\.(\d{1,2})(?:\.(\d{1,2}))?/);
+          return mm?{d:mm[1]+'.'+pad2(+mm[2])+(mm[3]?'.'+pad2(+mm[3]):''),co:it.co,k:SCH_KINDS.indexOf(x.k)>-1?x.k:'개정',t:String(x.t).slice(0,80),on:true}:null;}).filter(Boolean);
+        it.sched=mine;it.schAi=true;got+=mine.length;});
+      say('AI가 개정 일정 '+got+'건을 찾았습니다. 아래 「개정 일정」에서 확인하고 올리세요.');
+    }catch(e){say('AI로 일정을 읽지 못했습니다: '+(K&&K.err?K.err(e):(e.message||e))+' — 글자로 찾은 일정은 그대로 있습니다.');}
+    NU.schBusy=false;nuRender();
+  }
+  function schHtml(it,i){var S=it.sched||[];if(it.kind!=='news'&&it.kind!=='notice')return '';
+    return '<div class="nu-sch"><b>개정 일정</b> <span class="note">'+(S.length?S.length+'건 찾음'+(it.schAi?' (AI)':' (글자 규칙)')+' · 체크한 것만 「상품 개정 일정」에 올라갑니다':'찾은 일정 없음'+(it.noText?' (스캔본: 「AI로 일정 읽기」를 누르세요)':''))+'</span>'+
+      S.map(function(s,j){var a=' data-sc="'+i+'" data-j="'+j+'"';return '<div class="nu-sr"><input type="checkbox"'+a+' data-sk="on"'+(s.on!==false?' checked':'')+'><input class="in"'+a+' data-sk="d" value="'+esc(s.d)+'" style="width:96px">'+
+        '<select class="in"'+a+' data-sk="k">'+SCH_KINDS.map(function(k){return '<option'+(k===s.k?' selected':'')+'>'+k+'</option>';}).join('')+'</select><input class="in"'+a+' data-sk="t" value="'+esc(s.t)+'" style="flex:1;min-width:180px"></div>';}).join('')+'</div>';}
+  document.addEventListener('input',function(e){var t=e.target,i=t.getAttribute&&t.getAttribute('data-sc');if(i==null)return;var s=(NU.items[+i]||{}).sched;s=s&&s[+t.getAttribute('data-j')];if(!s)return;var k=t.getAttribute('data-sk');s[k]=k==='on'?t.checked:t.value.trim();});
+  document.addEventListener('change',function(e){var t=e.target,i=t.getAttribute&&t.getAttribute('data-sc');if(i==null)return;var s=(NU.items[+i]||{}).sched;s=s&&s[+t.getAttribute('data-j')];if(!s)return;var k=t.getAttribute('data-sk');s[k]=k==='on'?t.checked:t.value.trim();});
+  document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-scai]');if(!b)return;e.preventDefault();NU.items.forEach(function(it){it.schAi=false;});schedAi(false);});
   function nuPath(it){
     var r=Math.random().toString(36).slice(2,7), nm=(it.kind==='news'?it.co+'_'+it.y+it.mo+'_'+(it.wk?it.wk+'주차':'월간'):it.base).replace(/[\\\/:*?"<>|#%&{}\s]+/g,'_').slice(0,40);
     return (it.kind==='news'?'news/':'files/'+it.kind+'/')+it.y+'-'+it.mo+'/'+nm+'_'+r+'.'+it.ext;
@@ -1874,6 +1986,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,'이달의 컨셉',cp.month+' 이달의 컨셉 자료',p]);}
     });
     c.news=news;c.notices=notices;c.awards=awards;c.hypo=hypo;c.mats=mats;c.concept=cp;
+    var sa=[];list.forEach(function(x){(x.it.sched||[]).forEach(function(s){if(s.on!==false&&s.d&&s.t)sa.push({d:s.d,co:s.co||x.it.co,k:s.k,t:s.t,src:x.path});});});
+    c.sched=schedMerge(Array.isArray(c.sched)?c.sched:[],sa);
     return c;
   }
   /* PDF 첫 장 → 작은 JPG (카드 미리보기용) */
@@ -2436,7 +2550,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var BOARD={};
   function menuName(id,def){var n='';MENU.forEach(function(g){g.items.forEach(function(it){if(it[0]===id)n=it[1];});});return n||def;}
   function menuGroup(id){var n='';MENU.forEach(function(g){g.items.forEach(function(it){if(it[0]===id)n=g.g||'';});});return n;}
-  var MENU_FIXED={mats:1,home:1,compare:1,ai:1,ai2:1,edu:1,car:1,sangjo:1,me:1,admin:1,cadmin:1,refadmin:1,news:1,award:1,concept:1,hypo:1};
+  var MENU_FIXED={sched:1,mats:1,home:1,compare:1,ai:1,ai2:1,edu:1,car:1,sangjo:1,me:1,admin:1,cadmin:1,refadmin:1,news:1,award:1,concept:1,hypo:1};
   function menuSync(){
     BOARD={};MENU.forEach(function(g){if(g.admin||g.mobile)return;g.items.forEach(function(it){if(!MENU_FIXED[it[0]])BOARD[it[0]]=it[1];});});
     var base=[['news',menuName('news','보험사 소식지')],['notice','본사 공지'],['award',menuName('award','시상 공지')],['concept',menuName('concept','이달의 컨셉')],['hypo',menuName('hypo','대표 상품 가설')],['mats','교육 자료'],['onepick','이번 달의 원픽']];
@@ -2925,6 +3039,22 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
 
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-go]');if(b){e.preventDefault();go(b.getAttribute('data-go'));}});
+  /* 상품 개정 일정 화면: 구분 고르기 · 관리자 더하기/지우기/저장 */
+  var SCH_DIRTY=false;
+  document.addEventListener('click',async function(e){
+    if(cur!=='sched'||!e.target.closest)return;var b=e.target.closest('[data-schk],[data-schdel],#schAdd,#schSave');if(!b)return;
+    if(b.hasAttribute('data-schk')){var k=b.getAttribute('data-schk');Array.prototype.forEach.call(document.querySelectorAll('[data-schk]'),function(x){x.classList.toggle('on',x===b);});
+      Array.prototype.forEach.call(document.querySelectorAll('[data-schrow]'),function(r){r.style.display=!k||r.getAttribute('data-schrow')===k?'':'none';});
+      Array.prototype.forEach.call(document.querySelectorAll('.sch-m'),function(p){p.style.display=p.querySelector('[data-schrow]:not([style*="none"])')?'':'none';});return;}
+    var msg=function(t){var m=document.getElementById('schMsg');if(m)m.textContent=t;};
+    if(b.hasAttribute('data-schdel')){SCHED=SCHED.slice();SCHED.splice(+b.getAttribute('data-schdel'),1);SCH_DIRTY=true;go('sched');msg('지웠습니다. 「저장」을 눌러야 모든 FC에게 반영됩니다.');return;}
+    if(b.id==='schAdd'){var v=function(id){return (document.getElementById(id).value||'').trim();},d=v('schD').replace(/[\/\-\s년월일]+/g,'.').replace(/\.+$/,''),mm=d.match(/^(20\d{2})\.(\d{1,2})(?:\.(\d{1,2}))?$/);
+      if(!mm){msg('날짜를 2026.11.01 또는 2026.11처럼 넣어 주세요.');return;}if(!v('schT')){msg('내용을 넣어 주세요.');return;}
+      d=mm[1]+'.'+pad2(+mm[2])+(mm[3]?'.'+pad2(+mm[3]):'');SCHED=schedMerge(SCHED,[{d:d,co:ALIAS[v('schC')]||v('schC')||'기타',k:document.getElementById('schK').value,t:v('schT')}]);SCH_DIRTY=true;go('sched');msg('표에 더했습니다. 「저장」을 눌러야 모든 FC에게 반영됩니다.');return;}
+    if(b.id==='schSave'){b.disabled=true;msg('저장 중… (GitHub)');
+      try{SCHED=schedMerge(SCHED,[]);await siteSet({sched:SCHED},'상품 개정 일정 수정 ('+SCHED.length+'건)');if(SITE)SITE.sched=SCHED;SCH_DIRTY=false;msg('저장했습니다. 1~2분 뒤 모든 FC 화면에 보입니다.');}
+      catch(x){msg('저장 실패: '+(x&&x.message||x));}b.disabled=false;}
+  });
   document.getElementById('toHome').addEventListener('click',function(e){e.preventDefault();go('home');});
   document.getElementById('portalBack').addEventListener('click',portalBack);
   document.getElementById('portalHome').addEventListener('click',function(){go('home');});
