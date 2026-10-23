@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.3">
+<meta name="kif-build" content="2026-10-23.4">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1212,6 +1212,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     target:['부모님이 고령인 40~60대 고객','자녀가 멀리 살거나 1인 가구인 고객','장례 등 큰 비용을 미리 정해진 금액으로 준비하고 싶은 고객','종신·정기보험 상담 고객 — 보장 이야기 끝에 가족 준비까지 이어갈 때'],
     check:['상조회사가 공정거래위원회에 선불식 할부거래업자로 등록되어 있는지, 고객 납입금을 은행 예치·공제조합 등으로 보전하고 있는지 확인하세요.','중도 해약 시 돌려받는 금액(해약환급금) 기준을 고객에게 꼭 안내하세요.','상품에 포함되지 않아 따로 드는 비용이 있는지 미리 설명하세요.','가족에게 이전·양도할 수 있는지, 다른 지역에서도 서비스를 받을 수 있는지 확인하세요.'],
     perf:'고객 소개 시 실적 반영 기준은 본사 공지를 확인하세요.'};
+  /* 자동차 비교견적 — 외부 비교견적 사이트(koinserp) 연결 창. 주소·문의처·안내 문구는 관리자 페이지 「자동차 비교견적 안내」에서 바꾸고 content.json의 car로 저장된다. */
+  var CARQ={name:'자동차 비교견적',url:'https://koinserp.soffice.co.kr/',tel:'',
+    steps:[['사이트 접속','「비교견적 바로가기」로 새 창을 엽니다'],['로그인','발급받은 계정으로 로그인합니다'],['고객·차량 정보 입력','차량번호와 운전자 정보를 입력합니다'],['보험사별 견적 비교','여러 보험사 보험료와 담보를 한눈에 비교합니다'],['고객 안내·가입','가장 알맞은 견적으로 상담하고 가입을 진행합니다']],
+    prep:[['차량 정보','차량번호(또는 차대번호), 차종·연식'],['운전자 정보','피보험자 생년월일, 운전자 범위·최저 연령'],['현재 계약','기존 보험사와 만기일, 사고 이력'],['할인 특약','블랙박스·마일리지·자녀·안전장치 등 할인 여부']],
+    target:['자동차보험 만기가 1~2개월 남은 고객','보험료가 크게 오른 갱신 안내를 받은 고객','차를 새로 사거나 바꾸는 고객','가족 운전자 범위가 바뀐 고객 (자녀 운전 시작 등)'],
+    check:['견적은 입력 정보 기준의 예상 보험료입니다. 실제 보험료는 보험사 심사 후 확정됩니다.','고객 개인정보는 동의를 받은 뒤 입력하고, 상담이 끝나면 화면을 닫으세요.','보험료만이 아니라 대물 한도·자기차량손해·긴급출동 등 담보 차이도 함께 설명하세요.','만기일 30일 전부터 갱신 견적이 가능하니 미리 안내하세요.'],
+    perf:'자동차보험 실적 반영 기준은 본사 공지를 확인하세요.'};
   var BANNER={title:'11월 1일 간편건강 고지 개정 외 3건',sub:'보험사 소식지에서 일정을 확인하세요.'};
   var HYPO=[['30대 맞벌이 · 자녀 1','태아·어린이 종합 + 부부 3대질병','"아이 보험 보실 때 부모님 진단비도 같이 점검해 볼까요?"'],
     ['50대 · 고혈압 약 복용','간편건강보험(3.5.5)','"약 드시는 분도 고지 3가지만 확인하면 가입됩니다."'],
@@ -1299,7 +1306,23 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<div class="panel"><h3>교육 자료 <button class="more" data-go="home">교육 자료실 ›</button></h3><ul class="list">'+(CONCEPT.mats||[]).map(function(m){return '<li><span class="pill new">'+esc(m[0])+'</span><span class="t">'+cptMatLink(m)+'</span></li>';}).join('')+'</ul></div></div>';
       return h;
     },
-    car:function(){return extPage('자동차 비교견적','다이렉트·설계사 채널 비교','차량 번호와 운전자 정보를 입력해 여러 보험사 견적을 한 번에 받는 서비스로 연결합니다.','車');},
+    car:function(){
+      var S=CARQ,E=esc,n2=function(i){return pad2(i+1);};
+      var go=S.url?'<a class="btn gold" style="text-decoration:none" target="_blank" rel="noopener" href="'+E(S.url)+'">비교견적 바로가기 ↗</a>':'<button class="btn gold" type="button" disabled style="opacity:.6">비교견적 바로가기 (주소 준비 중)</button>';
+      var tel=S.tel?'<a class="btn line" style="text-decoration:none" href="tel:'+E(String(S.tel).replace(/[^0-9+]/g,''))+'">문의 전화 '+E(S.tel)+'</a>':'';
+      var h='<section class="sj-hero"><div class="sj-hl"><span class="sj-k">외부 연계 · 자동차보험</span><div class="sj-brand">자동차 비교견적<small>CAR INSURANCE QUOTE</small></div><p class="sj-en">여러 보험사 견적을 한 번에</p>'+
+        '<p class="sj-lead">고객 차량 정보를 한 번 입력하고<br>보험사별 보험료를 바로 비교합니다</p><p class="sj-tag">'+(S.url?'연결 사이트: '+E(S.url.replace(/^https?:\/\//,'').replace(/\/$/,'')):'연결 주소는 관리자 페이지에서 등록합니다')+' · 새 창으로 열리고, 로그인은 그 사이트에서 따로 합니다.</p><div class="sj-act">'+go+tel+'</div></div></section>';
+      h+='<section class="sj-sec"><div class="sj-t"><span>이용 방법</span><h2>비교견적 진행 순서</h2></div><ol class="sj-flow">'+
+        (S.steps||[]).map(function(x,i){return '<li><span class="sj-dot">'+n2(i)+'</span><b>'+E(x[0])+'</b><span>'+E(x[1])+'</span></li>';}).join('')+'</ol><p class="sj-bar">상담 중 고객 앞에서 바로 견적을 비교해 보여 주세요.</p></section>';
+      h+='<section class="sj-sec"><div class="sj-t"><span>준비 사항</span><h2>견적 전에 받아 둘 정보</h2></div><div class="sj-cards">'+
+        (S.prep||[]).map(function(x,i){return '<div class="sj-card"><span class="sj-no">'+n2(i)+'</span><b>'+E(x[0])+'</b><span>'+E(x[1])+'</span></div>';}).join('')+'</div></section>';
+      h+='<section class="sj-sec sj-fc"><div class="sj-t"><span>FC 상담 도움말</span><h2>이렇게 안내하세요</h2></div><div class="cols">'+
+        '<div class="panel"><h3>이런 고객에게 권하세요</h3><ul class="list">'+(S.target||[]).map(function(x){return '<li><span class="pill new">추천</span><span class="t">'+E(x)+'</span></li>';}).join('')+'</ul></div>'+
+        '<div class="panel"><h3>상담 전 꼭 확인할 점</h3><ul class="list">'+(S.check||[]).map(function(x){return '<li><span class="pill warn">확인</span><span class="t">'+E(x)+'</span></li>';}).join('')+'</ul></div>'+
+        '<div class="panel"><h3>실적 반영 기준</h3><p style="margin:0;line-height:1.7">'+E(S.perf||'')+'</p></div></div></section>';
+      h+='<section class="sj-sec"><div class="sj-contact"><div class="sj-box"><span>연결 사이트</span><b>'+(S.url?E(S.url.replace(/^https?:\/\//,'').replace(/\/$/,'')):'관리자 등록 예정')+'</b><span>문의</span><b>'+(S.tel?E(S.tel):'본사 담당자')+'</b><div class="sj-act">'+go+'</div></div></div></section>';
+      return '<div class="sj">'+h+'</div>';
+    },
     sangjo:function(){
       var D=SJ_DOC,S=SANGJO,E=esc,n2=function(i){return pad2(i+1);};
       var home=S.url?'<a class="btn gold" style="text-decoration:none" target="_blank" rel="noopener" href="'+E(S.url)+'">홈페이지 바로가기 ↗</a>':'<button class="btn gold" type="button" disabled style="opacity:.6">홈페이지 바로가기 (주소 준비 중)</button>';
@@ -1365,7 +1388,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       if(me.role!=='admin')return head('관리자','접근 권한 없음','관리자 계정으로 로그인해야 볼 수 있습니다.');
       var h=head('관리자','관리자 페이지','FC 계정, 공지, 메뉴 내용을 수정하고 접속 기록을 확인합니다.');
       h+='<div class="panel"><div class="row" style="gap:10px;flex-wrap:wrap"><b>메뉴별 자료 관리</b><span class="note">상품 비교 · 대표 상품 가설 · 이달의 컨셉 · 소식지 · 시상 · 공지 · 교육 자료를 하나씩 올리고, 켜고 끄고, 고치고, 지웁니다.</span><button class="btn sm" type="button" data-go="cadmin">자료 관리 열기</button></div></div>';
-      h+=acctHtml()+nuHtml()+sjHtml()+cmsHtml();
+      h+=acctHtml()+nuHtml()+sjHtml()+cqHtml()+cmsHtml();
       return h;
     }
   };
@@ -1457,7 +1480,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!c||typeof c!=='object')return;SITE=c;
     if(Array.isArray(c.news))NEWS=c.news;if(Array.isArray(c.awards))AWARDS=c.awards;if(Array.isArray(c.mats))MATS=c.mats;
     if(Array.isArray(c.lect))LECT=c.lect;if(Array.isArray(c.hypo))HYPO=c.hypo;if(Array.isArray(c.notices))NOTICES=c.notices;
-    if(c.concept)CONCEPT=Object.assign({},CONCEPT,c.concept);if(c.banner)BANNER=Object.assign({},BANNER,c.banner);if(c.sangjo)SANGJO=Object.assign({},SANGJO,c.sangjo);
+    if(c.concept)CONCEPT=Object.assign({},CONCEPT,c.concept);if(c.banner)BANNER=Object.assign({},BANNER,c.banner);if(c.sangjo)SANGJO=Object.assign({},SANGJO,c.sangjo);if(c.car)CARQ=Object.assign({},CARQ,c.car);
     if(Array.isArray(c.compare)&&c.compare.length)CMPL=c.compare;
     if(window.AIMOD&&AIMOD.content)AIMOD.content(c);
     if(!me)gateMode();
@@ -1510,7 +1533,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       notices:rows(v('cNotice'),3),news:rows(v('cNews'),7),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),3),
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
-      aiProxy:v('mProxy'),aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
+      aiProxy:v('mProxy'),aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,car:(SITE&&SITE.car)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
     ['compare','off','concepts','aiSamples','boards'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
     (c.hypo||[]).forEach(function(r){var o=(HYPO||[]).filter(function(x){return x[0]===r[0]&&Array.isArray(x[4]);})[0];if(o){while(r.length<4)r.push('');r[4]=o[4];}});
     var ck=document.getElementById('cOpts');
@@ -2461,6 +2484,34 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       sv.disabled=false;
     };
   }
+  /* ---------- 관리자: 자동차 비교견적 안내 ---------- */
+  function cqHtml(){
+    var S=CARQ,ta=function(id,lab,help,val,r){return '<label class="f">'+lab+' <span class="note">'+help+'</span><textarea class="in" id="'+id+'" rows="'+(r||4)+'">'+esc(val)+'</textarea></label>';};
+    return '<div class="panel form" id="cqPanel"><h3>자동차 비교견적 안내 <span class="pill new">메뉴 「자동차 비교견적」</span></h3>'+
+      '<p class="note">FC 화면 「교육·연계 → 자동차 비교견적」의 「비교견적 바로가기」가 아래 주소로 연결됩니다.</p>'+
+      '<div class="fgrid"><label class="f">비교견적 사이트 주소<input class="in" id="cqUrl" value="'+esc(S.url||'')+'" placeholder="https://"></label>'+
+      '<label class="f">문의 전화<input class="in" id="cqTel" value="'+esc(S.tel||'')+'" placeholder="예: 02-000-0000"></label></div>'+
+      '<div class="cols">'+ta('cqTarget','권할 고객','한 줄에 하나',(S.target||[]).join('\n'),4)+ta('cqCheck','상담 전 확인할 점','한 줄에 하나',(S.check||[]).join('\n'),4)+'</div>'+
+      ta('cqPerf','실적 반영 기준','',S.perf,2)+
+      '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn" type="button" id="cqSave">저장 (모든 FC에게 반영)</button><button class="btn ghost" type="button" id="cqPrev">이 기기에서 미리보기</button></div>'+
+      '<p class="note" id="cqMsg" role="status"></p></div>';
+  }
+  function cqCollect(){
+    var v=function(id){var e=document.getElementById(id);return e?e.value.trim():'';},L=function(id){return v(id).split('\n').map(function(x){return x.trim();}).filter(Boolean);};
+    var url=v('cqUrl');if(url&&!/^https?:\/\//i.test(url))url='https://'+url;
+    return {url:url,tel:v('cqTel'),target:L('cqTarget'),check:L('cqCheck'),perf:v('cqPerf')};
+  }
+  function bindCq(){
+    var sv=document.getElementById('cqSave'),pv=document.getElementById('cqPrev'),m=document.getElementById('cqMsg');if(!sv)return;
+    pv.onclick=function(){CARQ=Object.assign({},CARQ,cqCollect());m.innerHTML='이 기기에서만 바꿨습니다. <a href="#" data-go="car">자동차 비교견적 화면 보기</a> · 다른 FC에게 보이려면 「저장」을 누르세요.';};
+    sv.onclick=async function(){
+      var d=cqCollect();if(d.url&&!/^https?:\/\/[^\s.]+\.[^\s]+$/i.test(d.url)){m.textContent='사이트 주소를 확인해 주세요. (예: https://www.○○.co.kr)';return;}
+      sv.disabled=true;m.textContent='저장 중… (GitHub)';
+      try{var cur=Object.assign({},(SITE&&SITE.car)||{},d);await siteSet({car:cur},'자동차 비교견적 안내 수정');CARQ=Object.assign({},CARQ,d);m.innerHTML='저장했습니다. 1~2분 뒤 모든 FC 화면에 보입니다. <a href="#" data-go="car">자동차 비교견적 화면 보기</a>';}
+      catch(x){m.textContent='저장 실패: '+(x&&x.message||x);}
+      sv.disabled=false;
+    };
+  }
   function notices(){var s=store('fc_notices');try{return s?JSON.parse(s):null;}catch(e){return null;}}
   function renderNotices(){
     var l=(SITE&&Array.isArray(SITE.notices))?NOTICES:(notices()||NOTICES);
@@ -2495,7 +2546,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       Array.prototype.forEach.call(document.querySelectorAll('.guide'),function(b){b.addEventListener('click',function(){toast('"'+b.getAttribute('data-guide')+'" 사용가이드는 관리자가 등록하면 여기서 열립니다.');});});
     }
     if(id==='admin'&&me.role==='admin'){
-      bindCms();bindNu();bindAcct();bindSj();
+      bindCms();bindNu();bindAcct();bindSj();bindCq();
     }
     if(id==='news'){
       var nco='',nf=function(){var ym=document.getElementById('nYm').value,wk=document.getElementById('nWk').value,q=document.getElementById('nQ').value.trim(),n=0;
