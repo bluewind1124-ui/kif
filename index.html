@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.15">
+<meta name="kif-build" content="2026-10-23.16">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1224,7 +1224,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
     {g:'공지 · 시상',items:[['news','보험사 소식지'],['sched','상품 개정 일정','NEW'],['award','시상 공지']]},
     {g:'교육 · 연계',items:[['edu','온라인 교육센터'],['car','자동차 비교견적'],['sangjo','상조 서비스']]},
-    {g:'관리자',admin:true,items:[['admin','관리자 페이지'],['cadmin','자료 관리','NEW'],['refadmin','보장분석 샘플 올리기']]},
+    {g:'관리자',admin:true,items:[['admin','관리자 페이지'],['cadmin','자료 관리','NEW']]},
     {g:'내 정보',mobile:true,items:[['me','내 정보 · 자료 보관']]}
   ];
   var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',sched:'cal',award:'cup',edu:'cap',car:'car',sangjo:'heart',me:'user',admin:'gear',cadmin:'doc'};
@@ -4392,13 +4392,26 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return {type:'글',text:tidy(new TextDecoder().decode(buf))};
   }
   /* 샘플 파일 여러 개를 차례로 읽어 한꺼번에 등록하고, 모든 FC에게는 한 번만 올린다 */
+  /* 샘플을 올릴 때 제목·파일 이름에서 고객 이름을 찾아 제목·글·파일 이름 모두 성+OO로, 전화·주민번호는 *로 가린다 */
+  function piiNames(t){var N=[];String(t||'').replace(/([가-힣]{2,4})\s*님/g,function(a,n){if(!/O/.test(n)&&N.indexOf(n)<0)N.push(n);return a;});String(t||'').replace(/(?:^|[\s_])([가-힣]{2,4})_/,function(a,n){if(!/O/.test(n)&&N.indexOf(n)<0&&!/^(보장|보험|상품|실손|간편|종합|가입|설계|분석|비교)/.test(n))N.push(n);return a;});return N;}
+  function piiMask(t,N){t=String(t||'');(N||[]).forEach(function(n){t=t.replace(new RegExp(n.split('').join('\\s*'),'g'),n[0]+'OO');});
+    return t.replace(/01[016789][-\s.)]*\d{3,4}[-\s.]*\d{4}/g,'010-****-****').replace(/(\d{6})\s*-\s*[1-4]\d{6}/g,'$1-*******');}
+  /* 엑셀·워드·PPT 원본은 파일 속 글(XML)에서 같은 방식으로 가린다(서식은 그대로). 다른 형식은 그대로 둔다 */
+  function piiZip(buf,N){try{if(!(window.XLSX&&XLSX.CFB))return buf;var u=new Uint8Array(buf);if(u[0]!==0x50||u[1]!==0x4B)return buf;
+    var z=XLSX.CFB.read(u,{type:'array'}),n=0,TD=new TextDecoder(),TE2=new TextEncoder();
+    z.FullPaths.forEach(function(p,i){var f=z.FileIndex[i];if(!/\.xml$/i.test(p)||!f.content)return;var t=TD.decode(f.content),t2=piiMask(t,N);if(t2!==t){f.content=TE2.encode(t2);f.size=f.content.length;n++;}});
+    if(!n)return buf;var o=XLSX.CFB.write(z,{type:'array',fileType:'zip',compression:true});return o instanceof ArrayBuffer?o:new Uint8Array(o).buffer;}catch(e){return buf;}}
   async function onSmpFiles(fs){
     var msg=function(t){var e=document.getElementById('smMsg');if(e)e.innerHTML=t;},ti=document.getElementById('smTitle'),one=fs.length===1&&ti&&ti.value.trim(),ok=[],bad=[];
     for(var i=0;i<fs.length;i++){var f=fs[i];msg((fs.length>1?(i+1)+'/'+fs.length+' ':'')+'"'+esc(f.name)+'" 읽는 중…');
       try{var r=await smpFileText(f);if(!r.text||r.text.length<20)throw new Error('글자를 거의 읽지 못함(그림 파일일 수 있음)');if(!smpOk(r))throw new Error('글자가 깨져서 읽혔습니다. 원본 PPT·엑셀·워드 파일이나 다른 방식으로 저장한 PDF를 올려 주세요');
-        var title=one||f.name.replace(/\.[^.]+$/,''),nid='s'+Date.now().toString(36)+i;
-        if(/\.(pdf|xlsx?|pptx?|docx?)$/i.test(f.name)&&(document.getElementById('smKeep')||{}).checked){window.SMPBUF=window.SMPBUF||{};window.SMPBUF[nid]={name:f.name,buf:await f.arrayBuffer()};}
-        SMP.push({id:nid,title:title,type:r.type,on:true,opts:suggestOpts(title+' '+r.text.slice(0,2000)).slice(0,3),stage:'all',text:r.text.slice(0,6000),at:new Date().toISOString().slice(0,10)});ok.push(title);}
+        var title=one||f.name.replace(/\.[^.]+$/,''),nid='s'+Date.now().toString(36)+i,NM=piiNames(title+' '+f.name);
+        title=piiMask(title,NM);r.text=piiMask(r.text,NM);
+        /* 같은 샘플(이름을 가린 제목이 같음)을 다시 올리면 새로 늘리지 않고 그 샘플의 글과 원본 파일을 바꾼다 */
+        var key=function(t){return String(t||'').replace(/\.[^.]+$/,'').replace(/_\d{8}(_\d+)?$/,'').replace(/([가-힣])[가-힣O]{1,3}님/g,'$1OO님').replace(/[\s_]+/g,'');},old=SMP.filter(function(z){return key(z.title)===key(title);})[0];
+        if(old){nid=old.id;old.text=r.text.slice(0,6000);old.type=r.type;old.at=new Date().toISOString().slice(0,10);old.on=true;}
+        if(/\.(pdf|xlsx?|pptx?|docx?)$/i.test(f.name)&&(document.getElementById('smKeep')||{}).checked){window.SMPBUF=window.SMPBUF||{};window.SMPBUF[nid]={name:piiMask(f.name,NM),buf:/\.(xlsx|pptx|docx)$/i.test(f.name)?piiZip(await f.arrayBuffer(),NM):await f.arrayBuffer()};}
+        if(!old)SMP.push({id:nid,title:title,type:r.type,on:true,opts:suggestOpts(title+' '+r.text.slice(0,2000)).slice(0,3),stage:'all',text:r.text.slice(0,6000),at:new Date().toISOString().slice(0,10)});ok.push(title);}
       catch(e){bad.push(f.name+' — '+(e&&e.message||e));}}
     if(ok.length){await smpSave(ok.length===1?'"'+ok[0]+'" 샘플 등록':'샘플 '+ok.length+'건 등록');toast('샘플 '+ok.length+'건을 읽었습니다. 확인한 뒤 「저장」을 누르면 모든 FC에게 올라갑니다.');}
     if(bad.length)msg('⚠ 못 읽은 파일: '+bad.map(esc).join(' / ')+' — "파일 없이 글로 직접 추가"로 넣어 주세요.');
