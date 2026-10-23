@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.4">
+<meta name="kif-build" content="2026-10-23.5">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1218,7 +1218,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     perf:'고객 소개 시 실적 반영 기준은 본사 공지를 확인하세요.'};
   /* 자동차 비교견적 — 외부 비교견적 사이트(koinserp) 연결 창. 주소·문의처·안내 문구는 관리자 페이지 「자동차 비교견적 안내」에서 바꾸고 content.json의 car로 저장된다. */
   var CARQ={name:'자동차 비교견적',url:'https://koinserp.soffice.co.kr/',tel:'',
-    steps:[['사이트 접속','「비교견적 바로가기」로 새 창을 엽니다'],['로그인','발급받은 계정으로 로그인합니다'],['고객·차량 정보 입력','차량번호와 운전자 정보를 입력합니다'],['보험사별 견적 비교','여러 보험사 보험료와 담보를 한눈에 비교합니다'],['고객 안내·가입','가장 알맞은 견적으로 상담하고 가입을 진행합니다']],
+    steps:[['사이트 접속','「비교견적 바로가기」를 누르면 바로 이동합니다'],['로그인','발급받은 계정으로 로그인합니다'],['고객·차량 정보 입력','차량번호와 운전자 정보를 입력합니다'],['보험사별 견적 비교','여러 보험사 보험료와 담보를 한눈에 비교합니다'],['고객 안내·가입','가장 알맞은 견적으로 상담하고 가입을 진행합니다']],
     prep:[['차량 정보','차량번호(또는 차대번호), 차종·연식'],['운전자 정보','피보험자 생년월일, 운전자 범위·최저 연령'],['현재 계약','기존 보험사와 만기일, 사고 이력'],['할인 특약','블랙박스·마일리지·자녀·안전장치 등 할인 여부']],
     target:['자동차보험 만기가 1~2개월 남은 고객','보험료가 크게 오른 갱신 안내를 받은 고객','차를 새로 사거나 바꾸는 고객','가족 운전자 범위가 바뀐 고객 (자녀 운전 시작 등)'],
     check:['견적은 입력 정보 기준의 예상 보험료입니다. 실제 보험료는 보험사 심사 후 확정됩니다.','고객 개인정보는 동의를 받은 뒤 입력하고, 상담이 끝나면 화면을 닫으세요.','보험료만이 아니라 대물 한도·자기차량손해·긴급출동 등 담보 차이도 함께 설명하세요.','만기일 30일 전부터 갱신 견적이 가능하니 미리 안내하세요.'],
@@ -1312,10 +1312,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     },
     car:function(){
       var S=CARQ,E=esc,n2=function(i){return pad2(i+1);};
-      var go=S.url?'<a class="btn gold" style="text-decoration:none" target="_blank" rel="noopener" href="'+E(S.url)+'">비교견적 바로가기 ↗</a>':'<button class="btn gold" type="button" disabled style="opacity:.6">비교견적 바로가기 (주소 준비 중)</button>';
+      var go=S.url?'<a class="btn gold" style="text-decoration:none" href="'+E(S.url)+'" data-carq>비교견적 바로가기 →</a>':'<button class="btn gold" type="button" disabled style="opacity:.6">비교견적 바로가기 (주소 준비 중)</button>';
       var tel=S.tel?'<a class="btn line" style="text-decoration:none" href="tel:'+E(String(S.tel).replace(/[^0-9+]/g,''))+'">문의 전화 '+E(S.tel)+'</a>':'';
+      var nw=S.url?'<a class="btn line" style="text-decoration:none" target="_blank" rel="noopener" href="'+E(S.url)+'">새 창으로 열기 ↗</a>':'';
       var h='<section class="sj-hero"><div class="sj-hl"><span class="sj-k">외부 연계 · 자동차보험</span><div class="sj-brand">자동차 비교견적<small>CAR INSURANCE QUOTE</small></div><p class="sj-en">여러 보험사 견적을 한 번에</p>'+
-        '<p class="sj-lead">고객 차량 정보를 한 번 입력하고<br>보험사별 보험료를 바로 비교합니다</p><p class="sj-tag">'+(S.url?'연결 사이트: '+E(S.url.replace(/^https?:\/\//,'').replace(/\/$/,'')):'연결 주소는 관리자 페이지에서 등록합니다')+' · 새 창으로 열리고, 로그인은 그 사이트에서 따로 합니다.</p><div class="sj-act">'+go+tel+'</div></div></section>';
+        '<p class="sj-lead">고객 차량 정보를 한 번 입력하고<br>보험사별 보험료를 바로 비교합니다</p><p class="sj-tag">'+(S.url?'연결 사이트: '+E(S.url.replace(/^https?:\/\//,'').replace(/\/$/,'')):'연결 주소는 관리자 페이지에서 등록합니다')+' · 「바로가기」를 누르면 이 화면에서 바로 그 사이트로 이동합니다. 포털로 돌아올 때는 브라우저의 뒤로 가기(←)를 누르세요. 로그인은 그 사이트에서 따로 합니다.</p><div class="sj-act">'+go+nw+tel+'</div></div></section>';
       h+='<section class="sj-sec"><div class="sj-t"><span>이용 방법</span><h2>비교견적 진행 순서</h2></div><ol class="sj-flow">'+
         (S.steps||[]).map(function(x,i){return '<li><span class="sj-dot">'+n2(i)+'</span><b>'+E(x[0])+'</b><span>'+E(x[1])+'</span></li>';}).join('')+'</ol><p class="sj-bar">상담 중 고객 앞에서 바로 견적을 비교해 보여 주세요.</p></section>';
       h+='<section class="sj-sec"><div class="sj-t"><span>준비 사항</span><h2>견적 전에 받아 둘 정보</h2></div><div class="sj-cards">'+
