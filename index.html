@@ -1474,11 +1474,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<div class="panel"><h3>회사 AI <span class="note">주소를 넣으면 모든 FC가 키 없이 바로 AI로 읽습니다. 만드는 법: ai-relay 안내서</span></h3>'+
       inp('mProxy','회사 AI 서버 주소',SITE&&SITE.aiProxy,'https://fc-ai.○○○.workers.dev')+'<p class="note">비워 두면 FC는 복사·붙여넣기 방식으로 씁니다. 회사 API 키는 이 주소의 서버에만 넣고, 여기에는 넣지 마세요.</p></div>'+
       '<div class="panel"><h3>AI 보장분석 규칙 <span class="note">모든 FC의 AI(ChatGPT·Claude·Gemini·회사 AI)에 똑같이 보내는 규칙입니다</span></h3><textarea class="in" id="mRules" rows="9">'+esc((window.AIMOD&&AIMOD.getRules)?AIMOD.getRules():'')+'</textarea><p class="note">유리·불리 기준, 문장 표현, 금지 표현을 여기서 바꾸면 사이트에 반영한 뒤부터 모든 FC의 분석에 적용됩니다. 숫자와 출력물 모양은 포털이 정합니다.</p></div>'+
-      '<div class="panel"><h3>AI 보장분석 샘플 <span class="note">AI가 따라 쓰는 제안서·엑셀 샘플</span></h3><p class="note">샘플 파일 올리기·목록 확인·끄기·지우기는 <b>보장분석 샘플 관리</b> 화면에서 합니다.</p><button class="btn sm" type="button" data-go="refadmin">보장분석 샘플 관리 열기</button></div>'+
       '<div class="panel"><h3>AI 기본 모델 <span class="note">개인 API 키를 쓰는 FC용 기본값입니다. 새 모델이 나오면 이름만 바꾸세요.</span></h3><div class="fgrid">'+
       inp('mClaude','Claude API',md.claude,'claude-opus-5-5')+inp('mOpenai','ChatGPT',md.openai,'gpt-4.1')+inp('mGemini','Gemini',md.gemini,'gemini-2.5-flash')+'</div>'+
       '<label class="row"><input type="checkbox" id="cOpts"> 이 기기의 <b>분석 옵션</b>(AI보장분석 기본형 › 옵션 관리)을 모든 FC에게 배포</label></div>'+
-      '<div class="panel"><h3>보장분석 샘플(니즈환기 참고자료) <span class="pill new">모든 FC 공용</span></h3><p class="note">왼쪽 메뉴 <b>관리자 › 보장분석 샘플 올리기</b>에서 파일을 고르면 바로 모든 FC에게 올라갑니다(1~2분 뒤 반영). 따로 content.json을 받거나 GitHub에 붙여넣을 필요가 없습니다. 지금 공용 자료 <b>'+((window.AIMOD&&AIMOD.getRefs)?AIMOD.getRefs().refs.length:0)+'건</b>.</p>'+
+      '<div class="panel"><h3>보장분석 샘플 <span class="pill new">모든 FC 공용</span></h3>'+
+      '<p class="note">보장분석 샘플은 <b>한 화면</b>(왼쪽 메뉴 관리자 › 보장분석 샘플 올리기)에서 두 가지를 함께 관리합니다. 파일을 고르면 바로 모든 FC에게 올라갑니다(1~2분 뒤 반영).</p>'+
+      '<ul class="note" style="margin:4px 0 10px;padding-left:1.2em;line-height:1.9"><li><b>① AI가 따라 쓰는 샘플</b> — 제안서·분석 엑셀의 형식과 문장을 AI에게 보여 주는 글입니다. FC 제안서에 직접 붙지 않습니다. 지금 <b>'+((SITE&&Array.isArray(SITE.aiSamples))?SITE.aiSamples.length:0)+'건</b></li>'+
+      '<li><b>② 니즈환기 참고자료</b> — 그림·PDF 장표로, FC 제안서에 그대로 한 장씩 붙습니다. 지금 <b>'+((window.AIMOD&&AIMOD.getRefs)?AIMOD.getRefs().refs.length:0)+'건</b></li></ul>'+
       '<div class="row"><button class="btn" type="button" id="cmsRefs">보장분석 샘플 올리기 열기</button></div></div>'+
       '<div class="panel"><h3>사이트에 반영하는 방법</h3><ol class="note" style="margin:0;padding-left:1.2em;line-height:1.9">'+
       '<li><b>① 반영할 내용 복사</b>를 누릅니다.</li><li><b>② GitHub 편집 화면 열기</b>를 누르고(GitHub 로그인), 글 상자 안을 클릭해 <b>Ctrl+A</b> 후 <b>Ctrl+V</b>로 붙여넣습니다.</li>'+
