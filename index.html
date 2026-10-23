@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.20">
+<meta name="kif-build" content="2026-10-23.21">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -2028,52 +2028,58 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!r.ok){var t='';try{t=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(t?' · '+t:'')+(r.status===401?' (토큰을 확인하세요)':r.status===403||r.status===404?' (토큰 권한: kif · Contents Read and write)':''));}
     return r.json();
   }
+  /* 최신 main 위에 커밋한다. 그 사이 다른 저장·배포로 main이 바뀌어 「not a fast forward」(422)가 나면
+     최신 main과 content.json을 다시 받아 같은 변경을 다시 적용해 최대 5번 자동으로 다시 시도한다.
+     files: 미리 올린 파일 [{path,sha}] (sha:null이면 삭제) · mutate(cur,have,tree): 최신 content.json(cur)에 변경 적용 */
+  async function ghLand(files,mutate,message){
+    for(var t=0;;t++){
+      var ref=await gh('GET','/git/ref/heads/'+GH.branch),base=await gh('GET','/git/commits/'+ref.object.sha);
+      var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'),have={};(all.tree||[]).forEach(function(x){have[x.path]=x.sha;});
+      var cur={};if(have['content.json']){var bj=await gh('GET','/git/blobs/'+have['content.json']);cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(c){return c.charCodeAt(0);})));}
+      var tree=(files||[]).map(function(f){return {path:f.path,mode:'100644',type:'blob',sha:f.sha};});
+      var out=mutate?mutate(cur,have,tree):undefined;cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
+      var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
+      tree.push({path:'content.json',mode:'100644',type:'blob',sha:jb.sha});
+      var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:tree});
+      var cm=await gh('POST','/git/commits',{message:typeof message==='function'?message(out):message,tree:nt.sha,parents:[ref.object.sha]});
+      try{await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});return {cur:cur,have:have,out:out};}
+      catch(e){if(t>=4||!/422|fast.?forward/i.test(String(e&&e.message)))throw e;if(window.KSAVE)KSAVE.step('다른 저장과 겹쳐 최신 상태로 다시 저장하는 중 ('+(t+2)+'번째)');await new Promise(function(r){setTimeout(r,700*(t+1));});}
+    }
+  }
   /* 보장분석 샘플(참고자료) 바로 반영: 그림은 refs/<id>.jpg 파일로, 목록은 content.json refs에 한 번에 커밋 */
   window.KIFPUB={
     ready:function(){return !!ghTok();},
     /* AI 보장분석 샘플 목록(글)을 content.json의 aiSamples로 올린다 */
     samples:async function(list){
       if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다');
-      var ref=await gh('GET','/git/ref/heads/'+GH.branch),base=await gh('GET','/git/commits/'+ref.object.sha);
-      var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'),have={};(all.tree||[]).forEach(function(t){have[t.path]=t.sha;});
-      var cur={};if(have['content.json']){var bj=await gh('GET','/git/blobs/'+have['content.json']);cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(c){return c.charCodeAt(0);})));}
       /* 이 화면이 예전 목록을 들고 있어도, 서버에서 이미 고쳐진(글자가 제대로 읽히는) 샘플 글을 깨진 글로 덮어쓰지 않는다 */
       var okT=function(t){t=String(t||'').slice(0,600);if(/^PK/.test(t))return false;var h=(t.match(/[가-힣]/g)||[]).length,k=(t.match(/[一-鿿]/g)||[]).length;return h>20&&h>k*2;};
-      var sv={};(cur.aiSamples||[]).forEach(function(x){if(x&&x.id)sv[x.id]=x;});
-      list=list.map(function(x){var o=sv[x.id];x=o&&!okT(x.text)&&okT(o.text)?Object.assign({},x,{text:o.text,type:o.type}):x;
-        /* 서버에 있는 원본 PDF·첫 장 그림 연결은 화면이 예전 목록을 들고 있어도 지우지 않는다 */
-        if(o&&o.file&&!x.file&&!x.noFile)x=Object.assign({},x,{file:o.file,thumb:o.thumb});return x;});
-      /* 새로 올린 샘플 원본 PDF와 첫 장 그림 */
-      /* 올린 원본은 저장이 끝까지 성공한 뒤에만 비운다(중간에 실패해 「다시 저장」할 때 원본이 빠지지 않게) */
-      var tree=[],B=window.SMPBUF||{},usedB=[];
+      /* 새로 올린 샘플 원본 파일과 첫 장 그림을 먼저 올려 둔다 (다시 시도할 때 또 올리지 않음) */
+      var files=[],B=window.SMPBUF||{},usedB=[];list=list.slice();
       for(var bi=0;bi<list.length;bi++){var bx=B[list[bi].id];if(!bx)continue;
         var ext=((bx.name.match(/\.([a-z0-9]+)$/i)||['','pdf'])[1]).toLowerCase(),d=new Date(),pth='files/samples/'+d.getFullYear()+'-'+pad2(d.getMonth()+1)+'/'+(bx.name.replace(/\.[^.]+$/,'').replace(/[\\\/:*?"<>|#%&{}\s]+/g,'_').slice(0,40)||'sample')+'_'+Math.random().toString(36).slice(2,7)+'.'+ext;
         if(window.KSAVE)KSAVE.step('샘플 원본 올리는 중 '+bx.name);
-        var fb=await gh('POST','/git/blobs',{content:b64(bx.buf),encoding:'base64'});tree.push({path:pth,mode:'100644',type:'blob',sha:fb.sha});
-        var tp=null;try{var tb=await anyThumb(bx.name,bx.buf,list[bi].type,list[bi].title,list[bi].text);if(tb){tp=pth.replace(/\.[a-z0-9]+$/i,'')+'_thumb.jpg';var tbl=await gh('POST','/git/blobs',{content:b64(tb),encoding:'base64'});tree.push({path:tp,mode:'100644',type:'blob',sha:tbl.sha});}}catch(e){}
+        var fb=await gh('POST','/git/blobs',{content:b64(bx.buf),encoding:'base64'});files.push({path:pth,sha:fb.sha});
+        var tp=null;try{if(window.KSAVE)KSAVE.step('첫 장 그림 만드는 중 '+bx.name);var tb=await anyThumb(bx.name,bx.buf,list[bi].type,list[bi].title,list[bi].text);if(tb){tp=pth.replace(/\.[a-z0-9]+$/i,'')+'_thumb.jpg';var tbl=await gh('POST','/git/blobs',{content:b64(tb),encoding:'base64'});files.push({path:tp,sha:tbl.sha});}}catch(e){}
         list[bi]=Object.assign({},list[bi],{file:pth,thumb:tp||undefined});usedB.push(list[bi].id);}
-      cur.aiSamples=list;cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
-      var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
-      tree.push({path:'content.json',mode:'100644',type:'blob',sha:jb.sha});
-      var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:tree});
-      var cm=await gh('POST','/git/commits',{message:'AI 보장분석 샘플 '+list.length+'건 반영',tree:nt.sha,parents:[ref.object.sha]});
-      await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});usedB.forEach(function(id){delete B[id];});SITE=cur;return cur;
+      if(window.KSAVE)KSAVE.step('목록 저장 중');
+      var r=await ghLand(files,function(cur){
+        var sv={};(cur.aiSamples||[]).forEach(function(x){if(x&&x.id)sv[x.id]=x;});
+        cur.aiSamples=list.map(function(x){var o=sv[x.id];x=o&&!okT(x.text)&&okT(o.text)?Object.assign({},x,{text:o.text,type:o.type}):x;
+          /* 서버에 있는 원본·첫 장 그림 연결은 화면이 예전 목록을 들고 있어도 지우지 않는다 */
+          if(o&&o.file&&!x.file&&!x.noFile)x=Object.assign({},x,{file:o.file,thumb:o.thumb});return x;});
+      },'AI 보장분석 샘플 '+list.length+'건 반영');
+      usedB.forEach(function(id){delete B[id];});SITE=r.cur;return r.cur;
     },
     refs:async function(list,add,del){
       if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다');
-      var ref=await gh('GET','/git/ref/heads/'+GH.branch),base=await gh('GET','/git/commits/'+ref.object.sha);
-      var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'),have={};(all.tree||[]).forEach(function(t){have[t.path]=t.sha;});
-      var cur={};if(have['content.json']){var bj=await gh('GET','/git/blobs/'+have['content.json']);cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(c){return c.charCodeAt(0);})));}
-      var tree=[];
-      for(var i=0;i<add.length;i++){var bl=await gh('POST','/git/blobs',{content:add[i].data.replace(/^data:[^,]*,/,''),encoding:'base64'});tree.push({path:add[i].path,mode:'100644',type:'blob',sha:bl.sha});}
-      del.forEach(function(pth){if(have[pth])tree.push({path:pth,mode:'100644',type:'blob',sha:null});});
-      cur.refs=list;cur.ver=Date.now();cur.refsVer=String(cur.ver);cur.updated=new Date().toLocaleString('ko-KR');
-      var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
-      tree.push({path:'content.json',mode:'100644',type:'blob',sha:jb.sha});
-      var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:tree});
-      var cm=await gh('POST','/git/commits',{message:'보장분석 샘플 올리기: 공용 참고자료 '+list.length+'건',tree:nt.sha,parents:[ref.object.sha]});
-      await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});
-      SITE=cur;window.KIFPUB.last=cur;return cur.refsVer;
+      var files=[];
+      for(var i=0;i<add.length;i++){var bl=await gh('POST','/git/blobs',{content:add[i].data.replace(/^data:[^,]*,/,''),encoding:'base64'});files.push({path:add[i].path,sha:bl.sha});}
+      var r=await ghLand(files,function(cur,have,tree){
+        del.forEach(function(pth){if(have[pth])tree.push({path:pth,mode:'100644',type:'blob',sha:null});});
+        cur.refs=list;cur.refsVer=String(Date.now());
+      },'보장분석 샘플 올리기: 공용 참고자료 '+list.length+'건');
+      SITE=r.cur;window.KIFPUB.last=r.cur;return r.cur.refsVer;
     }
   };
   async function nuPublish(){
@@ -2082,33 +2088,23 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!ghTok()){msg.textContent='먼저 아래 「GitHub 연결 설정」에서 토큰을 저장하세요.';var ns=document.querySelector('.nu-set');if(ns)ns.open=true;KS.fail(lab,new Error('GitHub 연결(토큰)이 아직 없습니다. 관리자 페이지 › 자료 올리기 › GitHub 연결 설정에서 저장하세요.'));return false;}
     if(NU.busy)return false;NU.busy=true;nuRender();KS.start(lab);var okk=false;
     try{
-      msg.textContent='GitHub 최신 상태 확인 중…';
-      var ref=await gh('GET','/git/ref/heads/'+GH.branch), base=await gh('GET','/git/commits/'+ref.object.sha);
-      var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'), have={};
-      (all.tree||[]).forEach(function(t){have[t.path]=t.sha;});
-      var cur;
-      if(have['content.json']){var bj=await gh('GET','/git/blobs/'+have['content.json']);
-        cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(ch){return ch.charCodeAt(0);})));}
-      else cur=SITE?JSON.parse(JSON.stringify(SITE)):{};
-      var tree=[], list=[];
+      var files=[], list=[];
       for(var i=0;i<NU.items.length;i++){var it=NU.items[i];msg.textContent=(i+1)+'/'+NU.items.length+' '+it.file.name+' 올리는 중…';KS.step(msg.textContent);
-        var bl=await gh('POST','/git/blobs',{content:b64(it.buf),encoding:'base64'}),p=nuPath(it);tree.push({path:p,mode:'100644',type:'blob',sha:bl.sha});list.push({it:it,path:p});
-        if(it.ext==='pdf'){try{var tb=await pdfThumb(it.buf);if(tb){var tp=p.replace(/\.pdf$/i,'')+'_thumb.jpg',tbl=await gh('POST','/git/blobs',{content:b64(tb),encoding:'base64'});tree.push({path:tp,mode:'100644',type:'blob',sha:tbl.sha});list[list.length-1].thumb=tp;}}catch(e){}}}
-      nuMerge(cur,list);
-      cur.thumbs=cur.thumbs||{};list.forEach(function(x){if(x.thumb)cur.thumbs[x.path]=x.thumb;});
-      /* 보관 기간이 지난 소식지·공지 정리 (올린 파일이 있는 줄만) */
-      var cutD=keepCut(), del=0;
-      ['news','notices'].forEach(function(k){var fi=k==='news'?3:2;
-        cur[k]=cur[k].filter(function(n){var f=n&&n[fi];if(f&&/^(news|files)\//.test(f)&&String(n[0])<cutD){if(have[f])tree.push({path:f,mode:'100644',type:'blob',sha:null});del++;return false;}return true;});});
-      cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
-      var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
-      tree.push({path:'content.json',mode:'100644',type:'blob',sha:jb.sha});
+        var bl=await gh('POST','/git/blobs',{content:b64(it.buf),encoding:'base64'}),p=nuPath(it);files.push({path:p,sha:bl.sha});list.push({it:it,path:p});
+        if(it.ext==='pdf'){try{var tb=await pdfThumb(it.buf);if(tb){var tp=p.replace(/\.pdf$/i,'')+'_thumb.jpg',tbl=await gh('POST','/git/blobs',{content:b64(tb),encoding:'base64'});files.push({path:tp,sha:tbl.sha});list[list.length-1].thumb=tp;}}catch(e){}}}
       msg.textContent='저장 중…';
-      var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:tree});
       var names={};list.forEach(function(x){names[kindName(x.it.kind)]=(names[kindName(x.it.kind)]||0)+1;});
       var what=Object.keys(names).map(function(k){return k+' '+names[k]+'건';}).join(', ');
-      var cm=await gh('POST','/git/commits',{message:'자료 올리기: '+what+(del?' · 지난 자료 '+del+'건 정리':''),tree:nt.sha,parents:[ref.object.sha]});
-      await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});
+      var land=await ghLand(files,function(cur,have,tree){
+        nuMerge(cur,list);
+        cur.thumbs=cur.thumbs||{};list.forEach(function(x){if(x.thumb)cur.thumbs[x.path]=x.thumb;});
+        /* 보관 기간이 지난 소식지·공지 정리 (올린 파일이 있는 줄만) */
+        var cutD=keepCut(),dn=0;
+        ['news','notices'].forEach(function(k){var fi=k==='news'?3:2;
+          cur[k]=(cur[k]||[]).filter(function(n){var f=n&&n[fi];if(f&&/^(news|files)\//.test(f)&&String(n[0])<cutD){if(have[f])tree.push({path:f,mode:'100644',type:'blob',sha:null});dn++;return false;}return true;});});
+        return dn;
+      },function(dn){return '자료 올리기: '+what+(dn?' · 지난 자료 '+dn+'건 정리':'');});
+      var cur=land.cur,del=land.out||0;
       NU.items.forEach(function(x){URL.revokeObjectURL(x.url);});NU.items=[];
       applyContent(cur,false);nuRefreshCms();
       msg.textContent='✓ 저장 완료: '+what+(del?' (보관 기간이 지난 '+del+'건 정리)':'')+' · 아래 목록에 바로 들어갔고, 모든 FC 화면에는 1~2분 뒤 보입니다.';
@@ -2240,19 +2236,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   KIFPUB.patch=async function(fn,add,del,message){
     if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다');
-    var ref=await gh('GET','/git/ref/heads/'+GH.branch),base=await gh('GET','/git/commits/'+ref.object.sha);
-    var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'),have={};(all.tree||[]).forEach(function(t){have[t.path]=t.sha;});
-    var cur={};if(have['content.json']){var bj=await gh('GET','/git/blobs/'+have['content.json']);cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(c){return c.charCodeAt(0);})));}
-    var tree=[];
-    for(var i=0;i<add.length;i++){cmMsg('파일 올리는 중… ('+(i+1)+'/'+add.length+')');if(window.KSAVE)KSAVE.step('파일 올리는 중 '+(i+1)+'/'+add.length);var bl=await gh('POST','/git/blobs',{content:add[i].b64,encoding:'base64'});tree.push({path:add[i].path,mode:'100644',type:'blob',sha:bl.sha});}
-    del.forEach(function(p){if(have[p])tree.push({path:p,mode:'100644',type:'blob',sha:null});});
-    fn(cur);cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
-    var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
-    tree.push({path:'content.json',mode:'100644',type:'blob',sha:jb.sha});
-    var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:tree});
-    var cm=await gh('POST','/git/commits',{message:message,tree:nt.sha,parents:[ref.object.sha]});
-    await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});
-    return cur;
+    var files=[];
+    for(var i=0;i<add.length;i++){cmMsg('파일 올리는 중… ('+(i+1)+'/'+add.length+')');if(window.KSAVE)KSAVE.step('파일 올리는 중 '+(i+1)+'/'+add.length);var bl=await gh('POST','/git/blobs',{content:add[i].b64,encoding:'base64'});files.push({path:add[i].path,sha:bl.sha});}
+    var r=await ghLand(files,function(cur,have,tree){del.forEach(function(p){if(have[p])tree.push({path:p,mode:'100644',type:'blob',sha:null});});fn(cur);},message);
+    return r.cur;
   };
 
   function cmIn(attr,v,w,lab){
@@ -2973,15 +2960,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     KS.start(msg);try{var cur=await siteSet0(patch,msg);KS.done(msg,cur);}catch(e){KS.fail(msg,e);throw e;}
   }
   async function siteSet0(patch,msg){
-    var ref=await gh('GET','/git/ref/heads/'+GH.branch),base=await gh('GET','/git/commits/'+ref.object.sha);
-    var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'),sha=null;(all.tree||[]).forEach(function(t){if(t.path==='content.json')sha=t.sha;});
-    var cur={};if(sha){var bj=await gh('GET','/git/blobs/'+sha);cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(c){return c.charCodeAt(0);})));}
-    Object.keys(patch).forEach(function(k){cur[k]=patch[k];});cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
-    var jb=await gh('POST','/git/blobs',{content:b64(TE.encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
-    var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:[{path:'content.json',mode:'100644',type:'blob',sha:jb.sha}]});
-    var cm=await gh('POST','/git/commits',{message:msg,tree:nt.sha,parents:[ref.object.sha]});
-    await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});
-    applyContent(cur,false);return cur;
+    var r=await ghLand([],function(cur){Object.keys(patch).forEach(function(k){cur[k]=patch[k];});},msg);
+    applyContent(r.cur,false);return r.cur;
   }
 
   /* ---- 고객 자료 보관: 내 PC · 내 클라우드에 파일로 ----
