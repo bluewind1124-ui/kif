@@ -1018,6 +1018,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
 <div class="demo">시제품(데모)입니다. 화면 구성 확인용이며 실제 고객·상품 데이터가 아닌 예시가 들어 있습니다.</div>
 
 <!-- ===== 로그인 ===== -->
+<script>/* 이미 로그인한 기기면 로그인 화면을 잠깐도 보이지 않고 '확인 중'만 보여 준다 */try{var _s=JSON.parse(localStorage.getItem('kif_sso')||'null');if(_s&&_s.exp>Date.now())document.documentElement.classList.add('sso-chk');}catch(e){}</script>
+<style>.sso-chk #gate>*{visibility:hidden}.sso-chk #gate{position:relative}.sso-chk #gate::after{content:'로그인 확인 중…';position:fixed;inset:0;display:grid;place-items:center;font-size:1.05rem;font-weight:700;color:#0f2240;background:#f4f6fa}</style>
 <div id="gate">
   <div class="l">
     <div class="eyebrow">한보금on 활동지원</div>
@@ -2172,10 +2174,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   bindGateExtra();
   siteReady.then(function(){
     gateMode();
-    var s=ssoGet();if(!s||me)return;
-    if(!authApi()){if(s.demo)enter(s);else ssoClear();return;}
-    if(s.demo||!tok()){ssoClear();return;}
-    api({op:'check',token:tok()}).then(function(j){s.role=j.role;s.must=j.must;enter(s);},function(){ssoClear();}); /* 정지·삭제된 계정은 들어가지 않음 */
+    var done=function(){document.documentElement.classList.remove('sso-chk');};
+    var s=ssoGet();if(!s||me){done();return;}
+    if(!authApi()){if(s.demo)enter(s);else ssoClear();done();return;}
+    if(s.demo||!tok()){ssoClear();done();return;}
+    setTimeout(done,8000); /* 서버 응답이 늦으면 로그인 화면을 보여 준다 */
+    api({op:'check',token:tok()}).then(function(j){s.role=j.role;s.must=j.must;enter(s);done();},function(){ssoClear();done();}); /* 정지·삭제된 계정은 들어가지 않음 */
   });
 
   document.getElementById('logout').addEventListener('click',function(){me=null;PST=[];ssoClear();ACC.list=null;ACC.issued=null;try{sessionStorage.removeItem('fc_portal_ok');}catch(e){}document.getElementById('app').hidden=true;document.getElementById('gate').hidden=false;document.getElementById('upw').value='';});
