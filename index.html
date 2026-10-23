@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.8">
+<meta name="kif-build" content="2026-10-23.9">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -4030,7 +4030,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var on=SMP.filter(function(s){return s.on!==false;}).length;
     var h='<h2 class="smp-h">① AI가 따라 쓰는 보장분석 샘플 <span class="note">'+SMP.length+'건 · AI에 보내는 중 '+on+'건</span></h2>'+
       '<div class="panel"><h3>샘플 올리기</h3><p class="note">보장분석 제안서(PDF·PPTX)나 분석 엑셀(XLSX)을 올리면 글자와 표 구성을 읽어 샘플로 등록합니다. 읽은 내용은 아래 목록에서 확인·수정할 수 있고, 그 내용이 그대로 모든 FC의 AI에 전달됩니다. <b>고객 실명·연락처는 지우고 올려 주세요.</b> (파일 자체는 저장하지 않고 읽은 글만 저장합니다)</p>'+
-      '<label class="smp-drop" id="smDrop"><input type="file" id="smFile" accept=".pdf,.pptx,.xlsx,.xls,.txt,application/pdf" multiple hidden><b>＋ 샘플 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>PDF · PPTX · XLSX · TXT · 여러 개 한 번에 · 개수 제한 없음</em></label>'+
+      '<label class="smp-drop" id="smDrop"><input type="file" id="smFile" accept=".pdf,.pptx,.xlsx,.xls,.docx,.hwpx,.txt,application/pdf" multiple hidden><b>＋ 샘플 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>PDF · PPTX · XLSX · DOCX(워드) · HWPX(한글) · TXT · 여러 개 한 번에 · 개수 제한 없음</em></label>'+
       '<div class="fgrid"><label class="f">샘플 제목 <span class="note">한 개 올릴 때만 · 비우면 파일 이름</span><input class="in" id="smTitle" placeholder="예: 박OO님 암 보장 강화 제안서"></label></div>'+
       '<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="smpAdd">파일 없이 글로 직접 추가</button><span class="note" id="smMsg"></span></div>'+
       '<div class="row"><b>올리기 상태</b><span class="note" id="smPub">'+(SMPST.msg||(window.KIFPUB&&KIFPUB.ready()?'GitHub 연결됨 · 바꾸면 바로 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장해야 올라갑니다.'))+'</span></div></div>';
@@ -4052,9 +4052,17 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   async function smpFileText(f){
     var nm=f.name||'',ext=(nm.split('.').pop()||'').toLowerCase(),buf=await f.arrayBuffer();
     var tidy=function(t){return String(t).replace(/[ \t]+/g,' ').replace(/\n\s*\n+/g,'\n').trim();};
-    if(ext==='pdf'){var L=window.pdfjsLib;if(L)L.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';if(!L)throw new Error('PDF 읽기 도구를 불러오지 못했습니다');var d=await L.getDocument({data:buf}).promise,out=[];
+    if(ext==='hwp')throw new Error('한글(.hwp) 파일은 바로 읽지 못합니다. 한글에서 PDF나 .hwpx로 저장해 올려 주세요');
+    var u8=new Uint8Array(buf.slice(0,2));
+    if(u8[0]===0x50&&u8[1]===0x4B&&ext!=='xlsx'&&window.KIFAI&&KIFAI.officeText){var of=await KIFAI.officeText(buf);if(of)return {type:of.type,text:tidy(of.text)};}
+    if(ext==='pdf'){var L=window.pdfjsLib;if(L)L.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';if(!L)throw new Error('PDF 읽기 도구를 불러오지 못했습니다');var d=await L.getDocument({data:buf,cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',cMapPacked:true}).promise,out=[];
       for(var i=1;i<=Math.min(d.numPages,12);i++){var pg=await d.getPage(i),tc=await pg.getTextContent(),ln='',lastY=null;tc.items.forEach(function(it){var y=Math.round(it.transform[5]);if(lastY!==null&&Math.abs(y-lastY)>4)ln+='\n';else if(ln&&!/\s$/.test(ln))ln+=' ';ln+=it.str;lastY=y;});out.push('[p.'+i+'] '+tidy(ln));}
-      return {type:'PDF',text:out.join('\n')};}
+      var pt={type:'PDF',text:out.join('\n')};if(smpOk(pt))return pt;
+      /* 글자 정보 없이 모양만 저장된 PDF(Type3 글꼴 등): 등록한 AI가 페이지 그림을 읽어 옮겨 적는다 */
+      if(!(window.KIFAI&&KIFAI.chosen()&&KIFAI.cfg().mode==='ai'))throw new Error('이 PDF는 글자 정보 없이 모양만 저장된 파일이라 글자를 뽑을 수 없습니다. 홈의 「내 AI 등록」을 하면 AI가 페이지 그림을 읽어 등록합니다(또는 원본 PPT·엑셀·워드 파일을 올려 주세요)');
+      var mat=await KIFAI.read([f]);if(!mat.images.length&&mat.text&&smpOk({text:mat.text}))return {type:'PDF',text:tidy(mat.text)};
+      var ar=await KIFAI.ask('아래 그림은 보험 보장분석 샘플 문서의 페이지들이다. 보이는 글자를 페이지 순서대로 빠짐없이 옮겨 적어라. 페이지 앞에 [p.번호]를 붙이고, 표는 한 행을 한 줄로 칸은 " | "로 구분한다. 고객 이름은 성+OO으로, 전화번호는 010-****-****로 가린다. 요약하거나 지어내지 마라. JSON 하나로만 답하라: {"text":"옮겨 적은 내용"}',mat);
+      return {type:'PDF',text:tidy(ar&&ar.text||'')};}
     if(ext==='xlsx'||ext==='xls'){var wb=XLSX.read(buf,{type:'array'});return {type:'XLSX',text:wb.SheetNames.map(function(n){var rows=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:''}).filter(function(r){return r.some(function(v){return String(v).trim();});}).slice(0,25);return '[시트] '+n+'\n'+rows.map(function(r){return r.filter(function(v){return String(v).trim();}).join(' | ');}).join('\n');}).join('\n')};}
     if(ext==='pptx'){var z=XLSX.CFB.read(new Uint8Array(buf),{type:'array'}),sl=[];z.FullPaths.forEach(function(p,i){var m=p.match(/ppt\/slides\/slide(\d+)\.xml$/);if(m)sl.push([+m[1],z.FileIndex[i]]);});sl.sort(function(a,b){return a[0]-b[0];});
       return {type:'PPT',text:sl.map(function(s){var x=new TextDecoder().decode(s[1].content);var ps=x.split(/<\/a:p>/).map(function(q){return (q.match(/<a:t>([^<]*)<\/a:t>/g)||[]).map(function(t){return t.replace(/<\/?a:t>/g,'');}).join('');}).filter(function(q){return q.trim();});return '[장 '+s[0]+'] '+ps.join(' / ');}).join('\n').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"')};}
@@ -4064,7 +4072,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   async function onSmpFiles(fs){
     var msg=function(t){var e=document.getElementById('smMsg');if(e)e.innerHTML=t;},ti=document.getElementById('smTitle'),one=fs.length===1&&ti&&ti.value.trim(),ok=[],bad=[];
     for(var i=0;i<fs.length;i++){var f=fs[i];msg((fs.length>1?(i+1)+'/'+fs.length+' ':'')+'"'+esc(f.name)+'" 읽는 중…');
-      try{var r=await smpFileText(f);if(!r.text||r.text.length<20)throw new Error('글자를 거의 읽지 못함(그림 파일일 수 있음)');
+      try{var r=await smpFileText(f);if(!r.text||r.text.length<20)throw new Error('글자를 거의 읽지 못함(그림 파일일 수 있음)');if(!smpOk(r))throw new Error('글자가 깨져서 읽혔습니다. 원본 PPT·엑셀·워드 파일이나 다른 방식으로 저장한 PDF를 올려 주세요');
         var title=one||f.name.replace(/\.[^.]+$/,'');SMP.push({id:'s'+Date.now().toString(36)+i,title:title,type:r.type,on:true,opts:suggestOpts(title+' '+r.text.slice(0,2000)).slice(0,3),stage:'all',text:r.text.slice(0,6000),at:new Date().toISOString().slice(0,10)});ok.push(title);}
       catch(e){bad.push(f.name+' — '+(e&&e.message||e));}}
     if(ok.length){await smpSave(ok.length===1?'"'+ok[0]+'" 샘플 등록':'샘플 '+ok.length+'건 등록');toast('샘플 '+ok.length+'건을 등록했습니다. 아래 목록에서 쓰는 경우·옵션·내용을 확인하세요.');}
@@ -4243,7 +4251,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   async function pdfRead(file){
     if(!window.pdfjsLib)throw {code:'pdf',message:'PDF 읽기 도구를 불러오지 못했습니다(인터넷 연결 확인).'};
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    var doc;try{doc=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;}catch(e){throw {code:'pdf',message:'PDF를 열지 못했습니다'+(/password/i.test(e&&e.name||'')?'(비밀번호가 걸린 파일)':'')+'.'};}
+    var doc;try{doc=await pdfjsLib.getDocument({data:await file.arrayBuffer(),cMapUrl:'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/',cMapPacked:true}).promise;}catch(e){throw {code:'pdf',message:'PDF를 열지 못했습니다'+(/password/i.test(e&&e.name||'')?'(비밀번호가 걸린 파일)':'')+'.'};}
     var pages=[],all='';
     for(var p=1;p<=Math.min(doc.numPages,30);p++){var pg=await doc.getPage(p),tc=await pg.getTextContent();var t=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ');pages.push('[p'+p+'] '+t);all+=t;}
     if(all.replace(/\s/g,'').length>Math.min(300,60*doc.numPages)&&hangulRatio(all)>0.6)return {pages:pages,numPages:doc.numPages};

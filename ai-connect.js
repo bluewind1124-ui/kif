@@ -194,6 +194,20 @@ async function shrink(f){
     if(s===1&&f.size<3.5e6&&/jpe?g|png|webp/.test(f.type))return f;
     var cv=document.createElement('canvas');cv.width=Math.round(bmp.width*s);cv.height=Math.round(bmp.height*s);cv.getContext('2d').drawImage(bmp,0,0,cv.width,cv.height);return await canvasBlob(cv);}catch(e){return f;}
 }
+var CMAPS='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/cmaps/';
+/* 워드(.docx)·한글(.hwpx)·파워포인트(.pptx)·엑셀은 모두 zip 묶음이다. 확장자가 없거나 틀려도 안을 보고 글자를 꺼낸다 */
+async function officeText(buf){
+  await loadLib(XLSXJS,'XLSX');var u8=new Uint8Array(buf);if(!(u8[0]===0x50&&u8[1]===0x4B))return null;
+  var z;try{z=XLSX.CFB.read(u8,{type:'array'});}catch(e){return null;}var P=z.FullPaths;
+  var get=function(re){var L=[];P.forEach(function(p,i){var m=p.match(re);if(m)L.push([+(m[1]||0),z.FileIndex[i]]);});L.sort(function(a,b){return a[0]-b[0];});return L.map(function(x){return new TextDecoder().decode(x[1].content);});};
+  var para=function(x,end,tRe){return x.split(end).map(function(q){return (q.match(tRe)||[]).map(function(t){return t.replace(/<[^>]+>/g,'');}).join('');}).filter(function(q){return q.trim();}).join('\n');};
+  var un=function(t){return t.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&amp;/g,'&');};
+  var d=get(/word\/document\.xml$/);if(d.length)return {type:'DOCX',text:un(para(d[0],/<\/w:p>/,/<w:t(?:\s[^>]*)?>[^<]*<\/w:t>/g))};
+  var h=get(/Contents\/section(\d+)\.xml$/i);if(h.length)return {type:'HWPX',text:un(h.map(function(x){return para(x,/<\/hp:p>/,/<hp:t(?:\s[^>]*)?>[\s\S]*?<\/hp:t>/g);}).join('\n'))};
+  var sl=get(/ppt\/slides\/slide(\d+)\.xml$/);if(sl.length)return {type:'PPT',text:un(sl.map(function(x,i){return '[장 '+(i+1)+'] '+para(x,/<\/a:p>/,/<a:t>[^<]*<\/a:t>/g).replace(/\n/g,' / ');}).join('\n'))};
+  if(P.some(function(p){return /xl\/workbook\.xml$/.test(p);})){var wb=XLSX.read(u8,{type:'array'});return {type:'XLSX',text:wb.SheetNames.map(function(n){return '[시트] '+n+'\n'+XLSX.utils.sheet_to_csv(wb.Sheets[n]);}).join('\n')};}
+  return null;
+}
 async function read(files){
   var out={text:'',images:[],scanned:[]};
   for(var i=0;i<files.length;i++){
@@ -201,7 +215,7 @@ async function read(files){
     if(/^image\//.test(f.type)){out.images.push(await shrink(f));out.scanned.push(nm);continue;}
     if(f.type==='application/pdf'||/\.pdf$/.test(low)){
       await loadLib(PDFJS,'pdfjsLib');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      var doc;try{doc=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;}catch(e){throw {code:'pdf',message:nm+' 파일을 열지 못했습니다'+(/password/i.test(e&&e.name||'')?' (비밀번호가 걸린 파일)':'')+'.'};}
+      var doc;try{doc=await pdfjsLib.getDocument({data:await f.arrayBuffer(),cMapUrl:CMAPS,cMapPacked:true}).promise;}catch(e){throw {code:'pdf',message:nm+' 파일을 열지 못했습니다'+(/password/i.test(e&&e.name||'')?' (비밀번호가 걸린 파일)':'')+'.'};}
       var all='',pages=[];
       for(var p=1;p<=Math.min(doc.numPages,30);p++){var tc=await (await doc.getPage(p)).getTextContent();var t=tc.items.map(function(x){return x.str;}).join(' ').replace(/\s+/g,' ');pages.push('[p'+p+'] '+t);all+=t;}
       if(all.replace(/\s/g,'').length>Math.min(300,60*doc.numPages)&&hangul(all)>0.6){out.text+='\n\n===== '+nm+' =====\n'+pages.join('\n');continue;}
@@ -212,7 +226,9 @@ async function read(files){
       await loadLib(XLSXJS,'XLSX');var wb=XLSX.read(await f.arrayBuffer(),{type:'array'});
       out.text+='\n\n===== '+nm+' =====\n'+wb.SheetNames.map(function(s){return '[시트 '+s+']\n'+XLSX.utils.sheet_to_csv(wb.Sheets[s]);}).join('\n');continue;
     }
-    out.text+='\n\n===== '+nm+' =====\n'+(await f.text());
+    if(/\.hwp$/.test(low))throw {code:'hwp',message:nm+' — 한글(.hwp) 파일은 바로 읽지 못합니다. 한글에서 PDF나 .hwpx로 저장해 올려 주세요.'};
+    var ab=await f.arrayBuffer(),of=await officeText(ab);
+    out.text+='\n\n===== '+nm+' =====\n'+(of?of.text:new TextDecoder().decode(ab));
   }
   out.text=out.text.slice(0,80000);out.images=out.images.slice(0,8);
   return out;
@@ -315,5 +331,5 @@ function err(e){
 }
 if(document.readyState!=='loading')addCss();else document.addEventListener('DOMContentLoaded',addCss);
 window.addEventListener('storage',function(e){if(e.key===AIK)fire();});
-window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,err:err,migrateClaudeKey:migrateClaudeKey,onChange:function(f){subs.push(f);}};
+window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,err:err,migrateClaudeKey:migrateClaudeKey,onChange:function(f){subs.push(f);}};
 })();
