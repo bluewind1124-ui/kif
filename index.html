@@ -443,6 +443,8 @@ a.mat{color:inherit;text-decoration:none;display:block}
 .mview{position:fixed;inset:0;z-index:9999;background:rgba(12,22,40,.88);display:flex;flex-direction:column}
 .mview .mvh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:var(--surface,#fff);border-bottom:1px solid var(--line,#ddd)}
 .mview .mvh .sp{flex:1}
+.mview .mv-big{max-width:460px;margin:60px auto;text-align:center;background:var(--surface,#fff);border-radius:12px;padding:24px;line-height:1.6}
+.mview .mv-big p{margin:8px 0 16px;color:var(--muted,#666)}
 .mview .mvb{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px}
 .mview .mvb canvas,.mview .mvb img{max-width:100%;height:auto;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.35)}
 .mview .mvb.full{padding:0}
@@ -1254,7 +1256,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<button data-go="ai">'+ic('user','ki')+'<div><span>내 보장분석 고객</span><b>'+cust+'<small>명</small></b><em>이 기기에 저장된 고객</em></div></button></section>';
       h+='<section class="hm-cpt" id="hmCpt"><div class="cur l" aria-hidden="true"></div><div class="cur r" aria-hidden="true"></div><div class="hm-cpt-t"><span>'+E(CONCEPT.month)+' 이달의 컨셉</span><h2 data-t="'+E(CONCEPT.title)+'" aria-label="'+E(CONCEPT.title)+'">'+E(CONCEPT.title)+'</h2><p>'+E(CONCEPT.desc||'')+'</p></div>'+
         '<svg class="hm-cpt-art" viewBox="0 0 200 160" aria-hidden="true"><path d="M100 14l58 22v42c0 36-25 58-58 68-33-10-58-32-58-68V36z"/><path d="M100 54v44M78 76h44"/><path d="M20 150V120M44 150V104M156 150V96M180 150V112"/></svg>'+
-        '<div class="hm-cpt-b">'+(CONCEPT.file?'<a class="btn gold" target="_blank" rel="noopener" href="'+E(fileHref(CONCEPT.file))+'">컨셉 자료 보기 ›</a>':'<button class="btn gold" data-go="concept">컨셉 자료 보기 ›</button>')+'</div></section>';
+        '<div class="hm-cpt-b">'+(CONCEPT.file?'<a class="btn gold" target="_blank" rel="noopener" href="'+E(fileHref(CONCEPT.file))+'"'+cptMv(CONCEPT.file)+'>컨셉 자료 보기 ›</a>':'<button class="btn gold" data-go="concept">컨셉 자료 보기 ›</button>')+'</div></section>';
       /* 빠른 실행: 영업 도구 · 공지·시상 · 교육·연계 메뉴를 무작위 순서로 섞어 천천히 흘려 보낸다 (마우스를 올리면 멈춤) */
       var Q=[],seen={};MENU.forEach(function(g){if(!g.g||g.admin||g.mobile)return;g.items.forEach(function(it){if(seen[it[0]])return;seen[it[0]]=1;Q.push([SIC[it[0]]||'star',it[1],it[0],g.g]);});});
       for(var qi=Q.length-1;qi>0;qi--){var qj=Math.floor(Math.random()*(qi+1)),qt=Q[qi];Q[qi]=Q[qj];Q[qj]=qt;}
@@ -1600,6 +1602,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var it={file:file, ext:ext, kind:kind, co:co||'기타', y:y, mo:mo, wk:wk, period:period, status:status, product:'', cat:'자료', date:today(),
       heading:heading, base:base, bullets:bulls, summary:pts.slice(0,4).join(' · '),
       size:file.size, pages:r?r.numPages:0, buf:buf, url:URL.createObjectURL(file)};
+    if(kind==='concept'){var td=today();it.y=td.slice(0,4);it.mo=td.slice(5,7);} /* 이달의 컨셉은 파일 이름의 날짜가 아니라 이번 달로 올린다 */
     it.noText=!pts.length; /* 글자를 못 읽은 PDF(스캔본 등)도 회사·연월·주차·제목만으로 올린다 */
     nuRetitle(it);return it;
   }
@@ -1648,6 +1651,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     hit.sort(function(a,b){return isPdf(b[4])-isPdf(a[4]);});
     return hit[0]||null;
   }
+  /* 홈 배너의 컨셉 파일도 교육 자료 보기 창으로 연다 (같은 제목 PDF가 있으면 PDF로) */
+  function cptMv(f){var i=-1;MATS.some(function(r,j){if(r[4]===f){i=j;return true;}});return i<0?'':' data-mview="'+i+'"';}
   function cptMatFile(m){if(m&&m[2])return m[2];var r=cptMatRow(m);return r?r[4]:'';}
   function cptMatLink(m){
     var r=cptMatRow(m);
@@ -1816,7 +1821,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var L=document.getElementById('nuList');
     var setTitle=function(i,it){var e=L.querySelector('[data-nu="'+i+'"][data-k="title"]');if(e)e.value=it.title;};
     var onEdit=function(e){var t=e.target,i=t.getAttribute('data-nu');if(i==null)return;var it=NU.items[+i],k=t.getAttribute('data-k'),v=t.value;
-      if(k==='kind'){it.kind=v;nuRetitle(it);nuRender();return;}
+      if(k==='kind'){it.kind=v;if(v==='concept'){var td=today();it.y=td.slice(0,4);it.mo=td.slice(5,7);}nuRetitle(it);nuRender();return;}
       if(k==='ym'){var m=v.match(/(20\d{2})\D*(\d{1,2})/);if(m){it.y=m[1];it.mo=pad2(+m[2]);if(it.kind==='news'){nuRetitle(it);setTitle(i,it);}}return;}
       if(k==='co'||k==='wk'){it[k]=k==='co'?(v.trim()||'기타'):v;nuRetitle(it);setTitle(i,it);return;}
       it[k]=v;};
@@ -2178,8 +2183,15 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var esck=function(e){if(e.key==='Escape')close();};document.addEventListener('keydown',esck);
     w.addEventListener('click',function(e){if(e.target.closest('[data-v="x"]')||e.target===B)close();});
     if(isImg(show)){B.innerHTML='<img alt="'+esc(m[1])+'" src="'+fileHref(show)+'">';return;}
-    if(isPpt(show)){B.classList.add('full');B.innerHTML='<iframe title="'+esc(m[1])+'" src="https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(abs(show))+'"></iframe>';
-      pg.textContent='파일이 커서 안 보이면 관리자에게 PDF로 올려 달라고 하세요.';return;}
+    if(isPpt(show)){
+      /* Office 보기 화면은 10MB가 넘는 PPT를 열지 못하고 오류를 낸다 → 크기를 먼저 보고, 크면 안내와 내려받기 단추를 보여 준다 */
+      var big=function(){B.innerHTML='<div class="mv-big"><b>PPT 파일이 커서 화면에서 바로 열 수 없습니다.</b><p>아래 단추로 내려받아 PowerPoint에서 보세요. 관리자가 같은 제목의 PDF를 함께 올리면 여기서 바로 보입니다.</p><a class="btn gold" download href="'+fileHref(show)+'">PPT 내려받기</a></div>';pg.textContent='';};
+      var office=function(){B.classList.add('full');B.innerHTML='<iframe title="'+esc(m[1])+'" src="https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(abs(show))+'"></iframe>';
+        pg.textContent='파일이 안 보이면 「새 창으로」를 눌러 내려받으세요.';};
+      pg.textContent='불러오는 중…';
+      fetch(abs(show),{method:'HEAD'}).then(function(r){if(!alive)return;var n=+(r.headers.get('content-length')||0);if(!r.ok)throw 0;if(n>10*1024*1024)big();else office();})
+        .catch(function(){if(alive){B.innerHTML='<div class="mv-big"><b>자료를 아직 불러올 수 없습니다.</b><p>방금 올린 자료라면 1~2분 뒤 다시 눌러 주세요.</p></div>';pg.textContent='';}});
+      return;}
     if(!isPdf(show)||!pdfLib()){B.classList.add('full');B.innerHTML='<iframe title="'+esc(m[1])+'" src="'+fileHref(show)+'"></iframe>';return;}
     pg.textContent='불러오는 중…';
     pdfLib().getDocument(abs(show)).promise.then(async function(doc){
