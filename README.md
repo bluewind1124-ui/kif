@@ -18,7 +18,7 @@ FC 영업지원·교육지원 포털. GitHub Pages로 배포됩니다: https://b
 | `news/`, `files/` | 관리자 「자료 올리기」로 올린 파일 (소식지는 `news/연-월/`, 나머지는 `files/메뉴/연-월/`) |
 | `version.json` | 버전과 업데이트 내역 (화면 상단·홈에 표시) |
 | `app.html`, `manifest.webmanifest`, `icon-*`, `desktop-icon.zip`, `og-image.png` | 홈 화면 아이콘 설치 · 카톡 미리보기 카드 그림 |
-| `docs/` | 개발 문서 — 고급형 생성 기록, 법령·세법 업데이트 설명서 |
+| `docs/` | 개발 문서 — 고급형 생성 기록, 법령·세법 업데이트 설명서, 대기 중인 작업 요청(`작업요청_*.md`) |
 
 ## 메뉴 연결 (index.html)
 
