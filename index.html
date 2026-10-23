@@ -3527,7 +3527,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var doc;try{doc=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;}catch(e){throw {code:'pdf',message:'PDF를 열지 못했습니다'+(/password/i.test(e&&e.name||'')?'(비밀번호가 걸린 파일)':'')+'.'};}
     var pages=[],all='';
     for(var p=1;p<=Math.min(doc.numPages,30);p++){var pg=await doc.getPage(p),tc=await pg.getTextContent();var t=tc.items.map(function(i){return i.str;}).join(' ').replace(/\s+/g,' ');pages.push('[p'+p+'] '+t);all+=t;}
-    if(all.replace(/\s/g,'').length>300&&hangulRatio(all)>0.6)return {pages:pages,numPages:doc.numPages};
+    if(all.replace(/\s/g,'').length>Math.min(300,60*doc.numPages)&&hangulRatio(all)>0.6)return {pages:pages,numPages:doc.numPages};
     var imgs=[];for(var q=1;q<=Math.min(doc.numPages,12);q++){var pp=await doc.getPage(q),vp=pp.getViewport({scale:1.4}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;await pp.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;imgs.push(await new Promise(function(r){cv.toBlob(r,'image/jpeg',0.8);}));}
     return {images:imgs,numPages:doc.numPages,scanned:true};
   }
