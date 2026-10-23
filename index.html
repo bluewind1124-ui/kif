@@ -20,26 +20,41 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.11">
+<meta name="kif-build" content="2026-10-23.12">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
 (function(){
   var mine=document.querySelector('meta[name="kif-build"]').content;
+  /* 저장하지 않은 변경이 있거나 저장 중이면 다시 불러오지 않는다 */
+  function busy(){try{return !!(window.KSAVE&&KSAVE.has());}catch(e){return false;}}
+  function go(tag){if(busy())return;var k='kif_reload_'+tag;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');}catch(e){}
+    location.replace(location.pathname+'?v='+encodeURIComponent(tag)+location.hash);}
+  function hash(t){var x=0;for(var i=0;i<t.length;i+=3)x=(x*31+t.charCodeAt(i))|0;return (x>>>0).toString(36)+t.length.toString(36);}
+  var last=0;
   function check(){
+    if(Date.now()-last<5*60*1000&&last)return;last=Date.now();
     fetch('version.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(v){
-      if(!v||!v.build||v.build===mine)return;
-      var k='kif_reload_'+v.build;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1');}catch(e){}
-      location.replace(location.pathname+'?v='+encodeURIComponent(v.build)+location.hash);
+      if(v&&v.build&&v.build!==mine)go(v.build);
+    }).catch(function(){});
+    /* build 번호를 안 올린 수정도 잡는다: 지금 화면(브라우저가 기억한 사본)과 사이트의 최신 화면을 비교 */
+    if(!window.fetch||!window.Promise)return;
+    Promise.all([
+      fetch(location.pathname+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.text():null;}),
+      fetch(location.href.split('#')[0],{cache:'only-if-cached',mode:'same-origin'}).then(function(r){return r.ok?r.text():null;}).catch(function(){return null;})
+    ]).then(function(a){
+      if(!a[0]||!a[1])return;var hn=hash(a[0]);if(hn===hash(a[1]))return;
+      var m=a[0].match(/name="kif-build" content="([^"]+)"/);go((m?m[1]:'b')+'-'+hn);
     }).catch(function(){});
   }
-  check();setInterval(check,30*60*1000);
+  check();setInterval(function(){last=0;check();},30*60*1000);
   document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')check();});
 })();
 </script>
 <title>한보금on 활동지원</title>
 <!-- Claude Artifact 원본(fc-portal.html)을 감싼 파일. 예전 v1.0 화면은 classic/ 폴더에 보관 -->
-<style>body{margin:0}</style>
+<style>body{margin:0}.rf-step{margin-top:14px;padding-top:12px;border-top:1px solid rgba(20,40,75,.12)}.rf-step h4{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;font-size:15px;font-weight:700}.rf-step h4 .note{font-weight:400}.rf-step .rf-n{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#14284b;color:#fff;font-size:13px;flex:none}.rf-step>.in{width:100%;max-width:520px;box-sizing:border-box}
+</style>
 </head>
 <body>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1120,6 +1135,70 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
 
 <div class="toast" id="toast" hidden></div>
 <div class="scr" id="scrBtns" hidden><button type="button" id="scrUp" aria-label="맨 위로" title="맨 위로">▲<span>맨 위로</span></button><button type="button" id="scrDown" aria-label="아래로" title="아래로 한 화면">▼<span>아래로</span></button></div>
+<script>
+/* 저장 상태 막대(관리자): 파일을 붙이거나 내용을 바꾸면 「저장하지 않은 변경 [저장]」이 화면 아래에 뜨고,
+   누르면 「저장 중… → ✓ 저장 완료 → ✓ 모든 FC 화면에 반영됨」 또는 「⚠ 저장 실패: 이유 [다시 저장]」을 보여 준다.
+   저장한 내용은 이 기기에 잠시 기억해, 사이트가 새 내용을 내보내기 전(1~2분)에 새로고침해도 예전 목록이 보이지 않게 한다. */
+(function(){
+  var KS={pend:{},order:[],busy:false,label:'',step:'',err:null,ok:null,live:'',ver:0,timer:null,hide:null};
+  var LAST='kif_pub_last';
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function bar(){var b=document.getElementById('ksBar');if(!b){
+      var st=document.createElement('style');st.textContent=
+        '.ks-bar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9000;display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:min(720px,calc(100vw - 32px));box-sizing:border-box;padding:12px 16px;border-radius:14px;background:#14284b;color:#fff;font-size:15px;line-height:1.45;box-shadow:0 10px 30px rgba(10,20,40,.35)}'+
+        '.ks-bar[hidden]{display:none}.ks-bar .ks-t{flex:1 1 220px;min-width:0}.ks-bar .ks-s{display:block;font-size:13px;opacity:.85}'+
+        '.ks-bar button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:8px 16px;cursor:pointer;background:#c9a24a;color:#14284b}.ks-bar button.ks-x{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5);padding:7px 12px}'+
+        '.ks-bar.ok{background:#16603a}.ks-bar.bad{background:#a32424}.ks-bar.pend{background:#14284b;border:2px solid #c9a24a}'+
+        '.ks-spin{width:16px;height:16px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:ksr .8s linear infinite;flex:none}@keyframes ksr{to{transform:rotate(360deg)}}';
+      document.head.appendChild(st);
+      b=document.createElement('div');b.id='ksBar';b.className='ks-bar';b.hidden=true;b.setAttribute('role','status');b.setAttribute('aria-live','polite');document.body.appendChild(b);
+}
+    return b;}
+  document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-ks]');if(!t||t.disabled)return;var a=t.getAttribute('data-ks');
+    if(a==='save'){e.preventDefault();saveAll();}else if(a==='close'){KS.err=null;KS.ok=null;render();}});
+  function names(){return KS.order.filter(function(k){return KS.pend[k];}).map(function(k){return KS.pend[k].label;});}
+  function render(){var b=bar(),n=names(),h='',c='';clearTimeout(KS.hide);
+    if(KS.busy){c='busy';h='<span class="ks-spin"></span><span class="ks-t"><b>저장 중…</b> '+esc(KS.label)+(KS.step?'<span class="ks-s">'+esc(KS.step)+'</span>':'')+'</span>';}
+    else if(KS.err){c='bad';h='<span class="ks-t"><b>⚠ 저장하지 못했습니다</b> '+esc(KS.err.label)+'<span class="ks-s">'+esc(KS.err.msg)+' · 바꾼 내용은 이 화면에 그대로 있습니다.</span></span>'+(n.length?'<button type="button" data-ks="save">다시 저장</button>':'')+'<button type="button" class="ks-x" data-ks="close">닫기</button>';}
+    else if(n.length){c='pend';h='<span class="ks-t"><b>저장하지 않은 변경이 있습니다</b><span class="ks-s">'+esc(n.join(' · '))+'</span></span><button type="button" data-ks="save">저장</button>';}
+    else if(KS.ok){c='ok';var s=KS.live==='live'?'모든 FC 화면에 반영됐습니다.':KS.live==='slow'?'저장은 끝났고, FC 화면에는 잠시 뒤 보입니다.':'모든 FC 화면에 반영되는지 확인하는 중… (보통 1~2분)';
+      h='<span class="ks-t"><b>✓ 저장 완료</b> '+esc(KS.ok)+'<span class="ks-s">'+s+'</span></span><button type="button" class="ks-x" data-ks="close">닫기</button>';
+      if(KS.live)KS.hide=setTimeout(function(){KS.ok=null;render();},8000);}
+    b.className='ks-bar '+c;b.innerHTML=h;b.hidden=!h;
+    /* 패널 안의 저장 버튼도 같은 상태로 */
+    [].forEach.call(document.querySelectorAll('[data-ks="save"]'),function(x){if(!b.contains(x))x.disabled=KS.busy||!n.length;});
+  }
+  async function saveAll(){if(KS.busy)return;KS.err=null;
+    var ks=KS.order.filter(function(k){return KS.pend[k];});
+    for(var i=0;i<ks.length;i++){var k=ks[i],p=KS.pend[k];if(!p)continue;delete KS.pend[k];
+      var ok=false;try{ok=await p.fn();}catch(e){if(!KS.err)KS.err={label:p.label,msg:(e&&e.message)||String(e)};}
+      if(ok===false||KS.err){if(!KS.pend[k])KS.pend[k]=p;KS.busy=false;if(!KS.err)KS.err={label:p.label,msg:'저장하지 못했습니다'};render();return false;}}
+    render();return true;}
+  function watch(ver){if(!ver)return;KS.ver=ver;KS.live='';clearInterval(KS.timer);var t0=Date.now();
+    KS.timer=setInterval(function(){
+      fetch('content.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(c){
+        if(KS.ver!==ver)return;if((c&&c.ver||0)>=ver){clearInterval(KS.timer);KS.live='live';try{localStorage.removeItem(LAST);}catch(e){}render();}
+        else if(Date.now()-t0>6*60*1000){clearInterval(KS.timer);KS.live='slow';render();}}).catch(function(){});
+    },10000);}
+  window.KSAVE={
+    /* 바뀐 내용 등록: 「저장」을 누르면 fn()을 부른다(fn은 성공하면 true) */
+    pend:function(key,label,fn){if(!KS.pend[key]&&KS.order.indexOf(key)<0)KS.order.push(key);KS.pend[key]={label:label,fn:fn};KS.ok=null;render();},
+    unpend:function(key){if(KS.pend[key]){delete KS.pend[key];render();}},
+    has:function(key){return key?!!KS.pend[key]:names().length>0||KS.busy;},
+    saveAll:saveAll,
+    start:function(label){KS.busy=true;KS.label=label||'';KS.step='';KS.err=null;KS.ok=null;render();},
+    step:function(t){if(!KS.busy)return;KS.step=t||'';var b=document.getElementById('ksBar'),s=b&&b.querySelector('.ks-s');if(s)s.textContent=KS.step;else render();},
+    done:function(label,cur){KS.busy=false;KS.err=null;KS.ok=label||'저장했습니다';
+      if(cur&&cur.ver){try{localStorage.setItem(LAST,JSON.stringify({at:Date.now(),c:cur}));}catch(e){}watch(cur.ver);}else KS.live='live';render();},
+    fail:function(label,e){KS.busy=false;KS.err={label:label||'',msg:(e&&e.message)||String(e||'')};render();},
+    /* 방금 저장한 내용(사이트가 아직 내보내기 전)이 있으면 그것을 돌려준다 */
+    fresher:function(c){try{var L=JSON.parse(localStorage.getItem(LAST)||'null');if(!L||!L.c)return null;
+        if(Date.now()-L.at>15*60*1000||(c&&(c.ver||0)>=(L.c.ver||0))){localStorage.removeItem(LAST);return null;}
+        watch(L.c.ver);KS.ok=KS.ok||'방금 저장한 내용';setTimeout(render,0);return L.c;}catch(e){return null;}}
+  };
+  window.addEventListener('beforeunload',function(e){if(names().length||KS.busy){e.preventDefault();e.returnValue='';return '';}});
+})();
+</script>
 <script src="ai-connect.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -1590,7 +1669,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   (function loadContent(i){
     if(i>=CONTENT_URLS.length)return;
-    fetch(CONTENT_URLS[i]+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(c){applyContent(c);}).catch(function(){loadContent(i+1);});
+    fetch(CONTENT_URLS[i]+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(c){applyContent((window.KSAVE&&KSAVE.fresher(c))||c);}).catch(function(){loadContent(i+1);});
   })(0);
   function lines(a){return (a||[]).map(function(r){return Array.isArray(r)?r.join(' | '):String(r);}).join('\n');}
   function rows(t,n){return String(t||'').split('\n').map(function(x){return x.trim();}).filter(Boolean).map(function(x){var p=x.split('|').map(function(y){return y.trim();});while(p.length<n)p.push('');return p.slice(0,n);});}
@@ -1618,7 +1697,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       inp('mClaude','Claude API',md.claude,'claude-opus-5-5')+inp('mOpenai','ChatGPT',md.openai,'gpt-4.1')+inp('mGemini','Gemini',md.gemini,'gemini-2.5-flash')+'</div>'+
       '<label class="row"><input type="checkbox" id="cOpts"> 이 기기의 <b>분석 옵션</b>(AI보장분석 기본형 › 옵션 관리)을 모든 FC에게 배포</label></div>'+
       '<div class="panel"><h3>보장분석 샘플 <span class="pill new">모든 FC 공용</span></h3>'+
-      '<p class="note">보장분석 샘플은 <b>한 화면</b>(왼쪽 메뉴 관리자 › 보장분석 샘플 올리기)에서 두 가지를 함께 관리합니다. 파일을 고르면 바로 모든 FC에게 올라갑니다(1~2분 뒤 반영).</p>'+
+      '<p class="note">보장분석 샘플은 <b>한 화면</b>(왼쪽 메뉴 관리자 › 보장분석 샘플 올리기)에서 두 가지를 함께 관리합니다. 파일을 고른 뒤 「저장」을 누르면 모든 FC에게 올라갑니다(1~2분 뒤 반영).</p>'+
       '<ul class="note" style="margin:4px 0 10px;padding-left:1.2em;line-height:1.9"><li><b>① AI가 따라 쓰는 샘플</b> — 제안서·분석 엑셀의 형식과 문장을 AI에게 보여 주는 글입니다. FC 제안서에 직접 붙지 않습니다. 지금 <b>'+((SITE&&Array.isArray(SITE.aiSamples))?SITE.aiSamples.length:0)+'건</b></li>'+
       '<li><b>② 니즈환기 참고자료</b> — 그림·PDF 장표로, FC 제안서에 그대로 한 장씩 붙습니다. 지금 <b>'+((window.AIMOD&&AIMOD.getRefs)?AIMOD.getRefs().refs.length:0)+'건</b></li></ul>'+
       '<div class="row"><button class="btn" type="button" id="cmsRefs">보장분석 샘플 올리기 열기</button></div></div>'+
@@ -1743,7 +1822,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<label class="nu-drop" id="nuDrop"><input type="file" id="nuFile" accept=".pdf,.ppt,.pptx,.xls,.xlsx,.doc,.docx,.hwp,.hwpx,.png,.jpg,.jpeg" multiple hidden><b>파일을 여기로 끌어 놓거나 눌러서 고르세요</b><span class="note">PDF는 내용까지 읽고, PPT·엑셀·한글·사진은 파일 이름으로 제목을 만듭니다 · 여러 개 한 번에 · 파일당 50MB 이하</span></label>'+
       '<div class="row" style="margin-top:8px;gap:8px;flex-wrap:wrap"><label class="note" style="display:flex;align-items:center;gap:6px">판단이 안 될 때 넣을 메뉴 <select class="in" id="nuDef" style="width:auto">'+KINDS.map(function(k){return '<option value="'+k[0]+'"'+(k[0]===dk?' selected':'')+'>'+k[1]+'</option>';}).join('')+'</select></label></div>'+
       '<div id="nuList"></div><div id="nuCur"></div>'+
-      '<div class="row" style="margin-top:10px;flex-wrap:wrap;gap:8px"><button class="btn" type="button" id="nuPub" disabled>모든 FC에게 올리기</button><button class="btn ghost" type="button" id="nuPrev" disabled>이 기기에서 미리보기</button>'+
+      '<div class="row" style="margin-top:10px;flex-wrap:wrap;gap:8px"><button class="btn" type="button" id="nuPub" disabled>저장 (모든 FC에게 올리기)</button><button class="btn ghost" type="button" id="nuPrev" disabled>이 기기에서 미리보기</button>'+
       '<label class="note" style="display:flex;align-items:center;gap:6px">소식지·공지 보관 <input class="in" id="nuKeep" type="number" min="1" max="24" value="'+nuMonths()+'" style="width:64px"> 개월 (지난 자료는 올릴 때 지움)</label></div>'+
       '<p class="note" id="nuMsg" role="status"></p>'+
       '<details class="nu-set"'+(T?'':' open')+'><summary>GitHub 연결 설정 '+(T?'<span class="pill ok">연결됨</span>':'<span class="pill warn">처음 한 번 필요</span>')+'</summary>'+
@@ -1821,6 +1900,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       L.insertAdjacentHTML('afterbegin','<div class="nu-sch" style="margin:0 0 8px"><b>상품 개정 일정</b> <span class="note">올릴 일정 '+nS+'건 · 올리면 「상품 개정 일정」 화면과 홈 배너에 바로 반영되고, 한 달 지난 일정은 정리됩니다.</span> <button class="btn sm" type="button" data-scai'+(NU.schBusy?' disabled':'')+'>'+(NU.schBusy?'AI가 읽는 중…':'AI로 일정 읽기')+'</button></div>');}
     var C=document.getElementById('nuCur');if(C)C.innerHTML=nuCurHtml();
     var on=NU.items.length>0&&!NU.busy;document.getElementById('nuPub').disabled=!on;document.getElementById('nuPrev').disabled=!on;
+    if(window.KSAVE&&!NU.busy){if(NU.items.length)KSAVE.pend('nu','자료 올리기: 파일 '+NU.items.length+'건',nuPublish);else KSAVE.unpend('nu');}
   }
   async function nuAdd(files){
     var msg=document.getElementById('nuMsg');
@@ -1938,7 +2018,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
       var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:[{path:'content.json',mode:'100644',type:'blob',sha:jb.sha}]});
       var cm=await gh('POST','/git/commits',{message:'AI 보장분석 샘플 '+list.length+'건 반영',tree:nt.sha,parents:[ref.object.sha]});
-      await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});SITE=cur;
+      await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});SITE=cur;return cur;
     },
     refs:async function(list,add,del){
       if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다');
@@ -1954,12 +2034,14 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:tree});
       var cm=await gh('POST','/git/commits',{message:'보장분석 샘플 올리기: 공용 참고자료 '+list.length+'건',tree:nt.sha,parents:[ref.object.sha]});
       await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});
-      SITE=cur;return cur.refsVer;
+      SITE=cur;window.KIFPUB.last=cur;return cur.refsVer;
     }
   };
   async function nuPublish(){
-    var msg=document.getElementById('nuMsg');if(!ghTok()){msg.textContent='먼저 아래 「GitHub 연결 설정」에서 토큰을 저장하세요.';document.querySelector('.nu-set').open=true;return;}
-    NU.busy=true;nuRender();
+    var msg=document.getElementById('nuMsg')||{},KS=window.KSAVE,lab='자료 올리기 '+NU.items.length+'건';
+    if(!NU.items.length)return true;
+    if(!ghTok()){msg.textContent='먼저 아래 「GitHub 연결 설정」에서 토큰을 저장하세요.';var ns=document.querySelector('.nu-set');if(ns)ns.open=true;KS.fail(lab,new Error('GitHub 연결(토큰)이 아직 없습니다. 관리자 페이지 › 자료 올리기 › GitHub 연결 설정에서 저장하세요.'));return false;}
+    if(NU.busy)return false;NU.busy=true;nuRender();KS.start(lab);var okk=false;
     try{
       msg.textContent='GitHub 최신 상태 확인 중…';
       var ref=await gh('GET','/git/ref/heads/'+GH.branch), base=await gh('GET','/git/commits/'+ref.object.sha);
@@ -1970,7 +2052,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(ch){return ch.charCodeAt(0);})));}
       else cur=SITE?JSON.parse(JSON.stringify(SITE)):{};
       var tree=[], list=[];
-      for(var i=0;i<NU.items.length;i++){var it=NU.items[i];msg.textContent=(i+1)+'/'+NU.items.length+' '+it.file.name+' 올리는 중…';
+      for(var i=0;i<NU.items.length;i++){var it=NU.items[i];msg.textContent=(i+1)+'/'+NU.items.length+' '+it.file.name+' 올리는 중…';KS.step(msg.textContent);
         var bl=await gh('POST','/git/blobs',{content:b64(it.buf),encoding:'base64'}),p=nuPath(it);tree.push({path:p,mode:'100644',type:'blob',sha:bl.sha});list.push({it:it,path:p});
         if(it.ext==='pdf'){try{var tb=await pdfThumb(it.buf);if(tb){var tp=p.replace(/\.pdf$/i,'')+'_thumb.jpg',tbl=await gh('POST','/git/blobs',{content:b64(tb),encoding:'base64'});tree.push({path:tp,mode:'100644',type:'blob',sha:tbl.sha});list[list.length-1].thumb=tp;}}catch(e){}}}
       nuMerge(cur,list);
@@ -1990,10 +2072,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});
       NU.items.forEach(function(x){URL.revokeObjectURL(x.url);});NU.items=[];
       applyContent(cur,false);nuRefreshCms();
-      msg.textContent='올렸습니다: '+what+(del?' (보관 기간이 지난 '+del+'건 정리)':'')+'. 1~2분 뒤 모든 FC 화면에 보입니다.';
-      toast('자료를 올렸습니다');
-    }catch(e){msg.textContent='올리기 실패: '+(e.message||e)+' — 사이트는 바뀌지 않았습니다. 다시 시도하세요.';}
-    NU.busy=false;nuRender();
+      msg.textContent='✓ 저장 완료: '+what+(del?' (보관 기간이 지난 '+del+'건 정리)':'')+' · 아래 목록에 바로 들어갔고, 모든 FC 화면에는 1~2분 뒤 보입니다.';
+      KS.done(what+(del?' · 지난 자료 '+del+'건 정리':''),cur);okk=true;cmAfterNu();
+    }catch(e){msg.textContent='올리기 실패: '+(e.message||e)+' — 사이트는 바뀌지 않았습니다. 다시 시도하세요.';KS.fail(lab,e);}
+    NU.busy=false;nuRender();return okk;
   }
   /* 올린 뒤 아래 콘텐츠 관리 칸도 새 내용으로 다시 그려, 그 칸으로 반영할 때 올린 자료가 지워지지 않게 한다 */
   function nuRefreshCms(){var o=document.getElementById('cms');if(!o)return;var d=document.createElement('div');d.innerHTML=cmsHtml();o.parentNode.replaceChild(d.firstChild,o);bindCms();}
@@ -2087,13 +2169,18 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var p=path||cmPath(kind,file.name);CM.add=CM.add.filter(function(a){return a.path!==p;});CM.add.push({path:p,b64:b64(await file.arrayBuffer()),url:URL.createObjectURL(file)});return p;
   }
   function cmLocal(p){var a=CM.add.filter(function(x){return x.path===p;})[0];return a?a.url:p;}
+  /* 자료 올리기를 저장한 뒤 자료 관리 화면이 열려 있으면 목록을 새 내용으로 다시 그린다(메시지는 그대로) */
+  function cmAfterNu(){if(!document.getElementById('cmList'))return;var nm=document.getElementById('nuMsg'),mt=nm?nm.textContent:'';if(!CM.busy&&!Object.keys(CM.dirty).length)CM.w=null;cmRender();nm=document.getElementById('nuMsg');if(nm)nm.textContent=mt;}
   function cmMsg(t){CM.msg=t;var e=document.getElementById('cmPub');if(e)e.innerHTML=t;}
-  function cmTouch(k){CM.dirty[k]=1;clearTimeout(CM.t);cmMsg('바뀐 내용을 저장하는 중…');CM.t=setTimeout(cmSave,1200);}
+  /* 바꾸거나 파일을 붙이면 바로 올리지 않고 「저장하지 않은 변경」으로 모아 두었다가, 「저장」을 누르면 한 번에 올린다 */
+  function cmPendLabel(){var ks=Object.keys(CM.dirty).map(cmName),n=CM.add.length;return '자료 관리'+(ks.length?': '+ks.join(', '):'')+(n?' · 새 파일 '+n+'개':'');}
+  function cmTouch(k){CM.dirty[k]=1;clearTimeout(CM.t);cmMsg('<b>저장하지 않은 변경이 있습니다.</b> 「저장」을 눌러야 모든 FC에게 올라갑니다.');if(window.KSAVE)KSAVE.pend('cm',cmPendLabel(),cmSave);}
   async function cmSave(){
-    if(CM.busy){CM.again=true;return;}
-    if(!ghTok()){cmMsg('⚠ 이 기기에서만 바뀌었습니다. 위 「GitHub 연결 설정」에서 토큰을 저장하면 모든 FC에게 올라갑니다.');return;}
-    var W=cmW(),keys=Object.keys(CM.dirty),add=CM.add.slice(),del=CM.del.slice();if(!keys.length&&!add.length&&!del.length)return;
-    CM.busy=true;CM.dirty={};cmMsg('모든 FC에게 올리는 중…');
+    if(CM.busy){CM.again=true;return true;}
+    var KS=window.KSAVE,lab=cmPendLabel();
+    if(!ghTok()){cmMsg('⚠ 이 기기에서만 바뀌었습니다. 위 「GitHub 연결 설정」에서 토큰을 저장하면 모든 FC에게 올라갑니다.');KS.fail(lab,new Error('GitHub 연결(토큰)이 아직 없습니다. 이 화면 위쪽 「GitHub 연결 설정」에서 저장하세요.'));return false;}
+    var W=cmW(),keys=Object.keys(CM.dirty),add=CM.add.slice(),del=CM.del.slice();if(!keys.length&&!add.length&&!del.length)return true;
+    CM.busy=true;CM.dirty={};cmMsg('저장 중… 모든 FC에게 올리는 중입니다.');KS.start(lab);var okk=false;
     try{
       var cur=await KIFPUB.patch(function(c){
         keys.forEach(function(k){
@@ -2105,9 +2192,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       },add,del,'자료 관리: '+(keys.map(cmName).join(', ')||'파일 정리'));
       CM.add=CM.add.filter(function(a){return add.indexOf(a)<0;});CM.del=CM.del.filter(function(d){return del.indexOf(d)<0;});
       var keepW=CM.w;applyContent(cur,false);CM.w=keepW;
-      cmMsg('✓ 모든 FC에게 반영했습니다 ('+new Date().toLocaleTimeString('ko-KR')+'). 1~2분 뒤 FC 화면에 보입니다.');
-    }catch(e){keys.forEach(function(k){CM.dirty[k]=1;});cmMsg('⚠ 올리지 못했습니다: '+esc(e.message||String(e))+' · 이 기기에는 남아 있습니다. <button class="btn sm" type="button" data-cm="retry">다시 올리기</button>');}
-    CM.busy=false;if(CM.again){CM.again=false;cmSave();}
+      cmMsg('✓ 저장 완료 ('+new Date().toLocaleTimeString('ko-KR')+') · 모든 FC 화면에는 1~2분 뒤 보입니다.');
+      KS.done(lab.replace(/^자료 관리: ?/,'자료 관리 · '),cur);okk=true;
+      cmRender();
+    }catch(e){keys.forEach(function(k){CM.dirty[k]=1;});cmMsg('⚠ 저장하지 못했습니다: '+esc(e.message||String(e))+' · 바꾼 내용은 이 화면에 남아 있습니다. <button class="btn sm" type="button" data-cm="retry">다시 저장</button>');KS.fail(lab,e);}
+    CM.busy=false;if(CM.again){CM.again=false;if(Object.keys(CM.dirty).length||CM.add.length)KS.pend('cm',cmPendLabel(),cmSave);}
+    return okk;
   }
   KIFPUB.patch=async function(fn,add,del,message){
     if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다');
@@ -2115,7 +2205,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'),have={};(all.tree||[]).forEach(function(t){have[t.path]=t.sha;});
     var cur={};if(have['content.json']){var bj=await gh('GET','/git/blobs/'+have['content.json']);cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(c){return c.charCodeAt(0);})));}
     var tree=[];
-    for(var i=0;i<add.length;i++){cmMsg('파일 올리는 중… ('+(i+1)+'/'+add.length+')');var bl=await gh('POST','/git/blobs',{content:add[i].b64,encoding:'base64'});tree.push({path:add[i].path,mode:'100644',type:'blob',sha:bl.sha});}
+    for(var i=0;i<add.length;i++){cmMsg('파일 올리는 중… ('+(i+1)+'/'+add.length+')');if(window.KSAVE)KSAVE.step('파일 올리는 중 '+(i+1)+'/'+add.length);var bl=await gh('POST','/git/blobs',{content:add[i].b64,encoding:'base64'});tree.push({path:add[i].path,mode:'100644',type:'blob',sha:bl.sha});}
     del.forEach(function(p){if(have[p])tree.push({path:p,mode:'100644',type:'blob',sha:null});});
     fn(cur);cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
     var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
@@ -2313,8 +2403,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   function cmHtml(){
     var T=ghTok(),k=CM.tab;
-    var h=head('관리자','자료 관리','메뉴별 자료를 올리고, FC에게 보일지 켜고 끄고, 고치고, 지웁니다. 바꾸면 잠시 뒤 바로 모든 FC 화면에 반영됩니다(1~2분).');
-    h+='<div class="panel"><div class="row"><b>올리기 상태</b><span class="note" id="cmPub">'+(CM.msg||(T?'GitHub 연결됨 · 바꾸면 바로 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 아래 「GitHub 연결 설정」에서 토큰을 저장해야 모든 FC에게 올라갑니다.'))+'</span></div>'+
+    var h=head('관리자','자료 관리','메뉴별 자료를 올리고, FC에게 보일지 켜고 끄고, 고치고, 지웁니다. 바꾸거나 파일을 붙인 뒤 「저장」을 누르면 모든 FC 화면에 반영됩니다(1~2분).');
+    var dirty=Object.keys(CM.dirty).length||CM.add.length||CM.del.length;
+    h+='<div class="panel"><div class="row" style="gap:10px;flex-wrap:wrap"><b>저장 상태</b><span class="note" id="cmPub" style="flex:1 1 240px">'+(CM.msg||(T?'GitHub 연결됨 · 바꾸거나 파일을 붙인 뒤 「저장」을 누르면 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 아래 「GitHub 연결 설정」에서 토큰을 저장해야 모든 FC에게 올라갑니다.'))+'</span><button class="btn" type="button" data-ks="save"'+(dirty&&!CM.busy?'':' disabled')+'>저장</button></div>'+
       '<details class="nu-set"'+(T?'':' open')+'><summary>GitHub 연결 설정 '+(T?'<span class="pill ok">연결됨</span>':'<span class="pill warn">처음 한 번 필요</span>')+'</summary><p class="note">토큰 만드는 법은 <button class="btn sm ghost" type="button" data-go="admin">관리자 페이지 › 자료 올리기</button>의 같은 칸에 적혀 있습니다. 같은 토큰을 씁니다.</p>'+
       '<div class="row" style="gap:8px"><input class="in" id="cmTok" type="password" autocomplete="off" placeholder="github_pat_..." value="'+esc(T)+'" style="flex:1;min-width:200px"><button class="btn sm" type="button" data-cm="tok">저장</button></div></details></div>';
     h+='<div class="nchips cm-tabs" role="tablist">'+CM_TABS.map(function(t){var n=t[0]==='compare'?cmW().compare.length:t[0]==='onepick'?((cmW().onepick||{}).cats||[]).length:t[0]==='concept'?1+cmW().concepts.length:((cmW()[CM_KEY[t[0]]])||[]).length+((cmW().off[t[0]]||[]).length);
@@ -2323,9 +2414,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+='<div class="panel"><h3>'+cmName(k)+' 올리기</h3><p class="note">'+CM_HELP[k]+'</p>'+
       '<label class="smp-drop" id="cmDrop"><input type="file" id="cmFile" accept="'+acc+'" multiple hidden><b>＋ '+cmName(k)+' 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>'+(k==='compare'?'HTML(비교 프로그램) · PDF · 엑셀 · PPT · 그림':'PDF · PPT · 엑셀 · 워드 · 한글 · 그림')+' · 여러 개 한 번에 · 파일당 50MB 이하</em></label>'+
       (k==='compare'||k==='concept'||k==='onepick'?'':'<div class="row"><button class="btn sm ghost" type="button" data-cm="addrow">파일 없이 글로 한 줄 추가</button></div>')+
-      (k==='compare'?'':'<div id="nuList"></div><div class="row" style="margin-top:8px;gap:8px"><button class="btn" type="button" id="nuPub" disabled>확인한 자료 모든 FC에게 올리기</button><button class="btn ghost" type="button" id="nuPrev" disabled>이 기기에서 미리보기</button></div>')+
+      (k==='compare'?'':'<div id="nuList"></div><div class="row" style="margin-top:8px;gap:8px"><button class="btn" type="button" id="nuPub" disabled>저장 (모든 FC에게 올리기)</button><button class="btn ghost" type="button" id="nuPrev" disabled>이 기기에서 미리보기</button></div>')+
       '<p class="note" id="nuMsg" role="status"></p></div>';
-    h+='<div class="panel"><h3>'+(k==='concept'?'이달의 컨셉':k==='onepick'?'이번 달의 원픽':'등록된 '+cmName(k))+' <span class="note">고친 뒤 칸 밖을 누르면 저장됩니다</span></h3><div id="cmList">'+(k==='compare'?cmCompare():k==='concept'?cmConcept():k==='onepick'?cmOnepick():cmRows(k))+'</div></div>';
+    h+='<div class="panel"><h3>'+(k==='concept'?'이달의 컨셉':k==='onepick'?'이번 달의 원픽':'등록된 '+cmName(k))+' <span class="note">고친 뒤 「저장」을 누르면 모든 FC에게 올라갑니다</span></h3><div id="cmList">'+(k==='compare'?cmCompare():k==='concept'?cmConcept():k==='onepick'?cmOnepick():cmRows(k))+'</div></div>';
     return h;
   }
   function cmRender(){var v=document.getElementById('view');if(cur!=='cadmin'||!v)return;var y=window.scrollY;CM.keep=true;v.innerHTML=PAGES.cadmin();bindCm();window.scrollTo(0,y);}
@@ -2349,7 +2440,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function bindCm(){
     var v=document.getElementById('view');if(!v||!document.getElementById('cmList'))return;
     if(document.getElementById('nuList')){nuRender();
-      document.getElementById('nuPub').onclick=async function(){await nuPublish();var nm=document.getElementById('nuMsg'),mt=nm?nm.textContent:'';if(!CM.busy&&!Object.keys(CM.dirty).length)CM.w=null;cmRender();nm=document.getElementById('nuMsg');if(nm)nm.textContent=mt;};
+      document.getElementById('nuPub').onclick=function(){nuPublish();};
       document.getElementById('nuPrev').onclick=function(){var c=nuMerge(SITE?cmClone(SITE):{},NU.items.map(function(it){return {it:it,path:it.url};}));applyContent(c,false);document.getElementById('nuMsg').textContent='이 기기에서만 보이게 바꿨습니다. 메뉴에서 확인한 뒤 「모든 FC에게 올리기」를 누르세요.';};
       var L=document.getElementById('nuList');
       var ed=function(e){var t=e.target,i=t.getAttribute('data-nu');if(i==null)return;var it=NU.items[+i],kk=t.getAttribute('data-k'),val=t.value;
@@ -2771,7 +2862,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   /* content.json의 몇 칸만 바꿔 바로 저장 (GitHub API) */
   async function siteSet(patch,msg){
-    if(!ghTok())throw new Error('먼저 아래 「자료 올리기 → GitHub 연결 설정」에서 토큰을 저장하세요.');
+    var KS=window.KSAVE;if(!ghTok()){var er=new Error('먼저 아래 「자료 올리기 → GitHub 연결 설정」에서 토큰을 저장하세요.');KS.fail(msg,er);throw er;}
+    KS.start(msg);try{var cur=await siteSet0(patch,msg);KS.done(msg,cur);}catch(e){KS.fail(msg,e);throw e;}
+  }
+  async function siteSet0(patch,msg){
     var ref=await gh('GET','/git/ref/heads/'+GH.branch),base=await gh('GET','/git/commits/'+ref.object.sha);
     var all=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1'),sha=null;(all.tree||[]).forEach(function(t){if(t.path==='content.json')sha=t.sha;});
     var cur={};if(sha){var bj=await gh('GET','/git/blobs/'+sha);cur=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(bj.content.replace(/\s/g,'')),function(c){return c.charCodeAt(0);})));}
@@ -2780,7 +2874,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:[{path:'content.json',mode:'100644',type:'blob',sha:jb.sha}]});
     var cm=await gh('POST','/git/commits',{message:msg,tree:nt.sha,parents:[ref.object.sha]});
     await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});
-    applyContent(cur,false);
+    applyContent(cur,false);return cur;
   }
 
   /* ---- 고객 자료 보관: 내 PC · 내 클라우드에 파일로 ----
@@ -3492,9 +3586,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* ---------------- 화면 ---------------- */
   function render(){
     if(st.refAdm&&st.step===6&&isAdm()){
-      root.innerHTML='<div class="ph"><div class="kicker">관리자</div><h1>보장분석 샘플 올리기</h1><p>관리자만 쓰는 화면입니다. <b>① AI 샘플</b>은 모든 FC의 AI가 보장분석을 쓸 때 따라 하는 형식·표현이고, <b>② 참고자료</b>는 제안서에 그대로 붙는 니즈환기 장표입니다. 바꾸면 바로 사이트에 올라갑니다(1~2분 뒤 반영).</p></div>'+viewSamples()+
-        '<div class="panel"><div class="row"><b>올리기 상태</b><span class="note" id="rfPub">'+(PUB.msg||(window.KIFPUB&&KIFPUB.ready()?'GitHub 연결됨 · 파일을 고르면 바로 올라갑니다.':'⚠ 처음 한 번 <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장해야 바로 올라갑니다.'))+'</span><span class="sp"></span>'+
-        (load(KEY_RD,null)?'<button class="btn sm" data-a="pubRefs">지금 올리기</button>':'')+'</div></div>'+'<h2 class="smp-h">② 제안서에 붙는 참고자료 (니즈환기)</h2>'+viewRefs();
+      root.innerHTML='<div class="ph"><div class="kicker">관리자</div><h1>보장분석 샘플 올리기</h1><p>관리자만 쓰는 화면입니다. <b>① AI 샘플</b>은 모든 FC의 AI가 보장분석을 쓸 때 따라 하는 형식·표현이고, <b>② 참고자료</b>는 제안서에 그대로 붙는 니즈환기 장표입니다. 바꾼 뒤 「저장」을 누르면 사이트에 올라갑니다(1~2분 뒤 반영).</p></div>'+viewSamples()+
+        '<div class="panel"><div class="row"><b>올리기 상태</b><span class="note" id="rfPub">'+(PUB.msg||(window.KIFPUB&&KIFPUB.ready()?'GitHub 연결됨 · 파일을 고르거나 고친 뒤 「저장」을 누르면 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장해야 바로 올라갑니다.'))+'</span><span class="sp"></span>'+
+        (load(KEY_RD,null)?'<button class="btn sm" data-a="pubRefs">저장 (지금 올리기)</button>':'')+'</div></div>'+'<h2 class="smp-h">② 제안서에 붙는 참고자료 (니즈환기)</h2>'+viewRefs();
       return;
     }
     var c=cust();
@@ -4167,21 +4261,30 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<label class="smp-drop" id="smDrop"><input type="file" id="smFile" accept=".pdf,.pptx,.xlsx,.xls,.docx,.hwpx,.txt,application/pdf" multiple hidden><b>＋ 샘플 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>PDF · PPTX · XLSX · DOCX(워드) · HWPX(한글) · TXT · 여러 개 한 번에 · 개수 제한 없음</em></label>'+
       '<div class="fgrid"><label class="f">샘플 제목 <span class="note">한 개 올릴 때만 · 비우면 파일 이름</span><input class="in" id="smTitle" placeholder="예: 박OO님 암 보장 강화 제안서"></label></div>'+
       '<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="smpAdd">파일 없이 글로 직접 추가</button><span class="note" id="smMsg"></span></div>'+
-      '<div class="row"><b>올리기 상태</b><span class="note" id="smPub">'+(SMPST.msg||(window.KIFPUB&&KIFPUB.ready()?'GitHub 연결됨 · 바꾸면 바로 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장해야 올라갑니다.'))+'</span></div></div>';
+      '<div class="row"><b>올리기 상태</b><span class="note" id="smPub">'+(SMPST.msg||(window.KIFPUB&&KIFPUB.ready()?'GitHub 연결됨 · 바꾸거나 파일을 올린 뒤 「저장」을 누르면 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장해야 올라갑니다.'))+'</span></div></div>';
     h+='<div class="panel"><h3 style="display:flex;align-items:center;gap:8px">등록된 샘플 <span class="note">'+SMP.length+'건</span><label class="btn sm" style="margin-left:auto">＋ 샘플 추가<input type="file" data-smf="1" accept=".pdf,.pptx,.xlsx,.xls,.txt,application/pdf" multiple hidden></label></h3>'+(SMP.length?'<div class="smp-l">'+SMP.map(function(s){
       return '<div class="smp-c'+(s.on===false?' off':'')+'"><div class="row"><span class="pill'+(s.on===false?'':' new')+'">'+esc(s.type||'글')+'</span><input class="in" data-smt="'+s.id+'" value="'+esc(s.title)+'" aria-label="샘플 제목"><label class="note" style="white-space:nowrap"><input type="checkbox" data-smo="'+s.id+'"'+(s.on===false?'':' checked')+'> AI에 보냄</label><button class="btn sm ghost danger" data-a="smpDel" data-id="'+s.id+'">삭제</button></div>'+
         '<div class="row smp-w"><span class="note">쓰는 경우</span><select class="in" data-sst="'+s.id+'">'+Object.keys(SMP_STAGE).map(function(k){return '<option value="'+k+'"'+((s.stage||'all')===k?' selected':'')+'>'+SMP_STAGE[k]+'</option>';}).join('')+'</select><span class="pill">'+esc(refWhere(s))+'</span></div>'+
         '<details><summary class="note">연결할 분석 옵션 바꾸기</summary>'+optBoxes('',s.opts||[],'data-sop="'+s.id+'"')+'</details>'+
-        '<details><summary class="note">AI가 받는 내용 보기·고치기 ('+String(s.text||'').length+'자)</summary><textarea class="in" rows="10" data-smx="'+s.id+'">'+esc(s.text||'')+'</textarea><p class="note">고친 뒤 칸 밖을 누르면 저장·반영됩니다.</p></details></div>';}).join('')+'</div>':'<p class="note">등록된 샘플이 없습니다. 위에서 올려 주세요.</p>')+
+        '<details><summary class="note">AI가 받는 내용 보기·고치기 ('+String(s.text||'').length+'자)</summary><textarea class="in" rows="10" data-smx="'+s.id+'">'+esc(s.text||'')+'</textarea><p class="note">고친 뒤 칸 밖을 누르고 「저장」을 누르면 모든 FC에게 반영됩니다.</p></details></div>';}).join('')+'</div>':'<p class="note">등록된 샘플이 없습니다. 위에서 올려 주세요.</p>')+
       '<p class="note" style="margin-top:10px">샘플은 몇 건이든 올려도 됩니다. FC가 분석할 때 포털이 그 고객의 <b>분석 옵션</b>과 <b>단계</b>에 맞는 샘플을 골라 <b>3건까지만</b> AI에 보냅니다. 옵션을 안 고른 샘플은 모든 고객에 공통으로 쓰입니다.</p><details><summary class="note">AI에게 보내는 전체 글 미리보기 (규칙 + 켜 둔 샘플 전체)</summary><textarea class="in" rows="14" readonly>'+esc(aiGuide())+'</textarea></details>'+
       '<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="smpReset">기본 샘플 3건으로 되돌리기</button><span class="note">규칙 문장은 관리자 페이지 › 콘텐츠 관리 › AI 보장분석 규칙에서 고칩니다.</span></div></div>';
     return h;
   }
+  /* 샘플을 바꾸면 화면에만 먼저 반영하고 「저장하지 않은 변경」으로 모아 둔다. 「저장」을 누르면 한 번에 모든 FC에게 올린다 */
+  var SMPW=[];
   async function smpSave(why){
     if(!isAdm())return;var y=window.scrollY;render();window.scrollTo(0,y);
-    if(!(window.KIFPUB&&KIFPUB.ready())){smpMsg('⚠ 이 기기에만 바뀌었습니다. <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장한 뒤 다시 바꾸면 모든 FC에게 올라갑니다.');return;}
-    smpMsg('모든 FC에게 올리는 중…');
-    try{await KIFPUB.samples(SMP);smpMsg('✓ '+why+' · 모든 FC에게 반영했습니다(1~2분 뒤 새로고침).');}catch(e){smpMsg('⚠ 올리지 못했습니다: '+esc(e&&e.message||e));}
+    if(SMPW.indexOf(why)<0)SMPW.push(why);
+    smpMsg('<b>저장하지 않은 변경이 있습니다</b> ('+esc(SMPW.join(', '))+') · 「저장」을 눌러야 모든 FC에게 올라갑니다. <button class="btn sm" type="button" data-ks="save">저장</button>');
+    if(window.KSAVE)KSAVE.pend('smp','보장분석 샘플: '+SMPW.join(', '),smpPublish);
+  }
+  async function smpPublish(){
+    var KS=window.KSAVE,lab='보장분석 샘플: '+SMPW.join(', '),done=SMPW.slice();
+    if(!(window.KIFPUB&&KIFPUB.ready())){smpMsg('⚠ 이 기기에만 바뀌었습니다. <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장한 뒤 「저장」을 누르세요.');KS.fail(lab,new Error('GitHub 연결(토큰)이 아직 없습니다. 관리자 페이지 › 자료 올리기 › GitHub 연결 설정에서 저장하세요.'));return false;}
+    smpMsg('저장 중… 모든 FC에게 올리는 중입니다.');KS.start(lab);
+    try{var c=await KIFPUB.samples(SMP);SMPW=SMPW.filter(function(w){return done.indexOf(w)<0;});smpMsg('✓ 저장 완료: '+esc(done.join(', '))+' · 모든 FC 화면에는 1~2분 뒤 보입니다.');KS.done(lab,c);return true;}
+    catch(e){smpMsg('⚠ 저장하지 못했습니다: '+esc(e&&e.message||e)+' · 바꾼 내용은 이 화면에 남아 있습니다. <button class="btn sm" type="button" data-ks="save">다시 저장</button>');KS.fail(lab,e);return false;}
   }
   async function smpFileText(f){
     var nm=f.name||'',ext=(nm.split('.').pop()||'').toLowerCase(),buf=await f.arrayBuffer();
@@ -4209,20 +4312,21 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       try{var r=await smpFileText(f);if(!r.text||r.text.length<20)throw new Error('글자를 거의 읽지 못함(그림 파일일 수 있음)');if(!smpOk(r))throw new Error('글자가 깨져서 읽혔습니다. 원본 PPT·엑셀·워드 파일이나 다른 방식으로 저장한 PDF를 올려 주세요');
         var title=one||f.name.replace(/\.[^.]+$/,'');SMP.push({id:'s'+Date.now().toString(36)+i,title:title,type:r.type,on:true,opts:suggestOpts(title+' '+r.text.slice(0,2000)).slice(0,3),stage:'all',text:r.text.slice(0,6000),at:new Date().toISOString().slice(0,10)});ok.push(title);}
       catch(e){bad.push(f.name+' — '+(e&&e.message||e));}}
-    if(ok.length){await smpSave(ok.length===1?'"'+ok[0]+'" 샘플 등록':'샘플 '+ok.length+'건 등록');toast('샘플 '+ok.length+'건을 등록했습니다. 아래 목록에서 쓰는 경우·옵션·내용을 확인하세요.');}
+    if(ok.length){await smpSave(ok.length===1?'"'+ok[0]+'" 샘플 등록':'샘플 '+ok.length+'건 등록');toast('샘플 '+ok.length+'건을 읽었습니다. 확인한 뒤 「저장」을 누르면 모든 FC에게 올라갑니다.');}
     if(bad.length)msg('⚠ 못 읽은 파일: '+bad.map(esc).join(' / ')+' — "파일 없이 글로 직접 추가"로 넣어 주세요.');
   }
   function viewRefs(){
     var adm=isAdm(),c=cust(),cur=c?selIds(c):[];
     var h=!adm?'<div class="panel"><p class="note">참고자료와 보장분석 샘플은 <b>관리자만</b> 올리고 고칠 수 있습니다. 아래는 관리자가 올린 자료이며, 고른 분석 옵션에 맞춰 제안서에 자동으로 들어갑니다.</p></div>':'<div class="panel"><h3>참고자료(니즈환기) 올리기 <span class="pill new">관리자: 모든 FC 공용으로 올라갑니다</span></h3>'+
       '<p class="note">PPT를 그림으로 저장한 파일(PNG·JPG)이나 PDF를 올리면 한 장씩 한국보험금융 틀에 넣어 제안서에 붙입니다. 아래에서 고른 <b>분석 옵션</b>을 제안서에서 고르면 그 자료가 자동으로 함께 들어갑니다. 옵션을 하나도 고르지 않으면 모든 제안서 표지 뒤에 들어갑니다.</p>'+
-      '<div class="fgrid"><label class="f">자료 제목 <span class="note">비우면 파일 이름</span><input class="in" id="rfTitle" placeholder="예: 암 치료비의 현실"></label><label class="f">출처 <span class="note">선택</span><input class="in" id="rfSrc" placeholder="예: 국립암센터 2024"></label></div>'+
-      '<p class="note" style="margin:8px 0 2px"><b>연결할 분석 옵션</b> (제목을 쓰면 관련 옵션을 자동으로 골라 드립니다)</p>'+optBoxes('rf',[],'data-rfo')+
-      '<div class="row" style="margin-top:10px"><label class="btn">파일 고르기<input type="file" id="rfFile" accept="image/png,image/jpeg,image/webp,application/pdf,.pdf" multiple hidden></label><span class="note" id="rfMsg">그림 1장 = 1장, PDF는 쪽마다 1장(최대 10쪽)</span></div></div>';
+      '<div class="rf-step"><h4><span class="rf-n">1</span>연결할 분석 옵션 고르기 <span class="note">이 자료를 붙일 옵션 · 하나도 안 고르면 모든 제안서에 들어감</span></h4>'+optBoxes('rf',[],'data-rfo')+'</div>'+
+      '<div class="rf-step"><h4><span class="rf-n">2</span>자료 제목 <span class="note">비우면 파일 이름</span></h4><input class="in" id="rfTitle" placeholder="예: 암 치료비의 현실" aria-label="자료 제목"></div>'+
+      '<div class="rf-step"><h4><span class="rf-n">3</span>출처 <span class="note">선택</span></h4><input class="in" id="rfSrc" placeholder="예: 국립암센터 2024" aria-label="출처"></div>'+
+      '<div class="rf-step"><h4><span class="rf-n">4</span>파일 고르기 <span class="note">그림 1장 = 1장, PDF는 쪽마다 1장(최대 10쪽)</span></h4><div class="row"><label class="btn">파일 고르기<input type="file" id="rfFile" accept="image/png,image/jpeg,image/webp,application/pdf,.pdf" multiple hidden></label><span class="note" id="rfMsg"></span></div></div></div>';
     var groups=[['co','회사 공용 자료',SHREF],['me','내 자료',MYREF],['base','기본 자료',NEEDS]];
     groups.forEach(function(g){
       var can=adm&&(g[0]==='me'||g[0]==='co');if(g[0]==='me'&&!adm&&!g[2].length)return;
-      h+='<div class="panel"><h3>'+g[1]+' <span class="note">'+g[2].length+'건'+(g[0]==='co'&&adm?' · 제목·옵션을 고치거나 지우면 바로 모든 FC에게 반영됩니다':'')+'</span></h3>';
+      h+='<div class="panel"><h3>'+g[1]+' <span class="note">'+g[2].length+'건'+(g[0]==='co'&&adm?' · 제목·옵션을 고치거나 지운 뒤 「저장」을 누르면 모든 FC에게 반영됩니다':'')+'</span></h3>';
       if(!g[2].length){h+='<p class="note">'+(g[0]==='co'?'관리자가 올린 공용 자료가 아직 없습니다.':'아직 올린 자료가 없습니다.')+'</p></div>';return;}
       h+='<div class="nrfg">'+g[2].map(function(x){
         var th=x.img?'<img src="'+x.img+'" alt="">':'<span class="nrfb">한국보험금융<br><b>'+esc(x.title)+'</b></span>';
@@ -4237,11 +4341,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function findRef(id){var r=null,by='';[['co',SHREF],['me',MYREF]].forEach(function(g){g[1].forEach(function(x){if(x.id===id){r=x;by=g[0];}});});return r?{r:r,by:by}:null;}
   var PUB={t:null,del:[],busy:false,again:false,msg:''};
   function pubMsg(t){PUB.msg=t;var e=document.getElementById('rfPub');if(e)e.innerHTML=t;}
-  function pubShared(){clearTimeout(PUB.t);PUB.t=setTimeout(pubNow,800);}
+  /* 공용 참고자료를 바꾸면 「저장하지 않은 변경」으로 모아 두고, 「저장」을 누르면 한 번에 올린다 */
+  function pubShared(){clearTimeout(PUB.t);pubMsg('<b>저장하지 않은 변경이 있습니다.</b> 「저장」을 눌러야 모든 FC에게 올라갑니다. <button class="btn sm" type="button" data-ks="save">저장</button>');if(window.KSAVE)KSAVE.pend('ref','공용 참고자료(니즈환기)',pubNow);}
   async function pubNow(){
-    if(PUB.busy){PUB.again=true;return;}
-    if(!(window.KIFPUB&&KIFPUB.ready())){pubMsg('⚠ 아직 모든 FC에게 올라가지 않았습니다. <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 한 번 저장한 뒤 여기서 다시 <b>지금 올리기</b>를 누르세요.');return;}
-    PUB.busy=true;pubMsg('모든 FC에게 올리는 중…');
+    if(PUB.busy){PUB.again=true;return true;}
+    var KS=window.KSAVE,lab='공용 참고자료(니즈환기) '+SHREF.length+'건';
+    if(!(window.KIFPUB&&KIFPUB.ready())){pubMsg('⚠ 아직 모든 FC에게 올라가지 않았습니다. <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 한 번 저장한 뒤 「저장」을 누르세요.');KS.fail(lab,new Error('GitHub 연결(토큰)이 아직 없습니다. 관리자 페이지 › 자료 올리기 › GitHub 연결 설정에서 저장하세요.'));return false;}
+    PUB.busy=true;pubMsg('저장 중… 모든 FC에게 올리는 중입니다.');KS.start(lab);var okk=false;
     try{
       var add=[],list=SHREF.map(function(x){var y={id:x.id,title:x.title,opts:x.opts||[],src:x.src||'',img:x.img,ts:x.ts};
         if(/^data:/.test(x.img||'')){y.img='refs/'+x.id+'.jpg';add.push({path:y.img,data:x.img});}return y;});
@@ -4249,9 +4355,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var v=await KIFPUB.refs(list,add,del);
       PUB.del=PUB.del.filter(function(d){return del.indexOf(d)<0;});
       SHREF.forEach(function(x){if(/^data:/.test(x.img||''))x.img='refs/'+x.id+'.jpg';});SHVER=v;try{localStorage.removeItem(KEY_RD);}catch(e){}
-      pubMsg('✓ 모든 FC에게 올렸습니다. 1~2분 뒤 FC 화면에 보입니다.');toast('보장분석 샘플을 모든 FC에게 올렸습니다.');
-    }catch(e){pubMsg('⚠ 올리지 못했습니다: '+esc(e.message||String(e))+' · 이 기기에는 남아 있으니 <b>지금 올리기</b>로 다시 시도하세요.');}
-    PUB.busy=false;if(PUB.again){PUB.again=false;pubNow();}
+      pubMsg('✓ 저장 완료 · 모든 FC 화면에는 1~2분 뒤 보입니다.');KS.done(lab,KIFPUB.last);okk=true;
+    }catch(e){pubMsg('⚠ 저장하지 못했습니다: '+esc(e.message||String(e))+' · 바꾼 내용은 이 기기에 남아 있습니다. <button class="btn sm" type="button" data-ks="save">다시 저장</button>');KS.fail(lab,e);}
+    PUB.busy=false;if(PUB.again){PUB.again=false;KS.pend('ref','공용 참고자료(니즈환기)',pubNow);}
+    return okk;
   }
   function saveRefs(by,x,del){
     if(by==='co'){SHVER=String(Date.now());save(KEY_RD,{ver:SHVER,refs:SHREF});if(del&&x&&/^refs\//.test(x.img||''))PUB.del.push(x.img);pubShared();return;}
