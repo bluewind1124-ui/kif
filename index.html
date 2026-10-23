@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.19">
+<meta name="kif-build" content="2026-10-23.20">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -2044,19 +2044,20 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         /* 서버에 있는 원본 PDF·첫 장 그림 연결은 화면이 예전 목록을 들고 있어도 지우지 않는다 */
         if(o&&o.file&&!x.file&&!x.noFile)x=Object.assign({},x,{file:o.file,thumb:o.thumb});return x;});
       /* 새로 올린 샘플 원본 PDF와 첫 장 그림 */
-      var tree=[],B=window.SMPBUF||{};
+      /* 올린 원본은 저장이 끝까지 성공한 뒤에만 비운다(중간에 실패해 「다시 저장」할 때 원본이 빠지지 않게) */
+      var tree=[],B=window.SMPBUF||{},usedB=[];
       for(var bi=0;bi<list.length;bi++){var bx=B[list[bi].id];if(!bx)continue;
         var ext=((bx.name.match(/\.([a-z0-9]+)$/i)||['','pdf'])[1]).toLowerCase(),d=new Date(),pth='files/samples/'+d.getFullYear()+'-'+pad2(d.getMonth()+1)+'/'+(bx.name.replace(/\.[^.]+$/,'').replace(/[\\\/:*?"<>|#%&{}\s]+/g,'_').slice(0,40)||'sample')+'_'+Math.random().toString(36).slice(2,7)+'.'+ext;
         if(window.KSAVE)KSAVE.step('샘플 원본 올리는 중 '+bx.name);
         var fb=await gh('POST','/git/blobs',{content:b64(bx.buf),encoding:'base64'});tree.push({path:pth,mode:'100644',type:'blob',sha:fb.sha});
         var tp=null;try{var tb=await anyThumb(bx.name,bx.buf,list[bi].type,list[bi].title,list[bi].text);if(tb){tp=pth.replace(/\.[a-z0-9]+$/i,'')+'_thumb.jpg';var tbl=await gh('POST','/git/blobs',{content:b64(tb),encoding:'base64'});tree.push({path:tp,mode:'100644',type:'blob',sha:tbl.sha});}}catch(e){}
-        list[bi]=Object.assign({},list[bi],{file:pth,thumb:tp||undefined});delete B[list[bi].id];}
+        list[bi]=Object.assign({},list[bi],{file:pth,thumb:tp||undefined});usedB.push(list[bi].id);}
       cur.aiSamples=list;cur.ver=Date.now();cur.updated=new Date().toLocaleString('ko-KR');
       var jb=await gh('POST','/git/blobs',{content:b64(new TextEncoder().encode(JSON.stringify(cur,null,1)).buffer),encoding:'base64'});
       tree.push({path:'content.json',mode:'100644',type:'blob',sha:jb.sha});
       var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:tree});
       var cm=await gh('POST','/git/commits',{message:'AI 보장분석 샘플 '+list.length+'건 반영',tree:nt.sha,parents:[ref.object.sha]});
-      await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});SITE=cur;return cur;
+      await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});usedB.forEach(function(id){delete B[id];});SITE=cur;return cur;
     },
     refs:async function(list,add,del){
       if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다');
