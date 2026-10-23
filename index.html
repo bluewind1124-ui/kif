@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.6">
+<meta name="kif-build" content="2026-10-23.7">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -3510,7 +3510,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     '1. 숫자는 주어진 데이터에 있는 값만 쓴다. 새 숫자를 만들거나 반올림해 바꾸지 않는다. 단위: 가입금액 만원, 보험료 원.',
     '2. 유리한 부분 = 권장 기준(예시) 이상인 영역, 90세 이상·종신까지 가는 보장, 연간·매회 반복 지급 담보, 실손의료비 보유, 납입면제, 비갱신형.',
     '3. 불리한 부분 = 보장이 없는 영역(보장 공백), 권장 기준보다 부족한 영역, 갱신형 담보(보험료 인상 가능), 80세 이전에 끝나는 담보, 진단비 위주라 치료비가 약한 구성, 같은 담보 중복.',
-    '4. 고른 분석 관점(옵션)의 중심 영역을 먼저, 더 자세히 다룬다.',
+    '4. 고른 분석 관점(옵션)을 가장 강조한다: 옵션의 중심 영역을 맨 앞에 두고 숫자 근거와 함께 더 자세히 다루며, 핵심 포인트와 결론에서도 그 옵션을 [옵션 이름]으로 다시 짚는다. 옵션과 관계없는 영역은 짧게 쓴다.',
     '5. 항목마다 제목(15자 안팎) + 설명 1문장. 고객이 바로 알아듣는 쉬운 말로 쓴다.',
     '6. 과장·단정 표현(무조건, 반드시 받습니다, 최고 등)과 특정 회사 비방은 쓰지 않는다. 지급 여부는 약관이 우선한다는 점을 해치지 않는다.',
     '7. 출력 형식은 포털 샘플(16:9 리포트·엑셀 분석표)에 들어갈 문장만 만든다. 표·디자인은 포털이 만든다.',
@@ -3531,7 +3531,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     sc.sort(function(a,b){return b.v-a.v||a.i-b.i;});return sc.slice(0,3).map(function(x){return x.s;});
   }
   function smpText(ids,stage){var L=smpPick(ids,stage);if(!L.length)return '';
-    return '[보장분석 샘플 — 이 형식·방법·표현을 그대로 따른다'+(ids?'. 포털이 이 고객의 분석 관점에 가장 가까운 샘플을 골랐다. 앞에 있는 샘플일수록 더 가깝다':'')+']\n'+L.map(function(s,i){return '■ 샘플 '+(i+1)+': '+s.title+' ('+s.type+(s.opts&&s.opts.length?' · '+s.opts.map(optName).filter(Boolean).join(', '):'')+')\n'+String(s.text).trim().slice(0,4000);}).join('\n')+'\n'+SMP_HOW;}
+    return '[보장분석 샘플 — 이 형식·방법·표현을 그대로 따른다'+(ids?'. 포털이 이 고객의 분석 관점(옵션)·단계에 가장 가까운 샘플을 골랐다. 샘플 1을 이 고객 결과물의 기본 틀(구성 순서·장 제목 방식·문장 길이)로 쓰고, 나머지 샘플은 표현만 참고한다':'')+']\n'+L.map(function(s,i){return '■ 샘플 '+(i+1)+': '+s.title+' ('+s.type+(s.opts&&s.opts.length?' · '+s.opts.map(optName).filter(Boolean).join(', '):'')+')\n'+String(s.text).trim().slice(0,4000);}).join('\n')+'\n'+SMP_HOW;}
   function aiGuide(ids,stage){var t=smpText(ids,stage);return AI_RULES+(t?'\n\n'+t:'');}
   /* API·회사 AI에는 올려 둔 샘플 슬라이드 그림도 2장까지 같이 보낸다 (복사·붙여넣기는 글로만) */
   async function refImgs(o){if(isPaste())return [];var L=SHREF.concat(MYREF).filter(function(r){return r.img;});L.sort(function(x,y){return ((y.opts||[]).indexOf(o.id)>-1)-((x.opts||[]).indexOf(o.id)>-1);});var out=[];for(var i=0;i<L.length&&out.length<2;i++){try{var rs=await fetch(L[i].img);if(rs.ok)out.push(await rs.blob());}catch(e){}}return out;}
@@ -3549,7 +3549,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       월보험료합계:R.prem.old,포털이먼저찾은유리:PC.P,포털이먼저찾은불리:PC.C};
     var IMG;
     try{
-      var r=await cap.sample.json('너는 한국보험금융 FC의 기계약 보장분석 조수다. 아래 규칙을 반드시 지키고, 샘플의 형식·방법·표현(따옴표 컨셉 한 줄, 숫자 근거를 붙인 짧은 강점·약점, 용어 풀이, 역할 분담 관점의 결론)을 그대로 따라 써라.\n'+aiGuide(selIds(c),1)+'\n\n아래 데이터만 근거로 기존 계약의 유리한 부분과 불리한 부분을 정리하라. 샘플의 고객·숫자는 문체 참고용일 뿐 이 고객 분석에 옮겨 쓰지 마라. "포털이먼저찾은" 항목은 참고하되 빠진 것이 있으면 보태고, 틀린 것은 빼라. JSON 하나로만 답하라: {"pros":[["제목","설명 1문장"], 최대 6개],"cons":[["제목","설명 1문장"], 최대 6개],"conclusion":"1단계 결론 2문장 (지금 보험의 중심 + 2단계에서 조정·보완할 점)"}\n\n데이터:\n'+JSON.stringify(data),Object.assign({modelTier:'default'},(IMG=await refImgs(o)).length?{images:IMG}:{}));
+      var r=await cap.sample.json('너는 한국보험금융 FC의 기계약 보장분석 조수다. 아래 규칙을 반드시 지키고, 샘플의 형식·방법·표현(따옴표 컨셉 한 줄, 숫자 근거를 붙인 짧은 강점·약점, 용어 풀이, 역할 분담 관점의 결론)을 그대로 따라 써라.\n'+aiGuide(selIds(c),1)+'\n\n아래 데이터만 근거로 기존 계약의 유리한 부분과 불리한 부분을 정리하라. 분석관점(옵션)의 중심 영역(관점중심=true)을 각 목록의 앞쪽에 두고 더 자세히 쓴다. 샘플의 고객·숫자는 문체 참고용일 뿐 이 고객 분석에 옮겨 쓰지 마라. "포털이먼저찾은" 항목은 참고하되 빠진 것이 있으면 보태고, 틀린 것은 빼라. JSON 하나로만 답하라: {"pros":[["제목","설명 1문장"], 최대 6개],"cons":[["제목","설명 1문장"], 최대 6개],"conclusion":"1단계 결론 2문장 (지금 보험의 중심 + 2단계에서 조정·보완할 점)"}\n\n데이터:\n'+JSON.stringify(data),Object.assign({modelTier:'default'},(IMG=await refImgs(o)).length?{images:IMG}:{}));
       var ok=function(L){return Array.isArray(L)?L.filter(function(x){return Array.isArray(x)&&x[0];}).slice(0,6).map(function(x){return [String(x[0]),String(x[1]||'')];}):[];};
       var P=ok(r&&r.pros),C=ok(r&&r.cons);if(!P.length&&!C.length)throw {code:'bad_json'};
       c.ai1={opt:o.id,P:P.length?P:PC.P,C:C.length?C:PC.C,conclusion:String((r&&r.conclusion)||''),by:provName(),at:nowStr()};touch(c);render();toast(provName()+'가 포털 규칙으로 보장분석을 정리했습니다.');
@@ -4559,7 +4559,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       월보험료:{Before:vA._B.R0.prem.old,유지기존:R.prem.old,신규:R.prem.neu,After:R.prem.old+R.prem.neu},정리한담보:vA._B.drop.map(function(x){return x.it.name+' '+n(x.it.amt)+'만';}),동시지급:R.scen.length?{기존:R.sOld,신규:R.sNeu}:null,연간반복:(R.ann+R.ann10)?{연간:R.ann,십년한도:R.ann10,누적:R.years}:null,가족력:c.famHx,상담내용:c.memo,
       옵션별:(o.list||[o]).map(function(q){var S=spotInfo(q,R);return {옵션:q.title,보장공백:S.gap,기준미달:S.weak,점검포인트:q.points||[],관련기사:newsTxt(q)};})};
     try{
-      var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. 아래 규칙을 반드시 지키고, 샘플의 형식·방법·표현을 그대로 따라 써라(샘플의 고객·숫자는 옮겨 쓰지 마라).\n'+aiGuide(selIds(c),2)+'\n\nBefore(기존 그대로)와 After(조정한 기존 + 신계약)를 비교하는 관점으로 쓴다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션마다 최소 한 개의 포인트를 쓰고, 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 규칙 8대로만 쓴다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
+      var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. 아래 규칙을 반드시 지키고, 샘플의 형식·방법·표현을 그대로 따라 써라(샘플의 고객·숫자는 옮겨 쓰지 마라).\n'+aiGuide(selIds(c),2)+'\n\nBefore(기존 그대로)와 After(조정한 기존 + 신계약)를 비교하는 관점으로 쓴다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션을 가장 강조한다: 포인트의 절반 이상은 고른 옵션의 중심 영역에 대한 것으로 옵션 순서대로 쓰고(옵션마다 최소 한 개), 결론에도 고른 옵션을 짚어라. 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 규칙 8대로만 쓴다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
       if(r&&r.points&&r.points.length){c.ai={opt:o.id,s2:1,points:r.points.slice(0,6).map(String),conclusion:String(r.conclusion||'')};touch(c);render();toast('AI 문구로 바꿨습니다.');return;}
       throw {code:'x'};
     }catch(e){note.textContent=errMsg(e)+' 기본 문구를 그대로 씁니다.';btn.disabled=false;}
