@@ -34,7 +34,7 @@
 
     var top=document.createElement('div');top.className='kif-top';
     top.innerHTML=
-      '<a class="brand" href="index.html"><img src="emblem.png" alt="">'+
+      '<a class="brand" href="index.html"><img src="emblem.png?v=5" alt="">'+
       '<span><span class="tt">한국보험금융(주) <em>신채널 교육지원시스템</em></span><span class="sub">보험상품 비교 도구</span></span></a>'+
       '<span class="kif-go"><button type="button" class="kif-back">← 이전</button><a class="kif-home" href="../index.html">⌂ 포털 홈</a></span>'+
       '<span class="sp"></span><span class="who">전략채널본부 · <b>보험상품 비교 도구</b></span>'+
