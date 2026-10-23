@@ -1,5 +1,5 @@
 {
- "ver": 1792733674396,
+ "ver": 1792733871222,
  "updated": "2026. 10. 23. 오후 2:34:34",
  "notices": [
   [
@@ -365,8 +365,15 @@
    "PPT",
    "2026년 2월 Issue & Concept",
    "이달의 컨셉",
-   "2026.02 이달의 컨셉 자료",
+   "2026.10 이달의 컨셉 자료",
    "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm.pptx"
+  ],
+  [
+   "PDF",
+   "2026년 2월 Issue & Concept",
+   "이달의 컨셉",
+   "2026.10 이달의 컨셉 자료",
+   "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm.pdf"
   ],
   [
    "PDF",
@@ -427,7 +434,7 @@
   ]
  ],
  "concept": {
-  "month": "2026.02",
+  "month": "2026.10",
   "title": "2026년 2월 Issue & Concept",
   "target": "단기납 종신 VS 간병 보험",
   "product": "한화생명 케어백 간병 플러스",
