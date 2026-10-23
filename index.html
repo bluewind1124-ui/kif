@@ -469,7 +469,7 @@ a.mat:hover{outline:2px solid var(--gold);outline-offset:1px}
 .nu-f.wide .in{width:100%}
 .nu-set summary{cursor:pointer;font-weight:700;margin-top:6px}
 .nu-cur{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}.nu-cur summary{cursor:pointer;font-weight:700}.nu-cl{margin:6px 0 8px;padding-left:1.4em;line-height:1.8;font-size:.9rem}.nu-cl .note{margin-right:4px}
-.cm-tabs{margin:4px 0 12px}.cm-hx{margin-top:8px;padding:8px 10px;border-left:3px solid var(--gold,#cb9c3a);background:rgba(203,156,58,.06);border-radius:6px}.cm-file{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}.cm-file a{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cm-ord{display:inline-flex;gap:2px}.smp-c .row .sp{flex:1}.smp-c .nu-x{margin-top:8px}.smp-c .nu-f.wide{flex:1 1 260px}.cm-km{gap:8px;align-items:flex-end;margin:4px 0}.cmp-tabs{margin:0 0 10px}
+.cm-tabs{margin:4px 0 12px}.cm-hf{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;padding:8px 10px;border:1px dashed var(--line);border-radius:8px}.hy-f a{white-space:nowrap}.cm-file{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}.cm-file a{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cm-ord{display:inline-flex;gap:2px}.smp-c .row .sp{flex:1}.smp-c .nu-x{margin-top:8px}.smp-c .nu-f.wide{flex:1 1 260px}.cm-km{gap:8px;align-items:flex-end;margin:4px 0}.cmp-tabs{margin:0 0 10px}
 /* ===== AI보장분석 고급형 (advanced/ 를 iframe으로 연결) ===== */
 .ai-adv-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-6px 0 10px}
 .ai-adv{width:100%;height:calc(100vh - 190px);min-height:640px;border:1px solid var(--line);border-radius:4px;background:var(--surface);display:block}
@@ -1285,9 +1285,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     },
     hypo:function(){
       var h=head('영업 도구','대표 상품 가설','고객 유형별로 "이 고객에게는 이 상품부터"라는 가설과 첫 화법을 정리합니다. 관리자가 매달 바꿀 수 있습니다.');
-      h+='<div class="tbl"><table><thead><tr><th>고객 유형</th><th>대표 상품 가설</th><th>첫 화법</th></tr></thead><tbody>'+
-        HYPO.map(function(r){var L=hypoList(r),n=L.length;return L.map(function(x,j){return '<tr>'+(j?'':'<td rowspan="'+n+'"><b>'+esc(r[0])+'</b>'+(n>1?'<br><span class="note">가설 '+n+'건</span>':'')+'</td>')+
-          '<td>'+(n>1?'<span class="pill">'+(j+1)+'</span> ':'')+fileA(x[2],esc(x[0]))+'</td><td>'+esc(x[1])+'</td></tr>';}).join('');}).join('')+
+      h+='<div class="tbl"><table><thead><tr><th>고객 유형</th><th>대표 상품 가설</th><th>첫 화법</th><th>자료</th></tr></thead><tbody>'+
+        HYPO.map(function(r){var F=hypoFiles(r);return '<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td class="hy-f">'+(F.length?F.map(function(f){return fileA(f,esc(fileLabel(f)));}).join('<br>'):'<span class="note">—</span>')+'</td></tr>';}).join('')+
         '</tbody></table></div><p class="note">관리자가 콘텐츠 관리에서 바꾼 내용이 모든 FC에게 보입니다.</p>';
       return h;
     },
@@ -1634,12 +1633,14 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(it.kind==='notice')return nuField(i,'date',it.date,'100px','날짜');
     if(it.kind==='award')return nuField(i,'period',it.period,'190px','기간')+nuSel(i,'status',it.status,[['진행 중','진행 중'],['발표','발표']],'상태');
     if(it.kind==='concept')return nuField(i,'ym',it.y+'.'+it.mo,'76px','연월');
-    if(it.kind==='hypo')return nuSel(i,'into',it.into||'',[['','새 고객 유형으로 올리기']].concat(HYPO.map(function(r,j){return ['h'+j,'「'+String(r[0]).slice(0,24)+'」에 가설 추가'];})),'넣을 곳')+nuField(i,'product',it.product,'200px','대표 상품');
+    if(it.kind==='hypo')return nuSel(i,'into',it.into||'',[['','새 고객 유형으로 올리기']].concat(HYPO.map(function(r,j){return ['h'+j,'「'+String(r[0]).slice(0,24)+'」에 파일 추가'];})),'넣을 곳')+nuField(i,'product',it.product,'200px','대표 상품');
     if(BOARD[it.kind])return nuField(i,'date',it.date,'100px','날짜');
     return nuField(i,'cat',it.cat,'90px','분류');
   }
-  /* 대표 상품 가설: 고객 유형 한 줄 [유형, 상품, 화법, 파일, 추가 가설[[상품, 화법, 파일], …]] — 한 유형에 가설을 여러 건 둘 수 있다 */
-  function hypoList(r){var L=[[r[1]||'',r[2]||'',r[3]||'']].concat(Array.isArray(r[4])?r[4]:[]);var f=L.filter(function(x){return x[0]||x[1]||x[2];});return f.length?f:[L[0]];}
+  /* 대표 상품 가설 파일 여러 개: 첫 파일은 줄의 4번째 칸, 나머지는 5번째 칸 [경로, …] */
+  function hypoFiles(r){var X=Array.isArray(r[4])?r[4]:[];return [r[3]].concat(X.map(function(x){return Array.isArray(x)?x[2]:x;})).filter(Boolean);}
+  function hypoSetFiles(r,F){while(r.length<4)r.push('');F=F.filter(Boolean);r[3]=F[0]||'';if(F.length>1)r[4]=F.slice(1);else r.length=4;}
+  function fileLabel(f){return decodeURIComponent(String(f).split('/').pop()).replace(/_[a-z0-9]{5}(\.[a-z0-9]+)$/i,'$1').replace(/_/g,' ');}
   /* 이달의 컨셉 자료 ↔ 교육 자료(자료실) 연결: 컨셉 자료에 파일이 없으면 교육 자료에서 같은(또는 앞부분이 같은) 제목의 파일을 찾아 쓴다 */
   function cptMatRow(m){
     if(!m)return null;var f=m[2],t=String(m[1]||'').replace(/\s+/g,' ').trim();
@@ -1659,7 +1660,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(k==='news')return R(NEWS,function(n){return {t:n[4]||n[2]||'',s:(n[0]||'')+' · '+(n[1]||''),f:n[3]};});
     if(k==='notice')return R(NOTICES,function(n){return {t:n[1]||'',s:n[0]||'',f:n[2]};});
     if(k==='award')return R(AWARDS,function(a){return {t:a[0]||'',s:(a[1]||'')+' · '+(a[3]||''),f:a[4]};});
-    if(k==='hypo')return R(HYPO,function(h){var L=hypoList(h);return {t:h[0]||'',s:L.map(function(x){return x[0];}).join(' / ')+(L.length>1?' · 가설 '+L.length+'건':''),f:h[3]};});
+    if(k==='hypo')return R(HYPO,function(h){var F=hypoFiles(h);return {t:h[0]||'',s:(h[1]||'')+(F.length>1?' · 파일 '+F.length+'개':''),f:F[0]};});
     if(k==='mats')return R(MATS,function(m){return {t:m[1]||'',s:(m[0]||'')+' · '+(m[2]||''),f:m[4]};});
     if(BOARD[k])return R(((SITE&&SITE.boards)||{})[k],function(n){return {t:n[1]||'',s:n[0]||'',f:n[3]};});
     if(k==='concept')return [{t:CONCEPT.title||'',s:(CONCEPT.month||'')+' · 지금 보이는 컨셉',f:CONCEPT.file}].concat(R(CONCEPT.mats,function(m){return {t:m[1]||'',s:'컨셉 교육 자료 · '+(m[0]||''),f:cptMatFile(m)};}));
@@ -1717,7 +1718,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       else if(it.kind==='notice')notices.unshift([it.date,it.title,p]);
       else if(it.kind==='award')awards.unshift([it.title,it.period,it.summary,it.status,p]);
       else if(it.kind==='hypo'){var tn=it.into?(HYPO[+it.into.slice(1)]||[])[0]:'',hr=tn?hypo.filter(function(r){return r[0]===tn;})[0]:null;
-        if(hr){while(hr.length<4)hr.push('');hr[4]=Array.isArray(hr[4])?hr[4]:[];hr[4].push([it.product||it.title,it.summary,p]);}else hypo.unshift([it.title,it.product,it.summary,p]);}
+        if(hr)hypoSetFiles(hr,hypoFiles(hr).concat([p]));else hypo.unshift([it.title,it.product,it.summary,p]);}
       else if(it.kind==='mats')mats.unshift([/^ppt/.test(it.ext)?'PPT':it.ext.toUpperCase(),it.title,it.cat,it.summary,p]);
       else if(it.kind==='concept'){if(!arch&&cp.title&&cp.title!==it.title){arch=true;c.concepts=Array.isArray(c.concepts)?c.concepts:[];c.concepts.unshift(JSON.parse(JSON.stringify(cp)));cp.mats=[];}
         cp.month=it.y+'.'+it.mo;cp.title=it.title;if(it.summary)cp.desc=it.summary;cp.file=p;
@@ -1864,7 +1865,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var CM_COLS={
     news:[[0,'날짜','96px'],[1,'보험사','120px'],[5,'연월','80px'],[6,'주차 (비우면 월간)','110px'],[4,'제목','w'],[2,'요약','a']],
     award:[[0,'제목','w'],[1,'기간','200px'],[3,'상태','s:진행 중,발표'],[2,'내용','a']],
-    hypo:[[0,'고객 유형','w'],[1,'가설 1 · 대표 상품','w'],[2,'가설 1 · 첫 화법','a']],
+    hypo:[[0,'고객 유형','w'],[1,'대표 상품','w'],[2,'첫 화법','a']],
     mats:[[0,'종류','80px'],[2,'분류','100px'],[1,'제목','w'],[3,'설명','a']],
     notice:[[0,'날짜','96px'],[1,'내용','w']]};
   var CM_HELP={compare:'비교 프로그램(HTML)을 올리면 포털 안 화면에서 바로 돌아갑니다. PDF·엑셀·PPT·그림은 비교 자료로 올라가 누르면 화면 위에 펼쳐집니다.',
@@ -1947,18 +1948,14 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       return '<div class="smp-c'+(off?' off':'')+'"><div class="row"><span class="pill'+(off?'':' new')+'">'+(off?'꺼 둠':'보이는 중')+'</span>'+
         '<label class="note" style="white-space:nowrap"><input type="checkbox" data-cmon="'+id+'"'+(off?'':' checked')+'> FC에게 보이기</label>'+
         (off?'':'<span class="cm-ord"><button class="btn sm ghost" type="button" data-cmmv="'+i+'" data-d="-1" aria-label="위로"'+(i?'':' disabled')+'>▲</button><button class="btn sm ghost" type="button" data-cmmv="'+i+'" data-d="1" aria-label="아래로"'+(i<L.length-1?'':' disabled')+'>▼</button></span>')+
-        '<span class="sp"></span>'+cmFileBtns(r[fi],'data-cmf="'+id+'"')+cmDelBtn(id)+'</div>'+
-        '<div class="nu-x">'+C.map(function(c){return cmIn('data-cmr="'+id+'" data-c="'+c[0]+'"',r[c[0]],c[2],c[1]);}).join('')+'</div>'+(k==='hypo'?cmHypoMore(r,id):'')+'</div>';};
+        '<span class="sp"></span>'+(k==='hypo'?'':cmFileBtns(r[fi],'data-cmf="'+id+'"'))+cmDelBtn(id)+'</div>'+
+        '<div class="nu-x">'+C.map(function(c){return cmIn('data-cmr="'+id+'" data-c="'+c[0]+'"',r[c[0]],c[2],c[1]);}).join('')+'</div>'+(k==='hypo'?cmHypoFiles(r,id):'')+'</div>';};
     return '<div class="smp-l">'+(L.length?L.map(function(r,i){return card(r,i,false);}).join(''):'<p class="note">보이는 자료가 없습니다.</p>')+'</div>'+
       (O.length?'<h3 style="margin-top:16px">꺼 둔 자료 <span class="note">'+O.length+'건 · FC에게 안 보임 · 체크하면 다시 보입니다</span></h3><div class="smp-l">'+O.map(function(o,i){return card(o.r,i,true);}).join('')+'</div>':'');
   }
-  function cmHypoMore(r,id){
-    var X=Array.isArray(r[4])?r[4]:[];
-    return X.map(function(x,j){var hid='hx'+id+':'+j;return '<div class="cm-hx"><div class="row"><span class="pill">가설 '+(j+2)+'</span><span class="sp"></span>'+cmFileBtns(x[2],'data-cmf="'+hid+'"')+cmDelBtn(hid)+'</div>'+
-      '<div class="nu-x">'+cmIn('data-cmhx="'+id+':'+j+'" data-c="0"',x[0],'w','대표 상품')+cmIn('data-cmhx="'+id+':'+j+'" data-c="1"',x[1],'a','첫 화법')+'</div></div>';}).join('')+
-      '<div class="row" style="margin-top:6px"><button class="btn sm ghost" type="button" data-cmhadd="'+id+'">＋ 이 고객 유형에 가설 추가</button><span class="note">가설 '+(1+X.length)+'건</span></div>';
-  }
-  function cmHx(a){var m=String(a).match(/^(?:hx)?([vo]\d+):(\d+)$/);if(!m)return null;var l=cmLoc(m[1]);if(!l||!l.row)return null;while(l.row.length<4)l.row.push('');if(!Array.isArray(l.row[4]))l.row[4]=[];return {row:l.row,list:l.row[4],j:+m[2]};}
+  function cmHypoFiles(r,id){var F=hypoFiles(r);
+    return '<div class="cm-hf"><b class="note">가설 자료 파일 '+F.length+'개</b>'+F.map(function(f,j){return '<span class="cm-file"><a class="flink" target="_blank" rel="noopener" href="'+fileHref(cmLocal(f))+'">📎 '+esc(fileLabel(f))+'</a>'+cmDelBtn('hf'+id+':'+j)+'</span>';}).join('')+
+      '<label class="btn sm">＋ 파일 추가<input type="file" multiple hidden data-cmhf="'+id+'"></label></div>';}
   function cmCompare(){
     var L=cmW().compare;
     return '<div class="smp-l">'+L.map(function(x,i){var id='p'+i;
@@ -2044,7 +2041,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var t=e.target,a;
       if((a=t.getAttribute('data-cmr'))!=null){var l=cmLoc(a),c=t.getAttribute('data-c');if(l.obj)l.obj[c]=t.value;else l.row[+c]=t.value;cmTouch(k);return;}
       if((a=t.getAttribute('data-cmk'))!=null){W.concept[a]=a==='steps'?t.value.split('\n').map(function(x){return x.trim();}).filter(Boolean):t.value;cmTouch('concept');return;}
-      if((a=t.getAttribute('data-cmhx'))!=null){var hx2=cmHx(a);hx2.list[hx2.j][+t.getAttribute('data-c')]=t.value;cmTouch(k);return;}
+      if((a=t.getAttribute('data-cmhf'))!=null&&t.files&&t.files.length){var hl=cmLoc(a),F=hypoFiles(hl.row),fs=Array.prototype.slice.call(t.files);
+        try{for(var q=0;q<fs.length;q++)F.push(await cmStage('hypo',fs[q]));hypoSetFiles(hl.row,F);cmTouch(k);cmRender();}catch(err){toast(err.message||String(err));}return;}
       if((a=t.getAttribute('data-cmkm'))!=null){W.concept.mats[+a][+t.getAttribute('data-c')]=t.value;cmTouch('concept');return;}
       if((a=t.getAttribute('data-cmkl'))!=null){var mk=W.concept.mats[+a],r0=W.mats.filter(function(r){return r[4]===t.value;})[0];mk[2]=t.value;if(r0&&!mk[0])mk[0]=r0[0];cmTouch('concept');cmRender();return;}
       if((a=t.getAttribute('data-cmon'))!=null){
@@ -2058,9 +2056,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
           var fx2=(f.name.match(/\.([a-z0-9]+)$/i)||['',''])[1].toUpperCase();fx2=/^PPT/.test(fx2)?'PPT':fx2;
           if(a==='k'){old=W.concept.file;np=await cmStage('concept',f);W.concept.file=np;cmTouch('concept');cmMatAdd(fx2,W.concept.title||f.name,np);}
           else if(/^km/.test(a)){var m=W.concept.mats[+a.slice(2)];old=m[2];np=await cmStage('concept',f);m[2]=np;m[0]=fx2||m[0];cmTouch('concept');cmMatAdd(m[0],m[1]||f.name,np);}
-          else{var lc=/^hx/.test(a)?{}:cmLoc(a);
+          else{var lc=cmLoc(a);
             if(lc.obj){old=lc.obj.file;var keep=lc.obj.base&&/\.html?$/i.test(f.name);np=await cmStage('compare',f,keep?lc.obj.file:null);if(!keep){lc.obj.file=np;lc.obj.kind=/\.html?$/i.test(f.name)?'tool':'file';}else old='';}
-            else if(/^hx/.test(a)){var hx=cmHx(a),hr=hx.list[hx.j];old=hr[2];np=await cmStage(k,f);hr[2]=np;cmTouch(k);}
             else{var fx=CM_FI[k];old=lc.row[fx];np=await cmStage(k,f);while(lc.row.length<CM_LEN[k])lc.row.push('');lc.row[fx]=np;if(k==='mats'){var ex=(f.name.match(/\.([a-z0-9]+)$/i)||['',''])[1].toUpperCase();lc.row[0]=/^PPT/.test(ex)?'PPT':ex;}}
             cmTouch(k);}
           if(old&&old!==np&&cmIsRepo(old))CM.del.push(old);
@@ -2071,7 +2068,6 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     box.addEventListener('click',function(e){
       var b=e.target.closest&&e.target.closest('button');if(!b)return;var a;
       if((a=b.getAttribute('data-cmmv'))!=null){var L=k==='compare'?W.compare:W[CM_KEY[k]],i=+a,j=i+(+b.getAttribute('data-d'));if(j<0||j>=L.length)return;var x=L[i];L[i]=L[j];L[j]=x;cmTouch(k);cmRender();return;}
-      if((a=b.getAttribute('data-cmhadd'))!=null){var hx4=cmHx(a+':0');hx4.list.push(['','','']);cmRender();var ins=document.querySelectorAll('[data-cmhx^="'+a+':"][data-c="0"]');if(ins.length)ins[ins.length-1].focus();return;}
       if((a=b.getAttribute('data-cmview'))!=null){var it=W.compare[+a];if(!it)return;if(/^blob:/.test(cmLocal(it.file))){toast('저장이 끝난 뒤(1~2분) 열어 볼 수 있습니다.');return;}cmOpenPreview(it);return;}
       if((a=b.getAttribute('data-cmkuse'))!=null){var i2=+a,old=W.concept;W.concept=W.concepts.splice(i2,1)[0];if(old&&old.title)W.concepts.unshift(old);cmTouch('concept');cmRender();toast('이달의 컨셉을 바꿨습니다.');return;}
       if((a=b.getAttribute('data-cmdel'))!=null){
@@ -2080,8 +2076,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         if(a[0]==='p'){var it2=W.compare.splice(+a.slice(1),1)[0];gone.push(it2.file);cmTouch('compare');}
         else if(/^km/.test(a)){var m=W.concept.mats.splice(+a.slice(2),1)[0];gone.push(m[2]);cmTouch('concept');}
         else if(/^ka/.test(a)){var cx=W.concepts.splice(+a.slice(2),1)[0];gone.push(cx.file);(cx.mats||[]).forEach(function(mm){gone.push(mm[2]);});cmTouch('concept');}
-        else if(/^hx/.test(a)){var hx3=cmHx(a),hd=hx3.list.splice(hx3.j,1)[0];gone.push(hd&&hd[2]);if(!hx3.list.length)hx3.row.length=4;cmTouch(k);}
-        else{var lc=cmLoc(a);lc.list.splice(lc.i,1);gone.push(lc.row[CM_FI[k]]);(Array.isArray(lc.row[4])?lc.row[4]:[]).forEach(function(x){gone.push(x[2]);});cmTouch(k);}
+        else if(/^hf/.test(a)){var mm=a.match(/^hf([vo]\d+):(\d+)$/),hl2=cmLoc(mm[1]),F2=hypoFiles(hl2.row);gone.push(F2.splice(+mm[2],1)[0]);hypoSetFiles(hl2.row,F2);cmTouch(k);}
+        else{var lc=cmLoc(a);lc.list.splice(lc.i,1);gone.push(lc.row[CM_FI[k]]);if(k==='hypo')hypoFiles(lc.row).forEach(function(f){gone.push(f);});cmTouch(k);}
         /* 다른 곳(지난 컨셉 등)에서 같은 파일을 쓰면 파일은 남긴다 */
         var used=JSON.stringify([W.news,W.awards,W.hypo,W.mats,W.notices,W.off,W.compare,W.concept,W.concepts]);
         gone.forEach(function(p){if(p&&cmIsRepo(p)&&used.indexOf(JSON.stringify(p))<0)CM.del.push(p);});
