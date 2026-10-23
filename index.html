@@ -439,7 +439,7 @@ a.flink,a.hlink{color:inherit;text-decoration:none}
 a.flink:hover b,a.flink:hover{text-decoration:underline}
 a.flink .pill,a.hlink .pill{font-size:.68rem;padding:0 6px;vertical-align:2px;text-decoration:none}
 a.mat{color:inherit;text-decoration:none;display:block}
-.smp-h{font-size:1.08rem;margin:18px 0 8px}.smp-l{display:flex;flex-direction:column;gap:10px}.smp-c{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}.smp-c.off{opacity:.55}.smp-c .row{gap:8px;align-items:center}.smp-c .row .in{flex:1;min-width:160px}.smp-c textarea{width:100%;margin-top:6px}
+.smp-h{font-size:1.08rem;margin:18px 0 8px}.smp-l{display:flex;flex-direction:column;gap:10px}.smp-c{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}.smp-c.off{opacity:.55}.smp-c .row{gap:8px;align-items:center}.smp-c .row .in{flex:1;min-width:160px}.smp-c textarea{width:100%;margin-top:6px}.smp-w{margin-top:6px}.smp-w select{max-width:220px}
 .mview{position:fixed;inset:0;z-index:9999;background:rgba(12,22,40,.88);display:flex;flex-direction:column}
 .mview .mvh{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:var(--surface,#fff);border-bottom:1px solid var(--line,#ddd)}
 .mview .mvh .sp{flex:1}
@@ -2819,12 +2819,22 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     '7. 출력 형식은 포털 샘플(16:9 리포트·엑셀 분석표)에 들어갈 문장만 만든다. 표·디자인은 포털이 만든다.'].join('\n');
   var AI_RULES=AI_RULES_DEF;
   /* 보장분석 샘플(김덕중님 PPT·엑셀, 고OO님 보고서)에서 뽑은 형식·문장 예시. 모든 AI에 규칙과 함께 보낸다. 관리자가 콘텐츠 관리에서 고칠 수 있다 */
-  var SMP_DEF=[{"id": "d1", "title": "김OO님 보험 비교분석 발표자료", "type": "PPT", "on": true, "text": "· 구성 순서: 표지(월보험료 요약) → 01 OVERVIEW 종합 요약 → 02 COVERAGE MAP 전체 보장 지도 → 03 핵심 강화 영역 → 04 SIMULTANEOUS PAYOUT 동시 지급 → 05 ANNUAL RECURRENCE 매년 반복 → 06 CONCEPT 보장 컨셉 → 한 줄 결론 → 상세 부록\n· 장 제목은 「영문 라벨 + 한글 한 줄 주장」: \"02 COVERAGE MAP 전체 보장 지도 — 어디가 채워지는가\", \"06 CONCEPT 보장 컨셉 분석 — 경쟁이 아닌 역할 분담\"\n· 계약마다 따옴표 컨셉 한 줄 + → 요약 한 줄:\n  기존 · KB 금쪽같은 자녀보험 \"진단과 수술, 그 순간의 목돈\" → 사건이 '발생'하는 순간에 강한, 일시금 중심\n  신규 · DB 초경증 간편건강보험 \"치료 과정마다, 해마다, 겹겹이\" → 치료가 '이어지고 반복'될수록 강한, 단계별·연간 정액\n· 강점 문장 예: \"112대·5대기관·장기이식까지 수술비가 매우 두터움(약 1.8억)\", \"암·뇌혈관·심장 진단비를 폭넓게 보유\"\n· 약점 문장 예: \"약점: 진단~수술 사이 '치료 과정' 정액이 비어 있음\", \"대부분 최초 1회성 → 재발·장기치료 반복 보장 약함\"\n· 근거 숫자를 문장 안에 괄호로 붙인다: \"암 치료 축: 66 → 100점으로 가장 크게 확장\", \"뇌·심 치료 축: 0 → 41점, 비어 있던 영역이 새로 채워짐\"\n· 용어를 풀어 준다: \"'연간 1회한'은 평생 1회가 아니라 보험연도마다 1회 — 재발·장기치료 시 해마다 다시 지급됩니다\"\n· 한 줄 결론 예: \"기존의 진단·수술 일시금 위에 신규의 항암·치료 단계별 정액이 더해집니다.\"\n· 끝에 ※ 주의 문구: \"※ 본 자료는 가입설계서 기준 비교용 참고자료이며, 보장 여부·지급 조건은 각 상품 약관이 우선합니다.\""}, {"id": "d2", "title": "김OO님 보험 비교분석 엑셀", "type": "XLSX", "on": true, "text": "· 시트: 종합요약 / 담보별 상세비교 / 항암 보장 강화 / 동시지급 시나리오 / 연간 반복 누적\n· 종합요약 표: 구분 | 기존 보험 | 신규 보험(제안) | 합산 — 행: 보험사, 상품명, 계약일/보험기간, 만기/납기, 납입주기, 월 보험료, 담보 수, 보장 성격(\"진단·수술비 중심 (일시금)\")\n· 담보별 상세비교: ▌보장영역 소제목 아래 담보명 | 금액(만원) | 월보험료(원) | 보장기간 | 지급주기(최초1회 / 연간1회(매년) / 일시금)\n· ■ 핵심 포인트는 • 로 시작하는 2~4줄: \"• 기존은 진단·수술 '일시금' 중심, 신규는 진단 이후 치료 단계별 '정액'을 더해 빈틈을 보강합니다.\""}, {"id": "d3", "title": "고OO님 상품비교분석 보고서", "type": "PDF", "on": true, "text": "· 결론을 먼저 밝히고 \"두 상품은 대체재가 아니라 보완재\" 같은 역할 분담 관점으로 쓴다.\n· 비교 포인트마다 \"가입제안서 수치로 근거를 확인합니다\" — 숫자 두 개를 나란히: \"120.0% vs 120.98%\""}];
+  var SMP_DEF=[{"id": "d1", "opts": ["o1"], "stage": "all", "title": "김OO님 보험 비교분석 발표자료", "type": "PPT", "on": true, "text": "· 구성 순서: 표지(월보험료 요약) → 01 OVERVIEW 종합 요약 → 02 COVERAGE MAP 전체 보장 지도 → 03 핵심 강화 영역 → 04 SIMULTANEOUS PAYOUT 동시 지급 → 05 ANNUAL RECURRENCE 매년 반복 → 06 CONCEPT 보장 컨셉 → 한 줄 결론 → 상세 부록\n· 장 제목은 「영문 라벨 + 한글 한 줄 주장」: \"02 COVERAGE MAP 전체 보장 지도 — 어디가 채워지는가\", \"06 CONCEPT 보장 컨셉 분석 — 경쟁이 아닌 역할 분담\"\n· 계약마다 따옴표 컨셉 한 줄 + → 요약 한 줄:\n  기존 · KB 금쪽같은 자녀보험 \"진단과 수술, 그 순간의 목돈\" → 사건이 '발생'하는 순간에 강한, 일시금 중심\n  신규 · DB 초경증 간편건강보험 \"치료 과정마다, 해마다, 겹겹이\" → 치료가 '이어지고 반복'될수록 강한, 단계별·연간 정액\n· 강점 문장 예: \"112대·5대기관·장기이식까지 수술비가 매우 두터움(약 1.8억)\", \"암·뇌혈관·심장 진단비를 폭넓게 보유\"\n· 약점 문장 예: \"약점: 진단~수술 사이 '치료 과정' 정액이 비어 있음\", \"대부분 최초 1회성 → 재발·장기치료 반복 보장 약함\"\n· 근거 숫자를 문장 안에 괄호로 붙인다: \"암 치료 축: 66 → 100점으로 가장 크게 확장\", \"뇌·심 치료 축: 0 → 41점, 비어 있던 영역이 새로 채워짐\"\n· 용어를 풀어 준다: \"'연간 1회한'은 평생 1회가 아니라 보험연도마다 1회 — 재발·장기치료 시 해마다 다시 지급됩니다\"\n· 한 줄 결론 예: \"기존의 진단·수술 일시금 위에 신규의 항암·치료 단계별 정액이 더해집니다.\"\n· 끝에 ※ 주의 문구: \"※ 본 자료는 가입설계서 기준 비교용 참고자료이며, 보장 여부·지급 조건은 각 상품 약관이 우선합니다.\""}, {"id": "d2", "opts": ["o1"], "stage": "all", "title": "김OO님 보험 비교분석 엑셀", "type": "XLSX", "on": true, "text": "· 시트: 종합요약 / 담보별 상세비교 / 항암 보장 강화 / 동시지급 시나리오 / 연간 반복 누적\n· 종합요약 표: 구분 | 기존 보험 | 신규 보험(제안) | 합산 — 행: 보험사, 상품명, 계약일/보험기간, 만기/납기, 납입주기, 월 보험료, 담보 수, 보장 성격(\"진단·수술비 중심 (일시금)\")\n· 담보별 상세비교: ▌보장영역 소제목 아래 담보명 | 금액(만원) | 월보험료(원) | 보장기간 | 지급주기(최초1회 / 연간1회(매년) / 일시금)\n· ■ 핵심 포인트는 • 로 시작하는 2~4줄: \"• 기존은 진단·수술 '일시금' 중심, 신규는 진단 이후 치료 단계별 '정액'을 더해 빈틈을 보강합니다.\""}, {"id": "d3", "opts": [], "stage": "all", "title": "고OO님 상품비교분석 보고서", "type": "PDF", "on": true, "text": "· 결론을 먼저 밝히고 \"두 상품은 대체재가 아니라 보완재\" 같은 역할 분담 관점으로 쓴다.\n· 비교 포인트마다 \"가입제안서 수치로 근거를 확인합니다\" — 숫자 두 개를 나란히: \"120.0% vs 120.98%\""}];
   var SMP_HOW="■ 쓰는 법 요약: ① 계약별 성격을 따옴표 한 줄로 ② 강점·약점은 숫자 근거와 함께 짧게 ③ 어려운 약관 용어는 풀어서 ④ 역할 분담 관점의 한 줄 결론 ⑤ 단정 대신 \"~에 강합니다/~이 비어 있습니다\"";
   var SMP=JSON.parse(JSON.stringify(SMP_DEF));
-  function smpText(){var L=SMP.filter(function(s){return s.on!==false&&String(s.text||'').trim();});if(!L.length)return '';
-    return '[보장분석 샘플 — 이 형식·방법·표현을 그대로 따른다]\n'+L.map(function(s,i){return '■ 샘플 '+(i+1)+': '+s.title+' ('+s.type+')\n'+String(s.text).trim().slice(0,4000);}).join('\n')+'\n'+SMP_HOW;}
-  function aiGuide(){var t=smpText();return AI_RULES+(t?'\n\n'+t:'');}
+  /* 샘플 고르기: 고객이 고른 분석 옵션·단계에 맞는 샘플을 점수로 골라 3건까지만 보낸다 (많이 올려도 AI에 가는 글은 짧게).
+     옵션을 안 고른 샘플 = 모든 옵션 공통, 단계 all = 1·2단계 공통 */
+  var SMP_STAGE={all:'1·2단계 공통','1':'1단계 기계약 분석','2':'2단계 Before/After'};
+  function smpPick(ids,stage){
+    var L=SMP.filter(function(s){return s.on!==false&&String(s.text||'').trim();});
+    if(!ids)return L;
+    var sc=L.map(function(s,i){var o=s.opts||[],hit=o.filter(function(x){return ids.indexOf(x)>-1;}).length,sg=s.stage||'all';
+      var v=(o.length?(hit?3+hit:-99):1)+(sg===String(stage)?2:sg==='all'?1:-99);return {s:s,v:v,i:i};}).filter(function(x){return x.v>0;});
+    sc.sort(function(a,b){return b.v-a.v||a.i-b.i;});return sc.slice(0,3).map(function(x){return x.s;});
+  }
+  function smpText(ids,stage){var L=smpPick(ids,stage);if(!L.length)return '';
+    return '[보장분석 샘플 — 이 형식·방법·표현을 그대로 따른다'+(ids?'. 포털이 이 고객의 분석 관점에 가장 가까운 샘플을 골랐다. 앞에 있는 샘플일수록 더 가깝다':'')+']\n'+L.map(function(s,i){return '■ 샘플 '+(i+1)+': '+s.title+' ('+s.type+(s.opts&&s.opts.length?' · '+s.opts.map(optName).filter(Boolean).join(', '):'')+')\n'+String(s.text).trim().slice(0,4000);}).join('\n')+'\n'+SMP_HOW;}
+  function aiGuide(ids,stage){var t=smpText(ids,stage);return AI_RULES+(t?'\n\n'+t:'');}
   /* API·회사 AI에는 올려 둔 샘플 슬라이드 그림도 2장까지 같이 보낸다 (복사·붙여넣기는 글로만) */
   async function refImgs(o){if(isPaste())return [];var L=SHREF.concat(MYREF).filter(function(r){return r.img;});L.sort(function(x,y){return ((y.opts||[]).indexOf(o.id)>-1)-((x.opts||[]).indexOf(o.id)>-1);});var out=[];for(var i=0;i<L.length&&out.length<2;i++){try{var rs=await fetch(L[i].img);if(rs.ok)out.push(await rs.blob());}catch(e){}}return out;}
   function provName(){var c=aiCfg();return (AIP[c.prov]||{}).name||'내 AI';}
@@ -2841,7 +2851,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       월보험료합계:R.prem.old,포털이먼저찾은유리:PC.P,포털이먼저찾은불리:PC.C};
     var IMG;
     try{
-      var r=await cap.sample.json('너는 한국보험금융 FC의 기계약 보장분석 조수다. 아래 규칙을 반드시 지키고, 샘플의 형식·방법·표현(따옴표 컨셉 한 줄, 숫자 근거를 붙인 짧은 강점·약점, 용어 풀이, 역할 분담 관점의 결론)을 그대로 따라 써라.\n'+aiGuide()+'\n\n아래 데이터만 근거로 기존 계약의 유리한 부분과 불리한 부분을 정리하라. 샘플의 고객·숫자는 문체 참고용일 뿐 이 고객 분석에 옮겨 쓰지 마라. "포털이먼저찾은" 항목은 참고하되 빠진 것이 있으면 보태고, 틀린 것은 빼라. JSON 하나로만 답하라: {"pros":[["제목","설명 1문장"], 최대 6개],"cons":[["제목","설명 1문장"], 최대 6개],"conclusion":"1단계 결론 2문장 (지금 보험의 중심 + 2단계에서 조정·보완할 점)"}\n\n데이터:\n'+JSON.stringify(data),Object.assign({modelTier:'default'},(IMG=await refImgs(o)).length?{images:IMG}:{}));
+      var r=await cap.sample.json('너는 한국보험금융 FC의 기계약 보장분석 조수다. 아래 규칙을 반드시 지키고, 샘플의 형식·방법·표현(따옴표 컨셉 한 줄, 숫자 근거를 붙인 짧은 강점·약점, 용어 풀이, 역할 분담 관점의 결론)을 그대로 따라 써라.\n'+aiGuide(selIds(c),1)+'\n\n아래 데이터만 근거로 기존 계약의 유리한 부분과 불리한 부분을 정리하라. 샘플의 고객·숫자는 문체 참고용일 뿐 이 고객 분석에 옮겨 쓰지 마라. "포털이먼저찾은" 항목은 참고하되 빠진 것이 있으면 보태고, 틀린 것은 빼라. JSON 하나로만 답하라: {"pros":[["제목","설명 1문장"], 최대 6개],"cons":[["제목","설명 1문장"], 최대 6개],"conclusion":"1단계 결론 2문장 (지금 보험의 중심 + 2단계에서 조정·보완할 점)"}\n\n데이터:\n'+JSON.stringify(data),Object.assign({modelTier:'default'},(IMG=await refImgs(o)).length?{images:IMG}:{}));
       var ok=function(L){return Array.isArray(L)?L.filter(function(x){return Array.isArray(x)&&x[0];}).slice(0,6).map(function(x){return [String(x[0]),String(x[1]||'')];}):[];};
       var P=ok(r&&r.pros),C=ok(r&&r.cons);if(!P.length&&!C.length)throw {code:'bad_json'};
       c.ai1={opt:o.id,P:P.length?P:PC.P,C:C.length?C:PC.C,conclusion:String((r&&r.conclusion)||''),by:provName(),at:nowStr()};touch(c);render();toast(provName()+'가 포털 규칙으로 보장분석을 정리했습니다.');
@@ -3267,8 +3277,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<div class="row"><b>올리기 상태</b><span class="note" id="smPub">'+(SMPST.msg||(window.KIFPUB&&KIFPUB.ready()?'GitHub 연결됨 · 바꾸면 바로 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 <b>관리자 페이지 › 자료 올리기 › GitHub 연결 설정</b>에서 토큰을 저장해야 올라갑니다.'))+'</span></div></div>';
     h+='<div class="panel"><h3>등록된 샘플</h3>'+(SMP.length?'<div class="smp-l">'+SMP.map(function(s){
       return '<div class="smp-c'+(s.on===false?' off':'')+'"><div class="row"><span class="pill'+(s.on===false?'':' new')+'">'+esc(s.type||'글')+'</span><input class="in" data-smt="'+s.id+'" value="'+esc(s.title)+'" aria-label="샘플 제목"><label class="note" style="white-space:nowrap"><input type="checkbox" data-smo="'+s.id+'"'+(s.on===false?'':' checked')+'> AI에 보냄</label><button class="btn sm ghost danger" data-a="smpDel" data-id="'+s.id+'">삭제</button></div>'+
+        '<div class="row smp-w"><span class="note">쓰는 경우</span><select class="in" data-sst="'+s.id+'">'+Object.keys(SMP_STAGE).map(function(k){return '<option value="'+k+'"'+((s.stage||'all')===k?' selected':'')+'>'+SMP_STAGE[k]+'</option>';}).join('')+'</select><span class="pill">'+esc(refWhere(s))+'</span></div>'+
+        '<details><summary class="note">연결할 분석 옵션 바꾸기</summary>'+optBoxes('',s.opts||[],'data-sop="'+s.id+'"')+'</details>'+
         '<details><summary class="note">AI가 받는 내용 보기·고치기 ('+String(s.text||'').length+'자)</summary><textarea class="in" rows="10" data-smx="'+s.id+'">'+esc(s.text||'')+'</textarea><p class="note">고친 뒤 칸 밖을 누르면 저장·반영됩니다.</p></details></div>';}).join('')+'</div>':'<p class="note">등록된 샘플이 없습니다. 위에서 올려 주세요.</p>')+
-      '<details style="margin-top:10px"><summary class="note">AI에게 실제로 보내는 전체 글 미리보기 (규칙 + 샘플)</summary><textarea class="in" rows="14" readonly>'+esc(aiGuide())+'</textarea></details>'+
+      '<p class="note" style="margin-top:10px">샘플은 몇 건이든 올려도 됩니다. FC가 분석할 때 포털이 그 고객의 <b>분석 옵션</b>과 <b>단계</b>에 맞는 샘플을 골라 <b>3건까지만</b> AI에 보냅니다. 옵션을 안 고른 샘플은 모든 고객에 공통으로 쓰입니다.</p><details><summary class="note">AI에게 보내는 전체 글 미리보기 (규칙 + 켜 둔 샘플 전체)</summary><textarea class="in" rows="14" readonly>'+esc(aiGuide())+'</textarea></details>'+
       '<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="smpReset">기본 샘플 3건으로 되돌리기</button><span class="note">규칙 문장은 관리자 페이지 › 콘텐츠 관리 › AI 보장분석 규칙에서 고칩니다.</span></div></div>';
     return h;
   }
@@ -3292,7 +3304,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   async function onSmpFile(f){
     var msg=document.getElementById('smMsg'),ti=document.getElementById('smTitle');if(msg)msg.textContent='"'+f.name+'" 읽는 중…';
     try{var r=await smpFileText(f);if(!r.text||r.text.length<20)throw new Error('글자를 거의 읽지 못했습니다(그림으로만 된 파일일 수 있습니다). "글로 직접 추가"로 넣어 주세요');
-      var title=(ti&&ti.value.trim())||f.name.replace(/\.[^.]+$/,'');SMP.push({id:'s'+Date.now().toString(36),title:title,type:r.type,on:true,text:r.text.slice(0,6000),at:new Date().toISOString().slice(0,10)});
+      var title=(ti&&ti.value.trim())||f.name.replace(/\.[^.]+$/,'');SMP.push({id:'s'+Date.now().toString(36),title:title,type:r.type,on:true,opts:suggestOpts(title+' '+r.text.slice(0,2000)).slice(0,3),stage:'all',text:r.text.slice(0,6000),at:new Date().toISOString().slice(0,10)});
       smpSave('"'+title+'" 샘플 등록');toast('샘플을 등록했습니다. 아래 목록에서 AI가 받는 내용을 확인·수정하세요.');}
     catch(e){if(msg)msg.textContent='⚠ '+(e&&e.message||e);}
   }
@@ -3787,7 +3799,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       월보험료:{Before:vA._B.R0.prem.old,유지기존:R.prem.old,신규:R.prem.neu,After:R.prem.old+R.prem.neu},정리한담보:vA._B.drop.map(function(x){return x.it.name+' '+n(x.it.amt)+'만';}),동시지급:R.scen.length?{기존:R.sOld,신규:R.sNeu}:null,연간반복:(R.ann+R.ann10)?{연간:R.ann,십년한도:R.ann10,누적:R.years}:null,가족력:c.famHx,상담내용:c.memo,
       옵션별:(o.list||[o]).map(function(q){var S=spotInfo(q,R);return {옵션:q.title,보장공백:S.gap,기준미달:S.weak,점검포인트:q.points||[],관련기사:q.news&&q.news.title?q.news.src+' '+q.news.date+' "'+q.news.title+'" — '+q.news.sum:null};})};
     try{
-      var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. 아래 규칙을 반드시 지키고, 샘플의 형식·방법·표현을 그대로 따라 써라(샘플의 고객·숫자는 옮겨 쓰지 마라).\n'+aiGuide()+'\n\nBefore(기존 그대로)와 After(조정한 기존 + 신계약)를 비교하는 관점으로 쓴다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션마다 최소 한 개의 포인트를 쓰고, 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 근거로 한 번만 짧게 인용할 수 있다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
+      var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. 아래 규칙을 반드시 지키고, 샘플의 형식·방법·표현을 그대로 따라 써라(샘플의 고객·숫자는 옮겨 쓰지 마라).\n'+aiGuide(selIds(c),2)+'\n\nBefore(기존 그대로)와 After(조정한 기존 + 신계약)를 비교하는 관점으로 쓴다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션마다 최소 한 개의 포인트를 쓰고, 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 근거로 한 번만 짧게 인용할 수 있다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
       if(r&&r.points&&r.points.length){c.ai={opt:o.id,s2:1,points:r.points.slice(0,6).map(String),conclusion:String(r.conclusion||'')};touch(c);render();toast('AI 문구로 바꿨습니다.');return;}
       throw {code:'x'};
     }catch(e){note.textContent=errMsg(e)+' 기본 문구를 그대로 씁니다.';btn.disabled=false;}
@@ -3847,6 +3859,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var t=e.target;
     if(t.dataset&&t.dataset.ref){var cc=cust();if(!cc)return;var off=(cc.refOff||[]).filter(function(x){return x!==t.dataset.ref;});if(!t.checked)off.push(t.dataset.ref);cc.refOff=off;touch(cc);render();return;}
     if(t.id==='rfFile'&&t.files&&t.files.length&&isAdm()){onRefFiles([].slice.call(t.files));return;}
+    if(t.dataset&&t.dataset.sst){if(!isAdm())return;var s1=SMP.filter(function(s){return s.id===t.dataset.sst;})[0];if(s1){s1.stage=t.value;smpSave('"'+s1.title+'" 쓰는 단계 변경');}return;}
+    if(t.dataset&&t.dataset.sop){if(!isAdm())return;var bx=t.closest('.chips2'),al=bx.querySelector('[data-all]'),on1=[].slice.call(bx.querySelectorAll('input:not([data-all])'));
+      if(t===al){if(al.checked)on1.forEach(function(e){e.checked=false;});else al.checked=true;}else al.checked=!on1.some(function(e){return e.checked;});
+      var s2=SMP.filter(function(s){return s.id===t.dataset.sop;})[0];if(s2){s2.opts=on1.filter(function(e){return e.checked;}).map(function(e){return e.value;});smpSave('"'+s2.title+'" 연결 옵션 변경');}return;}
     if(t.id==='smFile'&&t.files&&t.files[0]){if(isAdm())onSmpFile(t.files[0]);t.value='';return;}
     if(t.dataset&&(t.dataset.smt||t.dataset.smo||t.dataset.smx)){if(!isAdm())return;var sid=t.dataset.smt||t.dataset.smo||t.dataset.smx,sx=SMP.filter(function(s){return s.id===sid;})[0];if(!sx)return;
       if(t.dataset.smt){sx.title=t.value.trim()||sx.title;smpSave('제목 변경');}else if(t.dataset.smo){sx.on=t.checked;smpSave(t.checked?'"'+sx.title+'" AI에 보냄':'"'+sx.title+'" AI에 안 보냄');}else{sx.text=t.value;smpSave('"'+sx.title+'" 내용 수정');}return;}
