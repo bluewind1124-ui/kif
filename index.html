@@ -1258,10 +1258,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
     {g:'공지 · 시상',items:[['news','보험사 소식지'],['sched','상품 개정 일정','NEW'],['award','시상 공지']]},
     {g:'교육 · 연계',items:[['edu','온라인 교육센터'],['policy','약관 분석','NEW'],['calc','금융계산기','NEW'],['car','자동차 비교견적'],['sangjo','상조 서비스']]},
-    {g:'관리자',admin:true,items:[['admin','관리자 페이지'],['cadmin','자료 관리','NEW']]},
+    {g:'관리자',admin:true,items:[['admin','관리자 페이지'],['cadmin','자료 관리','NEW'],['calcadmin','계산기 기준값','NEW']]},
     {g:'내 정보',mobile:true,items:[['me','내 정보 · 자료 보관']]}
   ];
-  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',sched:'cal',award:'cup',edu:'cap',car:'car',sangjo:'heart',policy:'terms',calc:'calcu',me:'user',admin:'gear',cadmin:'doc'};
+  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',sched:'cal',award:'cup',edu:'cap',car:'car',sangjo:'heart',policy:'terms',calc:'calcu',calcadmin:'calcu',me:'user',admin:'gear',cadmin:'doc'};
 
   var NEWS=[
     ['2026.10.14','삼성화재','간편건강보험 3.5.5 고지 개정, 11월 1일부터 적용'],
@@ -1440,6 +1440,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<div class="hh-cards">'+P.map(function(c){return '<div class="hh-card"><b>'+c[0]+'</b><span>'+c[1]+'</span><button type="button" data-go="'+c[2]+'">바로가기</button></div>';}).join('')+'</div></section>';
       h+='<section class="hm-hd"><div><div class="hm-date">'+ds+'</div><h1>'+E(me.name)+'님, 오늘 할 일부터 보세요</h1></div><div class="hm-srch">'+srchBox(false)+'</div></section>';
       h+=hmAi();
+      if(me&&me.role==='admin'&&calcDue().due)h+='<button class="hm-strip" data-go="calcadmin"><b>관리자 점검</b><span>금융계산기 기준값(세율·요율) 점검 시기입니다 · 마지막 확인 '+calcDue().at+'</span><em>점검하기 ›</em></button>';
       var BN=schedBanner();if(BN&&BN.title)h+='<button class="hm-strip" data-go="'+(BN.go||'news')+'"><b>이달의 상품 개정 일정</b><span>'+E(BN.title)+'</span><em>일정 보기 ›</em></button>';
       h+='<section class="hm-kpi">'+
         '<button data-go="news">'+ic('news','ki')+'<div><span>이번 주 새 소식지</span><b>'+nn+'<small>건</small></b><em>보험사 소식지 전체 '+NEWS.length+'건</em></div></button>'+
@@ -1529,6 +1530,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     },
     hub_sales:function(){return hubPage('hub_sales');},hub_edu:function(){return hubPage('hub_edu');},hub_notice:function(){return hubPage('hub_notice');},
     /* 금융계산기 — calc/index.html (FC·관리자 공통, 결과는 이 기기 브라우저에만 저장) */
+    /* 관리자: 금융계산기 기준값 고치기 (calc/index.html?admin=1 — 저장은 KIFPUB.calcRules) */
+    calcadmin:function(){
+      if(me.role!=='admin')return head('관리자','접근 권한 없음','관리자 계정으로 로그인해야 볼 수 있습니다.');
+      var h=head('관리자','계산기 기준값','금융계산기의 세율·공제 한도·기준금액입니다. 법이 바뀌면 숫자만 고쳐 저장하세요. 저장하면 모든 FC의 계산기에 반영됩니다.');
+      h+='<div class="ai-adv-bar"><button class="btn sm ghost" type="button" data-go="calc">FC 화면으로 보기</button></div>';
+      return h+'<iframe class="calc-fr" src="calc/index.html?embed=1&admin=1" title="계산기 기준값"></iframe>';
+    },
     calc:function(){
       var h=head('교육 · 연계','금융계산기','보장·연금·재무·세금·법인 상담에 쓰는 계산기입니다. 상황·키워드·초성으로 찾고, 결과는 복사해서 고객에게 보내거나 인쇄할 수 있습니다.');
       h+='<div class="ai-adv-bar"><a class="btn sm ghost" style="text-decoration:none" target="_blank" rel="noopener" href="calc/index.html">새 창으로 열기 ↗</a></div>';
@@ -1620,12 +1628,17 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       if(me.role!=='admin')return head('관리자','접근 권한 없음','관리자 계정으로 로그인해야 볼 수 있습니다.');
       var h=head('관리자','관리자 페이지','FC 계정, 공지, 메뉴 내용을 수정하고 접속 기록을 확인합니다.');
       h+='<div class="panel"><div class="row" style="gap:10px;flex-wrap:wrap"><b>메뉴별 자료 관리</b><span class="note">상품 비교 · 대표 상품 가설 · 이달의 컨셉 · 소식지 · 시상 · 공지 · 교육 자료를 하나씩 올리고, 켜고 끄고, 고치고, 지웁니다.</span><button class="btn sm" type="button" data-go="cadmin">자료 관리 열기</button></div></div>';
+      h+=calcDueHtml();
       h+=acctHtml()+nuHtml()+sjHtml()+cqHtml()+cmsHtml();
       return h;
     }
   };
 
   /* 홈 첫 카드 「바로가기」 → 그 묶음(메뉴 그룹)의 항목을 모두 카드로 보여 주는 화면. 메뉴(MENU)가 바뀌면 저절로 따라 바뀐다 */
+  /* 금융계산기 기준값 점검: 마지막 확인일(content.json calcRules.at)이 가장 최근 1월 1일·7월 1일보다 앞이면 점검 시기 */
+  function calcDue(){var at=(SITE&&SITE.calcRules&&SITE.calcRules.at)||'2026-10-24',t=new Date(),c=t.getMonth()>=6?new Date(t.getFullYear(),6,1):new Date(t.getFullYear(),0,1);return {due:!(new Date(at+'T00:00:00')>=c),at:at.replace(/-/g,'.'),basis:(SITE&&SITE.calcRules&&SITE.calcRules.basis)||'2026년 세법'};}
+  function calcDueHtml(){var d=calcDue();return d.due?'<div class="panel" style="border-left:4px solid #b3261e"><div class="row" style="gap:10px;flex-wrap:wrap"><b>금융계산기 기준값 점검 시기입니다</b><span class="note">1월·7월에는 세율·요율이 바뀌는지 확인해 주세요. 마지막 확인 '+d.at+' ('+esc(d.basis)+')</span><button class="btn sm" type="button" data-go="calcadmin">기준값 점검하기</button></div></div>':
+    '<div class="panel"><div class="row" style="gap:10px;flex-wrap:wrap"><b>금융계산기 기준값</b><span class="note">'+esc(d.basis)+' · '+d.at+' 확인 · 법이 바뀌면 여기서 숫자만 고쳐 저장</span><button class="btn sm ghost" type="button" data-go="calcadmin">기준값 열기</button></div></div>';}
   function calcCard(){return '<button type="button" class="hm-tool calc-card" data-go="calc"><span class="ti">'+ic('calcu','svg')+'</span><span class="tt"><b>금융계산기</b><small>사망보장·은퇴자금·상속세·연금 세액공제 등 상담용 계산기 37종</small></span><em>열기 ›</em></button>';}
   var HUBS={hub_sales:'영업 도구',hub_edu:'교육 · 연계',hub_notice:'공지 · 시상'};
   var HUB_D={compare:'보험사 상품을 한눈에 비교하는 비교 도구 모음',ai:'등록된 기준·샘플대로 보장분석과 제안서 만들기',ai2:'고급형 계산 규칙으로 보장·연금·자산 분석 제안서',
@@ -2197,6 +2210,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   window.KIFPUB={
     ready:function(){return !!ghTok();},
     admin:function(){return !!(me&&me.role==='admin');},
+    /* 금융계산기 기준값(세율·공제 한도 등)을 content.json의 calcRules{at,basis,by,v}로 올린다 — calc/index.html 관리자 화면에서 부른다 */
+    calcRules:async function(o){
+      if(!(me&&me.role==='admin'))throw new Error('관리자만 저장할 수 있습니다.');
+      if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다. 관리자 › 자료 올리기 › GitHub 연결 설정에서 먼저 연결해 주세요.');
+      var r=await ghLand([],function(cur){cur.calcRules=o;},'금융계산기 기준값 '+(Object.keys(o.v||{}).length?'수정':'확인')+' ('+o.basis+', '+o.at+')');SITE=r.cur;return r.cur;
+    },
     /* 약관 분석 「보험사 공시실 바로가기」 목록을 content.json의 policyLinks로 올린다 */
     policyLinks:async function(o){
       if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다. 관리자 › 자료 올리기 › GitHub 연결 설정에서 먼저 연결해 주세요.');
