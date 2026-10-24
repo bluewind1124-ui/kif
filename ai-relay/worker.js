@@ -11,6 +11,8 @@
  *   PROVIDER         (Text, 선택)    claude | openai | gemini  (기본 claude)
  *   MODEL            (Text, 선택)    비우면 아래 기본 모델
  *   ACCESS_CODE      (Secret, 선택)  넣으면 FC가 포털에 같은 코드를 넣어야 씁니다
+ *   AUTH_SECRET      (Secret, 선택)  계정 서버(kif-auth)의 SECRET과 같은 값. 넣으면 포털에 로그인한 사람만 씁니다
+ *   ALLOW            (Text, 선택)    admin = 관리자만 · all = 로그인한 모든 사람 (기본 all, AUTH_SECRET이 있을 때만 의미)
  *   ALLOWED_ORIGINS  (Text, 선택)    쉼표로 구분. 기본: 회사 포털 주소
  */
 const DEFAULT_MODEL = { claude: 'claude-opus-5-5', openai: 'gpt-4.1', gemini: 'gemini-2.5-flash' };
@@ -18,6 +20,20 @@ const DEFAULT_ORIGINS = 'https://bluewind1124-ui.github.io';
 const MAX_PROMPT = 400000;      // 글자 수
 const MAX_IMAGES = 12;
 const MAX_IMAGE_B64 = 7000000;  // 사진 한 장(base64) 약 5MB
+
+/* 계정 서버(kif-auth)가 준 로그인 증표를 같은 SECRET으로 확인한다 (id·role·만료 시각) */
+const enc = new TextEncoder();
+const b64u = (s) => btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = (s) => atob(s.replace(/-/g, '+').replace(/_/g, '/'));
+const same = (a, b) => { if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false; let r = 0; for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i); return r === 0; };
+async function readToken(secret, t) {
+  if (typeof t !== 'string' || t.indexOf('.') < 0) return null;
+  const [p, sig] = t.split('.');
+  const k = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const mine = b64u(String.fromCharCode(...new Uint8Array(await crypto.subtle.sign('HMAC', k, enc.encode(p)))));
+  if (!same(mine, sig)) return null;
+  try { const o = JSON.parse(unb64u(p)); return o.exp > Date.now() ? o : null; } catch (e) { return null; }
+}
 
 export default {
   async fetch(req, env) {
@@ -34,14 +50,21 @@ export default {
     const out = (status, obj) => new Response(JSON.stringify(obj), { status, headers: { ...cors, 'content-type': 'application/json; charset=utf-8' } });
 
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
-    if (req.method === 'GET') return out(200, { ok: true, service: '한국보험금융 FC 포털 AI 중계', provider: env.PROVIDER || 'claude', ready: !!env.API_KEY });
+    if (req.method === 'GET') return out(200, { ok: true, service: '한국보험금융 FC 포털 AI 중계', provider: env.PROVIDER || 'claude', ready: !!env.API_KEY, login: !!env.AUTH_SECRET, allow: env.AUTH_SECRET ? String(env.ALLOW || 'all').toLowerCase() : 'all' });
     if (req.method !== 'POST') return out(405, { error: 'POST만 받습니다.' });
     if (!okOrigin) return out(403, { error: '허용되지 않은 사이트에서 온 요청입니다.' });
     if (!env.API_KEY) return out(500, { error: '서버에 API_KEY가 설정되지 않았습니다.' });
 
     let body;
     try { body = await req.json(); } catch (e) { return out(400, { error: '요청 형식이 올바르지 않습니다.' }); }
-    if (env.ACCESS_CODE && String(body.code || '') !== String(env.ACCESS_CODE)) return out(401, { error: 'code' });
+    /* 로그인 확인: AUTH_SECRET이 있으면 포털 로그인 증표가 있어야 하고, ALLOW=admin이면 관리자만 */
+    let who = null;
+    if (env.AUTH_SECRET) {
+      who = await readToken(env.AUTH_SECRET, String(body.token || ''));
+      if (!who) return out(401, { error: 'login' });
+      if (String(env.ALLOW || 'all').toLowerCase() === 'admin' && who.role !== 'admin') return out(403, { error: 'role' });
+    }
+    if (env.ACCESS_CODE && !(who && who.role === 'admin') && String(body.code || '') !== String(env.ACCESS_CODE)) return out(401, { error: 'code' });
 
     const prompt = String(body.prompt || '');
     const images = Array.isArray(body.images) ? body.images : [];

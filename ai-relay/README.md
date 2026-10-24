@@ -36,6 +36,8 @@ FC 포털 ──(가입설계서 내용)──▶ 회사 AI 중계 서버 ──
    | `PROVIDER` | Text | `claude` 또는 `openai` 또는 `gemini` |
    | `MODEL` | Text (선택) | 비우면 기본 모델 (claude-opus-5-5 / gpt-4.1 / gemini-2.5-flash) |
    | `ACCESS_CODE` | Secret (선택) | FC에게만 알려줄 접속코드. 넣으면 코드를 아는 FC만 씁니다 |
+   | `AUTH_SECRET` | Secret (선택) | 계정 서버(kif-auth)의 `SECRET`과 **똑같은 값**. 넣으면 포털에 로그인한 사람만 씁니다 |
+   | `ALLOW` | Text (선택) | `admin` = 관리자만, `all` = 로그인한 모든 사람 (기본 `all`) |
 
 5. Worker 주소를 복사합니다. 예: `https://fc-ai.내계정.workers.dev`
    - 브라우저로 이 주소를 열어 `"ready":true` 가 보이면 정상입니다.
@@ -61,3 +63,12 @@ AI 회사 콘솔에서 **월 사용 한도(Spending limit / Budget)** 를 정해
 | 허용되지 않은 사이트에서 온 요청 | 포털 주소가 바뀌었다면 `ALLOWED_ORIGINS` 에 새 주소를 넣기 (쉼표로 여러 개) |
 
 회사 AI를 끄려면 관리자 화면에서 주소를 지우고 반영하면 됩니다. FC는 자동으로 **복사·붙여넣기** 방식으로 바뀝니다.
+
+
+## 관리자만 쓰게 하기 (관리자 기본 연결)
+
+관리자는 따로 등록하지 않아도 바로 회사 AI로 읽고, FC는 각자 「내 AI 등록」을 하게 하려면 다음처럼 설정합니다.
+
+1. 위 4번 설정에 `AUTH_SECRET`(kif-auth의 SECRET과 같은 값)과 `ALLOW` = `admin`을 넣고 **Deploy**합니다.
+2. 포털 **관리자 페이지 › 콘텐츠 관리 › 회사 AI**에 Worker 주소를 넣고, 「쓸 수 있는 사람」을 **관리자만**으로 고른 뒤 저장합니다.
+3. 나중에 FC 모두 쓰게 하려면 `ALLOW`를 `all`로 바꾸고, 포털에서도 「모든 FC」로 바꿉니다.
