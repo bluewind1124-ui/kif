@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-23.21">
+<meta name="kif-build" content="2026-10-24.1">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -407,6 +407,7 @@ body.adv-full{overflow:hidden}
 @media (max-width:520px){#meBtn{display:none}.top .zoom{display:none}}
 /* ===== 상조 서비스 (제휴사 소개서) ===== */
 .sj{display:grid;gap:22px}
+.hub-tile .no{display:flex;align-items:center;gap:6px}.hub-tile .no .si{width:18px;height:18px}
 .sch-t td{vertical-align:top}.sch-t td.d{white-space:nowrap;font-weight:700}.sch-t tr.past{opacity:.5}
 .nu-sch{margin-top:8px;padding:8px 10px;border:1px dashed #cb9c3a;border-radius:6px;background:#fffaf0}.nu-sr{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}.nu-sr .in{width:auto;padding:4px 6px;font-size:.85rem}.nu-sr input[type=checkbox]{width:18px;height:18px}
 .sj-hero{background:linear-gradient(135deg,#0f2240 0%,#1b3561 100%);color:#fff;border-radius:6px;padding:28px 26px;position:relative;overflow:hidden}
@@ -1401,7 +1402,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var live=AWARDS.filter(function(a){return a[3]==='진행 중';}).map(function(a){return {a:a,n:dleft(a[1])};}).sort(function(x,y){return (x.n==null?999:x.n)-(y.n==null?999:y.n);});
       var near=live[0], nn=newsNew(), cust=0;try{cust=(JSON.parse(localStorage.getItem('fc_ai_customers')||'[]')||[]).length;}catch(e){}
       var dd=function(n){return n==null?'진행 중':n>0?'D-'+n:n===0?'오늘 마감':'마감';};
-      var P=[['영업 도구','상품 비교 · AI보장분석 · 이달의 컨셉','compare'],['교육 · 연계','온라인 교육센터 · 자동차 견적 · 상조','edu'],['공지 · 시상','보험사 소식지 · 시상 공지','news']];
+      var P=Object.keys(HUBS).map(function(k){return [HUBS[k],hubItems(k).map(function(it){return it[1];}).join(' · '),k];});
       var h='<section class="hm-hero"><p class="hh-k">한국보험금융 FC 활동지원</p><h1 class="hh-w">한보금 <em>ON</em></h1><p class="hh-s">사람을 위한 <em>따뜻한</em> 보험</p>'+
         '<div class="hh-cards">'+P.map(function(c){return '<div class="hh-card"><b>'+c[0]+'</b><span>'+c[1]+'</span><button type="button" data-go="'+c[2]+'">바로가기</button></div>';}).join('')+'</div></section>';
       h+='<section class="hm-hd"><div><div class="hm-date">'+ds+'</div><h1>'+E(me.name)+'님, 오늘 할 일부터 보세요</h1></div><div class="hm-srch">'+srchBox(false)+'</div></section>';
@@ -1489,6 +1490,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn ghost" type="button" id="schAdd">표에 더하기</button><button class="btn" type="button" id="schSave">저장 (모든 FC에게 반영)</button></div><p class="note" id="schMsg" role="status"></p></div>';
       return h;
     },
+    hub_sales:function(){return hubPage('hub_sales');},hub_edu:function(){return hubPage('hub_edu');},hub_notice:function(){return hubPage('hub_notice');},
     car:function(){
       var S=CARQ,E=esc,n2=function(i){return pad2(i+1);};
       var go=S.url?'<a class="btn gold" style="text-decoration:none" href="'+E(S.url)+'" data-carq>비교견적 바로가기 →</a>':'<button class="btn gold" type="button" disabled style="opacity:.6">비교견적 바로가기 (주소 준비 중)</button>';
@@ -1579,6 +1581,19 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     }
   };
 
+  /* 홈 첫 카드 「바로가기」 → 그 묶음(메뉴 그룹)의 항목을 모두 카드로 보여 주는 화면. 메뉴(MENU)가 바뀌면 저절로 따라 바뀐다 */
+  var HUBS={hub_sales:'영업 도구',hub_edu:'교육 · 연계',hub_notice:'공지 · 시상'};
+  var HUB_D={compare:'보험사 상품을 한눈에 비교하는 비교 도구 모음',ai:'등록된 기준·샘플대로 보장분석과 제안서 만들기',ai2:'고급형 계산 규칙으로 보장·연금·자산 분석 제안서',
+    hypo:'고객 유형별 대표 상품과 첫 화법',concept:'이달 전 FC가 함께 쓰는 상담 컨셉과 자료',news:'보험사별 월간·주간 소식지',sched:'개정·출시·판매종료 일정을 한눈에',
+    award:'진행 중인 시상·시책 안내',edu:'온라인 교육센터 강의 바로가기',car:'자동차보험 비교견적 사이트 연결',sangjo:'제휴 상조 서비스 안내',mats:'교육·영업 자료 모음'};
+  function hubItems(k){var g=HUBS[k],out=[];MENU.forEach(function(gr){if(gr.g===g&&!gr.admin)gr.items.forEach(function(it){if(PAGES[it[0]])out.push(it);});});return out;}
+  function hubPage(k){
+    var L=hubItems(k),E=esc;
+    var h=head('바로가기',E(HUBS[k]),'이 묶음에 있는 메뉴입니다. 카드를 누르면 해당 화면으로 갑니다.');
+    h+='<div class="grid hub-grid">'+L.map(function(it,i){return '<a class="tile hub-tile" href="#" data-go="'+it[0]+'"><span class="no">'+ic(SIC[it[0]]||'star','si')+pad2(i+1)+(it[2]?' <span class="pill new">'+E(it[2])+'</span>':'')+'</span><h3>'+E(it[1])+'</h3><span class="d">'+E(HUB_D[it[0]]||'')+'</span><span class="go">열기 ›</span></a>';}).join('')+'</div>';
+    if(k==='hub_notice'&&NOTICES&&NOTICES.length)h+='<div class="panel" style="margin-top:16px"><h3>본사 공지</h3><ul class="list">'+NOTICES.slice(0,6).map(function(n){return '<li><span class="dt">'+E(n[0])+'</span><span class="t">'+fileA(n[2],E(n[1]))+'</span></li>';}).join('')+'</ul></div>';
+    return h;
+  }
   function head(k,t,p){return '<div class="ph"><div class="kicker">'+k+'</div><h1>'+t+'</h1>'+(p?'<p>'+p+'</p>':'')+'</div>';}
   function extPage(t,sub,d,ic,url){
     var btn=url?'<a class="btn sm" style="text-decoration:none" target="_blank" rel="noopener" href="'+url+'">'+t+' 바로가기 ↗</a>':'<button class="btn sm" disabled style="opacity:.55">'+t+' 바로가기 ↗</button>';
