@@ -1539,7 +1539,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       return h+'<iframe class="calc-fr" src="calc/index.html?embed=1&admin=1" title="계산기 기준값"></iframe>';
     },
     calc:function(){
-      var h=head('교육 · 연계','금융계산기','보장·연금·재무·세금·법인 상담에 쓰는 계산기입니다. 상황·키워드·초성으로 찾고, 결과는 복사해서 고객에게 보내거나 인쇄할 수 있습니다.');
+      var h=head('교육 · 연계','금융계산기','보장·노후·저축·세금·법인 상담에 쓰는 계산기입니다. 상황·키워드·초성으로 찾고, 결과는 복사해서 고객에게 보내거나 인쇄할 수 있습니다.');
       h+='<div class="ai-adv-bar"><a class="btn sm ghost" style="text-decoration:none" target="_blank" rel="noopener" href="calc/index.html">새 창으로 열기 ↗</a></div>';
       return h+'<iframe class="calc-fr" src="calc/index.html?embed=1" title="금융계산기"></iframe>';
     },
@@ -1644,7 +1644,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var HUBS={hub_sales:'영업 도구',hub_edu:'교육 · 연계',hub_notice:'공지 · 시상'};
   var HUB_D={compare:'보험사 상품을 한눈에 비교하는 비교 도구 모음',ai:'등록된 기준·샘플대로 보장분석과 제안서 만들기',ai2:'고급형 계산 규칙으로 보장·연금·자산 분석 제안서',
     hypo:'고객 유형별 대표 상품과 첫 화법',concept:'이달 전 FC가 함께 쓰는 상담 컨셉과 자료',news:'보험사별 월간·주간 소식지',sched:'개정·출시·판매종료 일정을 한눈에',
-    award:'진행 중인 시상·시책 안내',edu:'온라인 교육센터 강의 바로가기',car:'자동차보험 비교견적 사이트 연결',policy:'약관 PDF를 올리고 물어보면 AI가 조항을 찾아 답합니다',calc:'보장·연금·재무·세금·법인 계산기 37종',sangjo:'제휴 상조 서비스 안내',mats:'교육·영업 자료 모음'};
+    award:'진행 중인 시상·시책 안내',edu:'온라인 교육센터 강의 바로가기',car:'자동차보험 비교견적 사이트 연결',policy:'약관 PDF를 올리고 물어보면 AI가 조항을 찾아 답합니다',calc:'보장·노후·저축·세금·법인 계산기 37종',sangjo:'제휴 상조 서비스 안내',mats:'교육·영업 자료 모음'};
   function hubItems(k){var g=HUBS[k],out=[];MENU.forEach(function(gr){if(gr.g===g&&!gr.admin)gr.items.forEach(function(it){if(PAGES[it[0]])out.push(it);});});return out;}
   function hubPage(k){
     var L=hubItems(k),E=esc;
