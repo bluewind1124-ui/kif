@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-24.2">
+<meta name="kif-build" content="2026-10-24.3">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -921,6 +921,15 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .hq{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;color:var(--ink);font-weight:700;font-size:1.02rem;text-decoration:none;text-align:left}
 .hq:hover{border-color:var(--kgold);background:var(--gold-soft)}
 .qi{width:24px;height:24px;flex:none;fill:none;stroke:var(--navy-ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.hm-col{display:grid;gap:16px;min-width:0}
+.hm-rail{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 24px)/4);gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:6px}
+.hm-rail>.mat{scroll-snap-align:start;text-align:left;font:inherit;padding:0;display:flex;flex-direction:column;justify-content:flex-start;cursor:pointer}
+.hm-rail .mat .th{aspect-ratio:3/4;padding:10px;min-height:0;overflow:hidden}.hm-rail .mat .th b{font-size:.92rem}.hm-rail .mat .mt{font-size:.76rem;padding:6px 8px}
+.hm-rail .th.img img{object-fit:cover;object-position:top center}
+.hy-paper{background:linear-gradient(160deg,#16294a,#0f2240)!important;color:#fff;display:flex;flex-direction:column;gap:6px;justify-content:flex-start}.hy-paper b{font-size:.9rem;line-height:1.35}.hy-paper i{font-style:normal;font-size:.72rem;color:#e8d3a3;line-height:1.4}
+.hm-lrail{display:grid!important;grid-template-columns:none!important;grid-auto-flow:column;grid-auto-columns:calc((100% - 10px)/2);grid-template-rows:repeat(2,auto);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:6px}.hm-lrail>.lect{scroll-snap-align:start}
+.hm-vs{max-height:300px;overflow-y:auto;scrollbar-width:thin}.hm-vs.sm{max-height:170px}.hm-vs thead th{position:sticky;top:0;z-index:1}
+@media (max-width:900px){.hm-rail{grid-auto-columns:calc((100% - 16px)/3)}}@media (max-width:600px){.hm-rail{grid-auto-columns:calc((100% - 8px)/2)}.hm-lrail{grid-auto-columns:85%}}
 .hm-two{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
 .hm-two .panel h3{display:flex;align-items:baseline;gap:8px}
 .hm-two .panel h3 .more{margin-left:auto}
@@ -1426,15 +1435,17 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       for(var qi=Q.length-1;qi>0;qi--){var qj=Math.floor(Math.random()*(qi+1)),qt=Q[qi];Q[qi]=Q[qj];Q[qj]=qt;}
       var qrow=Q.map(function(q){return '<button class="hq" data-go="'+q[2]+'">'+ic(q[0],'qi')+'<span>'+E(q[1])+'</span><small>'+E(q[3])+'</small></button>';}).join('');
       h+='<section><h3 class="hm-h">빠른 실행 <span class="note">메뉴를 누르면 바로 열립니다 · 마우스를 올리면 멈춥니다</span></h3><div class="hm-mq" style="--n:'+Q.length+'"><div class="hm-mq-in">'+qrow+'<span class="hm-mq-gap" aria-hidden="true"></span>'+qrow.replace(/<button /g,'<button tabindex="-1" aria-hidden="true" ')+'</div></div></section>';
-      var nr=NEWS.slice(0,6).map(function(n){var m=newsMeta(n),t=m.title||sumText(n[2]);
+      var nr=NEWS.map(function(n){var m=newsMeta(n),t=m.title||sumText(n[2]);
         return '<tr><td><b>'+E(m.co)+'</b></td><td>'+(m.title?fileA(n[3],E(t)):E(t))+'</td><td>'+(m.ym?E(m.ym)+' '+(m.wk?m.wk+'주차':'월간'):'')+'</td><td class="r">'+E(String(n[0]||'').slice(5))+'</td></tr>';}).join('');
-      var ar=AWARDS.slice(0,3).map(function(a){var n=a[3]==='진행 중'?dleft(a[1]):null;
+      var ar=AWARDS.map(function(a){var n=a[3]==='진행 중'?dleft(a[1]):null;
         return '<li data-go="award">'+ic('cup','li-i')+'<span class="t">'+E(a[0])+'</span>'+(a[3]==='진행 중'?'<span class="aw-dd">'+dd(n)+'</span>':'<span class="aw-dd done">'+E(a[3])+'</span>')+'</li>';}).join('');
       h+='<section class="hm-two"><div class="panel"><h3>보험사 소식지 <button class="more" data-go="news">전체 '+NEWS.length+'건 보기 ›</button></h3>'+
-        '<div class="tbl hm-tbl"><table><thead><tr><th>보험사</th><th>자료명</th><th>구분</th><th class="r">등록일</th></tr></thead><tbody>'+nr+'</tbody></table></div></div>'+
-        '<div class="panel"><h3>시상 · 공지 <button class="more" data-go="award">전체 보기 ›</button></h3><ul class="hm-aw">'+ar+'</ul><div class="hm-nt"><b>본사 공지</b><ul class="list noticeList"></ul></div></div></section>';
-      h+='<section class="hm-two"><div class="panel"><h3>교육 자료 <span class="note">상담·교육용 PT와 비교 자료</span> <button class="more" data-go="mats">교육 자료실 ›</button></h3><div class="mats4">'+matsShown().filter(function(m){return m[4];}).slice(0,8).map(function(m){return matCard(m,false);}).join('')+'</div></div>'+
-        '<div class="panel"><h3>교육센터 새 강의 '+(LECT_AT?'<span class="note">'+E(LECT_AT)+' 확인</span> ':'')+'<button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects">'+LECT.slice(0,6).map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E([l[3],l[2]].filter(Boolean).join(' · '))+'</i></div></a>';}).join('')+'</div></div></section>';
+        '<div class="tbl hm-tbl hm-vs"><table><thead><tr><th>보험사</th><th>자료명</th><th>구분</th><th class="r">등록일</th></tr></thead><tbody>'+nr+'</tbody></table></div></div>'+
+        '<div class="panel"><h3>시상 · 공지 <button class="more" data-go="award">전체 보기 ›</button></h3><ul class="hm-aw hm-vs sm">'+ar+'</ul><div class="hm-nt"><b>본사 공지</b><ul class="list noticeList hm-vs sm"></ul></div></div></section>';
+      var ML=matsShown().filter(function(m){return m[4];});
+      h+='<section class="hm-two"><div class="hm-col"><div class="panel"><h3>교육 자료 <span class="note">상담·교육용 PT와 비교 자료 '+ML.length+'건</span>'+railNav('railMats',ML.length>4)+' <button class="more" data-go="mats">교육 자료실 ›</button></h3><div class="hm-rail" id="railMats">'+ML.map(function(m){return matCard(m,false);}).join('')+'</div></div>'+
+        '<div class="panel"><h3>대표 상품 가설 <span class="note">고객 유형별 대표 상품과 첫 화법 '+HYPO.length+'건</span>'+railNav('railHypo',HYPO.length>4)+' <button class="more" data-go="hypo">전체 보기 ›</button></h3>'+(HYPO.length?'<div class="hm-rail" id="railHypo">'+HYPO.map(hypoCard).join('')+'</div>':'<p class="note">아직 등록된 가설이 없습니다.</p>')+'</div></div>'+
+        '<div class="panel"><h3>교육센터 새 강의 '+(LECT_AT?'<span class="note">'+E(LECT_AT)+' 확인</span> ':'')+''+railNav('railLect',LECT.length>4)+'<button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects hm-lrail" id="railLect">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E([l[3],l[2]].filter(Boolean).join(' · '))+'</i></div></a>';}).join('')+'</div></div></section>';
       h+='<section class="panel smp-home">'+smpHome()+'</section>';
       h+='<footer class="pfoot">한국보험금융(주) 한보금on 활동지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
       return '<div class="hm">'+h+'</div>';
@@ -1599,6 +1610,26 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(k==='hub_notice'&&NOTICES&&NOTICES.length)h+='<div class="panel" style="margin-top:16px"><h3>본사 공지</h3><ul class="list">'+NOTICES.slice(0,6).map(function(n){return '<li><span class="dt">'+E(n[0])+'</span><span class="t">'+fileA(n[2],E(n[1]))+'</span></li>';}).join('')+'</ul></div>';
     return h;
   }
+  /* 홈 박스 좌우 넘기기: ◀ ▶ 버튼 + 손가락·마우스 휠 가로 스크롤 */
+  function railNav(id,on){return on?'<span class="smp-nav"><button class="btn sm ghost" type="button" data-rmv="-1" data-rail="'+id+'" aria-label="이전">◀</button><button class="btn sm ghost" type="button" data-rmv="1" data-rail="'+id+'" aria-label="다음">▶</button></span>':'';}
+  document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-rmv]');if(!b)return;var r=document.getElementById(b.getAttribute('data-rail'));if(r)r.scrollBy({left:(+b.getAttribute('data-rmv'))*Math.max(200,r.clientWidth*0.9),behavior:'smooth'});});
+  /* 홈 「대표 상품 가설」 카드: AI 보장분석 샘플처럼 첫 장 그림 + 제목. 올릴 때 만든 첫 장 그림(thumbs)이 없으면 화면에서 PDF 첫 장을 그려 넣는다 */
+  var HYTH={};
+  function hypoCard(r,i){
+    var F=hypoFiles(r),f=F[0]||'',T=(SITE&&SITE.thumbs)||{},th=f&&T[f]?fileHref(T[f]):(HYTH[f]||''),tag=f?String(f.split('.').pop()||'').toUpperCase():'가설';
+    var top=th?'<div class="th img"><img loading="lazy" alt="" src="'+th+'"><span>'+esc(tag)+'</span></div>':
+      '<div class="th paper hy-paper"'+(f&&isPdf(f)?' data-hythumb="'+esc(f)+'"':'')+'><span>'+esc(tag)+'</span><b>'+esc(r[0])+'</b><i>'+esc(r[2]||'')+'</i></div>';
+    return '<button type="button" class="mat smp-card hy-card" data-hyv="'+i+'">'+top+'<div class="mt"><b class="mtt">'+esc(r[0])+'</b>'+esc(r[1]||'')+(F.length>1?' · 자료 '+F.length+'개':'')+' <span class="pill new">보기</span></div></button>';
+  }
+  async function hyThumbs(){
+    var L=document.querySelectorAll('[data-hythumb]');if(!L.length||!pdfLib())return;
+    for(var k=0;k<L.length;k++){var el=L[k],f=el.getAttribute('data-hythumb');
+      try{if(!HYTH[f]){var doc=await pdfLib().getDocument(fileHref(f)).promise,pg=await doc.getPage(1),v0=pg.getViewport({scale:1}),v=pg.getViewport({scale:360/v0.width}),cv=document.createElement('canvas');
+          cv.width=Math.round(v.width);cv.height=Math.round(v.height);var cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);await pg.render({canvasContext:cx,viewport:v}).promise;HYTH[f]=cv.toDataURL('image/jpeg',0.8);}
+        if(el.isConnected){var tag=el.querySelector('span');el.outerHTML='<div class="th img"><img alt="" src="'+HYTH[f]+'"><span>'+(tag?tag.textContent:'PDF')+'</span></div>';}}catch(x){}}
+  }
+  document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-hyv]');if(!b)return;e.preventDefault();var r=HYPO[+b.getAttribute('data-hyv')];if(!r)return;var F=hypoFiles(r);
+    if(!F.length){go('hypo');return;}openMat([String(F[0].split('.').pop()||'').toUpperCase(),r[0],'',r[1]||'',F[0]]);});
   function head(k,t,p){return '<div class="ph"><div class="kicker">'+k+'</div><h1>'+t+'</h1>'+(p?'<p>'+p+'</p>':'')+'</div>';}
   function extPage(t,sub,d,ic,url){
     var btn=url?'<a class="btn sm" style="text-decoration:none" target="_blank" rel="noopener" href="'+url+'">'+t+' 바로가기 ↗</a>':'<button class="btn sm" disabled style="opacity:.55">'+t+' 바로가기 ↗</button>';
@@ -1672,7 +1703,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!pBack&&me&&cur&&cur!==id){PST.push(cur);if(PST.length>40)PST.shift();}
     cur=id;renderSide();updPBack();
     document.getElementById('view').innerHTML=PAGES[id]();
-    if(id==='home')renderNotices();
+    if(id==='home'){renderNotices();setTimeout(hyThumbs,30);}
     bindPage(id);
     var on=document.querySelector('#side button.on');if(on&&on.scrollIntoView)on.scrollIntoView({block:'nearest',inline:'center'});
     if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
