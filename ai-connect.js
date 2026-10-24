@@ -70,7 +70,8 @@ var css='.kai-ov{position:fixed;inset:0;background:rgba(10,18,26,.55);z-index:99
 '.kai-tip{background:#fbf3e3;color:#5a4416;border-radius:10px;padding:12px 14px;font-size:13px;margin-top:14px}'+
 '.kai-opt em{display:block;font-style:normal;font-size:12px;font-weight:700;color:#b07d1c;margin-top:6px}'+
 '.kai-krow{display:flex;gap:6px;margin-top:4px}.kai-krow input{margin-top:0!important;flex:1;font-family:ui-monospace,monospace}'+
-'.kai-done{background:#e6f4ec;border-radius:10px;padding:14px 16px;margin:8px 0}.kai-done b{display:block;color:#1d7f47;font-size:16px}.kai-done span{font-size:13px}'+
+'.kai-done{background:#e6f4ec;border-radius:10px;padding:14px 16px;margin:8px 0}.kai-done b{display:block;color:#1d7f47;font-size:16px}.kai-done span{font-size:13px}.kai-done span b{display:inline;font-size:inherit;color:inherit}'+
+'.kai-fd{border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px;margin:10px 0;background:#f8fafc}.kai-fdl{font-size:14px}.kai-fdl span{color:#9aa3ae}.kai-fd .kai-row{margin-top:8px}'+
 '.kai-ul{padding-left:20px;font-size:13px}.kai-faq h3{margin-top:0;font-size:16px}.kai-faq p{font-size:13px;margin:10px 0}'+
 '@media (max-width:640px){.kai-grid{grid-template-columns:1fr;gap:8px}.kai-main{border-left:0;padding-left:0}.kai-nav{display:flex;gap:4px;overflow-x:auto}.kai-nav li{flex:none;padding:4px 8px;border-radius:6px;background:#f2f4f7;font-size:12px}.kai-nav li.on{background:#fdf7ea}}'+
 '@media (max-width:560px){.kai-box{padding:16px}.kai-opts{grid-template-columns:1fr}}';
@@ -109,8 +110,8 @@ var sel='',ov=null,step=1,draft='';
 function open(){addCss();var c=cfg();sel=c.prov;step=1;draft='';if(!ov){ov=document.createElement('div');ov.className='kai-ov';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-label','내 AI 등록');ov.addEventListener('click',onClick);ov.addEventListener('input',onInput);document.body.appendChild(ov);}ov.hidden=false;render();}
 function close(){if(ov){ov.remove();ov=null;}}
 function connectedPill(){var c=cfg(),p=c.prov;if(!chosen()||c.mode!=='ai'||(AIP[p].key&&!c.keys[p]))return '<span class="kai-pill off">아직 연결 안 됨</span>';return '<span class="kai-pill">● '+esc(AIP[p].name.replace(/ \(.*\)$/,''))+' 연결됨</span>';}
-function stepNav(){var L=['AI 고르기','키 발급받기','붙여넣고 확인','완료'],api=AIP[sel]&&AIP[sel].key;
-  return '<ol class="kai-nav">'+L.map(function(t,i){var n=i+1,cls=n===step?'on':n<step?'done':'';if(!api&&n>1)cls+=' dim';return '<li class="'+cls+'"><i>'+(n<step?'✓':n)+'</i>'+t+'</li>';}).join('')+'</ol>';}
+function stepNav(){var L=['AI 고르기','키 발급받기','붙여넣고 확인','저장 폴더 · 완료'],api=AIP[sel]&&AIP[sel].key;
+  return '<ol class="kai-nav">'+L.map(function(t,i){var n=i+1,cls=n===step?'on':n<step?'done':'';if(!api&&n>1&&n<4)cls+=' dim';return '<li class="'+cls+'"><i>'+(n<step?'✓':n)+'</i>'+t+'</li>';}).join('')+'</ol>';}
 function render(){
   var c=cfg(),p=sel||c.prov,host=!!claudeHost(),h='';
   if(step===1){
@@ -140,8 +141,11 @@ function render(){
       '<div class="kai-row"><button type="button" class="kai-btn" data-kai="prev">이전</button><button type="button" class="kai-btn p" data-kai="check">확인</button><span class="kai-note" id="kaiMsg" role="status"></span></div>'+
       (c.keys[p]?'<div class="kai-row"><button type="button" class="kai-btn g d" data-kai="del">이 기기에서 키 지우기</button></div>':'');
   }else{
-    h='<h2>4. 완료</h2><div class="kai-done"><b>✓ '+esc(AIP[p].name)+' 연결됨</b><span>이제 AI보장분석 <b>기본형</b>과 <b>고급형</b>에서 자료를 올리면 이 AI가 읽습니다.</span></div>'+
-      '<ul class="kai-ul"><li>기본형: 증권·가입설계서를 올리면 등록된 기준·샘플대로 분석합니다.</li><li>고급형: 「증권·설계서 AI 판독」, 「자료로 채우기 (AI)」, 「AI 의견 초안 받기」에서 씁니다.</li><li>바꾸고 싶으면 홈의 「내 AI」 칸에서 언제든 다시 엽니다.</li></ul>'+
+    var man=c.mode!=='ai';
+    h='<h2>4. 고객 자료 저장 폴더 정하기</h2>'+(man?'<div class="kai-done"><b>✓ AI 없이 쓰기로 저장했습니다</b><span>값은 직접 입력합니다. 나중에 왼쪽 메뉴 아래 「AI 연결」에서 언제든 AI를 연결할 수 있습니다.</span></div>':
+      '<div class="kai-done"><b>✓ '+esc(AIP[p].name)+' 연결됨</b><span>이제 AI보장분석 <b>기본형</b>과 <b>고급형</b>에서 자료를 올리면 이 AI가 읽습니다.</span></div>')+
+      '<p class="kai-note">상담한 고객 자료는 회사 서버에 올라가지 않고 <b>이 기기</b>에만 있습니다. 내 PC나 내 클라우드(OneDrive·Google Drive) 안에 <b>보관 폴더</b>를 한 번 정해 두면, 「내 정보 · 자료 보관」에서 저장할 때마다 그 폴더에 날짜별 파일로 바로 저장됩니다.</p>'+fdBox()+
+      (man?'':'<ul class="kai-ul"><li>기본형: 증권·가입설계서를 올리면 등록된 기준·샘플대로 분석합니다.</li><li>고급형: 「증권·설계서 AI 판독」, 「자료로 채우기 (AI)」, 「AI 의견 초안 받기」에서 씁니다.</li><li>바꾸고 싶으면 왼쪽 메뉴 아래 「AI 연결」(폰은 「내 정보」)에서 언제든 다시 엽니다.</li></ul>')+
       '<div class="kai-row"><button type="button" class="kai-btn p" data-kai="x">닫기</button></div>';
   }
   var faq=(step===2||step===3)?'<div class="kai-box kai-faq"><h3>자주 묻는 것</h3>'+FAQ.map(function(f){return '<p><b>'+f[0]+'</b><br>'+f[1]+'</p>';}).join('')+'</div>':'';
@@ -175,8 +179,10 @@ function onClick(e){
       function(er){m.innerHTML='✕ '+esc(er&&er.code==='bad_key'?'키가 맞지 않거나 아직 사용할 수 없는 키입니다. 발급 페이지에서 복사 버튼으로 다시 복사해 붙여넣으세요(결제 등록이 필요한 회사는 결제부터 확인).':err(er))+' <button type="button" class="kai-link" data-kai="force">시험 없이 저장</button>';b.disabled=false;});
     return;}
   if(a==='force'){var kf=document.getElementById('kaiKey').value.trim(),mf=document.getElementById('kaiModel');if(!kf)return;saveKey(sel,kf,mf?mf.value.trim():null);step=4;render();return;}
-  if(a==='save'){var cd=document.getElementById('kaiCode'),c=raw();if(cd)c.code=cd.value.trim();c.prov=sel;c.mode='ai';saveRaw(c);close();note('내 AI를 저장했습니다 ('+AIP[sel].name+')');return;}
-  if(a==='off'){var r0=raw();r0.mode='manual';saveRaw(r0);close();note('AI 없이 쓰기로 바꿨습니다');return;}
+  if(a==='save'){var cd=document.getElementById('kaiCode'),c=raw();if(cd)c.code=cd.value.trim();c.prov=sel;c.mode='ai';saveRaw(c);step=4;render();note('내 AI를 저장했습니다 ('+AIP[sel].name+')');return;}
+  if(a==='off'){var r0=raw();r0.mode='manual';saveRaw(r0);step=4;render();note('AI 없이 쓰기로 바꿨습니다');return;}
+  if(a==='fd'){var fm=document.getElementById('kaiFdMsg');b.disabled=true;
+    fdPick().then(function(l){render();note('저장 폴더를 정했습니다: '+l);},function(er){b.disabled=false;if(fm)fm.textContent=er&&er.name==='AbortError'?'폴더 고르기를 취소했습니다.':'✕ '+fdErr(er);});return;}
   if(a==='del'){var r=raw();if(r.keys)delete r.keys[sel];saveRaw(r);draft='';render();return;}
   if(a==='test'){var cd2=document.getElementById('kaiCode'),c2=raw();if(cd2)c2.code=cd2.value.trim();c2.prov=sel;c2.mode='ai';saveRaw(c2);var m2=document.getElementById('kaiMsg');m2.textContent='시험 중…';b.disabled=true;
     ask('연결 시험이다. JSON 하나로만 답하라: {"ok":true}').then(function(r){m2.textContent=r&&r.ok?'✓ 연결됐습니다.':'답은 왔지만 형식이 다릅니다.';},function(er){m2.textContent='✕ '+err(er);}).then(function(){b.disabled=false;});}
@@ -348,7 +354,45 @@ function err(e){
     unavailable:'이 화면에서는 Claude 화면 연결을 쓸 수 없습니다. 「내 AI 등록」에서 다른 방식을 고르세요.',lib:'파일 읽기 도구를 불러오지 못했습니다(인터넷 연결 확인).'};
   var c=e&&e.code;return M[c]||(e&&e.message)||('AI 읽기 실패'+(c?' ('+c+')':''));
 }
+
+/* ---------- 고객 자료 저장 폴더 (PC 크롬·엣지) ----------
+   처음 한 번 폴더를 고르면 그 안에 「한보금on_고객자료」 폴더를 만들고, 폴더 위치(핸들)를 이 기기 브라우저(IndexedDB)에 기억한다.
+   이후 저장은 그 폴더에 날짜별 파일로 바로 쓴다. 폰·사파리·파이어폭스는 폴더 지정이 안 되므로 예전처럼 공유 창·다운로드로 저장한다. */
+var FD_NAME='한보금on_고객자료',FD_LS='kif_bk_dir',fdH=null,fdLoaded=false;
+function fdOk(){try{return !!window.showDirectoryPicker&&window.isSecureContext&&window.self===window.top&&!/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);}catch(e){return false;}}
+function idbDo(mode,f){return new Promise(function(res,rej){var r=indexedDB.open('kif_fs',1);r.onupgradeneeded=function(){r.result.createObjectStore('h');};r.onerror=function(){rej(r.error);};
+  r.onsuccess=function(){var db=r.result,t=db.transaction('h',mode),q=f(t.objectStore('h'));t.oncomplete=function(){db.close();res(q&&q.result);};t.onerror=t.onabort=function(){db.close();rej(t.error);};};});}
+function fdLabel(){try{return localStorage.getItem(FD_LS)||'';}catch(e){return '';}}
+async function fdGet(){if(fdLoaded)return fdH;fdLoaded=true;if(!fdOk())return null;try{fdH=(await idbDo('readonly',function(s){return s.get('dir');}))||null;}catch(e){fdH=null;}if(!fdH){try{localStorage.removeItem(FD_LS);}catch(e){}}return fdH;}
+async function fdPick(){
+  if(!fdOk())throw {code:'fd_unsupported'};
+  var base=await window.showDirectoryPicker({id:'kif-bk',mode:'readwrite',startIn:'documents'});
+  var d=base.name===FD_NAME?base:await base.getDirectoryHandle(FD_NAME,{create:true});
+  await idbDo('readwrite',function(s){return s.put(d,'dir');});fdH=d;fdLoaded=true;
+  var lab=(base.name===FD_NAME?'':base.name+' › ')+FD_NAME;try{localStorage.setItem(FD_LS,lab);}catch(e){}
+  fire();return lab;
+}
+async function fdClear(){fdH=null;fdLoaded=true;try{localStorage.removeItem(FD_LS);}catch(e){}try{await idbDo('readwrite',function(s){return s.delete('dir');});}catch(e){}fire();}
+async function fdPerm(h,ask){var o={mode:'readwrite'};if((await h.queryPermission(o))==='granted')return true;return ask!==false&&(await h.requestPermission(o))==='granted';}
+async function fdWrite(name,blob){
+  var h=await fdGet();if(!h)return null;
+  if(!(await fdPerm(h)))throw {code:'fd_denied'};
+  var fh;try{fh=await h.getFileHandle(name,{create:true});}catch(e){if(e&&e.name==='NotFoundError'){await fdClear();throw {code:'fd_gone'};}throw e;}
+  var w=await fh.createWritable();await w.write(blob);await w.close();return fdLabel()+' › '+name;
+}
+function fdErr(e){var M={fd_unsupported:'이 기기(브라우저)는 저장 폴더를 정할 수 없습니다. PC의 크롬이나 엣지에서 해 주세요.',fd_denied:'폴더에 저장하려면 브라우저 창에서 「허용」(파일 수정 허용)을 눌러야 합니다. 다시 눌러 주세요.',
+  fd_gone:'정해 둔 저장 폴더를 찾을 수 없습니다(옮기거나 지웠을 수 있습니다). 저장 폴더를 다시 골라 주세요.'};
+  if(e&&e.name==='SecurityError')return '이 폴더는 브라우저가 막는 곳입니다(바탕 화면·문서 자체 등). 그 안의 폴더를 고르거나 「새 폴더」로 만들어 고르세요.';
+  return M[e&&e.code]||(e&&e.message)||String(e);}
+function fdBox(){
+  if(!fdOk())return '<div class="kai-tip"><b>이 기기는 저장 폴더를 미리 정할 수 없습니다</b><br>휴대폰·사파리·파이어폭스는 브라우저가 폴더 지정을 막습니다. 「내 정보 · 자료 보관」에서 저장을 누르면 그때 <b>드라이브·파일 앱</b>(폰)이나 <b>다운로드 폴더</b>(PC)에 저장됩니다. 폴더를 정하려면 PC의 <b>크롬</b>이나 <b>엣지</b>에서 열어 주세요.</div>';
+  var l=fdLabel();
+  return '<div class="kai-fd"><div class="kai-fdl">📁 저장 폴더: '+(l?'<b>'+esc(l)+'</b>':'<span>아직 정하지 않음</span>')+'</div>'+
+    '<div class="kai-row"><button type="button" class="kai-btn'+(l?'':' p')+'" data-kai="fd">'+(l?'폴더 바꾸기':'저장 폴더 고르기')+'</button><span class="kai-note" id="kaiFdMsg" role="status"></span></div>'+
+    '<p class="kai-note" style="margin:8px 0 0">창이 뜨면 <b>OneDrive</b>·<b>Google Drive</b>·<b>문서</b> 안에서 보관할 곳을 고르고 「폴더 선택」 → 「파일 수정 허용」을 누르세요. 고른 곳 안에 <b>'+FD_NAME+'</b> 폴더를 자동으로 만들어 줍니다. (바탕 화면·문서 자체는 크롬이 막으니, 그 안의 폴더를 고르거나 「새 폴더」를 만들어 고르세요.)</p></div>';
+}
+var folder={name:FD_NAME,ok:fdOk,get:fdGet,label:fdLabel,pick:fdPick,write:fdWrite,clear:fdClear,perm:fdPerm,err:fdErr};
 if(document.readyState!=='loading')addCss();else document.addEventListener('DOMContentLoaded',addCss);
 window.addEventListener('storage',function(e){if(e.key===AIK)fire();});
-window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,err:err,migrateClaudeKey:migrateClaudeKey,onChange:function(f){subs.push(f);}};
+window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,err:err,migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
 })();

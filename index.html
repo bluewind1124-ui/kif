@@ -1216,7 +1216,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   window.addEventListener('beforeunload',function(e){if(names().length||KS.busy){e.preventDefault();e.returnValue='';return '';}});
 })();
 </script>
-<script src="ai-connect.js"></script>
+<script src="ai-connect.js?v=20261024fd"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
@@ -1405,7 +1405,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return '<section class="hm-ai'+(first?' first':'')+'" id="hmAi"><span class="t">'+(first?'처음 한 번: 내 AI 등록':'내 AI')+'</span><div class="s">'+(first?'AI보장분석에서 쓸 AI를 먼저 정해 주세요. 한 번 등록하면 <b>기본형</b>과 <b>고급형</b>이 같은 AI를 씁니다.':K.statusHTML())+
       '<small>기본형은 등록된 기준·샘플대로 분석하고, 고급형은 고급형 계산 규칙대로 제안서를 만듭니다.</small></div><button type="button" class="btn'+(first?' gold':'')+'" data-kai-open>'+(first?'내 AI 등록하기':'내 AI 바꾸기')+'</button></section>';
   }
-  if(window.KIFAI)KIFAI.onChange(function(){var el=document.getElementById('hmAi');if(el)el.outerHTML=hmAi();});
+  if(window.KIFAI)KIFAI.onChange(function(){var el=document.getElementById('hmAi');if(el)el.outerHTML=hmAi();
+    try{if(me&&document.getElementById('side').innerHTML)renderSide();}catch(e){}
+    var ma=document.getElementById('meAi');if(ma)ma.outerHTML=meAiHtml();
+    var bp=document.getElementById('bkDirRow');if(bp)bp.outerHTML=bkDirHtml();});
   var PAGES={
     home:function(){
       var d=new Date(),W='일월화수목금토',E=esc;
@@ -1683,6 +1686,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         h+='<button data-go="'+it[0]+'" class="'+(it[0]===cur?'on':'')+mo+'">'+ic(SIC[it[0]]||'star','si')+'<span class="sdl">'+it[1]+'</span>'+(tag?'<span class="tag">'+tag+'</span>':'')+'</button>';});
     });
     h+='<div class="sd-foot"><div class="sd-me">'+ic('user','si')+'<div><b>'+esc(me.name)+'</b><span>'+esc(me.org||'')+'</span></div></div>'+
+      '<button type="button" class="sd-link" data-kai-open>'+ic('scan','si')+'<span class="sdl">AI 연결</span>'+(window.KIFAI&&!(KIFAI.chosen()&&KIFAI.cfg().mode==='ai')?'<span class="tag">미연결</span>':'')+'</button>'+
       '<button data-go="me" class="sd-link'+(cur==='me'?' on':'')+'">'+ic('doc','si')+'<span class="sdl">내 정보 · 자료 보관</span></button>'+
       '<button type="button" class="sd-link" id="sdLogout">'+ic('logout','si')+'<span class="sdl">로그아웃</span></button></div>';
     document.getElementById('side').innerHTML=h;
@@ -2968,8 +2972,15 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     else h+='<p class="note">아이디 <b>'+esc(me.id)+'</b></p><label class="f">지금 비밀번호<input class="in" id="pwOld" type="password" autocomplete="current-password"></label>'+
       '<label class="f">새 비밀번호 (8자 이상)<input class="in" id="pwNew" type="password" autocomplete="new-password"></label><label class="f">새 비밀번호 확인<input class="in" id="pwNew2" type="password" autocomplete="new-password"></label>'+
       '<div class="row"><button class="btn" type="button" id="pwChange">비밀번호 바꾸기</button></div><p class="note">회사 비밀번호와 다르게 정하는 것을 권장합니다.</p>';
-    h+='<p class="note" id="pwMsg" role="status"></p></div>'+bkHtml()+'</div>';
+    h+='<p class="note" id="pwMsg" role="status"></p></div>'+bkHtml()+'</div>'+meAiHtml();
     return h;
+  }
+  function meAiHtml(){
+    var K=window.KIFAI;if(!K)return '';var on=K.chosen()&&K.cfg().mode==='ai';
+    return '<div class="panel form" id="meAi"><h3>AI 연결 <span class="pill new">기본형·고급형 공통</span></h3>'+
+      '<p>'+(K.chosen()?K.statusHTML():'<b>아직 AI를 연결하지 않았습니다.</b>')+'</p>'+
+      '<p class="note">AI 연결 창의 마지막 단계에서 <b>고객 자료 저장 폴더</b>도 함께 정합니다.</p>'+
+      '<div class="row"><button type="button" class="btn'+(on?'':' gold')+'" data-kai-open>'+(on?'AI 연결 바꾸기':'AI 연결하기')+'</button></div></div>';
   }
   function bindMe(){
     var b=document.getElementById('pwChange');
@@ -3073,42 +3084,59 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
 
   /* ---- 고객 자료 보관: 내 PC · 내 클라우드에 파일로 ----
-     고객 자료는 계정 서버에 올리지 않는다. 이 기기 브라우저에 있고, 아래 버튼으로 파일 한 개로 저장·불러오기 한다.
-     PC(크롬·엣지): 원드라이브·구글 드라이브 폴더에 저장해 두면 다음부터 같은 파일에 바로 덮어쓴다.
-     폰: 저장을 누르면 공유 창이 떠서 구글 드라이브·내 파일(아이클라우드)에 넣을 수 있다. */
+     고객 자료는 계정 서버에 올리지 않는다. 이 기기 브라우저에 있고, 아래 버튼으로 파일 한 개(.json)로 저장·불러오기 한다.
+     .json은 파일 하나일 뿐 폴더를 만들지 않는다. 그래서 PC(크롬·엣지)는 처음 한 번 「저장 폴더」를 정하게 하고
+     (AI 연결 마지막 단계 또는 아래 버튼, ai-connect.js의 KIFAI.folder), 이후 그 폴더에 날짜별 파일로 바로 저장한다.
+     폴더 지정이 안 되는 기기(폰·사파리·파이어폭스)는 공유 창·다운로드로 저장한다. */
   var BK_KEYS=['fc_ai_customers','fc_ai_options','fc_ai_sort','cov-planner-v1'];
-  var BK_LAST='kif_bk_last', bkHandle=null;
+  var BK_LAST='kif_bk_last';
+  function bkFD(){return window.KIFAI&&KIFAI.folder||null;}
   function bkCollect(){var d={};BK_KEYS.forEach(function(k){try{var v=localStorage.getItem(k);if(v!=null)d[k]=v;}catch(e){}});return {app:'한보금on 활동지원',kind:'고객 자료',v:1,at:new Date().toISOString(),by:me&&me.id||'',data:d};}
   function bkCount(){var n=0,m=0;try{n=(JSON.parse(localStorage.getItem('fc_ai_customers')||'[]')||[]).length;}catch(e){}try{var a=JSON.parse(localStorage.getItem('cov-planner-v1')||'null');m=a&&a.clients?a.clients.length:0;}catch(e){}return {basic:n,adv:m};}
   function bkName(){var d=new Date();return '한보금on_내고객자료_'+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+'.json';}
+  function bkDirHtml(){
+    var F=bkFD();
+    if(!F||!F.ok())return '<div class="note" id="bkDirRow" style="background:#fbf3e3;color:#5a4416;border-radius:8px;padding:8px 12px;margin:8px 0">📁 이 기기(휴대폰·사파리·파이어폭스)는 저장 폴더를 미리 정할 수 없어, 저장할 때마다 <b>드라이브·파일 앱</b>이나 <b>다운로드 폴더</b>로 저장됩니다. 폴더를 정하려면 PC의 <b>크롬·엣지</b>에서 여세요.</div>';
+    var l=F.label();
+    return '<div id="bkDirRow" style="border:1px solid var(--line,#e3e7ec);border-radius:8px;padding:8px 12px;margin:8px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+      '<span>📁 저장 폴더: '+(l?'<b>'+esc(l)+'</b>':'<span class="note">아직 정하지 않음 (처음 저장할 때 고릅니다)</span>')+'</span>'+
+      '<button class="btn ghost" type="button" id="bkDir" style="padding:4px 10px">'+(l?'폴더 바꾸기':'저장 폴더 고르기')+'</button></div>';
+  }
   function bkHtml(){
-    var c=bkCount(),last=store(BK_LAST);
+    var c=bkCount(),last=store(BK_LAST),F=bkFD(),fd=F&&F.ok();
     return '<div class="panel form" id="bkPanel"><h3>고객 자료 보관 <span class="pill new">내 PC · 내 클라우드</span></h3>'+
       '<p class="note">고객 자료는 회사 서버에 올라가지 않고 <b>이 기기</b>에만 있습니다. 폰을 바꾸거나 브라우저 기록을 지우면 사라질 수 있으니, 아래 버튼으로 <b>내 PC나 내 클라우드</b>(구글 드라이브·원드라이브·아이클라우드)에 파일로 보관하세요.</p>'+
       '<p>지금 이 기기: AI보장분석 기본형 고객 <b>'+c.basic+'명</b> · 고급형 고객 <b>'+c.adv+'명</b><br><span class="note">마지막 보관: '+(last?esc(new Date(+last).toLocaleString('ko-KR')):'아직 없음')+'</span></p>'+
-      '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn" type="button" id="bkSave">내 PC·클라우드에 저장</button><button class="btn ghost" type="button" id="bkLoad">저장한 파일 불러오기</button><input type="file" id="bkFile" accept=".json,application/json" hidden></div>'+
-      '<ol class="note" style="padding-left:1.2em;line-height:1.8;margin:10px 0 0"><li><b>PC</b>: 저장 창에서 <b>OneDrive</b>나 <b>Google Drive</b> 폴더를 고르면 내 클라우드에 보관됩니다.</li><li><b>폰</b>: 저장을 누르면 나오는 창에서 <b>드라이브</b>(안드로이드)나 <b>파일에 저장 → iCloud Drive</b>(아이폰)를 고르세요.</li><li>다른 기기에서는 <b>저장한 파일 불러오기</b>로 같은 파일을 고르면 고객 자료가 그대로 옮겨집니다.</li></ol>'+
+      bkDirHtml()+
+      '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn" type="button" id="bkSave">'+(fd?'저장 폴더에 저장':'내 PC·클라우드에 저장')+'</button><button class="btn ghost" type="button" id="bkLoad">저장한 파일 불러오기</button><input type="file" id="bkFile" accept=".json,application/json" hidden></div>'+
+      '<ol class="note" style="padding-left:1.2em;line-height:1.8;margin:10px 0 0">'+
+      (fd?'<li><b>PC</b>: 처음 한 번 <b>저장 폴더</b>를 고르면(OneDrive·Google Drive 안을 고르면 클라우드 보관) 그 안에 <b>한보금on_고객자료</b> 폴더가 생기고, 이후엔 누를 때마다 그 폴더에 <b>날짜별 파일</b>로 바로 저장됩니다. 같은 날 다시 저장하면 그날 파일을 새 내용으로 바꿉니다.</li><li>브라우저가 「파일 수정 허용」을 물으면 <b>허용</b>(가능하면 「항상 허용」)을 누르세요.</li>':
+       '<li><b>폰</b>: 저장을 누르면 나오는 창에서 <b>드라이브</b>(안드로이드)나 <b>파일에 저장 → iCloud Drive</b>(아이폰)를 고르세요. 처음 한 번 그 안에 <b>한보금on_고객자료</b> 폴더를 만들어 두면 찾기 쉽습니다.</li>')+
+      '<li>다른 기기에서는 <b>저장한 파일 불러오기</b>로 같은 파일을 고르면 고객 자료가 그대로 옮겨집니다.</li></ol>'+
       '<p class="note" id="bkMsg" role="status"></p></div>';
   }
   function bindBk(){
     var s=document.getElementById('bkSave'),l=document.getElementById('bkLoad'),f=document.getElementById('bkFile'),m=document.getElementById('bkMsg');if(!s)return;
+    var F=bkFD(),fd=F&&F.ok();
     var done=function(t){store(BK_LAST,String(Date.now()));m.textContent=t;};
+    var pickDir=async function(){try{var lab=await F.pick();m.textContent='저장 폴더를 정했습니다: '+lab;return true;}catch(e){m.textContent=e&&e.name==='AbortError'?'폴더 고르기를 취소했습니다.':'✕ '+F.err(e);return false;}};
+    var pnl=document.getElementById('bkPanel');
+    if(pnl)pnl.addEventListener('click',function(e){if(e.target&&e.target.id==='bkDir')pickDir();});
     s.onclick=async function(){
       var txt=JSON.stringify(bkCollect()),name=bkName(),blob=new Blob([txt],{type:'application/json'});
+      if(fd){
+        if(!(await F.get())){m.textContent='처음 한 번 저장 폴더를 고릅니다…';if(!(await pickDir()))return;}
+        try{var where=await F.write(name,blob);done('저장했습니다: '+where);return;}
+        catch(e){m.textContent='✕ '+F.err(e);return;}
+      }
       try{
-        if(window.showSaveFilePicker&&!/Android|iPhone|iPad/i.test(navigator.userAgent)){
-          if(!bkHandle)bkHandle=await showSaveFilePicker({suggestedName:name,types:[{description:'한보금on 고객 자료',accept:{'application/json':['.json']}}]});
-          var w=await bkHandle.createWritable();await w.write(blob);await w.close();done('저장했습니다: '+bkHandle.name+' (이 창을 닫기 전까지는 같은 파일에 바로 덮어씁니다)');return;
-        }
         var file=new File([blob],name,{type:'application/json'});
         if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'한보금on 고객 자료'});done('보관했습니다. 고른 곳(드라이브·파일)에서 확인하세요.');return;}
       }catch(e){if(e&&e.name==='AbortError'){m.textContent='저장을 취소했습니다.';return;}}
       var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href);},4000);
-      done('파일을 내려받았습니다('+name+'). 다운로드 폴더에서 드라이브·클라우드로 옮겨 두세요.');
+      done('파일을 내려받았습니다('+name+'). 다운로드 폴더에서 드라이브·클라우드의 「한보금on_고객자료」 폴더로 옮겨 두세요.');
     };
-    l.onclick=function(){f.click();};
-    f.onchange=function(){
-      var file=f.files[0];f.value='';if(!file)return;
+    var readFile=function(file){
       var r=new FileReader();r.onload=function(){
         var j;try{j=JSON.parse(r.result);}catch(e){m.textContent='한보금on 고객 자료 파일이 아닙니다.';return;}
         if(!j||!j.data||j.app!=='한보금on 활동지원'){m.textContent='한보금on 고객 자료 파일이 아닙니다.';return;}
@@ -3118,6 +3146,14 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         m.textContent='불러왔습니다. 화면을 새로 고칩니다…';setTimeout(function(){location.reload();},700);
       };r.readAsText(file);
     };
+    l.onclick=async function(){
+      /* 저장 폴더가 있으면 그 폴더에서 바로 열기 창을 연다 */
+      var h=fd&&window.showOpenFilePicker?await F.get():null;
+      if(h){try{var hs=await showOpenFilePicker({startIn:h,types:[{description:'한보금on 고객 자료',accept:{'application/json':['.json']}}]});readFile(await hs[0].getFile());}
+        catch(e){if(!(e&&e.name==='AbortError'))f.click();}return;}
+      f.click();
+    };
+    f.onchange=function(){var file=f.files[0];f.value='';if(file)readFile(file);};
   }
   /* ---------- 관리자: 상조 서비스 안내 ---------- */
   function sjHtml(){
