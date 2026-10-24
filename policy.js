@@ -112,7 +112,7 @@ function linksHtml(){
     '<p class="note" style="margin:0 0 8px">협회 공시실에서는 모든 회사의 판매 중·판매 중지 상품 약관을 한곳에서 찾을 수 있습니다. 회사 홈페이지는 보통 맨 아래 <b>공시실 › 상품공시</b>에 약관이 있습니다.</p>'+
     '<div class="pol-co wide">'+LINKS.common.map(function(x){return '<a target="_blank" rel="noopener" href="'+esc(x[1])+'">'+esc(x[0])+' ↗</a>';}).join('')+'</div>'+
     '<div class="pol-tabs" role="tablist"><button type="button" role="tab" data-pol="tab" data-v="life" class="'+(S.tab==='life'?'on':'')+'" aria-selected="'+(S.tab==='life')+'">생명보험</button><button type="button" role="tab" data-pol="tab" data-v="nonlife" class="'+(S.tab==='nonlife'?'on':'')+'" aria-selected="'+(S.tab==='nonlife')+'">손해보험</button></div>'+
-    '<div class="pol-co">'+L.map(function(x){return '<a target="_blank" rel="noopener" href="'+esc(x[1])+'">'+esc(x[0])+' ↗</a>';}).join('')+'</div></div></details>';
+    '<div class="pol-co">'+L.map(function(x){return '<a target="_blank" rel="noopener" href="'+esc(x[1])+'">'+esc(x[0])+' ↗</a>';}).join('')+'</div>'+adminHtml()+'</div></details>';
 }
 function ansHtml(){
   return S.qa.map(function(a,i){
@@ -263,6 +263,27 @@ async function addFiles(root,files){
 function copyText(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t);return true;}}catch(e){}var x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}x.remove();return ok;}
 function answerText(a){var r=a.r||{};return 'Q. '+a.q+'\n\n'+(r.answer||'')+(r.points&&r.points.length?'\n\n'+r.points.map(function(p){return '· '+p;}).join('\n'):'')+(r.refs&&r.refs.length?'\n\n[약관 근거]\n'+r.refs.map(function(f){return '- '+(f.where||'')+(f.quote?' : "'+f.quote+'"':'');}).join('\n'):'')+(r.caution?'\n\n※ '+r.caution:'')+'\n\n(약관 분석 참고용 · 최종 확인은 약관 원문과 보험사)';}
 
+
+/* ---------- 관리자: 공시실 바로가기 고치기 (content.json policyLinks로 저장, 모든 FC 화면에 반영) ---------- */
+function isAdmin(){try{return !!(window.KIFPUB&&KIFPUB.admin&&KIFPUB.admin());}catch(e){return false;}}
+function lines(L){return (L||[]).map(function(x){return x[0]+' | '+x[1];}).join('\n');}
+function parse(t){return String(t||'').split('\n').map(function(l){var p=l.split('|').map(function(y){return y.trim();});return p;}).filter(function(p){return p[0]&&/^https?:\/\//.test(p[1]||'');}).map(function(p){return [p[0],p[1]];});}
+function adminHtml(){
+  if(!isAdmin())return '';
+  return '<details class="pol-adm" style="margin-top:14px;border-top:1px dashed var(--line-strong);padding-top:10px"><summary style="cursor:pointer;font-weight:700;color:var(--gold)">관리자: 바로가기 목록 고치기</summary>'+
+    '<p class="note">한 줄에 <b>이름 | 주소</b> 하나씩 적습니다. 저장하면 모든 FC 화면에 바로 반영됩니다.</p>'+
+    [['common','협회 공시실'],['life','생명보험'],['nonlife','손해보험']].map(function(k){return '<label class="note" style="display:block;margin-top:8px"><b>'+k[1]+'</b><textarea class="pol-q" style="min-height:90px;font-size:.85rem" data-pl="'+k[0]+'">'+esc(lines(LINKS[k[0]]))+'</textarea></label>';}).join('')+
+    '<div class="pol-qr"><span class="note" id="polAdmMsg" role="status"></span><button type="button" class="btn sm gold" data-pol="plsave">저장해서 반영</button></div></details>';
+}
+async function saveLinks(root,b){
+  var o={},m=root.querySelector('#polAdmMsg');
+  root.querySelectorAll('[data-pl]').forEach(function(t){o[t.dataset.pl]=parse(t.value);});
+  if(!o.life.length||!o.nonlife.length){m.textContent='생명·손해보험 목록이 비었습니다. "이름 | https://주소" 형식인지 확인하세요.';return;}
+  b.disabled=true;m.textContent='저장 중…';
+  try{await KIFPUB.policyLinks(o);LINKS.common=o.common.length?o.common:LINKS.common;LINKS.life=o.life;LINKS.nonlife=o.nonlife;
+    var dd=root.querySelector('#polDir');dd.outerHTML=linksHtml();var nd=root.querySelector('#polDir');nd.open=true;var a=nd.querySelector('.pol-adm');if(a)a.open=true;var mm=root.querySelector('#polAdmMsg');if(mm)mm.textContent='✓ 저장했습니다. 1~2분 뒤 모든 화면에 반영됩니다.';}
+  catch(e){b.disabled=false;m.textContent='저장하지 못했습니다: '+((e&&e.message)||e);}
+}
 /* ---------- 이벤트 ---------- */
 function bind(root){
   if(!root)return;addCss();
@@ -276,7 +297,10 @@ function bind(root){
     var b=e.target.closest('[data-pol]');if(!b||!root.contains(b))return;var k=b.dataset.pol,i=+b.dataset.i;
     if(k==='guide')guide();else if(k==='keyhelp')keyHelp();
     else if(k==='rm'){S.docs.splice(i,1);refreshDocs(root);setMsg(root,'');}
-    else if(k==='tab'){S.tab=b.dataset.v;var dd=root.querySelector('#polDir'),op=dd&&dd.open;dd.outerHTML=linksHtml();var nd=root.querySelector('#polDir');if(op)nd.open=true;}
+    else if(k==='tab'){S.tab=b.dataset.v;var L=S.tab==='life'?LINKS.life:LINKS.nonlife;
+      root.querySelectorAll('[data-pol="tab"]').forEach(function(x){var on=x.dataset.v===S.tab;x.classList.toggle('on',on);x.setAttribute('aria-selected',on);});
+      root.querySelector('#polDir .pol-co:not(.wide)').innerHTML=L.map(function(x){return '<a target="_blank" rel="noopener" href="'+esc(x[1])+'">'+esc(x[0])+' ↗</a>';}).join('');}
+    else if(k==='plsave')saveLinks(root,b);
     else if(k==='ex'){var q=root.querySelector('#polQ');q.value=EX[i][1];q.focus();}
     else if(k==='ask')ask(root);
     else if(k==='copy'){var ok=copyText(answerText(S.qa[i]));b.textContent=ok?'✓ 복사됨':'복사 실패';setTimeout(function(){b.textContent='답 복사';},1500);}
