@@ -922,6 +922,13 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .hq:hover{border-color:var(--kgold);background:var(--gold-soft)}
 .qi{width:24px;height:24px;flex:none;fill:none;stroke:var(--navy-ink);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .hm-col{display:grid;gap:16px;min-width:0}
+.hm-tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.hm-tool{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--kgold);border-radius:4px;padding:14px 16px;color:var(--ink);min-width:0;transition:border-color .15s,box-shadow .15s}
+.hm-tool:hover{border-color:var(--kgold);box-shadow:var(--shadow)}
+.hm-tool .ti{flex:none;width:42px;height:42px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center}
+.hm-tool .ti svg{width:22px;height:22px;stroke:var(--kgold);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.hm-tool .tt{flex:1;min-width:0}.hm-tool .tt b{display:block;font-family:var(--font-h);font-size:1rem}.hm-tool .tt small{display:block;color:var(--muted);font-size:.8rem;line-height:1.45}
+.hm-tool em{flex:none;font-style:normal;font-weight:700;font-size:.82rem;color:var(--gold)}
 .hm-rail{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 24px)/4);gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:6px}
 .hm-rail>.mat{scroll-snap-align:start;text-align:left;font:inherit;padding:0;display:flex;flex-direction:column;justify-content:flex-start;cursor:pointer}
 .hm-rail .mat .th{aspect-ratio:3/4;padding:10px;min-height:0;overflow:hidden}.hm-rail .mat .th b{font-size:.92rem}.hm-rail .mat .mt{font-size:.76rem;padding:6px 8px}
@@ -1217,6 +1224,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
 })();
 </script>
 <script src="ai-connect.js?v=20261024ad"></script>
+<script src="policy.js?v=20261024a"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
@@ -1243,11 +1251,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     {g:null,items:[['home','홈']]},
     {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
     {g:'공지 · 시상',items:[['news','보험사 소식지'],['sched','상품 개정 일정','NEW'],['award','시상 공지']]},
-    {g:'교육 · 연계',items:[['edu','온라인 교육센터'],['car','자동차 비교견적'],['sangjo','상조 서비스']]},
+    {g:'교육 · 연계',items:[['edu','온라인 교육센터'],['policy','약관 분석','NEW'],['car','자동차 비교견적'],['sangjo','상조 서비스']]},
     {g:'관리자',admin:true,items:[['admin','관리자 페이지'],['cadmin','자료 관리','NEW']]},
     {g:'내 정보',mobile:true,items:[['me','내 정보 · 자료 보관']]}
   ];
-  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',sched:'cal',award:'cup',edu:'cap',car:'car',sangjo:'heart',me:'user',admin:'gear',cadmin:'doc'};
+  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',sched:'cal',award:'cup',edu:'cap',car:'car',sangjo:'heart',policy:'terms',me:'user',admin:'gear',cadmin:'doc'};
 
   var NEWS=[
     ['2026.10.14','삼성화재','간편건강보험 3.5.5 고지 개정, 11월 1일부터 적용'],
@@ -1282,6 +1290,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     book:'<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 19V5M9 7h6"/>',
     bld:'<path d="M4 21V5l8-3v19M12 9h8v12M7 8h2M7 12h2M7 16h2"/>',
     scan:'<path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3M8 14l2.5-3 2 2L16 9"/>',
+    terms:'<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 11h6M9 14h4"/><circle cx="15.5" cy="17" r="2.3"/><path d="M17.2 18.7L19 20.5"/>',
     bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 00-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0012 3z"/>',
     cal:'<path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M8 14l2.5 2.5L16 12"/>',
     play:'<path d="M8 5v14l11-7z"/>',
@@ -1448,7 +1457,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var ML=matsShown().filter(function(m){return m[4];});
       h+='<section class="hm-two"><div class="hm-col"><div class="panel"><h3>교육 자료 <span class="note">상담·교육용 PT와 비교 자료 '+ML.length+'건</span>'+railNav('railMats',ML.length>4)+' <button class="more" data-go="mats">교육 자료실 ›</button></h3><div class="hm-rail" id="railMats">'+ML.map(function(m){return matCard(m,false);}).join('')+'</div></div>'+
         '<div class="panel"><h3>대표 상품 가설 <span class="note">고객 유형별 대표 상품과 첫 화법 '+HYPO.length+'건</span>'+railNav('railHypo',HYPO.length>4)+' <button class="more" data-go="hypo">전체 보기 ›</button></h3>'+(HYPO.length?'<div class="hm-rail" id="railHypo">'+HYPO.map(hypoCard).join('')+'</div>':'<p class="note">아직 등록된 가설이 없습니다.</p>')+'</div></div>'+
-        '<div class="panel"><h3>교육센터 새 강의 '+(LECT_AT?'<span class="note">'+E(LECT_AT)+' 확인</span> ':'')+''+railNav('railLect',LECT.length>4)+'<button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects hm-lrail" id="railLect">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E([l[3],l[2]].filter(Boolean).join(' · '))+'</i></div></a>';}).join('')+'</div></div></section>';
+        '<div class="hm-col"><div class="panel"><h3>교육센터 새 강의 '+(LECT_AT?'<span class="note">'+E(LECT_AT)+' 확인</span> ':'')+''+railNav('railLect',LECT.length>4)+'<button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects hm-lrail" id="railLect">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E([l[3],l[2]].filter(Boolean).join(' · '))+'</i></div></a>';}).join('')+'</div></div>'+
+        /* 홈 도구 카드 줄: 약관 분석(policy.js) · 금융계산기 등 같은 모양(.hm-tool)으로 나란히 */
+        '<div class="hm-tools" id="hmTools">'+(window.KIFPOL?KIFPOL.card():'')+'</div></div></section>';
       h+='<section class="panel smp-home">'+smpHome()+'</section>';
       h+='<footer class="pfoot">한국보험금융(주) 한보금on 활동지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
       return '<div class="hm">'+h+'</div>';
@@ -1510,6 +1521,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       return h;
     },
     hub_sales:function(){return hubPage('hub_sales');},hub_edu:function(){return hubPage('hub_edu');},hub_notice:function(){return hubPage('hub_notice');},
+    policy:function(){return window.KIFPOL?KIFPOL.html():head('교육 · 연계','약관 분석','약관 분석 도구를 불러오지 못했습니다. 새로고침해 주세요.');},
     car:function(){
       var S=CARQ,E=esc,n2=function(i){return pad2(i+1);};
       var go=S.url?'<a class="btn gold" style="text-decoration:none" href="'+E(S.url)+'" data-carq>비교견적 바로가기 →</a>':'<button class="btn gold" type="button" disabled style="opacity:.6">비교견적 바로가기 (주소 준비 중)</button>';
@@ -3228,6 +3240,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function toast(m){var t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true;},2600);}
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function bindPage(id){
+    if(id==='policy'&&window.KIFPOL)KIFPOL.bind(document.querySelector('#view .pol'));
     if(id==='home')playCpt();
     if(id==='home'){
       var IDX=[];
