@@ -31,6 +31,7 @@ function saveRaw(c){try{localStorage.setItem(AIK,JSON.stringify(c));}catch(e){}f
 /* 포털 로그인 증표(kif_tok): 회사 AI 서버가 로그인·권한을 확인하는 데 쓴다. 화면에서는 권한(role)만 읽는다 */
 function login(){try{var t=JSON.parse(localStorage.getItem('kif_tok')||'null');if(!t||!(t.exp>Date.now())||!t.token)return null;var p=JSON.parse(atob(String(t.token).split('.')[0].replace(/-/g,'+').replace(/_/g,'/')));return {token:t.token,role:p.role||'fc'};}catch(e){return null;}}
 /* 회사 AI를 이 사람이 쓸 수 있는가 (관리자 전용으로 켠 경우 관리자만) */
+function ssoAdmin(){try{var s=JSON.parse(localStorage.getItem('kif_sso')||'null');return !!(s&&s.exp>Date.now()&&s.role==='admin');}catch(e){return false;}}
 function companyOk(){if(!AI_PROXY)return false;if(AI_FOR!=='admin')return true;var l=login();return !!(l&&l.role==='admin');}
 /* 관리자 전용 회사 AI가 켜져 있으면 관리자는 따로 등록하지 않아도 회사 AI로 바로 읽는다 */
 function adminDefault(){var l=login();return AI_FOR==='admin'&&companyOk()&&l&&l.role==='admin';}
@@ -46,6 +47,8 @@ function model(c,p){return String(c.models[p]||AI_MODELS[p]||AIP[p].model||'').t
 function migrateClaudeKey(k){k=String(k||'').trim();if(!k)return;var c=raw();c.keys=c.keys||{};if(!c.keys.claude){c.keys.claude=k;saveRaw(c);}}
 function statusHTML(){
   var c=cfg(),p=c.prov;
+  /* 관리자인데 로그인 증표(kif_tok)가 없거나 만료돼 회사 AI 기본 연결이 빠진 경우: 다시 로그인하면 된다고 알려 준다 */
+  if(AI_FOR==='admin'&&AI_PROXY&&!adminDefault()&&ssoAdmin()&&!(raw().prov&&raw().prov!=='paste'&&raw().prov!=='company'))return '관리자 계정은 <b>회사 AI</b>로 바로 읽는데, 로그인 확인이 만료되어 지금은 <b>'+esc(AIP[cfg().prov].name)+'</b>로 대신합니다. <b>로그아웃 후 다시 로그인</b>하면 회사 AI로 돌아옵니다. · <button type="button" class="kai-link" data-kai-open>내 AI 등록</button>';
   if(!chosen())return '아직 내 AI를 정하지 않았습니다. <button type="button" class="kai-link" data-kai-open>내 AI 등록</button>';
   if(c.mode!=='ai')return '「AI 없이 쓰기」로 되어 있습니다. <button type="button" class="kai-link" data-kai-open>내 AI 등록</button>에서 AI를 고르세요.';
   if(AIP[p].key&&!c.keys[p])return esc(AIP[p].name)+' 키가 없습니다. <button type="button" class="kai-link" data-kai-open>내 AI 등록</button>에서 키를 넣어 주세요.';
