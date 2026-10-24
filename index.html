@@ -1473,10 +1473,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     },
     /* 교육 자료실: 올린 교육 자료는 지우지 않고 모두 보관한다. 달별로 묶어 지난 자료도 계속 볼 수 있게 */
     mats:function(){
-      var h=head('교육','교육 자료실','상담·교육용 PT와 비교 자료를 모두 모아 둡니다. 새 자료가 올라와도 지난 자료는 아래 달별로 그대로 남습니다.');
-      var cats=[];matsShown().forEach(function(m){if(m[2]&&cats.indexOf(m[2])<0)cats.push(m[2]);});
+      var h=head('교육','교육 자료실','상담·교육용 자료를 구분별로 모아 둡니다. 구분 안에서는 최신 달 자료가 앞에 오고, 지난 자료도 그대로 남습니다.');
+      var cats=[];matsShown().forEach(function(m){if(m[2]&&cats.indexOf(m[2])<0)cats.push(m[2]);});cats.sort(function(a,b){var x=MAT_ORD.indexOf(a),y=MAT_ORD.indexOf(b);return (x<0?99:x)-(y<0?99:y);});
       h+='<div class="panel"><div class="row" style="gap:8px;flex-wrap:wrap"><input class="in" id="matQ" type="search" placeholder="자료 이름으로 찾기" value="'+esc(MATF.q)+'" style="flex:1;min-width:180px">'+
-        '<div class="nchips">'+[''].concat(cats).map(function(c){return '<button type="button" class="tg'+(MATF.c===c?' on':'')+'" data-matcat="'+esc(c)+'">'+(c?esc(c):'전체')+'</button>';}).join('')+'</div></div></div>';
+        '<div class="nchips">'+[''].concat(cats).map(function(c){return '<button type="button" class="tg'+(MATF.c===c?' on':'')+'" data-matcat="'+esc(c)+'">'+(c?esc(matCatName(c)):'전체')+'</button>';}).join('')+'</div></div></div>';
       return h+'<div id="matBox">'+matLib()+'</div>';
     },
     concept:function(){
@@ -2790,13 +2790,18 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   });
   var MATF={q:'',c:''};
   function matMonth(m){var x=String(m[3]||'').match(/^(20\d{2})\.(\d{2})/)||String(m[4]||'').match(/\/(20\d{2})-(\d{2})\//);return x?x[1]+'.'+x[2]:'';}
+  /* 교육 자료실은 자료 구분(이달의 컨셉 → 상품 전략·교육 → 상품 비교 → 보장분석 사례)별로 나누고, 구분 안에서는 최신 달부터 */
+  var MAT_CAT={'이달의 컨셉':['이달의 컨셉','한 달 동안 전 FC가 같은 메시지로 상담하는 컨셉 자료'],'자료':['상품 전략 · 교육 자료','본사 상품전략·핵심상품 등 교육용 자료'],'상품':['상품 비교','보험사별 담보·상품 비교표'],'사례':['보장분석 사례','고객 이름을 가린 실제 보장분석·제안서 사례']};
+  var MAT_ORD=['이달의 컨셉','자료','상품','사례'];
+  function matCatName(c){return (MAT_CAT[c]||[c])[0];}
   function matLib(){
     var q=MATF.q.replace(/\s+/g,'').toLowerCase(),L=matsShown().filter(function(m){return (!MATF.c||m[2]===MATF.c)&&(!q||String(m[1]+m[3]).replace(/\s+/g,'').toLowerCase().indexOf(q)>-1);});
     if(!L.length)return '<div class="panel"><p class="note">맞는 자료가 없습니다.</p></div>';
-    var G={},ks=[];L.forEach(function(m){var k=matMonth(m);if(!G[k]){G[k]=[];ks.push(k);}G[k].push(m);});
-    ks.sort(function(a,b){return !a?1:!b?-1:a<b?1:a>b?-1:0;});
+    var G={},ks=[];L.forEach(function(m){var k=m[2]||'기타';if(!G[k]){G[k]=[];ks.push(k);}G[k].push(m);});
+    var oi=function(k){var x=MAT_ORD.indexOf(k);return x<0?99:x;};ks.sort(function(a,b){return oi(a)-oi(b);});
     var now=today().slice(0,7).replace('-','.');
-    return ks.map(function(k,i){return '<div class="panel"><h3>'+(k?esc(k)+(k===now?' <span class="pill new">이번 달</span>':(i?' <span class="note">지난 자료</span>':'')):'이전 자료')+' <span class="note">'+G[k].length+'건</span></h3><div class="mats4">'+G[k].map(function(m){return matCard(m,true);}).join('')+'</div></div>';}).join('');
+    return ks.map(function(k){var A=G[k].slice().sort(function(a,b){var x=matMonth(a),y=matMonth(b);return x===y?0:!x?1:!y?-1:x<y?1:-1;}),nw=A.filter(function(m){return matMonth(m)===now;}).length;
+      return '<div class="panel"><h3>'+esc(matCatName(k))+' <span class="note">'+A.length+'건'+(MAT_CAT[k]?' · '+esc(MAT_CAT[k][1]):'')+'</span>'+(nw?' <span class="pill new">이번 달 '+nw+'</span>':'')+'</h3><div class="mats4">'+A.map(function(m){return matCard(m,true);}).join('')+'</div></div>';}).join('');
   }
   document.addEventListener('input',function(e){if(e.target&&e.target.id==='matQ'){MATF.q=e.target.value;var b=document.getElementById('matBox');if(b)b.innerHTML=matLib();}});
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-matcat]');if(!b)return;MATF.c=b.getAttribute('data-matcat');document.querySelectorAll('[data-matcat]').forEach(function(x){x.classList.toggle('on',x===b);});var bx=document.getElementById('matBox');if(bx)bx.innerHTML=matLib();});
@@ -2805,7 +2810,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function matCard(m,full){
     var th=matThumb(m);
     var inner=(th?'<div class="th img '+esc(m[0])+'"><img loading="lazy" alt="" src="'+fileHref(th)+'"><span>'+esc(m[0])+'</span></div><div class="mt"><b class="mtt">'+esc(m[1])+'</b>':'<div class="th '+esc(m[0])+'"><span>'+esc(m[0])+'</span><b>'+esc(m[1])+'</b></div><div class="mt">')+
-      (full?'<span class="pill">'+esc(m[2])+'</span> ':'')+esc(m[3]||'')+(m[4]?' <span class="pill new">열기</span>':'')+'</div>';
+      (full?(matMonth(m)?'<span class="pill">'+esc(matMonth(m))+'</span> ':''):'<span class="pill">'+esc(matCatName(m[2]))+'</span> ')+esc(m[3]||'')+(m[4]?' <span class="pill new">열기</span>':'')+'</div>';
     return m[4]?'<a class="mat" target="_blank" rel="noopener" href="'+fileHref(m[4])+'" data-mview="'+MATS.indexOf(m)+'">'+inner+'</a>':'<div class="mat">'+inner+'</div>';
   }
   /* 교육 자료 보기: 누르면 내려받지 않고 화면 위에 바로 펼친다.
