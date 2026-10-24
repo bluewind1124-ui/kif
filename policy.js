@@ -97,7 +97,7 @@ function aiState(){
 function aiBox(){
   var a=aiState();
   return '<div class="pol-ai" id="polAi"><div class="s">'+a.html+(a.ok&&a.paste?'<br><span class="note">복사·붙여넣기 방식은 질문을 AI 사이트에 붙여넣고 답을 다시 가져옵니다. 약관이 길면 질문과 관련된 쪽만 골라 보냅니다.</span>':'')+'</div>'+
-    '<button type="button" class="btn sm'+(a.ok?' ghost':' gold')+'" data-kai-open>'+(a.ok?'AI 바꾸기':'내 AI 등록')+'</button><button type="button" class="btn sm ghost" data-pol="keyhelp">🔑 키 발급 방법</button></div>';
+    '<button type="button" class="btn sm'+(a.ok?' ghost':' gold')+'" data-kai-open>'+(a.ok?'AI 바꾸기':'내 AI 등록')+'</button><button type="button" class="btn sm ghost" data-pol="keyhelp">AI 연결 방법</button></div>';
 }
 function docsHtml(){
   if(!S.docs.length)return '';
@@ -132,7 +132,7 @@ function html(){
     '<div class="pol-top"><div class="ph"><div class="kicker">교육 · 연계</div><h1>약관 분석</h1><p>보험 약관 PDF를 올리고 궁금한 것을 물어보세요. 등록한 AI가 약관을 읽고 <b>조항과 근거</b>를 붙여 답합니다. 파일은 서버에 올라가지 않습니다.</p></div>'+
       '<div class="bt"><button type="button" class="btn sm ghost" data-pol="guide">📖 이용 가이드</button><button type="button" class="btn sm ghost" data-go="home">✕ 닫기</button></div></div>'+
     '<div class="pol-cta"><span style="font-size:1.5rem" aria-hidden="true">💡</span><div class="note"><b>상담에 이렇게 써 보세요</b><br>고객이 "이것도 보험금 나와요?"라고 물을 때, 가입한 상품의 약관을 올리고 그대로 물어보면 해당 조항을 찾아 줍니다. 답은 참고용이니 최종 확인은 약관 원문으로 하세요.</div><button type="button" class="btn sm" data-pol="guide">사용 순서 보기</button></div>'+
-    '<section class="pol-st'+(a.ok?' done':'')+'"><div class="pol-sh"><span class="n">1</span><h3>AI 연결하기</h3><span class="note">포털 「내 AI 등록」을 그대로 씁니다 · 한 번만 정하면 됩니다</span></div><div class="pol-sb">'+aiBox()+'</div></section>'+
+    '<section class="pol-st'+(a.ok?' done':'')+'"><div class="pol-sh"><span class="n">1</span><h3>AI 연결하기</h3><span class="note">AI보장분석과 같은 AI를 씁니다 · 따로 등록할 필요 없음</span></div><div class="pol-sb">'+aiBox()+'</div></section>'+
     '<section class="pol-st'+(has?' done':'')+'"><div class="pol-sh"><span class="n">2</span><h3>약관 PDF 올리기</h3><span class="note">파일은 이 브라우저 안에서만 읽습니다</span></div><div class="pol-sb">'+
       '<label class="pol-drop" id="polDrop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M12 17v-6M9.5 13.5L12 11l2.5 2.5"/></svg><b>약관 PDF를 여기에 끌어다 놓거나 눌러서 고르기</b><span class="note">주계약·특약 약관을 여러 개 함께 올려도 됩니다 · 서버로 보내지 않습니다</span><input type="file" id="polFile" accept="application/pdf,.pdf" multiple></label>'+
       '<div id="polDocs">'+docsHtml()+'</div><div class="pol-msg" id="polMsg" role="status">'+esc(S.msg)+'</div>'+linksHtml()+'</div></section>'+
@@ -154,16 +154,17 @@ function modal(title,body){
   document.addEventListener('keydown',k);document.body.appendChild(w);w.querySelector('[data-x]').focus();
 }
 function keyHelp(){
-  modal('AI 키 발급 방법',
-    '<p style="margin:0">약관 분석은 포털 공통 <b>「내 AI 등록」</b>에 등록한 AI를 씁니다. 키가 없으면 <b>복사·붙여넣기</b>(무료 ChatGPT·Gemini·Claude 사이트 이용)로도 됩니다.</p>'+
-    '<h4>Gemini 키 (무료로 시작, 약 3분)</h4><ol><li>구글 계정으로 <a target="_blank" rel="noopener" href="https://aistudio.google.com/apikey">Google AI Studio ↗</a>에 들어갑니다.</li><li><b>Create API key</b>(API 키 만들기)를 누르면 긴 글자(키)가 나옵니다.</li><li>그 키를 <b>복사</b>합니다.</li><li>포털 <b>「내 AI 등록」 › Gemini (Google)</b>을 고르고 키를 붙여넣은 뒤 <b>저장</b>합니다.</li></ol>'+
+  modal('AI 연결 방법',
+    '<p style="margin:0">약관 분석은 <b>AI보장분석과 같은 「내 AI 등록」</b>을 씁니다. 보장분석에서 이미 AI를 등록했다면 <b>여기서 따로 할 일은 없습니다.</b> 관리자는 회사 AI로 바로 씁니다.</p>'+
+    '<h4>아직 등록 전이라면 (셋 중 하나)</h4><ol><li><b>복사·붙여넣기</b> — 키 없이 무료. 평소 쓰는 ChatGPT·Gemini·Claude 사이트에 질문을 붙여넣고 답을 가져옵니다.</li><li><b>내 API 키</b> — Claude·ChatGPT·Gemini 중 하나의 키를 넣으면 버튼 한 번에 바로 답이 나옵니다. 아래는 무료로 시작할 수 있는 Gemini 예시입니다.</li><li><b>회사 AI</b> — 관리자가 켜 둔 경우 등록 없이 씁니다.</li></ol>'+
+    '<h4>(선택) Gemini 키 받기 — 무료, 약 3분</h4><ol><li>구글 계정으로 <a target="_blank" rel="noopener" href="https://aistudio.google.com/apikey">Google AI Studio ↗</a>에 들어갑니다.</li><li><b>Create API key</b>(API 키 만들기)를 누르면 긴 글자(키)가 나옵니다.</li><li>그 키를 <b>복사</b>합니다.</li><li>포털 <b>「내 AI 등록」 › Gemini (Google)</b>을 고르고 키를 붙여넣은 뒤 <b>저장</b>합니다.</li></ol>'+
     '<h4>Claude · ChatGPT 키 (유료)</h4><ol><li><a target="_blank" rel="noopener" href="https://console.anthropic.com/settings/keys">Anthropic 콘솔 ↗</a> 또는 <a target="_blank" rel="noopener" href="https://platform.openai.com/api-keys">OpenAI 플랫폼 ↗</a>에서 키를 만듭니다.</li><li>「내 AI 등록」에서 해당 AI를 고르고 키를 붙여넣습니다.</li></ol>'+
     '<div class="pol-tip"><b>주의</b> 키는 비밀번호와 같습니다. 남에게 알려 주거나 단톡방·인터넷에 올리지 마세요. 키는 이 기기 브라우저에만 저장되니 공용 PC에서는 쓰고 나서 「내 AI 등록」에서 지워 주세요.</div>'+
     '<div class="row" style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn sm gold" data-kai-open>내 AI 등록 열기</button></div>');
 }
 function guide(){
   modal('약관 분석 이용 가이드',
-    '<h4>① AI 연결</h4><p style="margin:0">홈의 <b>내 AI</b>에서 한 번 등록하면 AI보장분석과 약관 분석이 같은 AI를 씁니다. 관리자는 회사 AI로 바로 씁니다.</p>'+
+    '<h4>① AI 연결</h4><p style="margin:0">AI보장분석에서 등록한 AI를 그대로 씁니다(따로 등록할 필요 없음). 관리자는 회사 AI로 바로 씁니다. 연결이 「복사·붙여넣기」로 나오면 질문을 AI 사이트에 붙여넣고 답을 가져오는 방식입니다.</p>'+
     '<h4>② 약관 받기 → 올리기</h4><p style="margin:0">고객이 가입한 상품의 <b>판매 시기에 맞는 약관</b>을 공시실에서 내려받아 올립니다. (같은 상품도 판매 시기마다 약관이 다릅니다. 가입일을 꼭 확인하세요.) 주계약과 특약 약관이 따로 있으면 함께 올리세요.</p>'+
     '<h4>③ 질문</h4><p style="margin:0">「이렇게 물어보세요」 버튼을 누르거나 고객이 물은 말을 그대로 적고 <b>약관에서 찾기</b>를 누릅니다. 답에는 근거 조항과 원문 인용이 붙습니다.</p>'+
     '<h4>스캔본(그림) PDF</h4><p style="margin:0">글자를 고를 수 없는 스캔본은 이 브라우저에서 문자 인식으로 읽습니다(앞 40쪽까지, 시간이 조금 걸림). 가능하면 공시실의 원본 PDF를 쓰세요.</p>'+
