@@ -57,6 +57,7 @@ button,input,select{font:inherit;color:inherit}
 .chd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .back{border:1px solid var(--line-2);background:var(--surface);border-radius:6px;padding:6px 12px;cursor:pointer}
 .chd h2{margin:0;font-size:21px}
+.chd .basis{font-size:12px;color:var(--muted);border:1px solid var(--line-2);padding:1px 8px;border-radius:999px}
 .chd .cg{font-size:12px;color:var(--gold-ink);background:var(--gold-soft);padding:2px 8px;border-radius:999px}
 .desc{color:var(--muted);margin:-4px 0 12px;font-size:14px}
 .cbody{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:14px;align-items:start}
@@ -104,6 +105,24 @@ button,input,select{font:inherit;color:inherit}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 16px;border-radius:6px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
 .toast.on{opacity:1}
 .foot{margin-top:24px;color:var(--muted);font-size:12px;text-align:center}
+.adm .due{background:#fdecea;border:1px solid #f1b5ae;color:#8a1c12;border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:14px}
+:root[data-theme="dark"] .adm .due{background:#3b1714;border-color:#7a2a22;color:#ffb4a9}
+.embed .adm>.chd,.embed .adm>.desc{display:none}
+.adm .ok{background:var(--gold-soft);border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:14px}
+.adm .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.adm .grp{margin-bottom:14px}
+.adm .sc{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:4px 14px}
+.adm .f.chg .iw{border-color:var(--gold);background:var(--gold-soft)}
+.adm .f .was{font-size:11px;color:var(--gold-ink);text-align:right;min-height:15px}
+.adm table.ed{border-collapse:collapse;font-size:13px;margin:4px 0 6px;width:100%;max-width:520px}
+.adm table.ed th{background:var(--navy-2);color:#fff;font-weight:500;padding:5px}
+.adm table.ed td{padding:3px 4px;border-bottom:1px solid var(--line)}
+.adm table.ed input{width:100%;border:1px solid var(--line-2);border-radius:4px;padding:5px 6px;background:var(--surface-2);text-align:right}
+.adm table.ed input.chg{border-color:var(--gold);background:var(--gold-soft)}
+.adm table.ed button{border:0;background:none;color:var(--bad);cursor:pointer;font-size:15px}
+.adm .tl{font-size:13px;font-weight:700;margin-top:8px}
+.adm .bar2{position:sticky;bottom:0;background:var(--surface);border-top:2px solid var(--gold);padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-radius:6px 6px 0 0;box-shadow:0 -6px 18px -12px rgba(0,0,0,.4)}
+.adm .bar2 .msg{font-size:13px;color:var(--muted);flex:1 1 100%}
 @media (max-width:860px){.cbody{grid-template-columns:minmax(0,1fr)}.rows td:last-child{white-space:normal;word-break:keep-all}.tbl{font-size:12px}.tbl td,.tbl th{padding:5px 3px}.hero h1{font-size:20px}.big b{font-size:24px}.grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.card{min-height:108px;padding:12px}.card p{font-size:12px}.card .tag{display:none}.bar{grid-template-columns:84px 1fr auto}}
 @media print{.top,.list,.back,.acts,.hero,.sits,.cats,.foot{display:none!important}body{background:#fff}.panel,.big{box-shadow:none;break-inside:avoid}.cbody{grid-template-columns:1fr 1fr}}
 </style>
@@ -124,7 +143,7 @@ button,input,select{font:inherit;color:inherit}
     <div id="lists"></div>
   </div>
   <div class="calc" id="calc"></div>
-  <div class="foot">모든 계산 결과는 상담용 참고 자료입니다. 세금은 2026년 10월 현재 세법 기준으로 단순화했으며, 실제 신고·지급액은 세무 전문가 확인과 상품 약관이 우선합니다.</div>
+  <div class="foot">모든 계산 결과는 상담용 참고 자료입니다. 세금은 <span id="footBasis">2026년 세법</span> 기준으로 단순화했으며, 실제 신고·지급액은 세무 전문가 확인과 상품 약관이 우선합니다.</div>
 </div>
 <div class="toast" id="toast"></div>
 <script>
@@ -159,13 +178,44 @@ function fvAnn(p,r,n){return r===0?p*n:p*(Math.pow(1+r,n)-1)/r;}          /* 기
 function pvAnn(p,r,n){return r===0?p*n:p*(1-Math.pow(1+r,-n))/r;}
 function pmtFor(pv,r,n){return r===0?pv/n:pv*r/(1-Math.pow(1+r,-n));}
 function mr(y){return Math.pow(1+y/100,1/12)-1;}                           /* 연 → 월 실효 */
-/* 누진세율 [상한, 세율, 누진공제] */
-function prog(base,T){if(base<=0)return 0;for(var i=0;i<T.length;i++)if(base<=T[i][0])return base*T[i][1]-T[i][2];return 0;}
-function topRate(base,T){for(var i=0;i<T.length;i++)if(base<=T[i][0])return T[i][1];return 0;}
-var INC=[[1400,.06,0],[5000,.15,126],[8800,.24,576],[15000,.35,1544],[30000,.38,1994],[50000,.40,2594],[100000,.42,3594],[1e15,.45,6594]];   /* 종합소득세(만원) */
-var INH=[[10000,.10,0],[50000,.20,1000],[100000,.30,6000],[300000,.40,16000],[1e15,.50,46000]];   /* 상속·증여세(만원) */
-var CORP={2026:[[20000,.10,0],[2000000,.20,2000],[30000000,.22,42000],[1e15,.25,942000]],
-          2025:[[20000,.09,0],[2000000,.19,2000],[30000000,.21,42000],[1e15,.24,942000]]};
+/* ---------- 법령 기준값 ----------
+   세율·공제 한도·기준금액은 모두 아래 RULES 한 곳에 모여 있다.
+   관리자가 포털 「관리자 › 계산기 기준값」에서 고쳐 저장하면 content.json의 calcRules{at,basis,by,v}에 들어가고,
+   계산기는 열릴 때 그것을 읽어 기본값을 덮어쓴다. 표(t)는 [구간 상한(만원, 마지막은 null), 세율%] 목록이다. */
+var RULES=[
+  {g:'종합소득세',items:[['inc','종합소득세 세율표','t',[[1400,6],[5000,15],[8800,24],[15000,35],[30000,38],[50000,40],[100000,42],[null,45]],'과세표준 구간 상한(만원) · 세율(%)'],
+    ['local','지방소득세 (소득세·법인세 대비)','%',10]]},
+  {g:'상속세 · 증여세',items:[['inh','상속·증여세 세율표','t',[[10000,10],[50000,20],[100000,30],[300000,40],[null,50]],'과세표준 구간 상한(만원) · 세율(%)'],
+    ['filing','신고세액공제','%',3],['lump','상속 일괄공제','만원',50000],['basic','상속 기초공제','만원',20000],['child','상속 자녀공제 (1인당)','만원',5000],
+    ['spMin','배우자 상속공제 최소','만원',50000],['spMax','배우자 상속공제 최대','만원',300000],['finAll','금융재산공제: 전액 공제 기준','만원',2000],['finRate','금융재산공제 비율','%',20],['finMax','금융재산공제 한도','만원',20000],
+    ['funMin','장례비 최소 인정','만원',500],['funMax','장례비 최대 인정 (봉안 포함)','만원',1500],
+    ['gSp','증여공제: 배우자','만원',60000],['gAd','증여공제: 성년 자녀','만원',5000],['gMi','증여공제: 미성년 자녀','만원',2000],['gPa','증여공제: 부모 (직계존속)','만원',5000],['gKin','증여공제: 기타 친족','만원',1000],
+    ['gWed','혼인·출산 증여공제 한도','만원',10000],['skip','세대생략 할증','%',30],['skip2','세대생략 할증 (미성년·20억 초과)','%',40],['skipBig','세대생략 40% 기준 금액','만원',200000]]},
+  {g:'연금 · 퇴직',items:[['psLim','연금저축 세액공제 한도','만원',600],['pnLim','연금저축+IRP 합계 한도','만원',900],['crLo','세액공제율 (소득 기준 이하, 지방세 포함)','%',16.5],['crHi','세액공제율 (기준 초과, 지방세 포함)','%',13.2],
+    ['bandW','공제율 기준: 총급여','만원',5500],['bandI','공제율 기준: 종합소득','만원',4500],['isaR','ISA 이전 추가 공제 비율','%',10],['isaMax','ISA 이전 추가 공제 한도','만원',300],
+    ['npsE','국민연금 조기 수령 감액 (1년당)','%',6],['npsL','국민연금 연기 수령 증액 (1년당)','%',7.2],['npsMax','조기·연기 최대 기간','년',5],
+    ['svc','퇴직소득 근속연수공제 (1년당 공제액)','t',[[5,100],[10,200],[20,250],[null,300]],'근속 연수 구간 상한(년) · 1년당 공제액(만원)'],
+    ['conv','퇴직소득 환산급여공제 (공제율)','t',[[800,100],[7000,60],[10000,55],[30000,45],[null,35]],'환산급여 구간 상한(만원) · 공제율(%)'],
+    ['pRed1','연금 수령 시 퇴직소득세 감면 (10년차까지)','%',30],['pRed2','연금 수령 시 퇴직소득세 감면 (11년차부터)','%',40],
+    ['ex1','임원퇴직금 한도 배수 (2012~2019 근속분)','배',3],['ex2','임원퇴직금 한도 배수 (2020년 이후 근속분)','배',2]]},
+  {g:'금융소득 · 4대보험',items:[['finThr','금융소득 종합과세 기준','만원',2000],['finW','이자·배당 원천징수 (국세)','%',14],
+    ['np','국민연금 요율 (근로자+회사)','%',9.5],['npMin','국민연금 기준소득월액 하한','만원',40],['npMax','국민연금 기준소득월액 상한','만원',637],
+    ['hi','건강보험 요율 (근로자+회사)','%',7.19],['lt','장기요양 (건강보험료 대비)','%',13.14],['em','고용보험 근로자','%',0.9],['emc','고용보험 회사 (고용안정 포함, 150인 미만)','%',1.15],['ia','산재보험 회사 (기본값)','%',0.7]]},
+  {g:'법인',items:[['corp','법인세 세율표','t',[[20000,10],[2000000,20],[30000000,22],[null,25]],'과세표준 구간 상한(만원) · 세율(%)'],
+    ['ii','가지급금 인정이자율 (당좌대출이자율)','%',4.6],['cap','비상장주식 순손익가치 환원율','%',10],['stPrem','최대주주 할증','%',20],['stFloor','비상장주식 하한 (순자산가치 대비)','%',80]]}
+];
+var P={},P0={},META={at:'2026-10-24',basis:'2026년 세법',by:''};
+RULES.forEach(function(g){g.items.forEach(function(it){P0[it[0]]=it[3];});});
+function cp(x){return JSON.parse(JSON.stringify(x));}
+function setRules(o){P=cp(P0);if(o&&o.v)for(var k in o.v)if(k in P0)P[k]=cp(o.v[k]);if(o){if(o.at)META.at=o.at;if(o.basis)META.basis=o.basis;META.by=o.by||'';}}
+setRules(null);
+/* 표 → 누진 계산: 구간마다 (그 구간에 든 금액 × 세율) 합 */
+function prog(base,T){var t=0,lo=0;if(base<=0)return 0;for(var i=0;i<T.length;i++){var hi=T[i][0]==null?Infinity:T[i][0];if(base>lo)t+=(Math.min(base,hi)-lo)*T[i][1]/100;lo=hi;if(base<=hi)break;}return t;}
+function topRate(base,T){for(var i=0;i<T.length;i++)if(T[i][0]==null||base<=T[i][0])return T[i][1]/100;return 0;}
+function bandIdx(base,T){for(var i=0;i<T.length;i++)if(T[i][0]==null||base<=T[i][0])return i;return T.length-1;}
+function tblRows(T,withQ){var lo=0;return T.map(function(r,i){var q=prog(lo,T)-lo*r[1]/100,row=[(r[0]==null?man(lo)+' 초과':man(r[0])+' 이하'),r[1]+'%'];if(withQ)row.push(i?man(-q):'-');lo=r[0]==null?lo:r[0];return row;});}
+function L(){return 1+P.local/100;}
+function rateList(T){return T.map(function(r){return r[1];}).join('·')+'%';}
 
 /* ---------- 아이콘 ---------- */
 var ICO={
@@ -312,8 +362,8 @@ add({id:'refund',cat:'cover',ic:'pct',name:'환급률·연환산 수익률 계�
     var irr=(Math.pow(1+lo,12)-1)*100;
     return {big:['환급률 '+pct(rate),'연 '+pct(irr,2)+' 복리와 같음','총 납입 '+man(paid)+' → 환급 '+man(v.cv)],
       rows:[['총 납입 보험료',man(paid)],['해지환급금',man(v.cv)],['차이 (이익)',man(v.cv-paid),v.cv>=paid?'plus':'minus'],['환급률',pct(rate),'tot'],['연환산 복리 수익률',pct(irr,2),'tot'],
-        ['같은 수익을 내려면 필요한 예금 금리 (이자소득세 15.4% 감안)',pct(irr/0.846,2),'sub']],
-      say:'"매달 '+man(v.p)+'씩 '+v.pay+'년 넣고 '+v.at+'년 뒤에 찾으면, 예금으로 치면 세전 연 <b>'+pct(irr/0.846,2)+'</b> 상품과 비슷합니다."',
+        ['같은 수익을 내려면 필요한 예금 금리 (이자소득세 '+pct(P.finW*L(),1)+' 감안)',pct(irr/(1-P.finW*L()/100),2),'sub']],
+      say:'"매달 '+man(v.p)+'씩 '+v.pay+'년 넣고 '+v.at+'년 뒤에 찾으면, 예금으로 치면 세전 연 <b>'+pct(irr/(1-P.finW*L()/100),2)+'</b> 상품과 비슷합니다."',
       note:'보험은 사망보장 비용이 포함돼 있어 단순 금융상품 비교와는 다릅니다. 저축성보험 비과세 요건(월납 5년 이상 납입·10년 유지, 한도 등) 충족 여부를 확인하세요.'};}});
 
 add({id:'renew',cat:'cover',ic:'renew',name:'갱신형 보험료 증가 계산기',kw:'갱신형 비갱신형 보험료 인상 총납입',
@@ -363,19 +413,19 @@ add({id:'draw',cat:'retire',ic:'hour',name:'노후자금 인출 기간 계산기
 
 add({id:'irp',cat:'retire',ic:'gift',name:'연금저축·IRP 세액공제 계산기',kw:'연금저축 IRP 세액공제 연말정산 13월의월급 ISA 900만원',
   d:'연금저축·IRP에 넣은 돈으로 연말정산 때 얼마를 돌려받는지 계산합니다.',
-  f:[['ps','연금저축 연 납입액','만원',600,'공제 한도 600만원'],['irp','IRP 연 납입액','만원',300,'연금저축 합쳐 900만원까지'],['isa','ISA 만기 자금 연금계좌 이전액','만원',0,'이전액의 10%, 최대 300만원 추가 공제'],
-     ['band','소득 구간','',0,'','sel',['총급여 5,500만원 이하 (종합소득 4,500만원 이하) — 16.5%','그 초과 — 13.2%']],['yrs','이렇게 넣는 기간','년',10]],
-  run:function(v){var r=v.band===0?.165:.132,base=Math.min(Math.min(v.ps,600)+v.irp,900),ex=Math.min(v.isa*.1,300),cr=(base+ex)*r;
+  f:[['ps','연금저축 연 납입액','만원',function(){return P.psLim;},function(){return '공제 한도 '+man(P.psLim);}],['irp','IRP 연 납입액','만원',function(){return P.pnLim-P.psLim;},function(){return '연금저축 합쳐 '+man(P.pnLim)+'까지';}],['isa','ISA 만기 자금 연금계좌 이전액','만원',0,function(){return '이전액의 '+P.isaR+'%, 최대 '+man(P.isaMax)+' 추가 공제';}],
+     ['band','소득 구간','',0,'','sel',function(){return ['총급여 '+man(P.bandW)+' 이하 (종합소득 '+man(P.bandI)+' 이하) — '+P.crLo+'%','그 초과 — '+P.crHi+'%'];}],['yrs','이렇게 넣는 기간','년',10]],
+  run:function(v){var r=(v.band===0?P.crLo:P.crHi)/100,base=Math.min(Math.min(v.ps,P.psLim)+v.irp,P.pnLim),ex=Math.min(v.isa*P.isaR/100,P.isaMax),cr=(base+ex)*r;
     return {big:['올해 돌려받는 세금',man(cr),'공제 대상 '+man(base+ex)+' × '+(r*100).toFixed(1)+'%'],
-      rows:[['연금저축 공제 대상',man(Math.min(v.ps,600))],['IRP 포함 합계 (900만원 한도)',man(base)],ex?['ISA 이전 추가 공제 대상',man(ex)]:null,['세액공제율 (지방세 포함)',pct(r*100)],['올해 환급액',man(cr),'tot plus'],[v.yrs+'년 누적 환급',man(cr*v.yrs),'plus'],
-        ['한도까지 더 넣을 수 있는 금액',man(Math.max(0,900-base))]].filter(Boolean),
+      rows:[['연금저축 공제 대상',man(Math.min(v.ps,P.psLim))],['IRP 포함 합계 ('+man(P.pnLim)+' 한도)',man(base)],ex?['ISA 이전 추가 공제 대상',man(ex)]:null,['세액공제율 (지방세 포함)',pct(r*100)],['올해 환급액',man(cr),'tot plus'],[v.yrs+'년 누적 환급',man(cr*v.yrs),'plus'],
+        ['한도까지 더 넣을 수 있는 금액',man(Math.max(0,P.pnLim-base))]].filter(Boolean),
       say:'"1년에 '+man(v.ps+v.irp)+'을 넣으면 연말정산 때 <b>'+man(cr)+'</b>을 돌려받습니다. 넣는 순간 '+(r*100).toFixed(1)+'% 수익이 확정되는 셈입니다."',
       note:'중도 해지하면 공제받은 금액에 기타소득세 16.5%가 붙습니다. 연금으로 받을 때 연금소득세 3.3~5.5%, 사적연금 연 1,500만원 초과 시 종합과세 또는 16.5% 분리과세를 고를 수 있습니다.'};}});
 
 add({id:'nps',cat:'retire',ic:'cal',name:'국민연금 수령 시기 비교 계산기',kw:'국민연금 조기수령 연기수령 손익분기',
   d:'국민연금을 일찍 받을 때(감액)와 늦게 받을 때(증액) 나이별 누적 수령액과 손익분기 나이를 비교합니다.',
-  f:[['m','정상 수령 시 월 연금액','만원',120],['age','정상 수령 시작 나이','세',65,'1969년생 이후 65세'],['e','조기 수령 (몇 년 당겨서)','년',5,'1년당 6% 감액, 최대 5년'],['l','연기 수령 (몇 년 늦춰서)','년',5,'1년당 7.2% 증액, 최대 5년']],
-  run:function(v){var e=Math.min(Math.max(v.e,0),5),l=Math.min(Math.max(v.l,0),5),A=[[v.age-e,v.m*(1-.06*e),'조기'],[v.age,v.m,'정상'],[v.age+l,v.m*(1+.072*l),'연기']];
+  f:[['m','정상 수령 시 월 연금액','만원',120],['age','정상 수령 시작 나이','세',65,'1969년생 이후 65세'],['e','조기 수령 (몇 년 당겨서)','년',function(){return P.npsMax;},function(){return '1년당 '+P.npsE+'% 감액, 최대 '+P.npsMax+'년';}],['l','연기 수령 (몇 년 늦춰서)','년',function(){return P.npsMax;},function(){return '1년당 '+P.npsL+'% 증액, 최대 '+P.npsMax+'년';}]],
+  run:function(v){var e=Math.min(Math.max(v.e,0),P.npsMax),l=Math.min(Math.max(v.l,0),P.npsMax),A=[[v.age-e,v.m*(1-P.npsE/100*e),'조기'],[v.age,v.m,'정상'],[v.age+l,v.m*(1+P.npsL/100*l),'연기']];
     function cum(o,x){return Math.max(0,x-o[0])*12*o[1];}
     var ages=[70,75,80,85,90,95],T=ages.map(function(x){return [x+'세'].concat(A.map(function(o){return man(cum(o,x));}));});
     function be(a,b){for(var x=b[0];x<120;x+=1/12)if(cum(b,x)>=cum(a,x))return x;return NaN;}
@@ -413,14 +463,14 @@ add({id:'sevtax',cat:'retire',ic:'scale',name:'퇴직소득세 · 일시금 vs �
   d:'퇴직금을 한 번에 받을 때 내는 퇴직소득세와, IRP에 넣어 연금으로 받을 때 줄어드는 세금을 비교합니다.',
   f:[['amt','퇴직금','만원',20000],['yrs','근속 연수','년',20,'1년 미만은 1년으로 올림']],
   run:function(v){var n=Math.max(1,Math.ceil(v.yrs)),a=v.amt;
-    var sd=n<=5?100*n:n<=10?500+200*(n-5):n<=20?1500+250*(n-10):4000+300*(n-20);sd=Math.min(sd,a);
-    var conv=(a-sd)*12/n,cd=conv<=800?conv:conv<=7000?800+(conv-800)*.6:conv<=10000?4520+(conv-7000)*.55:conv<=30000?6170+(conv-10000)*.45:15170+(conv-30000)*.35;
-    var base=Math.max(conv-cd,0),tax=prog(base,INC)*n/12,tot=tax*1.1;
+    var sd=Math.min(prog(n,P.svc)*100,a);
+    var conv=(a-sd)*12/n,cd=Math.min(prog(conv,P.conv),conv);
+    var base=Math.max(conv-cd,0),tax=prog(base,P.inc)*n/12,tot=tax*L(),k1=1-P.pRed1/100,k2=1-P.pRed2/100;
     return {big:['일시금 퇴직소득세',man(tot),'실효세율 '+pct(tot/a*100,2)+' (지방세 포함)'],
       rows:[['근속연수공제',man(sd),'sub'],['환산급여',man(conv),'sub'],['환산급여공제',man(cd),'sub'],['과세표준',man(base),'sub'],['일시금으로 받을 때 세금',man(tot),'tot'],
-        ['연금으로 받을 때 (10년차까지, 30% 감면)',man(tot*.7),'plus'],['연금으로 받을 때 (11년차부터, 40% 감면)',man(tot*.6),'plus'],['연금 수령 시 아끼는 세금 (최대)',man(tot*.4),'tot plus']],
-      bars:[['일시금',tot],['연금 1~10년차',tot*.7,null,'g'],['연금 11년차~',tot*.6,null,'g']],
-      say:'"퇴직금을 한 번에 받으면 세금이 <b>'+man(tot)+'</b>이지만, IRP로 옮겨 연금으로 받으면 최대 <b>'+man(tot*.4)+'</b>을 아낄 수 있습니다."',
+        ['연금으로 받을 때 (10년차까지, '+P.pRed1+'% 감면)',man(tot*k1),'plus'],['연금으로 받을 때 (11년차부터, '+P.pRed2+'% 감면)',man(tot*k2),'plus'],['연금 수령 시 아끼는 세금 (최대)',man(tot*(1-k2)),'tot plus']],
+      bars:[['일시금',tot],['연금 1~10년차',tot*k1,null,'g'],['연금 11년차~',tot*k2,null,'g']],
+      say:'"퇴직금을 한 번에 받으면 세금이 <b>'+man(tot)+'</b>이지만, IRP로 옮겨 연금으로 받으면 최대 <b>'+man(tot*(1-k2))+'</b>을 아낄 수 있습니다."',
       note:'2023년 이후 퇴직분 계산식입니다. 2016~2019년 이전 근속분 특례, 임원 퇴직금 한도 초과분은 반영하지 않았습니다.'};}});
 
 /* ===== 재무계산 ===== */
@@ -489,75 +539,75 @@ add({id:'opp',cat:'money',ic:'cup',name:'기회비용 계산기',kw:'기회비�
 /* ===== 세금 ===== */
 add({id:'inh',cat:'tax',ic:'house',name:'상속세 계산기',kw:'상속세 상속 배우자공제 일괄공제 종신보험 재원',
   d:'재산을 물려줄 때 내야 하는 상속세와, 이를 낼 돈(사망보험금)이 얼마나 필요한지 계산합니다.',
-  f:[['tot','상속재산 총액 (부동산·금융 등)','만원',300000],['fin','그중 금융재산','만원',50000],['debt','채무','만원',20000],['fun','장례비','만원',1000,'500만원~1,500만원(봉안 포함)까지 인정'],
-     ['gift','10년 안에 상속인에게 미리 준 재산','만원',0],['sp','배우자','',0,'','sel',['있음','없음']],['spAmt','배우자가 실제 받는 금액','만원',0,'0이면 최소 5억원 공제'],['kids','자녀 수','명',2]],
-  run:function(v){var fun=Math.min(Math.max(v.fun,500),1500),val=Math.max(v.tot-v.debt-fun+v.gift,0);
-    var lump=Math.max(50000,20000+5000*v.kids),spD=0;
-    if(v.sp===0){var share=1.5/(1.5+Math.max(v.kids,0)),lim=Math.min(300000,val*share);spD=Math.max(50000,Math.min(v.spAmt,lim));}
-    var fn=v.fin<=2000?v.fin:Math.min(Math.max(2000,v.fin*.2),20000);
-    var ded=Math.min(lump+spD+fn,Math.max(val-v.gift,0)),base=Math.max(val-ded,0),t=prog(base,INH),pay=t*.97;
-    return {big:['예상 상속세',man(pay),'신고세액공제 3% 반영'],
-      rows:[['상속세 과세가액',man(val)],['일괄공제 (또는 기초+인적)',man(lump),'minus'],v.sp===0?['배우자 공제',man(spD),'minus']:null,['금융재산 공제',man(fn),'minus'],['과세표준',man(base),'tot'],['적용 최고세율',pct(topRate(base,INH)*100,0)],['산출세액',man(t)],['납부할 세금 (3% 공제 후)',man(pay),'tot minus'],
+  f:[['tot','상속재산 총액 (부동산·금융 등)','만원',300000],['fin','그중 금융재산','만원',50000],['debt','채무','만원',20000],['fun','장례비','만원',1000,function(){return man(P.funMin)+'~'+man(P.funMax)+'(봉안 포함)까지 인정';}],
+     ['gift','10년 안에 상속인에게 미리 준 재산','만원',0],['sp','배우자','',0,'','sel',['있음','없음']],['spAmt','배우자가 실제 받는 금액','만원',0,function(){return '0이면 최소 '+man(P.spMin)+' 공제';}],['kids','자녀 수','명',2]],
+  run:function(v){    var fun=Math.min(Math.max(v.fun,P.funMin),P.funMax),val=Math.max(v.tot-v.debt-fun+v.gift,0);
+    var lump=Math.max(P.lump,P.basic+P.child*v.kids),spD=0;
+    if(v.sp===0){var share=1.5/(1.5+Math.max(v.kids,0)),lim=Math.min(P.spMax,val*share);spD=Math.max(P.spMin,Math.min(v.spAmt,lim));}
+    var fn=v.fin<=P.finAll?v.fin:Math.min(Math.max(P.finAll,v.fin*P.finRate/100),P.finMax);
+    var ded=Math.min(lump+spD+fn,Math.max(val-v.gift,0)),base=Math.max(val-ded,0),t=prog(base,P.inh),pay=t*(1-P.filing/100);
+    return {big:['예상 상속세',man(pay),'신고세액공제 '+P.filing+'% 반영'],
+      rows:[['상속세 과세가액',man(val)],['일괄공제 (또는 기초+인적)',man(lump),'minus'],v.sp===0?['배우자 공제',man(spD),'minus']:null,['금융재산 공제',man(fn),'minus'],['과세표준',man(base),'tot'],['적용 최고세율',pct(topRate(base,P.inh)*100,0)],['산출세액',man(t)],['납부할 세금 ('+P.filing+'% 공제 후)',man(pay),'tot minus'],
         ['재산 대비 세금',pct(pay/Math.max(v.tot,1)*100)]].filter(Boolean),
       bars:[['상속재산',v.tot],['상속세',pay,null,'g']],
       say:'"상속세 <b>'+man(pay)+'</b>은 상속 개시 후 6개월 안에 현금으로 내야 합니다. 부동산이 많으면 급매가 생길 수 있어 <b>종신보험으로 세금 낼 돈</b>을 미리 준비합니다."',
-      note:'2026년 현행 세율(10~50%)·공제 기준의 단순 계산입니다. 동거주택·가업·영농 공제, 공제 종합한도의 세부 규정, 감정평가는 반영하지 않았습니다. 사망보험금은 계약자가 피상속인이면 상속재산에 포함되므로, 계약자·수익자를 자녀로 하면 재원 마련에 유리합니다.'};}});
+      note:META.basis+' 세율('+rateList(P.inh)+')·공제 기준의 단순 계산입니다. 동거주택·가업·영농 공제, 공제 종합한도의 세부 규정, 감정평가는 반영하지 않았습니다. 사망보험금은 계약자가 피상속인이면 상속재산에 포함되므로, 계약자·수익자를 자녀로 하면 재원 마련에 유리합니다.'};}});
 
 add({id:'gift',cat:'tax',ic:'gift',name:'증여세 계산기',kw:'증여세 증여공제 자녀 손자 세대생략 혼인출산공제 10년합산',
   d:'가족에게 재산을 줄 때 내는 증여세를 관계별 공제와 10년 합산까지 반영해 계산합니다.',
   f:[['amt','이번에 주는 금액','만원',10000],['rel','받는 사람','',1,'','sel',['배우자','성년 자녀 (직계비속)','미성년 자녀','부모 (직계존속)','기타 친족','남']],
-     ['prior','10년 안에 같은 사람에게 준 금액','만원',0,'부모는 아버지·어머니를 한 사람으로 봅니다'],['wed','혼인·출산 공제 사용액','만원',0,'성년 자녀, 최대 1억원'],['skip','손자·손녀에게 바로 주기 (세대생략)','',0,'','chk']],
-  run:function(v){var D=[60000,5000,2000,5000,1000,0][v.rel],wed=v.rel===1?Math.min(v.wed,10000):0;
-    var all=v.amt+v.prior,base=Math.max(all-D-wed,0),t1=prog(base,INH),t0=prog(Math.max(v.prior-D,0),INH),t=Math.max(t1-t0,0);
-    var sur=v.skip?(v.rel===2&&all>200000?.4:.3):0,tt=t*(1+sur),pay=tt*.97;
+     ['prior','10년 안에 같은 사람에게 준 금액','만원',0,'부모는 아버지·어머니를 한 사람으로 봅니다'],['wed','혼인·출산 공제 사용액','만원',0,function(){return '성년 자녀, 최대 '+man(P.gWed);}],['skip','손자·손녀에게 바로 주기 (세대생략)','',0,'','chk']],
+  run:function(v){var D=[P.gSp,P.gAd,P.gMi,P.gPa,P.gKin,0][v.rel],wed=v.rel===1?Math.min(v.wed,P.gWed):0;
+    var all=v.amt+v.prior,base=Math.max(all-D-wed,0),t1=prog(base,P.inh),t0=prog(Math.max(v.prior-D,0),P.inh),t=Math.max(t1-t0,0);
+    var sur=v.skip?(v.rel===2&&all>P.skipBig?P.skip2:P.skip)/100:0,tt=t*(1+sur),pay=tt*(1-P.filing/100);
     return {big:['납부할 증여세',man(pay),'증여 공제 '+man(D+wed)+' 적용'],
-      rows:[['합산 증여액 (10년)',man(all)],['증여재산 공제',man(D),'minus'],wed?['혼인·출산 공제',man(wed),'minus']:null,['과세표준',man(base),'tot'],['산출세액 (이번 몫)',man(t)],sur?['세대생략 할증 ('+(sur*100)+'%)',man(t*sur),'minus']:null,['신고세액공제 3% 후 납부액',man(pay),'tot minus'],
+      rows:[['합산 증여액 (10년)',man(all)],['증여재산 공제',man(D),'minus'],wed?['혼인·출산 공제',man(wed),'minus']:null,['과세표준',man(base),'tot'],['산출세액 (이번 몫)',man(t)],sur?['세대생략 할증 ('+Math.round(sur*100)+'%)',man(t*sur),'minus']:null,['신고세액공제 '+P.filing+'% 후 납부액',man(pay),'tot minus'],
         ['세금 없이 줄 수 있는 남은 한도',man(Math.max(D+wed-v.prior-v.amt,0))]].filter(Boolean),
       say:D>0?'"'+['배우자','성년 자녀','미성년 자녀','부모','친족',''][v.rel]+'에게는 10년마다 <b>'+man(D)+'</b>까지 세금 없이 줄 수 있습니다. 일찍, 나눠서 주는 것이 절세의 기본입니다."':'"남에게 주는 재산은 공제가 없습니다."',
-      note:'2026년 현행 세율(10~50%) 기준입니다. 부담부증여, 저가 양수, 보험금 증여(계약자와 수익자가 다를 때) 등은 별도 판단이 필요합니다.'};}});
+      note:META.basis+' 세율('+rateList(P.inh)+') 기준입니다. 부담부증여, 저가 양수, 보험금 증여(계약자와 수익자가 다를 때) 등은 별도 판단이 필요합니다.'};}});
 
 add({id:'inc',cat:'tax',ic:'tax',name:'종합소득세 세율 계산기',kw:'종합소득세 과세표준 세율 누진공제 한계세율',
   d:'과세표준을 넣으면 종합소득세·지방소득세, 실효세율과 한계세율(마지막 1만원에 붙는 세율)을 보여 줍니다.',
   f:[['base','과세표준','만원',8000]],
-  run:function(v){var t=prog(v.base,INC);return {big:['세금 (지방세 포함)',man(t*1.1),'실효세율 '+pct(t*1.1/Math.max(v.base,1)*100,2)],
-    rows:[['종합소득세',man(t)],['지방소득세 (10%)',man(t*.1)],['합계',man(t*1.1),'tot'],['한계세율 (지방세 포함)',pct(topRate(v.base,INC)*110,1)]],
-    tbl:{h:['과세표준','세율','누진공제'],r:[['1,400만원 이하','6%','-'],['5,000만원 이하','15%','126만원'],['8,800만원 이하','24%','576만원'],['1.5억원 이하','35%','1,544만원'],['3억원 이하','38%','1,994만원'],['5억원 이하','40%','2,594만원'],['10억원 이하','42%','3,594만원'],['10억원 초과','45%','6,594만원']],hi:INC.findIndex(function(x){return v.base<=x[0];})},
-    say:'"이 소득 구간에선 1만원을 더 벌면 <b>'+pct(topRate(v.base,INC)*110,1)+'</b>가 세금입니다. 연금저축·IRP 공제의 효과가 큰 이유입니다."'};}});
+  run:function(v){var t=prog(v.base,P.inc);return {big:['세금 (지방세 포함)',man(t*L()),'실효세율 '+pct(t*L()/Math.max(v.base,1)*100,2)],
+    rows:[['종합소득세',man(t)],['지방소득세 ('+P.local+'%)',man(t*P.local/100)],['합계',man(t*L()),'tot'],['한계세율 (지방세 포함)',pct(topRate(v.base,P.inc)*100*L(),1)]],
+    tbl:{h:['과세표준','세율','누진공제'],r:tblRows(P.inc,true),hi:bandIdx(v.base,P.inc)},
+    say:'"이 소득 구간에선 1만원을 더 벌면 <b>'+pct(topRate(v.base,P.inc)*100*L(),1)+'</b>가 세금입니다. 연금저축·IRP 공제의 효과가 큰 이유입니다."'};}});
 
 add({id:'fin',cat:'tax',ic:'coin',name:'금융소득 종합과세 계산기',kw:'금융소득종합과세 이자 배당 2천만원 분리과세 비과세 저축보험',
   d:'이자·배당이 1년에 2천만원을 넘으면 다른 소득과 합쳐 세금이 늘어납니다. 늘어나는 세금을 계산합니다.',
   f:[['fin','연간 이자·배당 합계','만원',5000],['other','다른 종합소득 과세표준','만원',8000,'사업·근로·임대 등의 과세표준']],
-  run:function(v){var sep=v.fin*.14,base=prog(v.other,INC),tax;
-    if(v.fin<=2000)tax=base+sep;else{var x=v.fin-2000;tax=Math.max(prog(v.other+x,INC)+2000*.14,base+sep);}
-    var plus=(tax-base-sep)*1.1;
-    return {big:[v.fin>2000?'종합과세로 늘어나는 세금':'종합과세 대상 아님',man(Math.max(plus,0)),v.fin>2000?'2천만원 초과분 '+man(v.fin-2000)+'이 다른 소득과 합산':'2천만원 이하는 15.4% 원천징수로 끝'],
-      rows:[['금융소득',man(v.fin)],['원천징수 세금 (15.4%)',man(v.fin*.154)],['종합과세 후 금융소득 관련 세금',man((tax-base)*1.1)],['추가 부담',man(Math.max(plus,0)),'tot minus']],
-      say:v.fin>2000?'"금융소득이 2천만원을 넘어 <b>'+man(plus)+'</b>을 더 냅니다. 요건을 갖춘 저축성보험 이자(보험차익)는 비과세라 금융소득에 들어가지 않습니다."':'"아직 2천만원 기준 안입니다. 늘어날 때를 대비해 비과세 상품을 함께 보세요."',
+  run:function(v){var w=P.finW/100,th=P.finThr,sep=v.fin*w,base=prog(v.other,P.inc),tax;
+    if(v.fin<=th)tax=base+sep;else{var x=v.fin-th;tax=Math.max(prog(v.other+x,P.inc)+th*w,base+sep);}
+    var plus=(tax-base-sep)*L(),wl=pct(P.finW*L(),1);
+    return {big:[v.fin>th?'종합과세로 늘어나는 세금':'종합과세 대상 아님',man(Math.max(plus,0)),v.fin>th?man(th)+' 초과분 '+man(v.fin-th)+'이 다른 소득과 합산':man(th)+' 이하는 '+wl+' 원천징수로 끝'],
+      rows:[['금융소득',man(v.fin)],['원천징수 세금 ('+wl+')',man(v.fin*w*L())],['종합과세 후 금융소득 관련 세금',man((tax-base)*L())],['추가 부담',man(Math.max(plus,0)),'tot minus']],
+      say:v.fin>th?'"금융소득이 '+man(th)+'을 넘어 <b>'+man(plus)+'</b>을 더 냅니다. 요건을 갖춘 저축성보험 이자(보험차익)는 비과세라 금융소득에 들어가지 않습니다."':'"아직 '+man(P.finThr)+' 기준 안입니다. 늘어날 때를 대비해 비과세 상품을 함께 보세요."',
       note:'배당가산(Gross-up)·배당세액공제, 건강보험료 영향(금융소득 연 1천만원 초과 시 피부양자 자격·지역보험료)은 반영하지 않은 단순 계산입니다.'};}});
 
 add({id:'four',cat:'tax',ic:'user',name:'4대보험 계산기',kw:'4대보험 국민연금 건강보험 장기요양 고용보험 산재 월급 실수령',
   d:'월급에서 빠지는 4대보험료(근로자 몫)와 회사가 내는 몫을 계산합니다. 요율은 바꿔 넣을 수 있습니다.',
-  f:[['pay','월 급여 (비과세 제외)','만원',400],['np','국민연금 요율 (합계)','%',9.5,'2026년 9.5%, 근로자·회사 절반씩'],['hi','건강보험 요율 (합계)','%',7.19,'2026년 7.19%'],['lt','장기요양 (건강보험료 대비)','%',13.14,'2026년 13.14%'],
-     ['em','고용보험 근로자','%',0.9],['emc','고용보험 회사 (고용안정 포함)','%',1.15,'150인 미만 1.15%'],['ia','산재보험 회사','%',0.7,'업종별로 다름']],
-  run:function(v){var w=v.pay*10000,nb=Math.min(Math.max(w,400000),6370000),np=Math.floor(nb*v.np/200/10)*10,hi=Math.floor(w*v.hi/200/10)*10,lt=Math.floor(hi*v.lt/100/10)*10,em=Math.floor(w*v.em/100/10)*10;
+  f:[['pay','월 급여 (비과세 제외)','만원',400],['np','국민연금 요율 (합계)','%',function(){return P.np;},'근로자·회사 절반씩'],['hi','건강보험 요율 (합계)','%',function(){return P.hi;}],['lt','장기요양 (건강보험료 대비)','%',function(){return P.lt;}],
+     ['em','고용보험 근로자','%',function(){return P.em;}],['emc','고용보험 회사 (고용안정 포함)','%',function(){return P.emc;},'150인 미만 기준'],['ia','산재보험 회사','%',function(){return P.ia;},'업종별로 다름']],
+  run:function(v){var w=v.pay*10000,nb=Math.min(Math.max(w,P.npMin*10000),P.npMax*10000),np=Math.floor(nb*v.np/200/10)*10,hi=Math.floor(w*v.hi/200/10)*10,lt=Math.floor(hi*v.lt/100/10)*10,em=Math.floor(w*v.em/100/10)*10;
     var me=np+hi+lt+em,co=np+hi+lt+Math.floor(w*v.emc/100/10)*10+Math.floor(w*v.ia/100/10)*10;
     return {big:['근로자가 내는 4대보험료',won(me),'회사 부담 '+won(co)],
       rows:[['국민연금',won(np)],['건강보험',won(hi)],['장기요양',won(lt)],['고용보험',won(em)],['근로자 합계',won(me),'tot'],['회사 합계 (산재 포함)',won(co),'tot'],['회사+근로자 총 부담',won(me+co)]],
-      note:'국민연금 기준소득월액 상·하한(2025.7~2026.6: 637만원·40만원)을 적용했습니다. 소득세·지방소득세는 별도입니다.'};}});
+      note:'국민연금 기준소득월액 상·하한('+man(P.npMax)+'·'+man(P.npMin)+')을 적용했습니다. 요율 기본값은 「'+META.basis+'」 기준값입니다. 소득세·지방소득세는 별도입니다.'};}});
 
 /* ===== 법인·CEO ===== */
 add({id:'corp',cat:'corp',ic:'bld',name:'법인세 계산기',kw:'법인세 과세표준 지방소득세 법인',
   d:'법인 과세표준으로 법인세와 지방소득세를 계산합니다.',
-  f:[['base','과세표준','만원',50000],['yr','사업연도','',0,'2026년부터 구간별 1%p 인상','sel',['2026년 이후 (10·20·22·25%)','2025년 (9·19·21·24%)']]],
-  run:function(v){var T=v.yr===0?CORP[2026]:CORP[2025],t=prog(v.base,T);
-    return {big:['법인세 + 지방소득세',man(t*1.1),'실효세율 '+pct(t*1.1/Math.max(v.base,1)*100,2)],rows:[['법인세',man(t)],['지방소득세 (10%)',man(t*.1)],['합계',man(t*1.1),'tot'],['적용 최고세율',pct(topRate(v.base,T)*100,0)]],
-      tbl:{h:['과세표준','세율'],r:[['2억원 이하',v.yr===0?'10%':'9%'],['200억원 이하',v.yr===0?'20%':'19%'],['3,000억원 이하',v.yr===0?'22%':'21%'],['3,000억원 초과',v.yr===0?'25%':'24%']]},
+  f:[['base','과세표준','만원',50000]],
+  run:function(v){var T=P.corp,t=prog(v.base,T);
+    return {big:['법인세 + 지방소득세',man(t*L()),'실효세율 '+pct(t*L()/Math.max(v.base,1)*100,2)],rows:[['법인세',man(t)],['지방소득세 ('+P.local+'%)',man(t*P.local/100)],['합계',man(t*L()),'tot'],['적용 최고세율',pct(topRate(v.base,T)*100,0)]],
+      tbl:{h:['과세표준','세율'],r:tblRows(T,false),hi:bandIdx(v.base,T)},
       note:'성실신고확인 대상 소규모 부동산임대업 법인 특례세율, 각종 세액공제·감면은 반영하지 않았습니다.'};}});
 
 add({id:'loanint',cat:'corp',ic:'key',name:'가지급금 인정이자 계산기',kw:'가지급금 인정이자 대표이사 가수금 상여처분',
   d:'대표가 회사 돈을 빌려 쓴 가지급금에 붙는 인정이자와, 이 때문에 늘어나는 법인세·대표 소득세를 계산합니다.',
-  f:[['amt','가지급금 잔액','만원',30000],['r','인정이자율','%',4.6,'당좌대출이자율 4.6%'],['days','빌린 날수 (올해)','일',365],['paid','대표가 실제 낸 이자','만원',0],
-     ['ct','법인 한계세율 (지방세 포함)','%',22,'과표 2억~200억 2026년 20%+지방세'],['pt','대표 한계세율 (지방세 포함)','%',41.8]],
+  f:[['amt','가지급금 잔액','만원',30000],['r','인정이자율','%',function(){return P.ii;},function(){return '당좌대출이자율 '+P.ii+'%';}],['days','빌린 날수 (올해)','일',365],['paid','대표가 실제 낸 이자','만원',0],
+     ['ct','법인 한계세율 (지방세 포함)','%',function(){return Math.round(P.corp[1][1]*L()*10)/10;},function(){return '과표 2억~200억 구간 '+P.corp[1][1]+'% + 지방세';}],['pt','대표 한계세율 (지방세 포함)','%',41.8]],
   run:function(v){var it=v.amt*v.r/100*v.days/365,un=Math.max(it-v.paid,0),c=un*v.ct/100,p=un*v.pt/100;
     return {big:['올해 인정이자',man(it),'세금 부담 늘어남 '+man(c+p)],rows:[['인정이자',man(it)],['대표가 낸 이자',man(v.paid),'minus'],['익금산입 (상여 처분)',man(un),'tot'],['늘어나는 법인세',man(c),'minus'],['늘어나는 대표 소득세',man(p),'minus'],['합계 (1년)',man(c+p),'tot minus'],['5년 누적 (잔액 그대로일 때)',man((c+p)*5)]],
       say:'"가지급금 '+man(v.amt)+'을 그대로 두면 매년 <b>'+man(c+p)+'</b>의 세금이 더 나갑니다. 급여·배당·퇴직금 등으로 정리 계획을 세우셔야 합니다."',
@@ -566,9 +616,9 @@ add({id:'loanint',cat:'corp',ic:'key',name:'가지급금 인정이자 계산기'
 add({id:'exec',cat:'corp',ic:'brief',name:'임원 퇴직금 한도 계산기',kw:'임원퇴직금 정관 배수 한도 퇴직소득 근로소득',
   d:'정관에 정한 배수로 임원 퇴직금을 줄 때, 퇴직소득으로 인정되는 한도와 넘는 금액(근로소득 과세)을 계산합니다.',
   f:[['avg','퇴직 전 3년 연평균 급여','만원',15000,'비과세 제외 총급여'],['y1','2011년까지 근속','년',0],['y2','2012~2019년 근속','년',8],['y3','2020년 이후 근속','년',6],['mul','정관 지급 배수','배',3]],
-  run:function(v){var all=v.y1+v.y2+v.y3,pay=v.avg*.1*all*v.mul,lim=v.avg*.1*v.y1*v.mul+v.avg*.1*v.y2*3+v.avg*.1*v.y3*2;
+  run:function(v){var all=v.y1+v.y2+v.y3,pay=v.avg*.1*all*v.mul,lim=v.avg*.1*v.y1*v.mul+v.avg*.1*v.y2*P.ex1+v.avg*.1*v.y3*P.ex2;
     var over=Math.max(pay-lim,0);
-    return {big:['정관 기준 퇴직금',man(pay),'퇴직소득 한도 '+man(lim)],rows:[['총 근속',all+'년'],['정관 기준 퇴직금 (연봉×10%×근속×배수)',man(pay)],['2012~2019 근속분 한도 (3배)',man(v.avg*.1*v.y2*3),'sub'],['2020년 이후 근속분 한도 (2배)',man(v.avg*.1*v.y3*2),'sub'],['퇴직소득 인정 한도',man(lim),'tot'],
+    return {big:['정관 기준 퇴직금',man(pay),'퇴직소득 한도 '+man(lim)],rows:[['총 근속',all+'년'],['정관 기준 퇴직금 (연봉×10%×근속×배수)',man(pay)],['2012~2019 근속분 한도 ('+P.ex1+'배)',man(v.avg*.1*v.y2*P.ex1),'sub'],['2020년 이후 근속분 한도 ('+P.ex2+'배)',man(v.avg*.1*v.y3*P.ex2),'sub'],['퇴직소득 인정 한도',man(lim),'tot'],
         ['한도 초과 (근로소득 과세)',man(over),over>0?'tot minus':'tot plus']],
       bars:[['정관 퇴직금',pay],['퇴직소득 한도',lim,null,'g']],
       say:'"퇴직금 재원은 <b>'+man(pay)+'</b>이 필요합니다. 법인 보험으로 미리 쌓아 두면 퇴직 시점의 현금 부담을 줄일 수 있습니다."',
@@ -585,11 +635,11 @@ add({id:'keyman',cat:'corp',ic:'user',name:'키맨 리스크 계산기',kw:'키�
 add({id:'stock',cat:'corp',ic:'stock',name:'비상장주식 가치 계산기 (간이)',kw:'비상장주식 평가 순손익가치 순자산가치 가업승계 지분',
   d:'상속·증여세법 방식(순손익가치·순자산가치 가중평균)으로 비상장주식 1주 가치와 지분 가치를 간단히 계산합니다.',
   f:[['n1','최근 1년 순손익','만원',30000],['n2','2년 전 순손익','만원',25000],['n3','3년 전 순손익','만원',20000],['na','순자산 (자산−부채)','만원',150000],['sh','발행주식 수','주',20000],
-     ['own','대표 보유 주식 수','주',14000],['kind','회사 유형','',0,'','sel',['일반 법인 (3:2)','부동산 50% 이상 (2:3)','부동산 80% 이상 (순자산만)']],['top','최대주주 할증 20% 적용','',1,'중소기업은 할증 없음','chk']],
-  run:function(v){var w=(v.n1*3+v.n2*2+v.n3)/6,ip=w/v.sh*10000/.1,ap=v.na/v.sh*10000,val;
-    if(v.kind===2)val=ap;else{var a=v.kind===0?.6:.4;val=ip*a+ap*(1-a);val=Math.max(val,ap*.8);}
-    var fin=val*(v.top?1.2:1),own=fin*v.own/10000;
-    return {big:['대표 지분 가치',man(own),'1주당 '+won(fin)],rows:[['1주당 순손익가치',won(ip)],['1주당 순자산가치',won(ap)],['가중평균 (하한 순자산가치 80%)',won(val)],v.top?['최대주주 할증 20%',won(fin-val),'minus']:null,['1주당 평가액',won(fin),'tot'],['회사 전체 가치',man(fin*v.sh/10000)],['대표 지분 ('+com(v.own)+'주)',man(own),'tot']].filter(Boolean),
+     ['own','대표 보유 주식 수','주',14000],['kind','회사 유형','',0,'','sel',['일반 법인 (3:2)','부동산 50% 이상 (2:3)','부동산 80% 이상 (순자산만)']],['top',function(){return '최대주주 할증 '+P.stPrem+'% 적용';},'',1,'중소기업은 할증 없음','chk']],
+  run:function(v){var w=(v.n1*3+v.n2*2+v.n3)/6,ip=w/v.sh*10000/(P.cap/100),ap=v.na/v.sh*10000,val;
+    if(v.kind===2)val=ap;else{var a=v.kind===0?.6:.4;val=ip*a+ap*(1-a);val=Math.max(val,ap*P.stFloor/100);}
+    var fin=val*(v.top?1+P.stPrem/100:1),own=fin*v.own/10000;
+    return {big:['대표 지분 가치',man(own),'1주당 '+won(fin)],rows:[['1주당 순손익가치',won(ip)],['1주당 순자산가치',won(ap)],['가중평균 (하한 순자산가치 '+P.stFloor+'%)',won(val)],v.top?['최대주주 할증 '+P.stPrem+'%',won(fin-val),'minus']:null,['1주당 평가액',won(fin),'tot'],['회사 전체 가치',man(fin*v.sh/10000)],['대표 지분 ('+com(v.own)+'주)',man(own),'tot']].filter(Boolean),
       say:'"이익이 쌓일수록 주식 가치가 올라 <b>상속·증여세도 커집니다</b>. 지금 가치는 1주 '+won(fin)+', 대표님 지분은 '+man(own)+'입니다."',
       note:'간이 계산입니다. 실제 평가는 세무조정 후 순손익, 자산 시가 평가, 영업권, 업종·업력 특례 등이 들어가므로 세무사 확인이 필요합니다.'};}});
 
@@ -625,7 +675,7 @@ function renderList(){
     if(isCho(q))return c._c.indexOf(q.replace(/\s/g,''))>-1;
     return q.split(/\s+/).every(function(w){return c._t.indexOf(w)>-1;});});
   if(st.sit>-1)list.sort(function(a,b){return SITS[st.sit][1].indexOf(a.id)-SITS[st.sit][1].indexOf(b.id);});
-  document.getElementById('cnt').innerHTML='계산기 <b>'+C.length+'개</b> · '+CATS.map(function(k){return k[1]+' '+C.filter(function(c){return c.cat===k[0];}).length;}).join(' · ');
+  document.getElementById('cnt').innerHTML='계산기 <b>'+C.length+'개</b> · '+CATS.map(function(k){return k[1]+' '+C.filter(function(c){return c.cat===k[0];}).length;}).join(' · ')+'<br>세율·공제 기준: <b>'+esc(basisText())+'</b>';
   document.getElementById('sits').innerHTML=SITS.map(function(s,i){return '<button data-sit="'+i+'" class="'+(st.sit===i?'on':'')+'">'+s[0]+'</button>';}).join('');
   var fv=favs();
   document.getElementById('cats').innerHTML=[['all','전체',C.length],['fav','★ 즐겨찾기',fv.length]].concat(CATS.map(function(k){return [k[0],k[1],C.filter(function(c){return c.cat===k[0];}).length];}))
@@ -642,13 +692,17 @@ function renderList(){
 /* ---------- 계산 화면 ---------- */
 var cur=null,vals={};
 function unitRead(u,x){return u==='만원'&&isFinite(x)&&x!==0?man(x):'';}
+function fval(x){return typeof x==='function'?x():x;}
 function openCalc(id,push){var c=byId(id);if(!c)return;cur=c;vals={};
-  c.f.forEach(function(f){vals[f[0]]=f[3];});
+  /* 기준값(RULES)에 따라 바뀌는 이름·기본값·도움말을 지금 기준으로 풀어 둔다 */
+  c.F=c.f.map(function(f){return f.map(function(x,i){return (i===1||i===3||i===4||i===6)?fval(x):x;});});
+  c.F.forEach(function(f){vals[f[0]]=f[3];});
   var saved;try{saved=JSON.parse(lsGet('kif_calc_v_'+id)||'null');}catch(e){}
-  if(saved)for(var k in saved)if(k in vals)vals[k]=saved[k];
+  /* 기준값이 바뀐 뒤에는 기준값에서 온 칸(요율 등)은 예전에 넣은 값 대신 새 기준값을 쓴다 */
+  if(saved){var sv=saved.v||saved,same=saved.at===META.at;c.f.forEach(function(f){var k=f[0];if(!(k in sv))return;if(!same&&typeof f[3]==='function')return;vals[k]=sv[k];});}
   var rc=recent().filter(function(x){return x!==id;});rc.unshift(id);lsSet('kif_calc_recent',JSON.stringify(rc.slice(0,8)));
-  var h='<div class="chd"><button class="back" data-back="1">← 계산기 목록</button><h2>'+esc(c.name)+'</h2><span class="cg">'+catName(c.cat)+'</span></div><p class="desc">'+esc(c.d)+'</p>'+
-    '<div class="cbody"><div class="panel"><h3>입력</h3><div id="fs">'+c.f.map(fieldHtml).join('')+'</div>'+
+  var h='<div class="chd"><button class="back" data-back="1">← 계산기 목록</button><h2>'+esc(c.name)+'</h2><span class="cg">'+catName(c.cat)+'</span>'+(c.cat==='tax'||c.cat==='corp'||c.id==='irp'||c.id==='nps'||c.id==='sevtax'||c.id==='four'?'<span class="basis">'+basisText()+'</span>':'')+'</div><p class="desc">'+esc(c.d)+'</p>'+
+    '<div class="cbody"><div class="panel"><h3>입력</h3><div id="fs">'+c.F.map(fieldHtml).join('')+'</div>'+
     '<div class="acts"><button class="btn gh" data-reset="1">처음 값으로</button></div></div><div id="res"></div></div>';
   document.getElementById('calc').innerHTML=h;document.getElementById('app').classList.add('show-calc');
   if(push!==false)try{history.pushState({c:id},'','#c='+id);}catch(e){location.hash='c='+id;}
@@ -661,7 +715,7 @@ function fieldHtml(f){var k=f[0],t=f[5]||'n',v=vals[k];
 function com2(v){if(v===''||v==null)return '';var s=String(v).split('.');return s[0].replace(/\B(?=(\d{3})+(?!\d))/g,',')+(s.length>1?'.'+s[1]:'');}
 function num(s){var x=parseFloat(String(s).replace(/,/g,''));return isFinite(x)?x:0;}
 function calc(){var c=cur,v={};if(!c)return;
-  c.f.forEach(function(f){var x=vals[f[0]];v[f[0]]=(f[5]==='sel')?+x:(f[5]==='chk')?!!x:num(x);});
+  c.F.forEach(function(f){var x=vals[f[0]];v[f[0]]=(f[5]==='sel')?+x:(f[5]==='chk')?!!x:num(x);});
   var o;try{o=c.run(v);}catch(e){o={big:['계산할 수 없습니다','-','입력값을 확인해 주세요']};}
   var mx=0;(o.bars||[]).forEach(function(b){if(b[1]>mx)mx=b[1];});
   var h='<div class="big"><span>'+esc(o.big[0])+'</span><b>'+esc(o.big[1])+'</b><em>'+esc(o.big[2]||'')+'</em></div><div class="panel"><h3>계산 결과</h3>';
@@ -670,14 +724,14 @@ function calc(){var c=cur,v={};if(!c)return;
   if(o.tbl&&o.tbl.r&&o.tbl.r.length)h+='<table class="tbl"><thead><tr>'+o.tbl.h.map(function(x){return '<th>'+esc(x)+'</th>';}).join('')+'</tr></thead><tbody>'+o.tbl.r.map(function(r,i){return '<tr class="'+(o.tbl.hi===i?'hi':'')+'">'+r.map(function(x){return '<td>'+esc(x)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table>';
   if(o.say)h+='<div class="say"><b>상담 화법</b><br>'+o.say+'</div>';
   if(o.note)h+='<div class="note">※ '+esc(o.note)+'</div>';
-  h+='<div class="note">※ 상담용 참고 계산입니다. 실제 금액은 상품 약관·가입설계서와 세무 전문가 확인이 우선합니다.</div>';
+  h+='<div class="note">※ 상담용 참고 계산입니다. 적용 기준: '+basisText()+'. 실제 금액은 상품 약관·가입설계서와 세무 전문가 확인이 우선합니다.</div>';
   h+='<div class="acts"><button class="btn" data-copy="1">결과 복사 (문자·카톡용)</button><button class="btn gh" data-print="1">인쇄 · PDF</button></div></div>';
   document.getElementById('res').innerHTML=h;cur._o=o;cur._v=v;
-  try{lsSet('kif_calc_v_'+c.id,JSON.stringify(vals));}catch(e){}}
+  try{lsSet('kif_calc_v_'+c.id,JSON.stringify({at:META.at,v:vals}));}catch(e){}}
 function copyText(){var c=cur,o=c._o,t='['+c.name+']\n';
-  c.f.forEach(function(f){var x=c._v[f[0]];t+='· '+f[1]+': '+(f[5]==='sel'?f[6][x]:f[5]==='chk'?(x?'예':'아니오'):(f[2]==='만원'?man(x):com2(x)+f[2]))+'\n';});
+  c.F.forEach(function(f){var x=c._v[f[0]];t+='· '+f[1]+': '+(f[5]==='sel'?f[6][x]:f[5]==='chk'?(x?'예':'아니오'):(f[2]==='만원'?man(x):com2(x)+f[2]))+'\n';});
   t+='\n▶ '+o.big[0]+': '+o.big[1]+(o.big[2]?' ('+o.big[2]+')':'')+'\n';(o.rows||[]).forEach(function(r){t+='- '+r[0]+': '+r[1]+'\n';});
-  t+='\n※ 상담용 참고 계산이며 실제 금액은 약관·세법 확인이 우선합니다.\n한국보험금융 금융계산기';
+  t+='\n※ 상담용 참고 계산('+basisText()+')이며 실제 금액은 약관·세법 확인이 우선합니다.\n한국보험금융 금융계산기';
   function ok(){toast('결과를 복사했습니다');}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,function(){fb();});else fb();
   function fb(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');ok();}catch(e){}a.remove();}}
@@ -697,10 +751,10 @@ document.addEventListener('click',function(e){var t=e.target,b;
   if(t.closest('[data-print]')){window.print();return;}});
 document.addEventListener('keydown',function(e){if(e.key==='Enter'){var b=e.target.closest&&e.target.closest('[data-open]');if(b&&e.target===b)openCalc(b.getAttribute('data-open'));}});
 document.getElementById('calc').addEventListener('input',function(e){var k=e.target.getAttribute('data-k');if(!k)return;
-  var f=cur.f.filter(function(x){return x[0]===k;})[0];
+  var f=cur.F.filter(function(x){return x[0]===k;})[0];
   if(e.target.type==='checkbox')vals[k]=e.target.checked;
   else if(e.target.tagName==='SELECT'){vals[k]=+e.target.value;var p=cur.preset&&cur.preset[k]&&cur.preset[k][vals[k]];
-    if(p){for(var pk in p){vals[pk]=p[pk];var el=document.getElementById('i_'+pk);if(el)el.value=com2(p[pk]);var rd=document.getElementById('rd_'+pk);if(rd){var ff=cur.f.filter(function(x){return x[0]===pk;})[0];rd.textContent=unitRead(ff[2],p[pk]);}}}}
+    if(p){for(var pk in p){vals[pk]=p[pk];var el=document.getElementById('i_'+pk);if(el)el.value=com2(p[pk]);var rd=document.getElementById('rd_'+pk);if(rd){var ff=cur.F.filter(function(x){return x[0]===pk;})[0];rd.textContent=unitRead(ff[2],p[pk]);}}}}
   else{var raw=e.target.value.replace(/[^\d.\-]/g,'');vals[k]=raw;var rd2=document.getElementById('rd_'+k);if(rd2)rd2.textContent=unitRead(f[2],num(raw));}
   calc();});
 document.getElementById('calc').addEventListener('change',function(e){if(e.target.tagName==='INPUT'&&e.target.type==='text'){e.target.value=com2(vals[e.target.getAttribute('data-k')]);}});
@@ -709,9 +763,87 @@ window.addEventListener('popstate',function(){var m=/c=([\w]+)/.exec(location.ha
 /* 포털 테마가 바뀌면 따라간다 */
 window.addEventListener('message',function(e){if(e.data&&e.data.kifTheme)root.setAttribute('data-theme',e.data.kifTheme);});
 
-renderList();
-var m0=/c=([\w]+)/.exec(location.hash);if(m0)openCalc(m0[1],false);
-window.KIFCALC={list:C};
+/* ---------- 적용 기준 표시 · 점검 시기 ---------- */
+function dstr(d){return d.getFullYear()+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+('0'+d.getDate()).slice(-2);}
+function atStr(){return String(META.at||'').replace(/-/g,'.');}
+function basisText(){return META.basis+' · '+atStr()+' 확인';}
+/* 세법·요율이 주로 바뀌는 1월 1일·7월 1일 이후에 아직 확인하지 않았으면 점검 시기 */
+function lastCheckpoint(){var t=new Date(),y=t.getFullYear();return t.getMonth()>=6?new Date(y,6,1):new Date(y,0,1);}
+function nextCheckpoint(){var c=lastCheckpoint();return c.getMonth()?new Date(c.getFullYear()+1,0,1):new Date(c.getFullYear(),6,1);}
+function isDue(){var a=new Date(String(META.at||'2000-01-01').replace(/\./g,'-')+'T00:00:00');return !(a>=lastCheckpoint());}
+
+/* ---------- 관리자: 계산기 기준값 고치기 (?admin=1, 포털 관리자만) ---------- */
+var ADM=/[?&]admin=1/.test(location.search),ED=null;
+function pub(){try{return window.parent!==window&&parent.KIFPUB?parent.KIFPUB:null;}catch(e){return null;}}
+function isAdmin(){var k=pub();try{return !!(k&&k.admin());}catch(e){return false;}}
+function same(a,b){return JSON.stringify(a)===JSON.stringify(b);}
+function chgMsg(){var n=admChanges();return n?'바뀐 칸 <b>'+n+'개</b> · 저장하면 모든 FC 화면에 반영됩니다.':'아직 바뀐 칸이 없습니다.';}
+function admRender(){
+  document.getElementById('app').classList.add('show-calc');
+  var el=document.getElementById('calc');
+  if(!isAdmin()){el.innerHTML='<div class="panel">관리자 계정으로 포털에 로그인한 뒤 「관리자 › 계산기 기준값」에서 열어 주세요.</div>';return;}
+  if(!ED)ED={basis:META.basis,v:cp(P)};
+  var h='<div class="adm"><div class="chd"><h2>계산기 기준값</h2><span class="cg">관리자</span></div>'+
+    '<p class="desc">세율·공제 한도·기준금액을 여기서 고쳐 저장하면 모든 FC의 금융계산기에 반영됩니다. 법이 바뀌지 않았어도 1월·7월에 한 번씩 확인하고 「바뀐 것 없음 · 확인만」을 눌러 주세요.</p>'+
+    (isDue()?'<div class="due"><b>점검 시기입니다.</b> 마지막 확인이 '+esc(atStr())+'입니다. '+dstr(lastCheckpoint())+' 이후 바뀐 세법·요율이 있는지 확인해 주세요.</div>'
+        :'<div class="ok">마지막 확인: <b>'+esc(atStr())+'</b>'+(META.by?' ('+esc(META.by)+')':'')+' · 다음 점검: '+dstr(nextCheckpoint())+'</div>')+
+    '<div class="panel grp"><h3>기준 이름</h3><div class="meta"><div class="f"><label for="a_basis">FC 화면에 보이는 기준 이름</label><div class="iw"><input id="a_basis" data-meta="basis" style="text-align:left" value="'+esc(ED.basis)+'"></div><div class="hl">예) 2027년 세법 (2027.1.1 개정 반영)</div></div></div></div>';
+  RULES.forEach(function(g){
+    var sc=g.items.filter(function(it){return it[2]!=='t';}),tb=g.items.filter(function(it){return it[2]==='t';});
+    h+='<div class="panel grp"><h3>'+esc(g.g)+'</h3>';
+    tb.forEach(function(it){var k=it[0],T=ED.v[k];
+      h+='<div class="tl">'+esc(it[1])+'</div><table class="ed"><thead><tr><th>'+esc((it[4]||'구간 상한 · 값').split(' · ')[0])+'</th><th>'+esc((it[4]||'구간 상한 · 값').split(' · ')[1]||'값')+'</th><th></th></tr></thead><tbody>'+
+        T.map(function(r,i){var o=P[k][i]||[];return '<tr><td><input data-t="'+k+'" data-i="'+i+'" data-c="0" inputmode="decimal" value="'+(r[0]==null?'':com2(r[0]))+'" placeholder="마지막 구간 (상한 없음)" class="'+(o[0]!==r[0]?'chg':'')+'"></td>'+
+          '<td><input data-t="'+k+'" data-i="'+i+'" data-c="1" inputmode="decimal" value="'+r[1]+'" class="'+(o[1]!==r[1]?'chg':'')+'"></td><td><button type="button" data-rm="'+k+'" data-i="'+i+'" aria-label="구간 지우기">✕</button></td></tr>';}).join('')+
+        '</tbody></table><button class="btn gh" type="button" data-addrow="'+k+'" style="padding:4px 10px;font-size:13px;margin-bottom:6px">+ 구간 더하기</button>';});
+    if(sc.length)h+='<div class="sc" style="margin-top:10px">'+sc.map(function(it){var k=it[0],x=ED.v[k],chg=x!==P[k];
+      return '<div class="f'+(chg?' chg':'')+'"><label for="a_'+k+'">'+esc(it[1])+'</label><div class="iw"><input id="a_'+k+'" data-s="'+k+'" inputmode="decimal" value="'+com2(x)+'"><span class="u">'+esc(it[2])+'</span></div>'+
+        '<div class="was">'+(chg?'지금 '+com2(P[k])+it[2]+' → 바꿀 값':(it[2]==='만원'?man(x):''))+'</div></div>';}).join('')+'</div>';
+    h+='</div>';});
+  h+='<div class="bar2"><span class="msg" id="admMsg">'+chgMsg()+'</span>'+
+    '<button class="btn gh" type="button" data-adm="reset">처음 값(2026.10 기준)으로</button><button class="btn gh" type="button" data-adm="undo">고친 것 취소</button>'+
+    '<button class="btn gh" type="button" data-adm="check">바뀐 것 없음 · 확인만</button><button class="btn" type="button" data-adm="save">저장 (모든 FC에 반영)</button></div></div>';
+  el.innerHTML=h;}
+function admChanges(){var n=0;for(var k in P0)if(!same(ED.v[k],P[k]))n++;if(ED.basis!==META.basis)n++;return n;}
+function admMsg(t){var m=document.getElementById('admMsg');if(m)m.innerHTML=t;}
+function admCheck(){for(var k in ED.v){var T=ED.v[k];if(!Array.isArray(T))continue;
+    if(!T.length)return '표에 구간이 하나도 없습니다.';
+    for(var i=0;i<T.length;i++){var last=i===T.length-1;
+      if(!last&&!(T[i][0]>0))return '표의 '+(i+1)+'번째 구간 상한을 넣어 주세요 (마지막 구간만 비울 수 있습니다).';
+      if(last&&T[i][0]!=null)return '표의 마지막 구간은 상한을 비워 두어야 합니다 (그 이상 전부).';
+      if(i>0&&!last&&T[i][0]<=T[i-1][0])return '표의 구간 상한은 위에서 아래로 커져야 합니다.';}}
+  return '';}
+async function admSave(onlyCheck){var k=pub();if(!k)return;
+  var bad=onlyCheck?'':admCheck();if(bad){admMsg('<b style="color:var(--bad)">'+esc(bad)+'</b>');return;}
+  var src=onlyCheck?P:ED.v,v={};for(var x in P0)if(!same(src[x],P0[x]))v[x]=cp(src[x]);
+  var who='';try{who=(parent.document.getElementById('who')||{}).textContent||'';}catch(e){}
+  var o={at:new Date(Date.now()+9*3600000).toISOString().slice(0,10),basis:onlyCheck?META.basis:(ED.basis||META.basis),by:who.replace(/^.*·\s*/,'').trim(),v:v};
+  admMsg('저장하는 중… 잠시만 기다려 주세요.');
+  try{await k.calcRules(o);setRules(o);ED=null;admRender();admMsg('<b>저장했습니다.</b> 모든 FC 화면의 금융계산기에 반영됩니다 (FC가 새로고침하면 보임).');toast('저장했습니다');}
+  catch(e){admMsg('<b style="color:var(--bad)">저장하지 못했습니다:</b> '+esc(e&&e.message||e));}}
+if(ADM){
+  var CE=document.getElementById('calc');
+  CE.addEventListener('input',function(e){if(!ED)return;var t=e.target,k;
+    if((k=t.getAttribute('data-s'))){var raw=t.value.replace(/,/g,''),x=parseFloat(raw);ED.v[k]=isFinite(x)?x:P[k];}
+    else if((k=t.getAttribute('data-t'))){var i=+t.getAttribute('data-i'),c=+t.getAttribute('data-c'),r2=t.value.replace(/,/g,''),y=parseFloat(r2);ED.v[k][i][c]=(c===0&&r2==='')?null:(isFinite(y)?y:0);}
+    else if(t.getAttribute('data-meta')==='basis')ED.basis=t.value;
+    admMsg(chgMsg());});
+  CE.addEventListener('change',function(e){if(e.target.getAttribute('data-s')||e.target.getAttribute('data-t')){var y=window.scrollY;admRender();window.scrollTo(0,y);}});
+  CE.addEventListener('click',function(e){var b=e.target.closest('button');if(!b||!ED)return;var k,y=window.scrollY;
+    if((k=b.getAttribute('data-rm'))){if(ED.v[k].length>1){ED.v[k].splice(+b.getAttribute('data-i'),1);ED.v[k][ED.v[k].length-1][0]=null;}admRender();window.scrollTo(0,y);}
+    else if((k=b.getAttribute('data-addrow'))){var T=ED.v[k],last=T[T.length-1],prev=T.length>1?T[T.length-2][0]:0;T.splice(T.length-1,0,[prev?prev*2:1000,last[1]]);admRender();window.scrollTo(0,y);}
+    else if((k=b.getAttribute('data-adm'))){
+      if(k==='reset'){ED={basis:ED.basis,v:cp(P0)};admRender();admMsg('처음 값으로 바꿨습니다. 「저장」을 눌러야 반영됩니다. '+chgMsg());}
+      else if(k==='undo'){ED=null;admRender();}
+      else if(k==='check')admSave(true);else if(k==='save')admSave(false);}});
+}
+
+/* ---------- 시작: 관리자가 저장한 기준값(content.json calcRules)을 읽어 덮어쓴다 ---------- */
+function start(){var fb=document.getElementById('footBasis');if(fb)fb.textContent=basisText();if(ADM){admRender();return;}if(cur)openCalc(cur.id,false);else{renderList();var m0=/c=([\w]+)/.exec(location.hash);if(m0)openCalc(m0[1],false);}}
+start();
+fetch('../content.json?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(c){
+  if(c&&c.calcRules){setRules(c.calcRules);ED=null;start();}}).catch(function(){});
+window.KIFCALC={list:C,rules:function(){return {meta:META,v:P};},due:isDue};
 })();
 </script>
 </body>
