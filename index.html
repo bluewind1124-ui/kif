@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-24.5">
+<meta name="kif-build" content="2026-10-24.6">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1216,7 +1216,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   window.addEventListener('beforeunload',function(e){if(names().length||KS.busy){e.preventDefault();e.returnValue='';return '';}});
 })();
 </script>
-<script src="ai-connect.js?v=20261024st"></script>
+<script src="ai-connect.js?v=20261024ad"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
@@ -1808,7 +1808,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '</div>'+inp('kDesc','한 줄 설명',CONCEPT.desc)+'<div class="cols">'+ta('kSteps','주요 내용 (컨셉 자료 목차)','한 줄에 하나 · 제목 | 세부 내용 | 쪽',CONCEPT.steps.join('\n'),3)+ta('kMats','컨셉 교육 자료','종류 | 제목 | 파일',lines(CONCEPT.mats),3)+'</div></div>'+
       '<div class="panel"><h3>상품 개정 일정 배너</h3><div class="fgrid">'+inp('bTitle','제목',BANNER.title)+inp('bSub','설명',BANNER.sub)+'</div></div>'+
       '<div class="panel"><h3>회사 AI <span class="note">주소를 넣으면 모든 FC가 키 없이 바로 AI로 읽습니다. 만드는 법: ai-relay 안내서</span></h3>'+
-      inp('mProxy','회사 AI 서버 주소',SITE&&SITE.aiProxy,'https://fc-ai.○○○.workers.dev')+'<p class="note">비워 두면 FC는 복사·붙여넣기 방식으로 씁니다. 회사 API 키는 이 주소의 서버에만 넣고, 여기에는 넣지 마세요.</p></div>'+
+      inp('mProxy','회사 AI 서버 주소',SITE&&SITE.aiProxy,'https://fc-ai.○○○.workers.dev')+'<label class="f">쓸 수 있는 사람<select class="in" id="mProxyFor"><option value="admin"'+((SITE&&SITE.aiProxyFor)==='admin'?' selected':'')+'>관리자만 (관리자는 등록 없이 바로 연결, FC는 각자 「내 AI 등록」)</option><option value="all"'+((SITE&&SITE.aiProxyFor)!=='admin'?' selected':'')+'>모든 FC</option></select></label><p class="note">비워 두면 FC는 복사·붙여넣기 방식으로 씁니다. 회사 API 키는 이 주소의 서버에만 넣고, 여기에는 넣지 마세요. 「관리자만」은 서버에도 ALLOW=admin을 넣어야 실제로 막힙니다.</p></div>'+
       '<div class="panel"><h3>AI 보장분석 규칙 <span class="note">모든 FC의 AI(ChatGPT·Claude·Gemini·회사 AI)에 똑같이 보내는 규칙입니다</span></h3><textarea class="in" id="mRules" rows="9">'+esc((window.AIMOD&&AIMOD.getRules)?AIMOD.getRules():'')+'</textarea><p class="note">유리·불리 기준, 문장 표현, 금지 표현을 여기서 바꾸면 사이트에 반영한 뒤부터 모든 FC의 분석에 적용됩니다. 숫자와 출력물 모양은 포털이 정합니다.</p></div>'+
       '<div class="panel"><h3>AI 기본 모델 <span class="note">개인 API 키를 쓰는 FC용 기본값입니다. 새 모델이 나오면 이름만 바꾸세요.</span></h3><div class="fgrid">'+
       inp('mClaude','Claude API',md.claude,'claude-opus-5-5')+inp('mOpenai','ChatGPT',md.openai,'gpt-4.1')+inp('mGemini','Gemini',md.gemini,'gemini-2.5-flash')+'</div>'+
@@ -1832,7 +1832,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       notices:rows(v('cNotice'),3),news:rows(v('cNews'),7),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),4),lectAt:CMS_D.lect?nowTxt():((SITE&&SITE.lectAt)||LECT_AT||undefined),
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
-      aiProxy:v('mProxy'),aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,car:(SITE&&SITE.car)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
+      aiProxy:v('mProxy'),aiProxyFor:(document.getElementById('mProxyFor')||{}).value==='admin'?'admin':'all',aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,car:(SITE&&SITE.car)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
     ['compare','off','concepts','aiSamples','boards','onepick','onepicks','thumbs'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
     (c.hypo||[]).forEach(function(r){var o=(HYPO||[]).filter(function(x){return x[0]===r[0]&&Array.isArray(x[4]);})[0];if(o){while(r.length<4)r.push('');r[4]=o[4];}});
     var ck=document.getElementById('cOpts');
@@ -3649,7 +3649,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var AI_PROXY='',PASTE_SITES=[['chatgpt','ChatGPT','https://chatgpt.com/'],['gemini','Gemini','https://gemini.google.com/app'],['claude','Claude','https://claude.ai/new']];
   function defProv(){return HAS_AI?'claudeapp':(AI_PROXY?'company':'paste');}
   /* 저장된 방식이 이 화면에서 못 쓰는 것(사이트에서 'Claude 화면')이면 쓸 수 있는 기본값으로 바꾼다 */
-  function aiCfg(){var c=load(KEY_AI,null)||{},p=c.prov;if(!p||!AIP[p]||(p==='claudeapp'&&!HAS_AI))p=defProv();
+  function aiCfg(){if(window.KIFAI&&KIFAI.cfg)return KIFAI.cfg();/* 홈·고급형과 같은 판단(관리자 기본 연결 포함)을 쓴다 */
+    var c=load(KEY_AI,null)||{},p=c.prov;if(!p||!AIP[p]||(p==='claudeapp'&&!HAS_AI))p=defProv();
     return {mode:c.mode||'ai',prov:p,keys:c.keys||{},models:c.models||{},code:c.code||'',site:c.site||'chatgpt'};}
   function aiModel(c,p){return (c.models[p]||AI_ADMIN_MODELS[p]||AIP[p].model||'').trim();}
   function blobB64(b){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){var u=String(r.result),i=u.indexOf(',');res({mime:b.type||'image/png',data:u.slice(i+1)});};r.onerror=rej;r.readAsDataURL(b);});}
@@ -3687,8 +3688,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* 회사 AI: 관리자가 만든 중계 서버로 보낸다. 회사 키는 서버에만 있고 이 화면에는 없다 */
   async function relayCall(c,prompt,imgs){
     var r,j={};
-    try{r=await fetch(AI_PROXY,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({prompt:prompt,images:imgs,code:c.code||''})});}catch(e){throw {code:'relay_down'};}
+    try{r=await fetch(AI_PROXY,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({prompt:prompt,images:imgs,code:c.code||'',token:(function(){try{var t=JSON.parse(localStorage.getItem('kif_tok')||'null');return t&&t.exp>Date.now()?t.token:'';}catch(e){return '';}})()})});}catch(e){throw {code:'relay_down'};}
     try{j=await r.json();}catch(e){}
+    if(r.status===401&&j.error==='login')throw {code:'api_error',message:'회사 AI는 로그인한 사람만 씁니다. 다시 로그인해 주세요.'};
+    if(r.status===403&&j.error==='role')throw {code:'api_error',message:'회사 AI는 지금 관리자 전용입니다. 「AI 연결」에서 내 AI를 등록해 주세요.'};
     if(r.status===401)throw {code:'need_code'};
     if(r.status===429)throw {code:'rate_limited'};
     if(!r.ok||j.error)throw {code:'api_error',message:String(j.error||r.status)};
@@ -3741,9 +3744,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(c.mode!=='ai'){cap.why='ai_off';capMsg='<b>AI 없이 쓰기</b>로 되어 있습니다. 자료는 직접 입력하거나 엑셀 양식으로 올립니다.';return;}
     if(c.prov==='company'){
       if(!AI_PROXY){cap.why='no_proxy';capMsg='관리자가 아직 <b>회사 AI</b>를 켜지 않았습니다. 그동안은 <b>AI 연결 설정</b>에서 <b>복사·붙여넣기</b>를 고르세요.';return;}
-      cap.sample=relayAdapter(c);capMsg='연결된 AI: <b>회사 AI</b> · 자료를 올리면 바로 읽습니다.';return;
+      cap.sample=relayAdapter(c);capMsg='연결된 AI: <b>회사 AI</b>'+(window.KIFAI&&KIFAI.adminDefault&&KIFAI.adminDefault()?' (관리자 기본 연결 · 등록 필요 없음)':'')+' · 자료를 올리면 바로 읽습니다.';return;
     }
-    if(c.prov==='paste'){cap.sample=pasteAdapter();capMsg='연결된 AI: <b>복사·붙여넣기</b> · 쓰는 법: 고객 선택 → <b>② 기계약 자료</b>에서 증권·가입설계서 파일 올리기 → 뜨는 <b>"AI에게 읽히기"</b> 창에서 <b>ChatGPT로 보내기</b> → 열린 창에 붙여넣고(Ctrl+V) 보내기 → AI 답의 <b>복사</b> 아이콘 누르고 포털로 돌아오면 자동 반영';return;}
+    if(c.prov==='paste'){cap.sample=pasteAdapter();var rp=(load(KEY_AI,null)||{}).prov;
+      if(rp==='claudeapp'){capMsg='등록한 AI는 <b>Claude (Claude 화면)</b>인데, 이 방식은 <b>Claude 안에서 포털을 열었을 때만</b> 됩니다. 지금은 일반 브라우저라 <b>복사·붙여넣기</b>로 대신합니다. 바로 읽히려면 왼쪽 메뉴 <b>AI 연결</b>에서 <b>Claude API</b> 키를 넣어 주세요.';return;}
+      capMsg='연결된 AI: <b>복사·붙여넣기</b> · 키를 넣거나 회사 AI를 쓰면 붙여넣기 없이 바로 읽습니다. 쓰는 법: 고객 선택 → <b>② 기계약 자료</b>에서 증권·가입설계서 파일 올리기 → 뜨는 <b>"AI에게 읽히기"</b> 창에서 <b>ChatGPT로 보내기</b> → 열린 창에 붙여넣고(Ctrl+V) 보내기 → AI 답의 <b>복사</b> 아이콘 누르고 포털로 돌아오면 자동 반영';return;}
     if(c.prov==='claudeapp'){
       if(HAS_AI){capMsg='연결된 AI: <b>Claude</b> (Claude 화면)';cap.sampleP=claude.use('sample').then(function(s){cap.sample=s;if(!s){capMsg='이 화면에서는 Claude AI를 쓸 수 없습니다.';var nt=document.getElementById('aiCapNote');if(nt)nt.innerHTML=capMsg;}});}
       else{cap.why='need_claude';capMsg='Claude 화면 연결은 <a href="'+CLAUDE_URL+'" target="_blank" rel="noopener"><b>Claude에서 열기</b></a>로 엽니다. 이 사이트에서 바로 쓰려면 AI 연결 설정에서 ChatGPT·Gemini·Claude API 키를 넣으세요.';}

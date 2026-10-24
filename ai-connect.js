@@ -16,21 +16,29 @@ var AIP={
   gemini:{name:'Gemini (Google)',key:true,model:'gemini-2.5-flash',url:'https://aistudio.google.com/apikey',help:'Google AI Studio에서 만든 내 API 키'}
 };
 var PASTE_SITES=[['chatgpt','ChatGPT','https://chatgpt.com/'],['gemini','Gemini','https://gemini.google.com/app'],['claude','Claude','https://claude.ai/new']];
-var AI_PROXY='',AI_MODELS={},subs=[];
+var AI_PROXY='',AI_FOR='all',AI_MODELS={},subs=[];
 function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function fire(){subs.forEach(function(f){try{f();}catch(e){}});}
 fetch(new URL('content.json',BASE).href,{cache:'no-store'}).then(function(r){return r.ok?r.json():{};}).then(function(c){
   if(c&&/^https:\/\/\S+$/.test(String(c.aiProxy||'').trim()))AI_PROXY=String(c.aiProxy).trim();
+  if(c&&c.aiProxyFor==='admin')AI_FOR='admin';
   if(c&&c.aiModels&&typeof c.aiModels==='object')AI_MODELS=c.aiModels;
   fire();
 }).catch(function(){});
 function claudeHost(){try{if(window.claude&&window.claude.use)return window.claude;}catch(e){}try{if(window.top.claude&&window.top.claude.use)return window.top.claude;}catch(e){}return null;}
 function raw(){try{return JSON.parse(localStorage.getItem(AIK)||'null')||{};}catch(e){return {};}}
 function saveRaw(c){try{localStorage.setItem(AIK,JSON.stringify(c));}catch(e){}fire();}
-function chosen(){var r=raw();return !!(r.prov||r.mode);}
+/* 포털 로그인 증표(kif_tok): 회사 AI 서버가 로그인·권한을 확인하는 데 쓴다. 화면에서는 권한(role)만 읽는다 */
+function login(){try{var t=JSON.parse(localStorage.getItem('kif_tok')||'null');if(!t||!(t.exp>Date.now())||!t.token)return null;var p=JSON.parse(atob(String(t.token).split('.')[0].replace(/-/g,'+').replace(/_/g,'/')));return {token:t.token,role:p.role||'fc'};}catch(e){return null;}}
+/* 회사 AI를 이 사람이 쓸 수 있는가 (관리자 전용으로 켠 경우 관리자만) */
+function companyOk(){if(!AI_PROXY)return false;if(AI_FOR!=='admin')return true;var l=login();return !!(l&&l.role==='admin');}
+/* 관리자 전용 회사 AI가 켜져 있으면 관리자는 따로 등록하지 않아도 회사 AI로 바로 읽는다 */
+function adminDefault(){var l=login();return AI_FOR==='admin'&&companyOk()&&l&&l.role==='admin';}
+function chosen(){var r=raw();return !!(r.prov||r.mode)||adminDefault();}
 function cfg(){
   var c=raw(),p=c.prov;
-  if(!p||!AIP[p]||(p==='claudeapp'&&!claudeHost())||(p==='company'&&!AI_PROXY))p=claudeHost()?'claudeapp':(AI_PROXY?'company':'paste');
+  if(adminDefault()&&(!p||p==='paste'||(p==='claudeapp'&&!claudeHost())||(AIP[p]&&AIP[p].key&&!(c.keys||{})[p])))p='company';
+  if(!p||!AIP[p]||(p==='claudeapp'&&!claudeHost())||(p==='company'&&!companyOk()))p=claudeHost()?'claudeapp':(companyOk()?'company':'paste');
   return {mode:c.mode||'ai',prov:p,keys:Object.assign({},c.keys||{}),models:c.models||{},code:c.code||'',site:c.site||'chatgpt'};
 }
 function model(c,p){return String(c.models[p]||AI_MODELS[p]||AIP[p].model||'').trim();}
@@ -45,6 +53,7 @@ function statusHTML(){
   var rp=raw().prov;
   if(rp==='claudeapp'&&p!=='claudeapp')return '등록한 AI는 <b>Claude (Claude 화면)</b>인데, 이 방식은 <b>Claude 안에서 포털을 열었을 때만</b> 됩니다. 지금은 일반 브라우저로 열어서 <b>'+esc(AIP[p].name)+'</b>로 대신합니다. 여기서도 바로 읽히려면 <button type="button" class="kai-link" data-kai-open>내 AI 등록</button>에서 <b>Claude API 키</b>를 넣거나, Claude 안의 포털에서 작업하세요.';
   if(rp==='company'&&p!=='company')return '등록한 AI는 <b>회사 AI</b>인데 지금 회사 AI가 꺼져 있어 <b>'+esc(AIP[p].name)+'</b>로 대신합니다. <button type="button" class="kai-link" data-kai-open>내 AI 등록</button>에서 다른 AI를 고를 수 있습니다.';
+  if(p==='company'&&adminDefault())return '연결된 AI: <b>회사 AI</b> (관리자 기본 연결 · 등록 필요 없음) · <button type="button" class="kai-link" data-kai-open>바꾸기</button>';
   return '연결된 AI: <b>'+esc(AIP[p].name)+'</b>'+(AIP[p].key?' ('+esc(model(c,p))+')':'')+(p==='paste'?' (AI 사이트에 직접 붙여넣는 방식 · 키를 넣으면 바로 읽습니다)':'')+' · <button type="button" class="kai-link" data-kai-open>바꾸기</button>';
 }
 
@@ -120,7 +129,7 @@ function render(){
   var c=cfg(),p=sel||c.prov,host=!!claudeHost(),h='';
   if(step===1){
     var card=function(k){return '<button type="button" class="kai-opt'+(k===p?' on':'')+'" data-kai-p="'+k+'"><b>'+(k===p?'✓ ':'')+AIP[k].name+'</b><span>'+AIP[k].help+'</span>'+(AIP[k].key?'<em>'+(c.keys[k]?'키 등록됨 · 바꾸기':'키 발급 안내 따라 하기 ›')+'</em>':'')+'</button>';};
-    var easy=['company','paste','claudeapp'].filter(function(k){return (k!=='company'||AI_PROXY)&&(k!=='claudeapp'||host);});
+    var easy=['company','paste','claudeapp'].filter(function(k){return (k!=='company'||companyOk())&&(k!=='claudeapp'||host);});
     h='<h2>1. 쓸 AI 고르기</h2><p class="kai-note">한 번 등록하면 <b>AI보장분석 기본형</b>과 <b>고급형</b>이 같은 AI를 씁니다. 기본형은 등록된 기준·샘플대로 분석하고, 고급형은 고급형 계산 규칙대로 제안서를 만듭니다.</p>'+
       '<h3>키 없이 쓰기 <span class="kai-note">추천 · 바로 시작</span></h3><div class="kai-opts">'+easy.map(card).join('')+'</div>'+
       '<h3>내 API 키로 쓰기 <span class="kai-note">더 빠르고 자동 · 발급 안내가 이어집니다</span></h3><div class="kai-opts">'+['claude','openai','gemini'].map(card).join('')+'</div>';
@@ -293,8 +302,10 @@ async function apiCall(p,key,mdl,prompt,imgs){
 }
 async function relayCall(c,prompt,imgs){
   var r,j={};
-  try{r=await fetch(AI_PROXY,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({prompt:prompt,images:imgs,code:c.code||''})});}catch(e){throw {code:'relay_down'};}
+  try{r=await fetch(AI_PROXY,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({prompt:prompt,images:imgs,code:c.code||'',token:(login()||{}).token||''})});}catch(e){throw {code:'relay_down'};}
   try{j=await r.json();}catch(e){}
+  if(r.status===401&&j.error==='login')throw {code:'need_login'};
+  if(r.status===403&&j.error==='role')throw {code:'admin_only'};
   if(r.status===401)throw {code:'need_code'};
   if(r.status===429)throw {code:'rate_limited'};
   if(!r.ok||j.error)throw {code:'api_error',message:String(j.error||r.status)};
@@ -345,7 +356,7 @@ async function ask(prompt,mat){
   if(p==='paste')return await pasteAsk(PASTE_HEAD+full,mat.scanned||[]);
   if(p==='claudeapp'){var h=claudeHost(),s=h&&await h.use('sample');if(!s)throw {code:'unavailable'};var o={};if(mat.images.length)o.images=mat.images;return await s.json(full,o);}
   var imgs=await Promise.all(mat.images.map(b64));
-  if(p==='company'){if(!AI_PROXY)throw {code:'no_proxy'};return pickJson(await relayCall(c,full,imgs));}
+  if(p==='company'){if(!companyOk())throw {code:AI_PROXY?'admin_only':'no_proxy'};return pickJson(await relayCall(c,full,imgs));}
   if(!c.keys[p])throw {code:'no_key'};
   return pickJson(await apiCall(p,c.keys[p],model(c,p),full,imgs));
 }
@@ -354,7 +365,7 @@ function err(e){
     bad_key:'AI 키가 맞지 않거나 사용 권한이 없습니다. 「내 AI 등록」에서 키를 확인하세요.',bad_model:'모델 이름을 찾지 못했습니다. 「내 AI 등록」의 모델 이름을 확인하세요.',
     network:'AI 회사에 연결하지 못했습니다. 인터넷 연결을 확인하세요.',bad_json:'AI 답을 표로 바꾸지 못했습니다. 한 번 더 읽혀 보세요.',refused:'AI가 이 요청을 처리하지 않았습니다. 값을 직접 입력해 주세요.',
     rate_limited:'AI 사용량 한도에 걸렸습니다. 잠시 뒤 다시 해 보세요.',relay_down:'회사 AI 서버에 연결하지 못했습니다. 관리자에게 알려 주세요.',need_code:'회사 접속코드가 맞지 않습니다. 「내 AI 등록 › 회사 AI」에서 코드를 넣으세요.',
-    no_proxy:'관리자가 아직 회사 AI를 켜지 않았습니다. 「내 AI 등록」에서 복사·붙여넣기를 고르세요.',paste_cancel:'AI 답을 가져오기 전에 창을 닫았습니다. 다시 눌러 주세요.',
+    need_login:'회사 AI는 포털에 로그인한 사람만 씁니다. 로그아웃 후 다시 로그인해 주세요.',admin_only:'회사 AI는 지금 관리자 전용입니다. 「내 AI 등록」에서 내 AI를 등록해 주세요.',no_proxy:'관리자가 아직 회사 AI를 켜지 않았습니다. 「내 AI 등록」에서 복사·붙여넣기를 고르세요.',paste_cancel:'AI 답을 가져오기 전에 창을 닫았습니다. 다시 눌러 주세요.',
     unavailable:'이 화면에서는 Claude 화면 연결을 쓸 수 없습니다. 「내 AI 등록」에서 다른 방식을 고르세요.',lib:'파일 읽기 도구를 불러오지 못했습니다(인터넷 연결 확인).'};
   var c=e&&e.code;return M[c]||(e&&e.message)||('AI 읽기 실패'+(c?' ('+c+')':''));
 }
@@ -398,5 +409,5 @@ function fdBox(){
 var folder={name:FD_NAME,ok:fdOk,get:fdGet,label:fdLabel,pick:fdPick,write:fdWrite,clear:fdClear,perm:fdPerm,err:fdErr};
 if(document.readyState!=='loading')addCss();else document.addEventListener('DOMContentLoaded',addCss);
 window.addEventListener('storage',function(e){if(e.key===AIK)fire();});
-window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,err:err,migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
+window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,err:err,migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
 })();
