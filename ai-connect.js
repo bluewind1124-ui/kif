@@ -41,7 +41,11 @@ function statusHTML(){
   if(!chosen())return '아직 내 AI를 정하지 않았습니다. <button type="button" class="kai-link" data-kai-open>내 AI 등록</button>';
   if(c.mode!=='ai')return '「AI 없이 쓰기」로 되어 있습니다. <button type="button" class="kai-link" data-kai-open>내 AI 등록</button>에서 AI를 고르세요.';
   if(AIP[p].key&&!c.keys[p])return esc(AIP[p].name)+' 키가 없습니다. <button type="button" class="kai-link" data-kai-open>내 AI 등록</button>에서 키를 넣어 주세요.';
-  return '연결된 AI: <b>'+esc(AIP[p].name)+'</b>'+(AIP[p].key?' ('+esc(model(c,p))+')':'')+' · <button type="button" class="kai-link" data-kai-open>바꾸기</button>';
+  /* 등록한 AI를 이 화면에서 쓸 수 없어 복사·붙여넣기로 대신하는 경우, 왜 그런지와 해결법을 함께 보여 준다 */
+  var rp=raw().prov;
+  if(rp==='claudeapp'&&p!=='claudeapp')return '등록한 AI는 <b>Claude (Claude 화면)</b>인데, 이 방식은 <b>Claude 안에서 포털을 열었을 때만</b> 됩니다. 지금은 일반 브라우저로 열어서 <b>'+esc(AIP[p].name)+'</b>로 대신합니다. 여기서도 바로 읽히려면 <button type="button" class="kai-link" data-kai-open>내 AI 등록</button>에서 <b>Claude API 키</b>를 넣거나, Claude 안의 포털에서 작업하세요.';
+  if(rp==='company'&&p!=='company')return '등록한 AI는 <b>회사 AI</b>인데 지금 회사 AI가 꺼져 있어 <b>'+esc(AIP[p].name)+'</b>로 대신합니다. <button type="button" class="kai-link" data-kai-open>내 AI 등록</button>에서 다른 AI를 고를 수 있습니다.';
+  return '연결된 AI: <b>'+esc(AIP[p].name)+'</b>'+(AIP[p].key?' ('+esc(model(c,p))+')':'')+(p==='paste'?' (AI 사이트에 직접 붙여넣는 방식 · 키를 넣으면 바로 읽습니다)':'')+' · <button type="button" class="kai-link" data-kai-open>바꾸기</button>';
 }
 
 /* ---------- 스타일 (어느 화면에 붙어도 같은 모양) ---------- */
