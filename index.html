@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-24.20">
+<meta name="kif-build" content="2026-10-24.21">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1229,6 +1229,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   window.addEventListener('beforeunload',function(e){if(names().length||KS.busy){e.preventDefault();e.returnValue='';return '';}});
 })();
 </script>
+<script src="archive.js?v=20261024a"></script>
 <script src="ai-connect.js?v=20261024ae"></script>
 <script src="policy.js?v=20261024d"></script>
 <script src="cmp-ai.js?v=20261024a"></script>
@@ -1256,13 +1257,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* ---------- 메뉴 정의 ---------- */
   var MENU=[
     {g:null,items:[['home','홈']]},
-    {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
+    {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['arcbox','내 자료함','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
     {g:'공지 · 시상',items:[['news','보험사 소식지'],['sched','상품 개정 일정','NEW'],['award','시상 공지']]},
     {g:'교육 · 연계',items:[['edu','온라인 교육센터'],['policy','약관 분석','NEW'],['calc','금융계산기','NEW'],['car','자동차 비교견적'],['sangjo','상조 서비스']]},
     {g:'관리자',admin:true,items:[['admin','관리자 페이지'],['cadmin','자료 관리','NEW'],['calcadmin','계산기 기준값','NEW']]},
     {g:'내 정보',mobile:true,items:[['me','내 정보 · 자료 보관']]}
   ];
-  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',hypo:'bulb',concept:'star',news:'news',sched:'cal',award:'cup',edu:'cap',car:'car',sangjo:'heart',policy:'terms',calc:'calcu',calcadmin:'calcu',me:'user',admin:'gear',cadmin:'doc'};
+  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',arcbox:'doc',hypo:'bulb',concept:'star',news:'news',sched:'cal',award:'cup',edu:'cap',car:'car',sangjo:'heart',policy:'terms',calc:'calcu',calcadmin:'calcu',me:'user',admin:'gear',cadmin:'doc'};
 
   var NEWS=[
     ['2026.10.14','삼성화재','간편건강보험 3.5.5 고지 개정, 11월 1일부터 적용'],
@@ -1272,7 +1273,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   ];
   var BLOCKS=[
     ['상품 비교',[['이번 달의 원픽',V1+'onepick.html','Hot'],['생명보험 가이드북 비교',V1+'life.html'],['담보별 비교견적',V1+'nonlife.html','Best'],['단기납 종신보험 비교',V1+'wholelife.html'],['3대질병진단비 비교',V1+'critical3.html'],['경영인 정기보험 비교',V1+'ceoterm.html']]],
-    ['보장분석 · 설계',[['AI보장분석 기본형','ai'],['AI보장분석 고급형','ai2','New'],['대표 상품 가설','hypo'],['이달의 컨셉','concept','Hot']]],
+    ['보장분석 · 설계',[['AI보장분석 기본형','ai'],['AI보장분석 고급형','ai2','New'],['내 자료함','arcbox','New'],['대표 상품 가설','hypo'],['이달의 컨셉','concept','Hot']]],
     ['교육 · 연계',[['온라인 교육센터','edu','New'],['약관 분석','policy','New'],['금융계산기','calc','New'],['AI보장분석 고급형','ai2','New'],['자동차 비교견적','car'],['상조 서비스','sangjo']]],
     ['공지 · 시상',[['보험사 소식지','news'],['시상 공지','award','Hot'],['상품 개정 일정','sched','New']]]
   ];
@@ -1478,6 +1479,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     ai:function(){return '<div id="aiApp"></div>';},
     refadmin:function(){if(me.role!=='admin')return head('관리자','접근 권한 없음','관리자 계정으로 로그인해야 볼 수 있습니다.');return '<div id="aiApp"></div>';},
     me:function(){return meHtml();},
+    /* 내 자료함 — 기본형·고급형에서 만든 리포트·제안서 보관본 (archive.js, 이 기기에만 저장) */
+    arcbox:function(){return head('영업 도구','내 자료함','AI보장분석 기본형·고급형에서 만든 리포트·제안서를 고객별·날짜별로 다시 보고 인쇄합니다. 이 기기에만 보관됩니다.')+'<div id="arcApp"><p class="note">불러오는 중…</p></div>';},
     /* AI보장분석 고급형 — advanced/index.html (보장·연금·자산 상담 설계, 제안서, 고객 리포트, 세법 기준표·법령 점검) */
     ai2:function(){
       var h=head('영업 도구 · 교육','AI보장분석 고급형','상담 설계(보장·연금·자산) → 제안서(시뮬레이션·발표 노트) → 고객 리포트까지. 기본형보다 깊은 분석용입니다. 고객 자료는 이 기기의 브라우저에만 저장됩니다.');
@@ -3345,7 +3348,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var pnl=document.getElementById('bkPanel');
     if(pnl)pnl.addEventListener('click',function(e){if(e.target&&e.target.id==='bkDir')pickDir();});
     s.onclick=async function(){
-      var txt=JSON.stringify(bkCollect()),name=bkName(),blob=new Blob([txt],{type:'application/json'});
+      var obj=bkCollect();if(window.KIFARC){try{obj.archive=await KIFARC.dump();}catch(e){}}
+      var txt=JSON.stringify(obj),name=bkName(),blob=new Blob([txt],{type:'application/json'});
       if(fd){
         if(!(await F.get())){m.textContent='처음 한 번 저장 폴더를 고릅니다…';if(!(await pickDir()))return;}
         try{var where=await F.write(name,blob);done('저장했습니다: '+where);return;}
@@ -3363,9 +3367,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         var j;try{j=JSON.parse(r.result);}catch(e){m.textContent='한보금on 고객 자료 파일이 아닙니다.';return;}
         if(!j||!j.data||j.app!=='한보금on 활동지원'){m.textContent='한보금on 고객 자료 파일이 아닙니다.';return;}
         var n=0,a=0;try{n=(JSON.parse(j.data.fc_ai_customers||'[]')||[]).length;}catch(e){}try{var x=JSON.parse(j.data['cov-planner-v1']||'null');a=x&&x.clients?x.clients.length:0;}catch(e){}
-        if(!confirm('파일('+new Date(j.at).toLocaleString('ko-KR')+' 저장)의 자료로 이 기기 고객 자료를 바꿀까요?\n기본형 고객 '+n+'명 · 고급형 고객 '+a+'명\n지금 이 기기에 있는 고객 자료는 파일 내용으로 바뀝니다.'))return;
+        if(!confirm('파일('+new Date(j.at).toLocaleString('ko-KR')+' 저장)의 자료로 이 기기 고객 자료를 바꿀까요?\n기본형 고객 '+n+'명 · 고급형 고객 '+a+'명'+(j.archive&&j.archive.items?' · 자료함 보관본 '+j.archive.items.length+'개(있는 것은 그대로 두고 더함)':'')+'\n지금 이 기기에 있는 고객 자료는 파일 내용으로 바뀝니다.'))return;
         BK_KEYS.forEach(function(k){try{if(k in j.data)localStorage.setItem(k,j.data[k]);}catch(e){}});
-        m.textContent='불러왔습니다. 화면을 새로 고칩니다…';setTimeout(function(){location.reload();},700);
+        var fin=function(x){m.textContent='불러왔습니다'+(x?' (자료함 보관본 '+x+'개 추가)':'')+'. 화면을 새로 고칩니다…';setTimeout(function(){location.reload();},900);};
+        if(j.archive&&window.KIFARC)KIFARC.load(j.archive).then(fin,function(){fin(0);});else fin(0);
       };r.readAsText(file);
     };
     l.onclick=async function(){
@@ -3482,6 +3487,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       ['nYm','nWk'].forEach(function(k){document.getElementById(k).onchange=nf;});document.getElementById('nQ').oninput=nf;
     }
     if(id==='me')bindMe();
+    if(id==='arcbox'){var ae=document.getElementById('arcApp');if(window.KIFARC)KIFARC.mountBox(ae,toast);else if(ae)ae.innerHTML='<div class="panel"><p class="note">이 화면에서는 자료함을 열 수 없습니다. 새로고침해 주세요.</p></div>';}
     if(id==='cadmin'&&me.role==='admin')bindCm();
     if(id==='compare'){var cf=document.getElementById('cmpFull'),cr=document.querySelector('iframe.cmp-fr'),cx=document.getElementById('cmpClose');
       if(cf&&cr){var setC=function(on){cr.classList.toggle('full',on);cx.hidden=!on;document.body.classList.toggle('adv-full',on);};cf.onclick=function(){setC(true);};cx.onclick=function(){setC(false);};}}
@@ -4114,6 +4120,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     else h+=[0,viewInfo,0,viewAnalysis1,viewReport][st.step](c);
     h+=back+'</section></div>';
     root.innerHTML=h;syncNote();
+    if(st.arcNext&&c&&(st.step===3||st.step===4)){st.arcNext=0;arcBasic(c,true);}
   }
   function viewList(){
     var L=st.customers;
@@ -4335,7 +4342,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     P=fill(P,PC.P);C=fill(C,PC.C);
     var cc=String((r&&r.conclusion)||''),W=aiCheck(P.concat(C).map(function(x){return x.join(' ');}).concat([cc]),JSON.stringify(D.data)+JSON.stringify(PC));
     if(extra)W=W.concat(extra);
-    c.ai1={opt:o.id,P:P,C:C,conclusion:cc,by:provName(),at:nowStr(),warn:W};return true;}
+    c.ai1={opt:o.id,P:P,C:C,conclusion:cc,by:provName(),at:nowStr(),warn:W};st.arcNext=1;return true;}
   /* 1단계: 내 AI로 보장분석 — 포털이 계산한 숫자 + 규칙을 보내고, 유리·불리·결론 문장을 받는다 */
   async function aiAnalyze1(c){
     var btn=document.getElementById('ai1Btn'),note=document.getElementById('ai1Note');
@@ -4402,7 +4409,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   function bars1(R,focus){return bars(R,focus).replace('<span><i class="mo"></i>기존</span><span><i class="mt"></i>신규 가입 후(합산)</span>','<span><i class="mt"></i>기존 계약 보장</span>');}
   function rptBar(c,title,pill){return '<div class="panel rtool"><div class="row"><b>'+title+'</b><span class="pill new">'+esc(pill)+'</span><span class="sp"></span>'+
-      (st.step===4?'<button class="btn sm ghost" data-a="aiText" id="aiTextBtn">AI로 문구 다듬기</button>'+pkgBtns():'')+'<button class="btn sm ghost" data-a="print">인쇄</button><button class="btn sm ghost" data-a="saveHtml">HTML 저장</button></div>'+
+      (st.step===4?'<button class="btn sm ghost" data-a="aiText" id="aiTextBtn">AI로 문구 다듬기</button>'+pkgBtns():'')+'<button class="btn sm ghost" data-a="print">인쇄</button><button class="btn sm ghost" data-a="saveHtml">HTML 저장</button><button class="btn sm ghost" data-a="arcSave" title="이 화면을 「내 자료함」에 날짜별로 남깁니다">자료함에 보관</button></div>'+
       '<div class="row outs"><b>카카오톡으로 보낼 파일</b><button class="btn sm" data-a="pdfRpt">'+(st.step===3?'분석 리포트':'제안서')+' PDF 저장</button><button class="btn sm" data-a="pdfSheet">분석표 PDF 저장</button><button class="btn sm ghost" data-a="saveXlsx">분석표 엑셀 저장</button><span class="note" id="pdfNote">PDF를 저장한 뒤 카카오톡 대화방에서 파일로 첨부하면 됩니다.</span></div>'+
       needsPick(c,opt(c));}
   /* 화면 3: 1단계 기계약 보장분석 */
@@ -5238,6 +5245,14 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     try{await cap.dl.save({filename:name,data:data});toast('저장했습니다.');}catch(e){if(e&&e.code!=='declined')toast('저장하지 못했습니다 ('+(e&&e.code||'오류')+').');}
   }
   function rptCss(){var s='';document.querySelectorAll('style').forEach(function(x){s+=x.textContent;});return s;}
+  /* 내 자료함에 지금 화면(1단계 리포트 또는 2단계 제안서)을 보관한다 — 인쇄·PDF·HTML 저장·AI 결과·「자료함에 보관」 때 */
+  function arcBasic(c,say){
+    var el=document.getElementById('rpt');if(!el||!c||!window.KIFARC||(st.step!==3&&st.step!==4))return;
+    var o=opt(c),kind=st.step===3?'1단계 기계약 분석 리포트':'2단계 Before/After 제안서';
+    KIFARC.add({src:'basic',cid:c.id,cname:c.name,kind:kind,title:kind+(o&&o.title?' · '+o.title:''),html:el.innerHTML,wrap:'rpt',css:rptCss()})
+      .then(function(r){if(say&&r)toast(r.dup?'자료함의 최신 보관본과 같아 시간만 고쳤습니다.':'내 자료함에 보관했습니다.');})
+      .catch(function(e){if(say)toast('보관하지 못했습니다: '+(e&&e.message||'저장 공간 부족'));});
+  }
   function saveHtml(c){
     var html='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(c.name)+'님 보장분석 제안서</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"><style>'+rptCss()+'body{background:#eef1f6;padding:20px}.pbtn{position:fixed;right:16px;top:16px;z-index:9}@media print{.pbtn{display:none}body{padding:0;background:#fff}}</style></head><body><button class="btn pbtn" onclick="window.print()">인쇄</button><div class="rpt">'+document.getElementById('rpt').innerHTML+'</div></body></html>';
     dl(c.name.replace(/[\\/:*?"<>|()\s]/g,'')+'_보장분석제안서.html',html);
@@ -5441,7 +5456,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var r=await askJ('너는 보험 제안서를 쓰는 FC의 조수다. '+smpLead(c)+(smpMode(c)==='none'?'':'(샘플의 고객·숫자는 옮겨 쓰지 마라)')+'.\n'+aiGuide(selIds(c),2,c)+'\n\n'+OUT2+'\n\nBefore(기존 그대로)와 After(조정한 기존 + 신계약)를 비교하는 관점으로 쓴다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션을 가장 강조한다: 포인트의 절반 이상은 고른 옵션의 중심 영역에 대한 것으로 옵션 순서대로 쓰고(옵션마다 최소 한 개), 결론에도 고른 옵션을 짚어라. 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 규칙 8대로만 쓴다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default',smp:smpFor(c,2),pkg:{kind:'ai',cid:c.id,cname:c.name,label:'2단계 제안서 문구'}});
       if(r&&r.points&&r.points.length){var pts=r.points.slice(0,6).map(String),cc2=String(r.conclusion||''),W2=aiCheck(pts.concat([cc2]),JSON.stringify(data)+JSON.stringify(defText(vA,o,R)));
         if(pts.length<3)W2.unshift('포인트가 '+pts.length+'개뿐 — 샘플은 4~5개');
-        c.ai={opt:o.id,s2:1,points:pts,conclusion:cc2,warn:W2,by:provName()};touch(c);render();toast(W2.length?'AI 문구로 바꿨습니다. 화면의 「AI 답 점검」을 확인하세요.':'AI 문구로 바꿨습니다.');return;}
+        c.ai={opt:o.id,s2:1,points:pts,conclusion:cc2,warn:W2,by:provName()};st.arcNext=1;touch(c);render();toast(W2.length?'AI 문구로 바꿨습니다. 화면의 「AI 답 점검」을 확인하세요.':'AI 문구로 바꿨습니다.');return;}
       throw {code:'x'};
     }catch(e){if(note)note.textContent=errMsg(e)+' 기본 문구를 그대로 씁니다.';if(btn)btn.disabled=false;}
   }
@@ -5497,13 +5512,14 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(a==='okK'){gatherDocs(c);c.contracts[+b.dataset.k].confirmed=true;touch(c);render();toast('확인 완료로 표시했습니다.');return;}
     if(a==='saveDocs'||a==='docsNext'||a==='adjNext'){gatherDocs(c);c.contracts.forEach(function(k){k.items.forEach(function(it){if(it.area==='기타')it.area=classify(it.name);});});touch(c);if(a==='docsNext')st.step=3;if(a==='adjNext')st.step=4;render();toast('저장했습니다.');return;}
     if(a==='tpl'){saveTpl();return;}
-    if(a==='pdfRpt'){pdfReport(dataC(c),b);return;}
-    if(a==='pdfSheet'){pdfSheet(dataC(c),b);return;}
+    if(a==='pdfRpt'){arcBasic(c);pdfReport(dataC(c),b);return;}
+    if(a==='pdfSheet'){arcBasic(c);pdfSheet(dataC(c),b);return;}
+    if(a==='arcSave'){arcBasic(c,true);return;}
     if(a==='aiText'){aiText(c);return;}
     if(a==='ai1'){aiAnalyze1(c);return;}
     if(a==='ai1off'){c.ai1=null;touch(c);render();toast('포털 규칙으로 정리한 기본 결과로 돌렸습니다.');return;}
-    if(a==='print'){window.print();return;}
-    if(a==='saveHtml'){saveHtml(dataC(c));return;}
+    if(a==='print'){arcBasic(c);window.print();return;}
+    if(a==='saveHtml'){arcBasic(c);saveHtml(dataC(c));return;}
     if(a==='saveXlsx'){saveXlsx(dataC(c),b);return;}
     if(a==='saveOpt'){gatherOpts();save(KEY_O,st.opts);pushOpts();render();toast('옵션을 저장했습니다.');return;}
     if(a==='resetOpt'){st.opts=JSON.parse(JSON.stringify(DEF_OPTS));save(KEY_O,st.opts);pushOpts();render();toast('처음 10가지로 되돌렸습니다.');return;}
