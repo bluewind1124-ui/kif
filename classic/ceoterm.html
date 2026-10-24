@@ -211,8 +211,9 @@ table.cmp thead th{position:static}
   <div class="step" id="s3"><div class="step-head"><span class="step-num">3</span><h2>전체 상품 비교</h2><span class="hint" id="s3hint"></span></div><div class="fbar" id="s3filter"></div><div id="s3body"></div></div>
 </div>
 <p class="foot-note">한국보험금융 「경영인 정기보험(환급률) 26.09.04」 자료. 각 보험사 대표 상품·확정이율(또는 최저보증이율) 기준으로 설계했으며, 환급금(률)은 조건에 따라 달라지므로 상품 비교 이해용 참고자료입니다.</p>
+<script src="cmpdata.js?v=20261024a"></script>
 <script>
-const DATA = {
+let DATA = {
  "meta": {
   "기준": "40세 남자(3억원은 남/여) · 90세만기 · 전기납 · 해지환급금 보증형 · 체증형 · U/W 2026.09.04",
   "fxRate": 1342,
@@ -3420,6 +3421,7 @@ const DATA = {
   "미래에셋"
  ]
 };
+if(window.KIFCMP_LOAD)DATA=KIFCMP_LOAD('ceoterm',DATA);
 const won = n => n==null ? "—" : Math.round(n).toLocaleString("ko-KR")+"원";
 const pct = n => n==null ? "—" : n.toFixed(1)+"%";
 const state = { amount:"1억원", review:"일반심사", sub:"40세", sort:"보험료", year:10, show:[] };

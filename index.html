@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-24.18">
+<meta name="kif-build" content="2026-10-24.19">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1231,6 +1231,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
 </script>
 <script src="ai-connect.js?v=20261024ae"></script>
 <script src="policy.js?v=20261024c"></script>
+<script src="cmp-ai.js?v=20261024a"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
@@ -1701,7 +1702,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   window.addEventListener('message',function(e){if(e.origin!==location.origin||!e.data)return;if(e.data.kif==='back')portalPop();if(e.data.kif==='home')go('home');
     /* 비교 도구(원픽)의 「원본 PDF에서 보기」: 포털 자료 보기 창으로 해당 쪽부터 */
-    if(e.data.kif==='pdf'&&typeof e.data.file==='string'&&/^files\//.test(e.data.file))openMat(['PDF',String(e.data.title||'원본 자료'),'','',e.data.file],+e.data.page||1);});
+    if(e.data.kif==='pdf'&&typeof e.data.file==='string'&&/^files\//.test(e.data.file))openMat(['PDF',String(e.data.title||'원본 자료'),'','',e.data.file],+e.data.page||1);
+    if(e.data.kif==='mat'&&typeof e.data.file==='string'&&/^(files\/|blob:)/.test(e.data.file))openMat([(e.data.file.match(/\.([a-z0-9]+)$/i)||['',''])[1].toUpperCase()||'PDF',String(e.data.title||'이번 달 원본 자료'),'','',e.data.file]);});
   /* 최근 7일 안에 올라온 소식지 수 (사이드바 「새 글」·홈 숫자) */
   function newsNew(){var d=new Date(Date.now()-7*864e5),c=d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());return NEWS.filter(function(n){return String(n[0]||'')>=c;}).length;}
   /* 이달의 컨셉: 커튼이 열린 뒤 제목을 한 글자씩 친다 (움직임 줄이기 설정이면 바로 보여 줌) */
@@ -1880,7 +1882,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
       aiProxy:v('mProxy'),aiProxyFor:(document.getElementById('mProxyFor')||{}).value==='admin'?'admin':'all',aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,car:(SITE&&SITE.car)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
-    ['compare','off','concepts','aiSamples','boards','onepick','onepicks','thumbs'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
+    ['compare','off','concepts','aiSamples','boards','onepick','onepicks','cmpdata','thumbs'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
     (c.hypo||[]).forEach(function(r){var o=(HYPO||[]).filter(function(x){return x[0]===r[0]&&Array.isArray(x[4]);})[0];if(o){while(r.length<4)r.push('');r[4]=o[4];}});
     var ck=document.getElementById('cOpts');
     if(ck&&ck.checked&&window.AIMOD&&AIMOD.getOpts){c.opts=AIMOD.getOpts();c.optsVer=c.ver;}
@@ -2340,7 +2342,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   },true);
 
   var CM={tab:store('kif_cm_tab')||'compare',w:null,dirty:{},add:[],del:[],t:null,busy:false,again:false,msg:'',ask:''};
-  var CM_TABS=[['compare','상품 비교'],['hypo','대표 상품 가설'],['concept','이달의 컨셉'],['news','보험사 소식지'],['award','시상 공지'],['notice','본사 공지'],['mats','교육 자료']];
+  var CM_TABS=[['compare','상품 비교'],['cmpdata','비교자료 업로드'],['hypo','대표 상품 가설'],['concept','이달의 컨셉'],['news','보험사 소식지'],['award','시상 공지'],['notice','본사 공지'],['mats','교육 자료']];
   var CM_KEY={news:'news',award:'awards',hypo:'hypo',mats:'mats',notice:'notices'};
   var CM_LEN={news:7,award:5,hypo:4,mats:5,notice:3}, CM_FI={news:3,award:4,hypo:3,mats:4,notice:2};
   var CM_COLS={
@@ -2349,7 +2351,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     hypo:[[0,'고객 유형','w'],[1,'대표 상품','w'],[2,'첫 화법','a']],
     mats:[[0,'종류','80px'],[2,'분류','100px'],[1,'제목','w'],[3,'설명','a']],
     notice:[[0,'날짜','96px'],[1,'내용','w']]};
-  var CM_HELP={compare:'비교 프로그램(HTML)을 올리면 포털 안 화면에서 바로 돌아갑니다. PDF·엑셀·PPT·그림은 비교 자료로 올라가 누르면 화면 위에 펼쳐집니다.',
+  var CM_HELP={cmpdata:'생명보험 가이드북·담보별 비교견적·단기납 종신·3대질병·경영인 정기 비교 도구의 이번 달 자료를 올리는 곳입니다. 도구마다 새 자료(PDF·엑셀·PPT·그림)를 올리고 「AI로 읽어 표 새로 만들기」를 누르면, AI가 자료의 보험료·환급률·상품명·조건을 읽어 도구의 표를 새로 채웁니다. 1·2·3위는 지금처럼 도구가 화면 옵션(나이·성별·납입기간·심사 등)에 따라 자동으로 매깁니다. 새로 바꾸면 지난 자료는 보관하지 않고 지웁니다. ⚠ 이 사이트에 올린 파일은 주소만 알면 누구나 열 수 있습니다.',
+    compare:'비교 프로그램(HTML)을 올리면 포털 안 화면에서 바로 돌아갑니다. PDF·엑셀·PPT·그림은 비교 자료로 올라가 누르면 화면 위에 펼쳐집니다.',
     hypo:'고객 유형별 대표 상품과 첫 화법입니다. 파일(PDF·PPT)을 붙이면 FC가 제목을 눌러 엽니다.',
     concept:'이달의 컨셉은 한 번에 하나만 보입니다. 새 컨셉을 올리면 지금 컨셉은 아래 「지난 컨셉」으로 옮겨지고, 언제든 다시 꺼내 쓸 수 있습니다.',
     news:'보험사 소식지 PDF를 올리면 회사·연월·주차를 읽어 제목을 만듭니다.',award:'시상·시책 자료를 올리면 기간을 읽어 진행 중/발표를 정합니다.',
@@ -2360,7 +2363,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function cmW(){
     if(CM.w)return CM.w;var S=SITE||{};
     CM.w={news:cmClone(NEWS),awards:cmClone(AWARDS),hypo:cmClone(HYPO),mats:cmClone(MATS),notices:cmClone(NOTICES),
-      off:cmClone(S.off||{}),compare:cmClone(CMPL),concept:cmClone(CONCEPT),concepts:cmClone(S.concepts||[]),onepick:cmClone(S.onepick||null),onepicks:cmClone(S.onepicks||[])};
+      off:cmClone(S.off||{}),compare:cmClone(CMPL),concept:cmClone(CONCEPT),concepts:cmClone(S.concepts||[]),onepick:cmClone(S.onepick||null),onepicks:cmClone(S.onepicks||[]),cmpdata:cmClone(S.cmpdata||{})};
     Object.keys(BOARD).forEach(function(b){CM.w['board:'+b]=cmClone(((S.boards||{})[b])||[]);});
     return CM.w;
   }
@@ -2370,7 +2373,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(kind==='compare'&&/^html?$/.test(ext))return 'classic/cmp_'+r+'.html';
     return (kind==='news'?'news/':'files/'+kind+'/')+ym+'/'+nm+'_'+r+'.'+ext;
   }
-  function cmIsRepo(p){return /^(news|files|refs)\//.test(p||'')||/^classic\/cmp_[a-z0-9]+\.html$/.test(p||'');}
+  function cmIsRepo(p){return /^(news|files|refs)\//.test(p||'')||/^classic\/cmp_[a-z0-9]+\.html$/.test(p||'')||/^classic\/data\/[a-z0-9]+\.json$/.test(p||'');}
   async function cmStage(kind,file,path){
     if(file.size>50*1048576)throw new Error(file.name+': 50MB를 넘습니다');
     var p=path||cmPath(kind,file.name);CM.add=CM.add.filter(function(a){return a.path!==p;});CM.add.push({path:p,b64:b64(await file.arrayBuffer()),url:URL.createObjectURL(file)});return p;
@@ -2394,6 +2397,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
           if(k==='concept'){c.concept=cmClone(W.concept);c.concepts=cmClone(W.concepts);return;}
           if(k==='compare'){c.compare=cmClone(W.compare);return;}
           if(k==='onepick'){c.onepick=cmClone(W.onepick);c.onepicks=cmClone(W.onepicks);return;}
+          if(k==='cmpdata'){c.cmpdata=cmClone(W.cmpdata||{});if(!Object.keys(c.cmpdata).length)delete c.cmpdata;return;}
           var key=CM_KEY[k];if(/^board:/.test(key)){c.boards=c.boards||{};c.boards[k]=cmClone(W[key]||[]);}else c[key]=cmClone(W[key]);c.off=c.off||{};c.off[k]=cmClone(W.off[k]||[]);
         });
       },add,del,'자료 관리: '+(keys.map(cmName).join(', ')||'파일 정리'));
@@ -2446,7 +2450,16 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<span class="cm-ord"><button class="btn sm ghost" type="button" data-cmmv="'+i+'" data-d="-1" aria-label="위로"'+(i?'':' disabled')+'>▲</button><button class="btn sm ghost" type="button" data-cmmv="'+i+'" data-d="1" aria-label="아래로"'+(i<L.length-1?'':' disabled')+'>▼</button></span>'+
         '<span class="sp"></span><button class="btn sm ghost" type="button" data-cmview="'+i+'">포털에서 열어 보기</button>'+cmFileBtns(x.file,'data-cmf="'+id+'"')+(x.base?'':cmDelBtn(id))+'</div>'+
         '<div class="nu-x">'+cmIn('data-cmr="'+id+'" data-c="title"',x.title,'w','이름')+cmIn('data-cmr="'+id+'" data-c="desc"',x.desc,'w','설명 (타일 아래 글)')+'</div>'+
-        (x.base?'<p class="note" style="margin:4px 0 0">기본 도구입니다. 내용(보험료·상품)을 바꾸려면 새로 만든 HTML 파일로 <b>파일 바꾸기</b>를 하세요. 주소는 그대로라 홈 화면 바로가기도 그대로 맞습니다.</p>':'')+'</div>';}).join('')+'</div>';
+        (x.base?cmCmpNote(x):'')+'</div>';}).join('')+'</div>';
+  }
+  /* 상품 비교 탭의 기본 도구 카드: 비교자료 업로드와 같은 cmpdata를 보여 주고 바로 바꾸기·지우기 */
+  function cmCmpNote(x){
+    if(x.id==='onepick')return '<p class="note" style="margin:4px 0 0">기본 도구입니다. 이번 달 내용은 <button class="btn sm ghost" type="button" data-cmtab="onepick">이번 달의 원픽</button> 탭에서 바꿉니다.</p>';
+    if(CD_IDS.indexOf(x.id)<0)return '<p class="note" style="margin:4px 0 0">기본 도구입니다.</p>';
+    var R=(cmW().cmpdata||{})[x.id];
+    return '<div class="row" style="gap:8px;margin-top:6px"><span class="note">이번 달 자료: '+(R?'<b>'+esc(R.month||'기준월 없음')+'</b>'+(R.upd?' · 업데이트 '+esc(R.upd):'')+(R.file?' · <a class="flink" target="_blank" rel="noopener" href="'+fileHref(cmLocal(R.file))+'">📎 원본</a>':''):'아직 없음 (도구 안의 기본 데이터)')+'</span><span class="sp"></span>'+
+      '<button class="btn sm" type="button" data-cd="totab" data-id="'+x.id+'">'+(R?'비교자료 바꾸기':'비교자료 올리기')+'</button>'+(R?cmDelBtn('cd'+x.id):'')+'</div>'+
+      '<p class="note" style="margin:4px 0 0">보험료·상품 같은 내용은 <b>비교자료 업로드</b> 탭에서 새 자료를 올리고 AI로 읽어 바꿉니다(같은 자료를 함께 봅니다). 주소는 그대로라 홈 화면 바로가기도 그대로 맞습니다.</p>';
   }
   function cmConcept(){
     var W=cmW(),c=W.concept,f=function(k,lab,w){return cmIn('data-cmk="'+k+'"',c[k],w,lab);};
@@ -2599,6 +2612,142 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     }catch(e){msg('⚠ '+(e&&e.code&&KIFAI.err?KIFAI.err(e):(e&&e.message)||String(e)));}
     CM.opBusy=false;cmRender();
   }
+  /* ---------- 비교자료 업로드 (도구 5종: 생명 가이드북·담보별 비교견적·단기납 종신·3대질병·경영인 정기) ----------
+     content.json cmpdata[도구] = {month, upd, title(원본 이름), file(원본 파일), data:'classic/data/도구.json', ver, at} — 도구마다 최신 1건만.
+     classic/cmpdata.js가 이 값을 읽어 도구의 DATA를 바꾼다. AI는 자료의 숫자·상품명·조건만 읽고, 순위는 도구가 옵션에 따라 자동으로 매긴다.
+     읽기는 cmp-ai.js(KIFCMPAI)가 DATA를 약 1만 글자 단위로 나눠 단위마다 AI를 부르고 다시 합친다. 상품 비교 탭과 같은 W.cmpdata를 함께 본다. */
+  var CD_IDS=['life','nonlife','wholelife','critical3','ceoterm'];
+  var CD_ACC='.pdf,.xlsx,.xls,.pptx,.png,.jpg,.jpeg';
+  CM.cd={};
+  function cdS(id){return CM.cd[id]=CM.cd[id]||{};}
+  function cdTitle(id){var x=cmpFind(id)||CMP_BASE.filter(function(t){return t.id===id;})[0];return x?x.title:id;}
+  function cdPrevKey(id){return 'kif_cmpprev_'+id;}
+  function cdPrevOff(id){try{localStorage.removeItem(cdPrevKey(id));}catch(e){}}
+  function cdMonthGuess(t){var m=String(t||'').match(/(20\d{2})\s*[.\-년_\s]\s*(\d{1,2})\s*월?/)||String(t||'').match(/(?:^|\D)(\d{2})[.\-_](\d{2})(?:\D|$)/);if(!m)return '';var y=m[1].length===2?'20'+m[1]:m[1],mo=+m[2];return mo>=1&&mo<=12?y+'.'+pad2(mo):'';}
+  /* 지금 이 도구가 쓰는 DATA(올린 데이터가 있으면 그것, 없으면 html 안의 기본 DATA)를 지난 달 구조로 가져온다 */
+  async function cdBase(id){
+    var R=(cmW().cmpdata||{})[id];
+    if(R&&R.data){var a=CM.add.filter(function(x){return x.path===R.data;})[0];
+      try{var r=await fetch(a?a.url:fileHref(R.data)+'?v='+encodeURIComponent(R.ver||Date.now()),{cache:'no-store'});if(r.ok)return await r.json();}catch(e){}}
+    var h=await (await fetch('classic/'+id+'.html',{cache:'no-store'})).text(),i=h.indexOf('let DATA'),j=h.indexOf('{',i);if(i<0||j<0)throw new Error('도구 파일에서 데이터를 찾지 못했습니다');
+    var d=0,q=null,k=j;for(;k<h.length;k++){var c=h[k];if(q){if(c==='\\'){k++;continue;}if(c===q)q=null;continue;}if(c==='"'||c==="'"||c==='`'){q=c;continue;}if(c==='{'||c==='[')d++;else if(c==='}'||c===']'){d--;if(!d)break;}}
+    var src=h.slice(j,k+1);try{return JSON.parse(src);}catch(e){return (new Function('return ('+src+');'))();}
+  }
+  /* 새 자료 → 쪽 목록 [{n,text}] (PDF는 쪽, 엑셀은 시트, PPT는 장) · 사진은 images로 */
+  async function cdPages(f){
+    var low=(f.name||'').toLowerCase();
+    if(/\.pdf$/.test(low)){var u=URL.createObjectURL(f),P;try{P=await pdfPages(u);}finally{URL.revokeObjectURL(u);}
+      if(P.join('').replace(/\s/g,'').length<300)throw new Error('이 PDF는 글자 없이 그림으로만 되어 있어(스캔본) 나눠 읽을 수 없습니다. 글자가 들어 있는 PDF나 엑셀 원본을 올려 주세요.');
+      return {pages:P.map(function(t,i){return {n:i+1,text:t};}),images:[]};}
+    if(/\.(png|jpe?g)$/.test(low)){var r=await KIFAI.read([f]);return {pages:[],images:r.images,scanned:r.scanned};}
+    var of=await KIFAI.officeText(await f.arrayBuffer());if(!of||!of.text.trim())throw new Error('파일에서 글자를 읽지 못했습니다. PDF로 저장해 올려 주세요.');
+    var parts=of.type==='XLSX'?of.text.split(/\n?(?=\[시트\] )/):of.type==='PPT'?of.text.split(/\n(?=\[장 \d+\])/):[of.text],out=[];
+    parts.forEach(function(p){while(p.length>12000){var cut=p.lastIndexOf('\n',12000);if(cut<4000)cut=12000;out.push(p.slice(0,cut));p=p.slice(cut);}if(p.trim())out.push(p);});
+    return {pages:out.map(function(t,i){return {n:i+1,text:t};}),images:[]};
+  }
+  async function cdSrcFile(id){
+    var s=cdS(id),R=(cmW().cmpdata||{})[id];if(s.f)return s.f;
+    if(!R||!R.file)return null;var r=await fetch(fileHref(R.file),{cache:'no-store'});if(!r.ok)throw new Error('올려 둔 원본 파일을 열지 못했습니다');
+    return new File([await r.blob()],String(R.title||R.file.split('/').pop())+((R.file.match(/\.[a-z0-9]+$/i)||[''])[0]),{type:r.headers.get('content-type')||''});
+  }
+  function cdMsg(id,t){var s=cdS(id);s.msg=t;var e=document.getElementById('cdMsg_'+id);if(e)e.textContent=t;}
+  function cdAiReady(id){
+    if(!window.KIFAI||!window.KIFCMPAI){cdMsg(id,'AI 연결 도구를 불러오지 못했습니다. 새로고침해 주세요.');return false;}
+    if(!KIFAI.chosen()||KIFAI.cfg().mode!=='ai'){cdMsg(id,'먼저 쓸 AI를 연결해 주세요. 열린 「내 AI 등록」 창에서 고르면 됩니다.');KIFAI.open();return false;}
+    if(KIFAI.cfg().prov==='paste'){cdMsg(id,'이 기능은 AI를 수십 번 불러야 해서 「복사·붙여넣기」 방식으로는 할 수 없습니다. 「내 AI 등록」에서 회사 AI·내 AI 키·Claude 화면 중 하나로 바꿔 주세요.');KIFAI.open();return false;}
+    return true;
+  }
+  async function cdAi(id,only){
+    var s=cdS(id);if(s.busy||!cdAiReady(id))return;
+    s.busy=true;if(!only){s.run=null;s.draft=null;}cmRender();
+    try{
+      if(!only){
+        cdMsg(id,'지난 달 데이터를 불러오는 중…');s.base=await cdBase(id);
+        var f=await cdSrcFile(id);if(!f)throw new Error('먼저 이번 달 새 자료 파일을 올려 주세요.');
+        cdMsg(id,'새 자료의 글자를 읽는 중…');var pg=await cdPages(f);s.pages=pg.pages;s.images=pg.images||[];s.scanned=pg.scanned||[];
+      }
+      var ask=function(q,text){return KIFAI.ask(q,{text:text,images:s.images||[],scanned:s.scanned||[]});};
+      var r=await KIFCMPAI.run({tool:cdTitle(id),base:s.base,pages:s.pages,ask:ask,err:KIFAI.err,conc:3,units:s.run&&s.run.units,map:s.run&&s.run.map,res:s.run&&s.run.res,only:only,
+        step:function(t){cdMsg(id,t);}});
+      s.run=r;
+      var R=(cmW().cmpdata||{})[id]||{};
+      if(!only){s.month=r.map.month||cdMonthGuess(s.f&&s.f.name)||R.month||'';s.upd=r.map.upd||today();}
+      s.draft=KIFCMPAI.merge(s.base,r.units,r.res);
+      var bad=r.units.filter(function(u){return !(r.res[u.id]&&r.res[u.id].ok);}).length;
+      cdMsg(id,bad?'⚠ 단위 '+r.units.length+'개 중 '+bad+'개를 읽지 못해 지난 값 그대로 두었습니다. 아래에서 「다시 읽기」를 누르거나, 그대로 확인 후 바꾸세요.':'✓ 다 읽었습니다. 아래 결과를 보고 「미리 보기」로 확인한 뒤 「이 내용으로 바꾸기」를 누르세요.');
+    }catch(e){cdMsg(id,'⚠ '+(e&&e.code&&KIFAI.err?KIFAI.err(e):(e&&e.message)||String(e)));}
+    s.busy=false;cmRender();
+  }
+  function cdReport(id){
+    var s=cdS(id),r=s.run;if(!r)return '';
+    var tot={changed:0,added:0,removed:0},bad=0,rows=r.units.map(function(u){var x=r.res[u.id]||{};
+      if(!x.ok){bad++;return '<li class="cd-bad">⚠ '+esc(u.label)+' — '+esc(x.err||'아직 안 읽음')+(x.pages&&x.pages.length?' (쪽 '+x.pages.join('·')+')':'')+' <button class="btn sm ghost" type="button" data-cd="re" data-id="'+id+'" data-u="'+u.id+'"'+(s.busy?' disabled':'')+'>다시 읽기</button></li>';}
+      var t=x.stat;tot.changed+=t.changed;tot.added+=t.added;tot.removed+=t.removed;
+      return '<li>✓ '+esc(u.label)+' — 바뀐 값 '+t.changed+(t.added?' · 새 값 '+t.added:'')+(t.removed?' · 빠진 값 '+t.removed:'')+(t.rowsOld!==t.rowsNew?' · <b>줄 '+t.rowsOld+'→'+t.rowsNew+'</b>':'')+(x.miss&&x.miss.length?' · <span class="cd-warn">빠진 칸 '+x.miss.length+'개는 지난 값으로 채움</span>':'')+(x.pages&&x.pages.length?' <span class="note">(쪽 '+x.pages.join('·')+')</span>':'')+'</li>';});
+    return '<div class="op-draft"><b>AI가 읽은 결과: 단위 '+r.units.length+'개 중 '+(r.units.length-bad)+'개 · 바뀐 값 '+tot.changed+'개'+(tot.added?' · 새 값 '+tot.added:'')+(tot.removed?' · 빠진 값 '+tot.removed:'')+'</b> <span class="note">쪽 찾기: '+(r.map.by==='ai'?'AI':'이름 맞추기')+'</span>'+
+      '<details'+(bad?' open':'')+'><summary class="note">단위별로 보기</summary><ul class="cd-ul">'+rows.join('')+'</ul></details>'+
+      '<div class="nu-x">'+cmIn('data-cdd="'+id+'" data-c="month"',s.month,'90px','자료 기준월 (YYYY.MM)')+cmIn('data-cdd="'+id+'" data-c="upd"',s.upd,'110px','업데이트 날짜')+'</div>'+
+      '<div class="row" style="gap:8px;margin-top:6px"><button class="btn sm ghost" type="button" data-cd="prev" data-id="'+id+'">미리 보기 (포털 안에서 열기)</button><button class="btn sm" type="button" data-cd="ok" data-id="'+id+'">이 내용으로 바꾸기</button><button class="btn sm ghost" type="button" data-cd="no" data-id="'+id+'">버리기</button></div>'+
+      '<p class="note" style="margin:6px 0 0">미리 보기는 이 브라우저에서만 2시간 동안 보입니다(FC 화면은 그대로). 숫자는 꼭 원본과 몇 군데 맞춰 보세요. 순위(1·2·3위)는 도구가 옵션에 따라 자동으로 매깁니다.</p></div>';
+  }
+  function cdCard(id){
+    var W=cmW(),R=(W.cmpdata||{})[id],s=cdS(id);
+    var h='<div class="smp-c cd-c"><div class="row"><span class="pill'+(R?' new':'')+'">'+(R?(R.month?esc(R.month)+' 자료':'올린 자료'):'기본 데이터')+'</span><b>'+esc(cdTitle(id))+'</b>'+(R&&R.upd?'<span class="note">업데이트 '+esc(R.upd)+'</span>':'')+'<span class="sp"></span>'+
+      '<button class="btn sm ghost" type="button" data-cd="view" data-id="'+id+'">포털에서 열어 보기</button>'+
+      (R&&R.file?'<a class="flink" target="_blank" rel="noopener" href="'+fileHref(cmLocal(R.file))+'">📎 원본</a>':'')+(R?cmDelBtn('cd'+id):'')+'</div>';
+    if(R)h+='<div class="nu-x">'+cmIn('data-cdr="'+id+'" data-c="month"',R.month,'90px','기준월')+cmIn('data-cdr="'+id+'" data-c="upd"',R.upd,'110px','업데이트')+cmIn('data-cdr="'+id+'" data-c="title"',R.title,'w','원본 이름 (FC 화면 「원본 자료」)')+'</div>'+
+      (R.data?'':'<p class="note" style="margin:4px 0 0">원본 파일만 올라가 있고 표는 기본 데이터 그대로입니다.</p>');
+    else h+='<p class="note" style="margin:4px 0 0">아직 올린 자료가 없어 도구 안의 기본 데이터로 보입니다. 지우기를 하면 이 상태로 돌아갑니다.</p>';
+    h+='<div class="row" style="gap:8px;margin-top:8px"><label class="btn sm'+(s.f?' ghost':'')+'">'+(s.f?'다른 파일 고르기':'＋ 이번 달 새 자료 올리기')+'<input type="file" hidden accept="'+CD_ACC+'" data-cdf="'+id+'"></label>'+
+      (s.f?'<span class="note">새 자료: <b>'+esc(s.f.name)+'</b> (아직 저장 전)</span><button class="btn sm ghost" type="button" data-cd="fileonly" data-id="'+id+'" title="표(숫자)는 그대로 두고 FC 화면 「원본 자료」 파일만 바꿉니다">원본 파일만 바꾸기</button><button class="btn sm ghost" type="button" data-cd="unf" data-id="'+id+'">취소</button>':'<span class="note">PDF · 엑셀 · PPT · 그림</span>')+'</div>';
+    h+='<div class="row" style="gap:8px;margin-top:8px"><button class="btn sm" type="button" data-cd="ai" data-id="'+id+'"'+(s.busy||!(s.f||(R&&R.file))?' disabled':'')+'>'+(s.busy?'읽는 중…':'🤖 AI로 읽어 표 새로 만들기')+'</button><span class="note" id="cdMsg_'+id+'" role="status">'+esc(s.msg||(s.f?'새 자료를 읽어 표를 만듭니다.':(R&&R.file?'올려 둔 원본을 다시 읽어 표를 만듭니다.':'새 자료를 먼저 올려 주세요.')))+'</span></div>';
+    return h+cdReport(id)+'</div>';
+  }
+  function cmCmpdata(){return '<div class="smp-l">'+CD_IDS.map(cdCard).join('')+'</div>';}
+  /* 이 도구의 비교자료를 지운다: 원본 파일 + classic/data/도구.json + cmpdata[도구] → 도구는 기본 DATA로 돌아간다 */
+  function cdDelete(id){
+    var W=cmW(),R=W.cmpdata[id];if(!R)return [];delete W.cmpdata[id];cdPrevOff(id);
+    var gone=[R.file,R.data].filter(Boolean);CM.add=CM.add.filter(function(a){return gone.indexOf(a.path)<0;});cmTouch('cmpdata');return gone;
+  }
+  async function cdApply(id,fileOnly){
+    var W=cmW(),s=cdS(id),R=W.cmpdata[id]||{},n=Object.assign({},R),dp='classic/data/'+id+'.json';
+    if(s.f){var np=await cmStage('cmpdata',s.f);if(R.file&&R.file!==np&&cmIsRepo(R.file))CM.del.push(R.file);n.file=np;n.title=s.f.name.replace(/\.[^.]+$/,'');}
+    if(!fileOnly){
+      if(!s.draft)return;
+      await cmStage('cmpdata',new File([JSON.stringify(s.draft)],id+'.json',{type:'application/json'}),dp);
+      CM.del=CM.del.filter(function(p){return p!==dp;});
+      n.data=dp;n.ver=String(Date.now());n.month=s.month||n.month||'';n.upd=s.upd||today();
+    }else{if(!s.f)return;n.month=cdMonthGuess(s.f.name)||n.month||'';n.upd=n.upd||today();}
+    n.at=today();W.cmpdata[id]=n;
+    if(s.url)URL.revokeObjectURL(s.url);CM.cd[id]={msg:fileOnly?'✓ 원본 파일을 바꿨습니다. 「저장」을 누르면 FC 화면에 반영됩니다.':'✓ 새 표로 바꿨습니다. 「저장」을 누르면 1~2분 뒤 FC 화면에 보입니다.'};
+    cdPrevOff(id);cmTouch('cmpdata');cmRender();
+  }
+  function cdPreview(id){
+    var s=cdS(id),R=(cmW().cmpdata||{})[id]||{};if(!s.draft)return;
+    try{localStorage.setItem(cdPrevKey(id),JSON.stringify({exp:Date.now()+2*3600e3,data:s.draft,month:s.month||'',upd:s.upd||'',file:s.f?s.url:(R.file||''),title:s.f?s.f.name:(R.title||'')}));}
+    catch(e){toast('이 브라우저 저장 공간이 모자라 미리 보기를 못 합니다. 「이 내용으로 바꾸기」 후 저장해서 확인해 주세요.');return;}
+    CMP.open=id;go('compare');toast('미리 보기입니다. 확인한 뒤 관리자 › 자료 관리 › 비교자료 업로드로 돌아오세요.');
+  }
+  function cdBind(box){
+    var W=cmW();
+    box.addEventListener('change',function(e){var t=e.target,a;
+      if((a=t.getAttribute('data-cdf'))!=null&&t.files&&t.files[0]){var f=t.files[0],s=cdS(a);if(f.size>50*1048576){toast(f.name+': 50MB를 넘습니다');return;}
+        if(s.url)URL.revokeObjectURL(s.url);CM.cd[a]={f:f,url:URL.createObjectURL(f),msg:'새 자료를 올렸습니다. 「AI로 읽어 표 새로 만들기」를 누르세요.'};cdPrevOff(a);cmRender();return;}
+      if((a=t.getAttribute('data-cdr'))!=null){var R=W.cmpdata[a];if(!R)return;R[t.getAttribute('data-c')]=t.value.trim();cmTouch('cmpdata');return;}
+      if((a=t.getAttribute('data-cdd'))!=null){cdS(a)[t.getAttribute('data-c')]=t.value.trim();return;}
+    });
+    box.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-cd]');if(!b)return;var a=b.getAttribute('data-cd'),id=b.getAttribute('data-id'),s=cdS(id);
+      if(a==='ai')cdAi(id);
+      else if(a==='re')cdAi(id,[b.getAttribute('data-u')]);
+      else if(a==='prev')cdPreview(id);
+      else if(a==='ok')cdApply(id,false).catch(function(er){toast(er.message||String(er));});
+      else if(a==='fileonly')cdApply(id,true).catch(function(er){toast(er.message||String(er));});
+      else if(a==='no'){s.run=null;s.draft=null;s.msg='';cdPrevOff(id);cmRender();}
+      else if(a==='unf'){if(s.url)URL.revokeObjectURL(s.url);CM.cd[id]={};cdPrevOff(id);cmRender();}
+      else if(a==='view'){cdPrevOff(id);CMP.open=id;go('compare');}
+      else if(a==='totab'){CM.tab='cmpdata';store('kif_cm_tab','cmpdata');cmRender();}
+    });
+  }
   function cmHtml(){
     var T=ghTok(),k=CM.tab;
     var h=head('관리자','자료 관리','메뉴별 자료를 올리고, FC에게 보일지 켜고 끄고, 고치고, 지웁니다. 바꾸거나 파일을 붙인 뒤 「저장」을 누르면 모든 FC 화면에 반영됩니다(1~2분).');
@@ -2606,8 +2755,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+='<div class="panel"><div class="row" style="gap:10px;flex-wrap:wrap"><b>저장 상태</b><span class="note" id="cmPub" style="flex:1 1 240px">'+(CM.msg||(T?'GitHub 연결됨 · 바꾸거나 파일을 붙인 뒤 「저장」을 누르면 모든 FC에게 올라갑니다.':'⚠ 처음 한 번 아래 「GitHub 연결 설정」에서 토큰을 저장해야 모든 FC에게 올라갑니다.'))+'</span><button class="btn" type="button" data-ks="save"'+(dirty&&!CM.busy?'':' disabled')+'>저장</button></div>'+
       '<details class="nu-set"'+(T?'':' open')+'><summary>GitHub 연결 설정 '+(T?'<span class="pill ok">연결됨</span>':'<span class="pill warn">처음 한 번 필요</span>')+'</summary><p class="note">토큰 만드는 법은 <button class="btn sm ghost" type="button" data-go="admin">관리자 페이지 › 자료 올리기</button>의 같은 칸에 적혀 있습니다. 같은 토큰을 씁니다.</p>'+
       '<div class="row" style="gap:8px"><input class="in" id="cmTok" type="password" autocomplete="off" placeholder="github_pat_..." value="'+esc(T)+'" style="flex:1;min-width:200px"><button class="btn sm" type="button" data-cm="tok">저장</button></div></details></div>';
-    h+='<div class="nchips cm-tabs" role="tablist">'+CM_TABS.map(function(t){var n=t[0]==='compare'?cmW().compare.length:t[0]==='onepick'?((cmW().onepick||{}).cats||[]).length:t[0]==='concept'?1+cmW().concepts.length:((cmW()[CM_KEY[t[0]]])||[]).length+((cmW().off[t[0]]||[]).length);
+    h+='<div class="nchips cm-tabs" role="tablist">'+CM_TABS.map(function(t){var n=t[0]==='compare'?cmW().compare.length:t[0]==='cmpdata'?Object.keys(cmW().cmpdata||{}).length+'/'+CD_IDS.length:t[0]==='onepick'?((cmW().onepick||{}).cats||[]).length:t[0]==='concept'?1+cmW().concepts.length:((cmW()[CM_KEY[t[0]]])||[]).length+((cmW().off[t[0]]||[]).length);
       return '<button type="button" role="tab" class="tg'+(t[0]===k?' on':'')+'" aria-selected="'+(t[0]===k)+'" data-cmtab="'+t[0]+'">'+t[1]+' <span class="note">'+n+'</span></button>';}).join('')+'</div>';
+    if(k==='cmpdata'){h+='<div class="panel"><h3>비교자료 업로드 <span class="note">도구마다 이번 달 자료를 올리고 AI로 읽어 표를 바꿉니다 · 바꾼 뒤 위 「저장」</span></h3><p class="note">'+CM_HELP.cmpdata+'</p><div id="cmList">'+cmCmpdata()+'</div></div>';return h;}
     var acc=k==='compare'?'.html,.htm,.pdf,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg':'.pdf,.ppt,.pptx,.xls,.xlsx,.doc,.docx,.hwp,.hwpx,.png,.jpg,.jpeg';
     h+='<div class="panel"><h3>'+cmName(k)+' 올리기</h3><p class="note">'+CM_HELP[k]+'</p>'+
       '<label class="smp-drop" id="cmDrop"><input type="file" id="cmFile" accept="'+acc+'" multiple hidden><b>＋ '+cmName(k)+' 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>'+(k==='compare'?'HTML(비교 프로그램) · PDF · 엑셀 · PPT · 그림':'PDF · PPT · 엑셀 · 워드 · 한글 · 그림')+' · 여러 개 한 번에 · 파일당 50MB 이하</em></label>'+
@@ -2649,11 +2799,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       L.addEventListener('change',ed);L.addEventListener('input',function(e){if(e.target.tagName!=='SELECT'&&e.target.getAttribute('data-k')!=='ym')ed(e);});
       L.addEventListener('click',function(e){var d=e.target.getAttribute&&e.target.getAttribute('data-nudel');if(d==null)return;URL.revokeObjectURL(NU.items[+d].url);NU.items.splice(+d,1);nuRender();});
     }
+    var box0=document.getElementById('cmList');cdBind(box0);
     var fi=document.getElementById('cmFile'),dr=document.getElementById('cmDrop');
-    fi.onchange=function(){cmFiles(Array.prototype.slice.call(fi.files));fi.value='';};
+    if(fi&&dr){fi.onchange=function(){cmFiles(Array.prototype.slice.call(fi.files));fi.value='';};
     dr.addEventListener('dragover',function(e){e.preventDefault();dr.classList.add('over');});
     dr.addEventListener('dragleave',function(){dr.classList.remove('over');});
-    dr.addEventListener('drop',function(e){e.preventDefault();dr.classList.remove('over');cmFiles(Array.prototype.slice.call(e.dataTransfer.files));});
+    dr.addEventListener('drop',function(e){e.preventDefault();dr.classList.remove('over');cmFiles(Array.prototype.slice.call(e.dataTransfer.files));});}
     var box=document.getElementById('cmList'),W=cmW(),k=CM.tab;
     box.addEventListener('change',async function(e){
       var t=e.target,a;
@@ -2703,7 +2854,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       if((a=b.getAttribute('data-cmdel'))!=null){
         if(CM.ask!==a){CM.ask=a;cmRender();return;}CM.ask='';
         var gone=[];
-        if(a[0]==='p'){var it2=W.compare.splice(+a.slice(1),1)[0];gone.push(it2.file);cmTouch('compare');}
+        if(/^cd/.test(a)){cdDelete(a.slice(2)).forEach(function(p){gone.push(p);});}
+        else if(a[0]==='p'){var it2=W.compare.splice(+a.slice(1),1)[0];gone.push(it2.file);cmTouch('compare');}
         else if(/^km/.test(a)){var m=W.concept.mats.splice(+a.slice(2),1)[0];gone.push(m[2]);cmTouch('concept');}
         else if(/^oc/.test(a)){W.onepick.cats.splice(+a.slice(2),1);CM.opOpen=-1;cmTouch('onepick');}
         else if(/^oa/.test(a)){var oa=W.onepicks.splice(+a.slice(2),1)[0];gone.push(oa.guide);cmTouch('onepick');}
@@ -2711,7 +2863,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         else if(/^hf/.test(a)){var mm=a.match(/^hf([vo]\d+):(\d+)$/),hl2=cmLoc(mm[1]),F2=hypoFiles(hl2.row);gone.push(F2.splice(+mm[2],1)[0]);hypoSetFiles(hl2.row,F2);cmTouch(k);}
         else{var lc=cmLoc(a);lc.list.splice(lc.i,1);gone.push(lc.row[CM_FI[k]]);if(k==='hypo')hypoFiles(lc.row).forEach(function(f){gone.push(f);});cmTouch(k);}
         /* 다른 곳(지난 컨셉 등)에서 같은 파일을 쓰면 파일은 남긴다 */
-        var used=JSON.stringify([W.news,W.awards,W.hypo,W.mats,W.notices,W.off,W.compare,W.concept,W.concepts,W.onepick,W.onepicks]);
+        var used=JSON.stringify([W.news,W.awards,W.hypo,W.mats,W.notices,W.off,W.compare,W.concept,W.concepts,W.onepick,W.onepicks,W.cmpdata]);
         gone.forEach(function(p){if(p&&cmIsRepo(p)&&used.indexOf(JSON.stringify(p))<0)CM.del.push(p);});
         cmRender();return;}
     });
@@ -2754,11 +2906,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var base=[['news',menuName('news','보험사 소식지')],['notice','본사 공지'],['award',menuName('award','시상 공지')],['concept',menuName('concept','이달의 컨셉')],['hypo',menuName('hypo','대표 상품 가설')],['mats','교육 자료'],['onepick','이번 달의 원픽']];
     var bl=Object.keys(BOARD).map(function(b){return [b,BOARD[b]];});
     KINDS.length=0;base.concat(bl).forEach(function(x){KINDS.push(x);});
-    CM_TABS.length=0;[['compare',menuName('compare','상품 비교')],['onepick','이번 달의 원픽']].concat(base.filter(function(x){return x[0]==='hypo'||x[0]==='concept';}),base.filter(function(x){return x[0]!=='hypo'&&x[0]!=='concept'&&x[0]!=='onepick';}),bl).forEach(function(x){CM_TABS.push(x);});
+    CM_TABS.length=0;[['compare',menuName('compare','상품 비교')],['onepick','이번 달의 원픽'],['cmpdata','비교자료 업로드']].concat(base.filter(function(x){return x[0]==='hypo'||x[0]==='concept';}),base.filter(function(x){return x[0]!=='hypo'&&x[0]!=='concept'&&x[0]!=='onepick';}),bl).forEach(function(x){CM_TABS.push(x);});
     bl.forEach(function(x){var b=x[0];CM_KEY[b]='board:'+b;CM_COLS[b]=[[0,'날짜','96px'],[1,'제목','w'],[2,'설명','a']];CM_FI[b]=3;CM_LEN[b]=4;CM_HELP[b]='「'+x[1]+'」 메뉴에 보이는 자료입니다.';
       if(!PAGES[b])PAGES[b]=function(){var L=((SITE&&SITE.boards)||{})[b]||[];
         return head(menuGroup(b)||'자료',esc(BOARD[b]||b),'관리자가 올린 자료입니다. 제목을 누르면 열립니다.')+'<div class="panel"><ul class="list">'+(L.length?L.map(function(r){return '<li><span class="dt">'+esc(r[0]||'')+'</span><span class="t">'+fileA(r[3],'<b>'+esc(r[1]||'')+'</b>')+(r[2]?'<br><span class="note">'+esc(r[2])+'</span>':'')+'</span></li>';}).join(''):'<li class="note">아직 올라온 자료가 없습니다.</li>')+'</ul></div>';};});
-    if(KINDS.every(function(k){return k[0]!==CM.tab;})&&CM.tab!=='compare')CM.tab='compare';
+    if(KINDS.every(function(k){return k[0]!==CM.tab;})&&CM.tab!=='compare'&&CM.tab!=='cmpdata')CM.tab='compare';
   }
   menuSync();
   /* 상품 비교 화면 (FC): 목록 → 누르면 포털 안에서 바로 열림 */
@@ -2767,7 +2919,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(x&&x.kind==='tool'){
       var h=head('영업 도구 · 상품 비교',esc(x.title),esc(x.desc||''));
       h+='<div class="nchips cmp-tabs">'+cmpOn().filter(function(t){return t.kind==='tool';}).map(function(t){return '<button type="button" class="tg'+(t.id===x.id?' on':'')+'" data-cmpo="'+esc(t.id)+'">'+esc(t.title)+'</button>';}).join('')+'</div>';
-      h+='<div class="ai-adv-bar"><button class="btn sm ghost" type="button" data-cmpo="">◂ 비교 목록</button><button class="btn sm" type="button" id="cmpFull">크게 보기 (전체 화면)</button><a class="btn sm ghost pc-only" style="text-decoration:none" target="_blank" rel="noopener" data-cmpnew="1" href="'+cmpSrc(x)+'">새 창으로 열기 ↗</a></div>';
+      var CR=((SITE&&SITE.cmpdata)||{})[x.id];
+      h+='<div class="ai-adv-bar"><button class="btn sm ghost" type="button" data-cmpo="">◂ 비교 목록</button><button class="btn sm" type="button" id="cmpFull">크게 보기 (전체 화면)</button>'+(CR&&CR.file?'<button class="btn sm ghost" type="button" data-cmpsrc="'+esc(x.id)+'">📎 이번 달 원본 자료'+(CR.month?' ('+esc(CR.month)+')':'')+'</button>':'')+'<a class="btn sm ghost pc-only" style="text-decoration:none" target="_blank" rel="noopener" data-cmpnew="1" href="'+cmpSrc(x)+'">새 창으로 열기 ↗</a></div>';
       return h+'<button class="adv-close" id="cmpClose" type="button" hidden>✕ 작게 보기</button><iframe class="ai-adv cmp-fr" src="'+cmpSrc(x)+'" title="'+esc(x.title)+'"></iframe>';
     }
     CMP.open='';
@@ -2775,6 +2928,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h2+='<div class="grid">'+L.map(function(t,i){return '<a class="tile" href="#" data-cmpo="'+esc(t.id)+'"><span class="no">'+pad2(i+1)+(t.kind==='file'?' · 자료':'')+'</span><h3>'+esc(t.title)+'</h3><span class="d">'+esc(t.desc||'')+'</span><span class="go">'+(t.kind==='tool'?'열기 ›':'자료 보기 ›')+'</span></a>';}).join('')+'</div>';
     return h2+(L.length?'':'<p class="note">관리자가 아직 비교 도구를 켜 두지 않았습니다.</p>')+(me&&me.role==='admin'?'<p class="note">목록·이름·파일은 <button class="btn sm ghost" type="button" data-go="cadmin">관리자 › 자료 관리 › 상품 비교</button>에서 바꿉니다.</p>':'');
   }
+  document.addEventListener('click',function(e){
+    var s=e.target.closest&&e.target.closest('[data-cmpsrc]');if(!s)return;e.preventDefault();
+    var R=((SITE&&SITE.cmpdata)||{})[s.getAttribute('data-cmpsrc')];if(R&&R.file)openMat([(R.file.match(/\.([a-z0-9]+)$/i)||['',''])[1].toUpperCase(),R.title||'이번 달 원본 자료','','',R.file]);
+  });
   document.addEventListener('click',function(e){
     var b=e.target.closest&&e.target.closest('[data-cmpo]');if(!b)return;e.preventDefault();
     var id=b.getAttribute('data-cmpo');if(!id){CMP.open='';pBack=true;try{go('compare');}finally{pBack=false;}return;}
