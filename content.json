@@ -2676,5 +2676,6 @@
    "src": "news/2026-10/라이나생명_202610_월간_haj0o.pdf"
   }
  ],
- "aiProxy": "https://fc-ai.bluewind1124.workers.dev"
+ "aiProxy": "https://fc-ai.bluewind1124.workers.dev",
+ "aiProxyFor": "admin"
 }

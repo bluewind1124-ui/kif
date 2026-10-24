@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-24.6">
+<meta name="kif-build" content="2026-10-24.7">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1842,8 +1842,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return c;
   }
   /* 콘텐츠 관리 칸: 고친 칸만 모아 두었다가 「저장」을 누르면 그 항목만 content.json에 바로 올린다(다른 항목은 서버 내용 그대로) */
-  var CMS_F={cNotice:'notices',cNews:'news',cAward:'awards',cHypo:'hypo',cMats:'mats',cLect:'lect',kMonth:'concept',kTitle:'concept',kTarget:'concept',kProduct:'concept',kDesc:'concept',kSteps:'concept',kMats:'concept',bTitle:'banner',bSub:'banner',mProxy:'aiProxy',mRules:'aiRules',mClaude:'aiModels',mOpenai:'aiModels',mGemini:'aiModels',cOpts:'opts'};
-  var CMS_N={notices:'본사 공지',news:'보험사 소식지',awards:'시상 공지',hypo:'대표 상품 가설',mats:'교육 자료',lect:'교육센터 강의',concept:'이달의 컨셉',banner:'상품 개정 일정 배너',aiProxy:'회사 AI 주소',aiRules:'AI 보장분석 규칙',aiModels:'AI 기본 모델',opts:'분석 옵션'};
+  var CMS_F={cNotice:'notices',cNews:'news',cAward:'awards',cHypo:'hypo',cMats:'mats',cLect:'lect',kMonth:'concept',kTitle:'concept',kTarget:'concept',kProduct:'concept',kDesc:'concept',kSteps:'concept',kMats:'concept',bTitle:'banner',bSub:'banner',mProxy:'aiProxy',mProxyFor:'aiProxy',mRules:'aiRules',mClaude:'aiModels',mOpenai:'aiModels',mGemini:'aiModels',cOpts:'opts'};
+  var CMS_N={notices:'본사 공지',news:'보험사 소식지',awards:'시상 공지',hypo:'대표 상품 가설',mats:'교육 자료',lect:'교육센터 강의',concept:'이달의 컨셉',banner:'상품 개정 일정 배너',aiProxy:'회사 AI 주소·쓸 수 있는 사람',aiRules:'AI 보장분석 규칙',aiModels:'AI 기본 모델',opts:'분석 옵션'};
   var CMS_D={};
   function cmsLabel(){return '관리자 페이지: '+Object.keys(CMS_D).map(function(k){return CMS_N[k]||k;}).join(', ');}
   async function cmsPublish(){
@@ -1854,6 +1854,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
           if(k==='concept'){c.concept=Object.assign({},c.concept||{},n.concept);}
           else if(k==='opts'){if(n.opts){c.opts=n.opts;c.optsVer=n.optsVer;}}
           else if(k==='lect'){c.lect=n.lect;c.lectAt=n.lectAt;}
+          else if(k==='aiProxy'){c.aiProxy=n.aiProxy;c.aiProxyFor=n.aiProxyFor;}
           else if(n[k]===undefined)delete c[k];else c[k]=n[k];});},[],[],'관리자 페이지: '+keys.map(function(k){return CMS_N[k]||k;}).join(', '));
       CMS_D={};applyContent(cur,false);KS.done(lab,cur);msg.textContent='✓ 저장 완료 · 모든 FC 화면에는 1~2분 뒤 보입니다.';return true;}
     catch(e){KS.fail(lab,e);msg.textContent='⚠ 저장하지 못했습니다: '+(e.message||e);return false;}
