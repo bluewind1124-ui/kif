@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-24.21">
+<meta name="kif-build" content="2026-10-24.22">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -4109,7 +4109,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+='<div class="ai-steps" role="tablist">'+steps.map(function(s){return '<button role="tab" aria-selected="'+(st.step===s[0])+'" data-a="step" data-s="'+s[0]+'" class="'+(st.step===s[0]?'on':'')+'"><i>'+s[2]+'</i>'+s[1]+'</button>';}).join('')+'</div>';
     /* 단계마다 이전 단계로 돌아가는 버튼(위·아래) */
     var SN={0:'고객 목록',1:'고객정보',2:'기계약 자료',3:'1단계 기계약 분석',8:'2단계 조정·신계약',4:'2단계 Before/After',5:'옵션 관리',6:'참고자료'},ORD=[0,1,2,3,8,4],pv=isSide(st.step)?(st.from5==null?3:st.from5):ORD[Math.max(0,ORD.indexOf(st.step)-1)];
-    var back=st.step>0?'<div class="ai-back"><button class="btn sm ghost" data-a="step" data-s="'+pv+'">◂ 뒤로: '+SN[pv]+'</button></div>':'';
+    var back=st.step>0?'<div class="ai-back" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn sm ghost" data-a="step" data-s="'+pv+'">◂ 뒤로: '+SN[pv]+'</button>'+(c&&window.KIFARC?'<select class="in" data-arcpick aria-label="이 고객의 지난 분석본" style="max-width:380px;flex:1 1 220px;padding:5px 8px;font-size:13px"><option value="">📂 지난 분석본 찾는 중…</option></select>':'')+'</div>':'';
     h+=back;
     if(st.step===0)h+=viewList();
     else if(st.step===5)h+=viewOpts();
@@ -4119,7 +4119,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     else if(st.step===2)h+=viewDocs(c,'기존');
     else h+=[0,viewInfo,0,viewAnalysis1,viewReport][st.step](c);
     h+=back+'</section></div>';
-    root.innerHTML=h;syncNote();
+    root.innerHTML=h;syncNote();arcPick(c);
     if(st.arcNext&&c&&(st.step===3||st.step===4)){st.arcNext=0;arcBasic(c,true);}
   }
   function viewList(){
@@ -5246,11 +5246,25 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   function rptCss(){var s='';document.querySelectorAll('style').forEach(function(x){s+=x.textContent;});return s;}
   /* 내 자료함에 지금 화면(1단계 리포트 또는 2단계 제안서)을 보관한다 — 인쇄·PDF·HTML 저장·AI 결과·「자료함에 보관」 때 */
+  /* 「뒤로」 옆 칸: 이 고객의 지난 분석본(내 자료함)을 골라 바로 본다 */
+  function arcPick(c){
+    var S=document.querySelectorAll('[data-arcpick]');if(!S.length||!c||!window.KIFARC)return;
+    KIFARC.list().then(function(L){
+      L=L.filter(function(x){return x.src==='basic'&&x.cid===String(c.id);});
+      var d=function(t){var x=new Date(t);return (x.getMonth()+1)+'/'+x.getDate()+' '+String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0');};
+      var o=L.length?'<option value="">📂 지난 분석본 '+L.length+'개 — 골라서 보기</option>'+L.map(function(x){return '<option value="'+esc(x.id)+'">'+esc(d(x.at)+' · '+x.title)+'</option>';}).join('')+'<option value="__box">→ 내 자료함 전체 보기</option>'
+        :'<option value="">📂 이 고객의 지난 분석본 없음 (인쇄·PDF·「자료함에 보관」 때 남습니다)</option>';
+      Array.prototype.forEach.call(S,function(sel){sel.innerHTML=o;sel.disabled=!L.length;
+        sel.onchange=function(){var v=sel.value;sel.value='';if(!v)return;
+          if(v==='__box'){var g=document.querySelector('[data-go="arcbox"]');if(g)g.click();return;}
+          KIFARC.open(v).catch(function(e){toast(e.message||'열지 못했습니다');});};});
+    }).catch(function(){});
+  }
   function arcBasic(c,say){
     var el=document.getElementById('rpt');if(!el||!c||!window.KIFARC||(st.step!==3&&st.step!==4))return;
     var o=opt(c),kind=st.step===3?'1단계 기계약 분석 리포트':'2단계 Before/After 제안서';
     KIFARC.add({src:'basic',cid:c.id,cname:c.name,kind:kind,title:kind+(o&&o.title?' · '+o.title:''),html:el.innerHTML,wrap:'rpt',css:rptCss()})
-      .then(function(r){if(say&&r)toast(r.dup?'자료함의 최신 보관본과 같아 시간만 고쳤습니다.':'내 자료함에 보관했습니다.');})
+      .then(function(r){arcPick(c);if(say&&r)toast(r.dup?'자료함의 최신 보관본과 같아 시간만 고쳤습니다.':'내 자료함에 보관했습니다.');})
       .catch(function(e){if(say)toast('보관하지 못했습니다: '+(e&&e.message||'저장 공간 부족'));});
   }
   function saveHtml(c){
