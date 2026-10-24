@@ -1628,9 +1628,9 @@ const AGE_UNIT='세', MAN='만원', MM='만원/월', PCT='%', YR='년';
 const PLAN_FORMS = {
   coverage:{ name:'보장설계', desc:'사망·진단·수술·간병·자녀 보장', sections:[
     {t:'고객 기본', f:[
-      {k:'age',l:'나이',u:AGE_UNIT}, {k:'sex',l:'성별',t:'sel',o:['남','여']}, {k:'job',l:'직업',t:'text',ph:'회사원(과장)'}, {k:'smoke',l:'흡연',t:'sel',o:['비흡연','흡연']},
-      {k:'history',l:'최근 5년 병력',t:'sel',o:['입원·수술·중대질병 없음','있음']}, {k:'historyMemo',l:'병력 내용',t:'text',s:2,ph:'있음일 때 병명·시기'}, {k:'earner',l:'소득 구조',t:'sel',o:['외벌이','맞벌이']},
-      {k:'spouse',l:'배우자',t:'text',ph:'동갑, 전업주부'}, {k:'kids',l:'자녀 나이',t:'text',ph:'8, 10',hint:'쉼표로 구분'}, {k:'income',l:'연소득',u:MAN}, {k:'incomeM',l:'월소득',u:MM,hint:'비우면 연소득÷12'}]},
+      {k:'age',l:'나이',u:AGE_UNIT}, {k:'sex',l:'성별',t:'sel',o:['남','여']}, {k:'job',l:'직업',t:'text',ph:'간호사'}, {k:'smoke',l:'흡연',t:'sel',o:['비흡연','흡연']},
+      {k:'history',l:'최근 5년 병력',t:'sel',o:['없음','있음']}, {k:'historyMemo',l:'병력 내용',t:'text',s:2,ph:'있음일 때 병명·시기'}, {k:'earner',l:'소득 구조',t:'sel',o:['외벌이','맞벌이']},
+      {k:'spouse',l:'배우자',t:'text',ph:'39세, 회사원'}, {k:'kids',l:'자녀 나이',t:'text',ph:'5, 9',hint:'쉼표로 구분'}, {k:'income',l:'연소득',u:MAN}, {k:'incomeM',l:'월소득',u:MM,hint:'비우면 연소득÷12'}]},
     {t:'사망보장 필요자금', sub:'유족이 필요한 돈 − 바로 쓸 수 있는 돈', f:[
       {k:'survMonthly',l:'유족 월 생활비',u:MM}, {k:'survYears',l:'부양 기간',u:YR}, {k:'edu',l:'자녀 교육비 총액',u:MAN}, {k:'emergency',l:'긴급 예비자금',u:MAN},
       {k:'mortgage',l:'주택담보대출 잔액',u:MAN}, {k:'mortgageYears',l:'대출 잔여기간',u:YR}, {k:'liquid',l:'가용 유동자산',u:MAN,hint:'즉시 현금화 가능'}, {k:'exDeath',l:'기존 사망보장',u:MAN}]},
@@ -1648,10 +1648,10 @@ const PLAN_FORMS = {
       {k:'careMonthly',l:'월 간병비',u:MM}, {k:'careYears',l:'간병 예상기간',u:YR}, {k:'careSelf',l:'본인부담률',u:PCT}, {k:'exCare',l:'기존 간병보장',u:MAN}]},
     {t:'자녀 보장', f:[
       {k:'kidCI',l:'자녀 진단·치료비 가정',u:MAN,hint:'자녀 1인당'}, {k:'kidMemo',l:'자녀 보험 현황',t:'text',s:3,ph:'예) 어린이보험 미가입'}]},
-    {t:'계산 가정', sub:'고객 확정 시 교체', f:[
+    {t:'계산 가정', sub:'상담 때 고객과 정할 값', f:[
       {k:'disc',l:'할인율',u:PCT}, {k:'infl',l:'물가상승률',u:PCT}]},
     {t:'설계 목표', f:[
-      {k:'goal',l:'목표 · 추가 요청',t:'area',s:4,ph:'예) 사망·진단·수술·입원·간병·자녀 보장까지 포함한 종합 보장설계 제안서'}]}
+      {k:'goal',l:'목표 · 추가 요청',t:'area',s:4,ph:'예) 한 사람 소득이 끊겨도 버틸 수 있게, 진단비·간병까지 보강'}]}
   ]},
   pension:{ name:'연금설계', desc:'은퇴 부족자금·3층연금·크레바스', sections:[
     {t:'고객 기본', f:[
@@ -1665,7 +1665,7 @@ const PLAN_FORMS = {
     {t:'3층 · 개인연금', f:[
       {k:'psBal',l:'연금저축 잔액',u:MAN}, {k:'psMonthly',l:'연금저축 월 납입',u:MM,hint:'신규 포함'}, {k:'irpBal',l:'IRP 잔액',u:MAN}, {k:'irpMonthly',l:'IRP 월 납입',u:MM},
       {k:'extraMonthly',l:'기타 노후 저축',u:MM,hint:'위에 없는 추가 저축'}]},
-    {t:'은퇴설계 기준', sub:'고객 확정 시 교체', f:[
+    {t:'노후 계산 조건', sub:'상담 때 고객과 정할 값', f:[
       {k:'expense',l:'은퇴 후 희망 생활비',u:MM,hint:'현재가치'}, {k:'raAcc',l:'적립기 수익률',u:PCT}, {k:'raPay',l:'수령기 수익률',u:PCT}, {k:'infl',l:'물가상승률',u:PCT}, {k:'disc',l:'할인율',u:PCT}]},
     {t:'인상률 가정', sub:'고객과 확정하는 값', f:[
       {k:'salaryGrowth',l:'급여 인상률',u:PCT,hint:'퇴직연금(DC) 납입에 그대로 반영'}, {k:'saveRatio',l:'저축 반영 비율',u:PCT,hint:'급여 인상분 중 저축으로 가는 몫'},
@@ -1678,57 +1678,57 @@ const PLAN_FORMS = {
       {k:'hpMethod',l:'지급 방식',t:'sel',o:['종신 정액형','종신 정기증가형','종신 초기증액형']},
       {k:'hpMonthly',l:'월지급금 (공사 조회값)',u:MM,hint:'비우면 참고 추정값으로 계산'}]},
     {t:'요청 사항', f:[
-      {k:'reqGap',l:'물가 반영 은퇴 부족자금',t:'chk'}, {k:'req3',l:'3층연금 보강안',t:'chk'}, {k:'reqCrev',l:'은퇴 크레바스 대응',t:'chk'}, {k:'reqHouse',l:'주택연금 활용',t:'chk'},
-      {k:'memo',l:'추가 요청',t:'area',s:4,ph:'예) 배우자 국민연금 임의가입 정성 제안'}]}
+      {k:'reqGap',l:'물가를 감안한 노후 부족액',t:'chk'}, {k:'req3',l:'연금 층별로 채울 방법',t:'chk'}, {k:'reqCrev',l:'연금 받기 전 소득 공백 메우기',t:'chk'}, {k:'reqHouse',l:'집으로 노후 소득 만들기 (주택연금)',t:'chk'},
+      {k:'memo',l:'추가 요청',t:'area',s:4,ph:'예) 퇴직 후 국민연금까지 비는 기간 대비'}]}
   ]},
   asset:{ name:'자산설계', desc:'자산배분·은퇴자금·절세계좌', sections:[
     {t:'고객 기본', f:[
-      {k:'age',l:'나이',u:AGE_UNIT}, {k:'sex',l:'성별',t:'sel',o:['남','여']}, {k:'job',l:'직업',t:'text',ph:'회사원(부장)'}, {k:'dual',l:'소득 구조',t:'sel',o:['맞벌이','외벌이']},
-      {k:'salary',l:'본인 총급여',u:MAN}, {k:'spouseIncome',l:'배우자 소득',u:MAN}, {k:'otherIncome',l:'본인 기타 종합소득',u:MAN,hint:'금융소득 외'}, {k:'kids',l:'자녀',t:'text',ph:'1명(대학생)'}]},
+      {k:'age',l:'나이',u:AGE_UNIT}, {k:'sex',l:'성별',t:'sel',o:['남','여']}, {k:'job',l:'직업',t:'text',ph:'자영업(카페 운영)'}, {k:'dual',l:'소득 구조',t:'sel',o:['맞벌이','외벌이']},
+      {k:'salary',l:'본인 총급여',u:MAN}, {k:'spouseIncome',l:'배우자 소득',u:MAN}, {k:'otherIncome',l:'본인 기타 종합소득',u:MAN,hint:'금융소득 외'}, {k:'kids',l:'자녀',t:'text',ph:'2명(중·고등학생)'}]},
     {t:'금융자산', f:[
       {k:'finTotal',l:'금융자산 총액',u:MAN}, {k:'pStock',l:'주식 비중',u:PCT}, {k:'pBond',l:'채권 비중',u:PCT}, {k:'pCash',l:'현금 비중',u:PCT},
       {k:'pAlt',l:'대체(리츠 등) 비중',u:PCT}, {k:'goalAmt',l:'단기 목표자금',u:MAN}, {k:'goalYears',l:'목표 시기',u:'년 내'}, {k:'goalIncl',l:'목표자금이 금융자산에 포함됨',t:'chk'},
       {k:'emergency',l:'비상자금',u:MAN}, {k:'emergSep',l:'비상자금은 금융자산과 별도',t:'chk'}]},
     {t:'부동산 · 부채', f:[
       {k:'house',l:'주택 시가',u:MAN}, {k:'mortgage',l:'주택담보대출',u:MAN}, {k:'mortYears',l:'잔여기간',u:YR}, {k:'mortRate',l:'금리',u:PCT}, {k:'mortMonthly',l:'월 원리금',u:MM,hint:'비우면 자동 계산'}]},
-    {t:'연금 · 노후 준비', f:[
+    {t:'이미 준비된 연금', f:[
       {k:'npSelf',l:'본인 국민연금',u:MM}, {k:'npStart',l:'본인 개시',u:AGE_UNIT}, {k:'npSpouse',l:'배우자 국민연금',u:MM}, {k:'npSpouseStart',l:'배우자 개시',u:AGE_UNIT},
       {k:'dcBal',l:'퇴직연금(DC) 적립금',u:MAN}, {k:'dcYear',l:'회사 부담금',u:'만원/년'}, {k:'psBal',l:'개인연금 잔액',u:MAN}]},
-    {t:'현금흐름 · 목표', f:[
+    {t:'매달 돈의 흐름 · 은퇴 목표', f:[
       {k:'retireAge',l:'은퇴 목표 나이',u:AGE_UNIT}, {k:'expenseRetire',l:'은퇴 후 희망 생활비',u:MM}, {k:'fixedMonthly',l:'월 고정 생활비',u:MM}, {k:'saveMonthly',l:'월 저축여력',u:MM,hint:'대출 상환 후'},
       {k:'profile',l:'투자성향',t:'sel',o:['안정형','안정추구형','위험중립형','적극투자형','공격투자형']}, {k:'lifeAge',l:'기대수명',u:AGE_UNIT}]},
     {t:'인상률 가정', sub:'고객과 확정하는 값', f:[
       {k:'salaryGrowth',l:'급여 인상률',u:PCT,hint:'회사 부담금(DC)에 그대로 반영'}, {k:'saveRatio',l:'저축 반영 비율',u:PCT,hint:'급여 인상분 중 저축으로 가는 몫'},
       {k:'reGrowth',l:'부동산 상승률',u:PCT}, {k:'npGrowth',l:'국민연금 인상률',u:PCT,hint:'비우면 물가상승률'}]},
-    {t:'금융소득 · 절세계좌', sub:'고객 확정 시 교체', f:[
-      {k:'interest',l:'연 이자소득',u:MAN}, {k:'dividend',l:'연 배당소득',u:MAN}, {k:'personalDeduct',l:'인적공제',u:MAN}, {k:'accOpen',l:'보유 계좌',t:'text',ph:'ISA·연금저축·IRP 미개설'},
+    {t:'이자·배당 · 세금 혜택 계좌', sub:'상담 때 고객과 정할 값', f:[
+      {k:'interest',l:'연 이자소득',u:MAN}, {k:'dividend',l:'연 배당소득',u:MAN}, {k:'personalDeduct',l:'인적공제',u:MAN}, {k:'accOpen',l:'보유 계좌',t:'text',ph:'연금저축만 보유'},
       {k:'newPS',l:'연금저축 신규 월 납입',u:MM}, {k:'newIRP',l:'IRP 신규 월 납입',u:MM}, {k:'newISA',l:'ISA 신규 월 납입',u:MM}, {k:'years',l:'운용기간',u:YR},
       {k:'ret',l:'기대수익률',u:PCT}, {k:'infl',l:'물가상승률',u:PCT}, {k:'disc',l:'할인율',u:PCT}]},
     {t:'요청 사항', f:[
-      {k:'reqAlloc',l:'자산배분 재설계',t:'chk'}, {k:'reqRetire',l:'은퇴자금 적정성 점검',t:'chk'}, {k:'reqTax',l:'금융소득종합과세 대비',t:'chk'}, {k:'reqAcc',l:'절세계좌 효과 수치화',t:'chk'},
+      {k:'reqAlloc',l:'자산 나눠 담기 다시 짜기',t:'chk'}, {k:'reqRetire',l:'노후 자금이 충분한지 확인',t:'chk'}, {k:'reqTax',l:'이자·배당 세금 줄이기',t:'chk'}, {k:'reqAcc',l:'세금 혜택 계좌 효과를 숫자로',t:'chk'},
       {k:'memo',l:'추가 요청',t:'area',s:4}]}
   ]}
 };
 const PLAN_SAMPLES = {
-  coverage:{age:40,sex:'남',job:'회사원(과장)',smoke:'비흡연',history:'입원·수술·중대질병 없음',earner:'외벌이',spouse:'동갑, 전업주부',kids:'8, 10',income:6000,incomeM:500,
-    survMonthly:300,survYears:30,edu:12000,emergency:3000,mortgage:20000,mortgageYears:20,liquid:5000,exDeath:5000,
-    exCancer:1000,exBrain:0,exHeart:0,silson:'4세대',budgetMin:20,budgetMax:50,payYears:20,wlPremium:35,termAge:60,termPremium:8,
-    ciCost:3000,lossRate:60,recoverMonths:12,medYear:500,tgCancer:3000,tgBrain:2000,tgHeart:2000,hospDay:5,surgQual:true,hospQual:true,
-    careMonthly:150,careYears:5,careSelf:100,exCare:0,kidCI:2000,disc:3.0,infl:2.5,
-    goal:'사망보장 갭 산출 후 종신보험으로 보강(월 보험료 예산 20~50만 원, 납입기간 20년). 사망·진단·수술·입원·간병·자녀 보장까지 포함한 종합 보장설계 제안서.'},
-  pension:{age:40,sex:'남',retireAge:60,lifeAge:90,incomeM:500,npSelf:100,npStart:65,npSpouseStatus:'미가입 · 임의가입 검토',npSpouse:0,npSpouseStart:65,
-    rpType:'DC',rpBal:0,rpMonthly:30,retireTax:500,psBal:0,psMonthly:30,irpBal:0,irpMonthly:20,extraMonthly:0,
-    expense:300,raAcc:5.0,raPay:3.5,infl:2.5,disc:3.0,salaryGrowth:3,saveRatio:50,npGrowth:'',house:50000,hpUse:true,hpPublic:'',hpOwner:'1주택',hpType:'일반주택 (아파트·단독·연립)',hpStart:65,hpAgeGap:0,hpMethod:'종신 정액형',hpMonthly:'',
-    reqGap:true,req3:true,reqCrev:true,reqHouse:true,memo:'배우자 국민연금 임의가입 검토(정성 제안). 연금저축·IRP 신규 가입 검토.',
+  coverage:{age:37,sex:'여',job:'간호사',smoke:'비흡연',history:'없음',earner:'맞벌이',spouse:'39세, 회사원',kids:'5',income:5200,incomeM:430,
+    survMonthly:250,survYears:25,edu:9000,emergency:2000,mortgage:15000,mortgageYears:25,liquid:3500,exDeath:3000,
+    exCancer:2000,exBrain:500,exHeart:500,silson:'3세대',budgetMin:15,budgetMax:35,payYears:20,wlPremium:28,termAge:65,termPremium:6,
+    ciCost:3500,lossRate:50,recoverMonths:10,medYear:400,tgCancer:5000,tgBrain:3000,tgHeart:3000,hospDay:3,surgQual:true,hospQual:false,
+    careMonthly:180,careYears:4,careSelf:80,exCare:0,kidCI:3000,disc:2.8,infl:2.3,kidMemo:'태아보험에서 이어진 어린이보험 1건',
+    goal:'맞벌이라 한 사람 소득이 끊겨도 버틸 수 있게. 정기보험으로 사망보장을 채우고, 진단비·간병을 보강(월 15~35만 원, 20년납).'},
+  pension:{age:45,sex:'여',retireAge:62,lifeAge:92,incomeM:420,npSelf:85,npStart:65,npSpouseStatus:'가입',npSpouse:110,npSpouseStart:65,
+    rpType:'DC',rpBal:6000,rpMonthly:25,retireTax:300,psBal:1500,psMonthly:25,irpBal:800,irpMonthly:15,extraMonthly:10,
+    expense:280,raAcc:4.5,raPay:3.0,infl:2.3,disc:2.8,salaryGrowth:2.5,saveRatio:40,npGrowth:'',house:42000,hpUse:true,hpPublic:'',hpOwner:'1주택',hpType:'일반주택 (아파트·단독·연립)',hpStart:67,hpAgeGap:2,hpMethod:'종신 초기증액형',hpMonthly:'',
+    reqGap:true,req3:true,reqCrev:true,reqHouse:true,memo:'퇴직 후 국민연금까지 3년 비는 기간이 걱정. 연금저축 납입을 늘릴지 함께 판단.',
     products:[
-      {type:'공시이율형',insurer:'예시생명',product:'(예시) 행복연금보험',currency:'KRW',monthly:50,payYears:10,sumInsured:50,issueAge:40,startAge:65,payout:'20년',rate:2.9,minRate:1.0,fee:0,gmab:0,expense:7,acq:50,fxIssue:'',fxPayout:'',designMonthly:'',designTotal:'',refund:'',memo:'예시 데이터 — 실제 설계서 값으로 바꾸세요'},
-      {type:'달러연금',insurer:'예시생명',product:'(예시) 달러연금보험',currency:'USD',monthly:300,payYears:10,sumInsured:300,issueAge:40,startAge:65,payout:'종신',rate:3.5,minRate:1.0,fee:0,gmab:0,expense:7,acq:50,fxIssue:1380,fxPayout:1380,designMonthly:'',designTotal:'',refund:'',memo:'예시 데이터 — 환율에 따라 원화 연금이 달라집니다'}]},
-  asset:{age:50,sex:'남',job:'회사원(부장)',dual:'맞벌이',salary:8000,spouseIncome:6000,otherIncome:0,kids:'1명(대학생)',
-    finTotal:40000,pStock:50,pBond:10,pCash:35,pAlt:5,goalAmt:8000,goalYears:3,goalIncl:true,emergency:5000,emergSep:true,
-    house:90000,mortgage:25000,mortYears:18,mortRate:4.0,mortMonthly:163,npSelf:110,npStart:65,npSpouse:70,npSpouseStart:65,dcBal:12000,dcYear:700,psBal:0,
-    retireAge:60,expenseRetire:400,fixedMonthly:350,saveMonthly:200,profile:'위험중립형',lifeAge:90,salaryGrowth:3,saveRatio:50,reGrowth:2,npGrowth:'',
-    interest:600,dividend:400,personalDeduct:150,accOpen:'ISA·연금저축·IRP 미개설',newPS:50,newIRP:25,newISA:0,years:10,ret:4.5,infl:2.5,disc:3.0,
-    reqAlloc:true,reqRetire:true,reqTax:true,reqAcc:true,memo:'부동산 비중이 커 유동성 우려.'}
+      {type:'공시이율형',insurer:'예시생명',product:'(예시) 행복연금보험',currency:'KRW',monthly:50,payYears:10,sumInsured:50,issueAge:45,startAge:65,payout:'20년',rate:2.9,minRate:1.0,fee:0,gmab:0,expense:7,acq:50,fxIssue:'',fxPayout:'',designMonthly:'',designTotal:'',refund:'',memo:'예시 데이터 — 실제 설계서 값으로 바꾸세요'},
+      {type:'달러연금',insurer:'예시생명',product:'(예시) 달러연금보험',currency:'USD',monthly:300,payYears:10,sumInsured:300,issueAge:45,startAge:65,payout:'종신',rate:3.5,minRate:1.0,fee:0,gmab:0,expense:7,acq:50,fxIssue:1380,fxPayout:1380,designMonthly:'',designTotal:'',refund:'',memo:'예시 데이터 — 환율에 따라 원화 연금이 달라집니다'}]},
+  asset:{age:47,sex:'여',job:'자영업(카페 운영)',dual:'외벌이',salary:7000,spouseIncome:0,otherIncome:1200,kids:'2명(중·고등학생)',
+    finTotal:30000,pStock:30,pBond:20,pCash:45,pAlt:5,goalAmt:6000,goalYears:5,goalIncl:true,emergency:3000,emergSep:true,
+    house:70000,mortgage:18000,mortYears:15,mortRate:3.8,mortMonthly:'',npSelf:80,npStart:65,npSpouse:0,npSpouseStart:65,dcBal:0,dcYear:0,psBal:2500,
+    retireAge:63,expenseRetire:350,fixedMonthly:380,saveMonthly:150,profile:'안정추구형',lifeAge:92,salaryGrowth:2,saveRatio:40,reGrowth:1.5,npGrowth:'',
+    interest:450,dividend:900,personalDeduct:600,accOpen:'연금저축만 보유',newPS:40,newIRP:20,newISA:50,years:10,ret:4.0,infl:2.3,disc:2.8,
+    reqAlloc:true,reqRetire:true,reqTax:true,reqAcc:true,memo:'가게 매출이 달마다 달라 비상자금을 넉넉히 두고 싶음. 배당 위주 투자는 유지 희망.'}
 };
 const PL_ICONS = {
   coverage:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="var(--accent-soft)"/><path d="M20 9l9 3.5v7c0 5.6-3.8 9.8-9 11.5-5.2-1.7-9-5.9-9-11.5v-7z" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 20l3 3 5-6" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -2008,7 +2008,7 @@ const PLAN_CALC = {
       out.push({l:m.diff>=0?'여유':'부족', v:wonMan(Math.abs(m.diff)), st:m.diff>=0?'ok':'bad'});
       if(m.npStart>m.R&&m.npStart<99) out.push({l:'소득 크레바스 ('+m.R+'~'+m.npStart+'세)', v:wonMan(m.rt.crev), st:'warn', s:'국민연금 개시 전 생활비 · 은퇴 시점 가치'});
     }
-    out.push({h:'금융소득 · 절세계좌 ('+TX().year+'년 세법 기준표)'});
+    out.push({h:'이자·배당 · 세금 혜택 계좌 ('+TX().year+'년 세법 기준표)'});
     out.push({l:'연 금융소득', v:wonMan(m.fin), st:m.fin>TX().finCut?'bad':m.fin>TX().finCut*.75?'warn':'ok', s:m.fin>TX().finCut?man(TX().finCut)+'원 초과분 종합과세':'종합과세 기준 '+man(TX().finCut)+'원까지 '+man(TX().finCut-m.fin)+'원 여유'});
     if(m.credBase) out.push({l:'연금계좌 세액공제 (연)', v:wonMan(m.credit), st:'ok', s:'공제대상 '+man(m.credBase)+'원(한도 '+man(TX().pensionLimit)+') × '+(m.credRate*100).toFixed(1)+'% · '+m.Y+'년 누적 '+man(m.credit*m.Y)+'원'});
     if(n(v.newISA)) out.push({l:'ISA 절세 효과 ('+m.Y+'년)', v:wonMan(m.isaSave), st:'ok', s:'운용수익 '+man(m.isaGain)+'원 · 일반과세 '+TX().withhold+'% 대비 · 일반형 비과세 '+man(TX().isaFree)+'원'});
@@ -2241,12 +2241,12 @@ const ppC = items => '<div class="pp-cards">'+items.map(c=>'<div class="pp-card"
 const ppTriad = (f,i,m) => '<div class="pp-triad"><div><span>사실</span><p>'+f+'</p></div><div><span>의미</span><p>'+i+'</p></div><div><span>영향</span><p>'+m+'</p></div></div>';
 const ppSteps = list => '<ol class="pp-steps">'+list.map((s,i)=>'<li><i>'+(i+1)+'순위</i><div><b>'+esc(s.t)+'</b>'+(s.d?'<p>'+s.d+'</p>':'')+'</div></li>').join('')+'</ol>';
 const ppNote = t => '<p class="pp-note">'+t+'</p>';
-const ppRefs = list => '<div class="pp-refs">'+list.map(r=>'<a class="pp-ref" href="'+r.url+'" target="_blank" rel="noopener"><b>'+esc(r.t)+'</b><span>'+esc(r.src)+'</span><em>열기 →</em></a>').join('')+'</div>'+ppNote('참고용 자료입니다. 링크는 국가법령정보센터 등의 현행 조문으로 연결되며, 개별 사안에 따라 결론이 달라질 수 있습니다.');
+const ppRefs = list => '<div class="pp-refs">'+list.map(r=>'<a class="pp-ref" href="'+r.url+'" target="_blank" rel="noopener"><b>'+esc(r.t)+'</b><span>'+esc(r.src)+'</span><em>열기 →</em></a>').join('')+'</div>'+ppNote('참고용 링크입니다. 국가법령정보센터 등의 현행 조문이 열리며, 고객 상황마다 적용 결과는 다를 수 있습니다.');
 const ppBar = (label, part, whole, st) => { const p=whole>0?Math.max(0,Math.min(100,part/whole*100)):0; return '<div class="pp-bar"><span>'+esc(label)+'</span><div><i class="'+(st||'')+'" style="width:'+p.toFixed(1)+'%"></i></div><em class="num">'+p.toFixed(0)+'%</em></div>'; };
 function ppSim(id, title, sliders, base, out){
   const state={}; sliders.forEach(s=>{ let v=n(base[s.k]); if(s.init!=null) v=s.init; state[s.k]=Math.min(s.max,Math.max(s.min,v)); });
   PP.sims[id]={state, sliders, base, out};
-  let h='<div class="pp-sim" data-sim="'+id+'"><div class="pp-sim-h">'+esc(title)+' <small>슬라이더를 움직이면 바로 다시 계산합니다</small></div><div class="pp-sliders">';
+  let h='<div class="pp-sim" data-sim="'+id+'"><div class="pp-sim-h">'+esc(title)+' <small>값을 끌어 보면 결과가 따라 바뀝니다</small></div><div class="pp-sliders">';
   sliders.forEach(s=>{ h+='<label class="pp-sl"><span>'+esc(s.l)+' <b data-lab="'+s.k+'">'+s.f(state[s.k])+'</b></span><input type="range" class="pp-range" data-sim="'+id+'" data-k="'+s.k+'" id="sim-'+id+'-'+s.k+'" min="'+s.min+'" max="'+s.max+'" step="'+s.step+'" value="'+state[s.k]+'"></label>'; });
   h+='</div><div class="pp-sim-out">'+out(Object.assign({},base,state),state)+'</div></div>';
   return h;
@@ -2278,8 +2278,8 @@ function covSections(v, cu){
   S.push({tag:'요약', title:'핵심 요약 — 필요한 보장과 지금 보장의 차이', lead:'세 영역 가운데 '+doms[0].nm+' 부족액이 '+wonMan(doms[0].g)+'으로 가장 큽니다.',
     html: ppK([{v:wonMan(m.gap),l:'사망보장 부족액',st:m.gap?'bad':'ok'},{v:wonMan(m.ciGap),l:'진단비 부족액',st:m.ciGap?'bad':'ok'},{v:wonMan(m.careGap),l:'간병 부족액 (현재가치)',st:m.careGap?'bad':'ok'}])
       + ppC([{t:'핵심 메시지',d:msg},{t:'설계 방향',d:'월 '+n(v.budgetMin)+'~'+n(v.budgetMax)+'만원 예산 안에서 '+doms.filter(d=>d.g>0).map(d=>d.nm).join(' → ')+' 순서로 부족분을 나눠 채웁니다.'}])
-      + ppSim('cov-ex','기존 사망보장에 따른 부족액',[{k:'exDeath',l:'기존 사망보장',min:0,max:Math.max(50000,Math.ceil((n(v.exDeath)+m.gap)/10000)*10000),step:1000,f:F_MAN}], v,
-        x=>{ const mm=covModel(x); return ppK([{v:eok(x.exDeath)+'원',l:'기존 사망보장'},{v:eok(mm.gap)+'원',l:'부족 보장액',st:mm.gap?'bad':'ok'}]); })});
+      + ppSim('cov-ex','사망보장 빈자리 계산기',[{k:'survMonthly',l:'남은 가족 월 생활비',min:50,max:800,step:10,f:F_MM},{k:'exDeath',l:'이미 있는 사망보장',min:0,max:Math.max(50000,Math.ceil((n(v.exDeath)+m.gap)/10000)*10000),step:1000,f:F_MAN}], v,
+        x=>{ const mm=covModel(x); return ppK([{v:eok(mm.total)+'원',l:'가족에게 필요한 돈'},{v:eok(mm.gap)+'원',l:'아직 비어 있는 보장',st:mm.gap?'bad':'ok'}]); })});
 
   const remain=n(v.mortgage)-n(v.exDeath);
   S.push({tag:'진단', title:'현재 진단 — 사망보장 점검', lead: remain>0 ? '사망보장이 대출 잔액에도 미치지 못해, 유고 시 빚과 생활비 부담이 가족에게 옮겨 가는 구조입니다.' : '대출은 사망보장으로 정리되지만 유족 생활비와 교육비가 비어 있습니다.',
@@ -2297,7 +2297,7 @@ function covSections(v, cu){
   S.push({tag:'산출', title:'필요 사망보장액 산출', lead:'생활비·교육비·대출·예비자금을 더하고, 바로 쓸 수 있는 자산과 기존 보장을 빼면 부족분은 '+wonMan(m.gap)+'입니다.',
     html: ppT(['항목','금액'],[['유족 생활비 (현재가치)',wonMan(m.surv)],['자녀 교육비',wonMan(v.edu)],['상환 필요 부채',wonMan(v.mortgage)],['긴급 예비자금',wonMan(v.emergency)],['필요보장 총액',wonMan(m.total)],['차감 (유동자산 + 기존 보장)','− '+wonMan(m.deduct)],['사망보장 부족분','<b style="color:var(--bad)">'+wonMan(m.gap)+'</b>']],[4,6])
       + ppC([{t:'산식',d:'필요보장 총액 − (유동자산 '+man(v.liquid)+' + 기존 보장 '+man(v.exDeath)+') = 부족분'},{t:'생활비 계산 방법',d:'월 '+man(v.survMonthly)+'원 × 12 × '+n(v.survYears)+'년을 매년 물가 '+n(v.infl)+'%만큼 올리고, 할인율 '+n(v.disc)+'%로 현재가치로 바꿨습니다.'}])
-      + ppSim('cov-edu','교육비 비교 — 자녀 교육비에 따른 필요 보장액',[{k:'survMonthly',l:'유족 월 생활비',min:50,max:800,step:10,f:F_MM},{k:'survYears',l:'부양 기간',min:5,max:50,step:1,f:F_YR},{k:'edu',l:'기준 교육비',min:0,max:40000,step:1000,f:F_MAN}], v,
+      + ppSim('cov-edu','자녀 교육비가 1억·2억 더 들면',[{k:'survMonthly',l:'유족 월 생활비',min:50,max:800,step:10,f:F_MM},{k:'survYears',l:'부양 기간',min:5,max:50,step:1,f:F_YR},{k:'edu',l:'기준 교육비',min:0,max:40000,step:1000,f:F_MAN}], v,
         x=>{ const b=covModel(x); return ppCompare([0,10000,20000].map((d,i)=>{ const mm=covModel(Object.assign({},x,{edu:n(x.edu)+d})); return {h:eok(n(x.edu)+d)+'원',base:!i,tag:i?'+'+eok(mm.gap-b.gap):'기준',rows:[['필요 보장액',eok(mm.total)],['부족 보장액',eok(mm.gap)]]}; })); })});
 
   const goodTime = age && age<=45 && v.smoke==='비흡연' && noHist;
@@ -2309,7 +2309,7 @@ function covSections(v, cu){
     html: ppSim('cov-wl','보험료 비교 — 차액을 굴리면',[{k:'wlPremium',l:'종신 월 보험료',min:5,max:150,step:1,f:F_MM},{k:'termPremium',l:'정기 월 보험료',min:1,max:60,step:1,f:F_MM},{k:'invRate',l:'차액 운용수익률(가정)',min:0,max:8,step:.1,init:n(v.disc)||3,f:F_PCT}], v,
         x=>{ const mm=covModel(x); return ppK([{v:comma(mm.wlTot*10000),l:'종신 총 납입 (원)'},{v:comma(mm.termTot*10000),l:'정기 총 납입 (원)'},{v:comma(mm.diffFV*10000),l:'정기 + 차액 운용 적립 (원, 추정)',st:'ok'}])
           + ppC([{t:'종신 (월 '+x.wlPremium+'만 · '+n(x.payYears)+'년납)',d:'평생 보장 · 상속 재원. 총 납입 약 '+eok(mm.wlTot)+'원'},{t:'정기 ('+n(x.termAge)+'세 만기 · 월 '+x.termPremium+'만)',d:'책임 기간 집중 보장. 총 납입 약 '+eok(mm.termTot)+'원, 종신보다 '+eok(mm.wlTot-mm.termTot)+'원 적음'},{t:'정기 + 차액 운용',d:'월 차액 '+mm.diffM+'만원을 '+n(x.invRate).toFixed(1)+'%로 굴리면 약 '+eok(mm.diffFV)+'원 (확정 아님)'}]); })
-      + ppSim('cov-years','부양기간 비교 — 부양 기간에 따른 필요 보장액',[{k:'survMonthly',l:'유족 월 생활비',min:50,max:800,step:10,f:F_MM},{k:'exDeath',l:'기존 사망보장',min:0,max:50000,step:1000,f:F_MAN},{k:'survYears',l:'기준 부양 기간',min:5,max:40,step:1,init:Math.max(5,n(v.survYears)-10),f:F_YR}], v,
+      + ppSim('cov-years','가족을 10년·20년 더 지켜야 한다면',[{k:'survMonthly',l:'유족 월 생활비',min:50,max:800,step:10,f:F_MM},{k:'exDeath',l:'기존 사망보장',min:0,max:50000,step:1000,f:F_MAN},{k:'survYears',l:'기준 부양 기간',min:5,max:40,step:1,init:Math.max(5,n(v.survYears)-10),f:F_YR}], v,
         x=>{ const b=covModel(x); return ppCompare([0,10,20].map((d,i)=>{ const mm=covModel(Object.assign({},x,{survYears:n(x.survYears)+d})); return {h:(n(x.survYears)+d)+'년',base:!i,tag:i?'+'+eok(mm.gap-b.gap):'기준',rows:[['필요 보장액',eok(mm.total)],['부족 보장액',eok(mm.gap)]]}; })); })});
 
   S.push({tag:'질병', title:'치료비보다 큰 문제 — 진단 후 소득 공백', lead: m.ciLoss>n(v.ciCost) ? '중대질병에 걸리면 치료비 '+man(v.ciCost)+'원보다 회복 기간의 소득 손실 '+man(m.ciLoss)+'원이 더 큰 부담입니다.' : '치료비 '+man(v.ciCost)+'원에 회복 기간 소득 손실 '+man(m.ciLoss)+'원이 더해집니다.',
@@ -2354,7 +2354,7 @@ function covSections(v, cu){
     html: ppSteps(steps)
       + ppT(['다음 상담 때 준비할 서류','확인 목적'],[['기존 보험증권 (사망·암·실손)','중복·공백·갱신·보장 종료 점검'],['최근 급여명세 또는 소득 확인 서류','보험료 부담률과 소득 확정'],['주택담보대출 상환 계획서','대출 연동 보장액 확정'],['건강검진 결과 · 복용 약 내역','인수 심사 사전 확인']])
       + ppC([{t:'다음 단계',d:'세 설계안 중 방향을 정해 주시면 실제 상품·보험료·인수 조건을 확인해 정밀 설계로 이어 가겠습니다.'}])
-      + ppNote('이 자료는 의사결정을 돕기 위한 참고 자료입니다. 실제 가입과 보장은 약관, 인수 심사, 관계 법령에 따라 달라질 수 있습니다.')});
+      + ppNote('이 자료는 상담용 참고 자료입니다. 실제 가입과 보장은 약관, 인수 심사, 관계 법령에 따라 달라질 수 있습니다.')});
 
   S.push({tag:'참고', title:'근거자료', lead:'본문에서 언급한 제도의 출처입니다.', html: ppRefs([
     {t:'상속세 및 증여세법 제8조 (상속재산으로 보는 보험금)', src:'국가법령정보센터', url:'https://www.law.go.kr/법령/상속세및증여세법/제8조'},
@@ -2474,15 +2474,15 @@ function penSections(v, cu, opts){
       ['은퇴 후 희망 생활비','현재가치 월 '+man(E)+'원'+(n(v.incomeM)?' (현재 소득의 약 '+pct(E/n(v.incomeM)*100)+')':'')],
       ['주택',n(v.house)?'시가 '+wonMan(v.house)+(v.hpUse?' · 주택연금 활용 검토':''):'-'],
       ['계산 가정','적립 '+n(v.raAcc)+'% · 수령 '+n(v.raPay)+'% · 물가 '+n(v.infl)+'% · 할인율 '+n(v.disc)+'% → 실질수익률 적립 '+fnum(m.real*100)+'% · 수령 '+fnum(m.realPay*100)+'%'],
-      ['인상률 가정','급여 '+fnum(m.gw*100)+'% (DC 납입 반영) · 저축 반영 비율 '+fnum(m.G.ratio)+'% → 연금저축·IRP 납입 연 '+fnum(m.gs*100)+'% 증가 · 국민연금 연 '+fnum(m.G.np*100)+'% (고객 확정 시 교체)']])});
+      ['인상률 가정','급여 '+fnum(m.gw*100)+'% (DC 납입 반영) · 저축 반영 비율 '+fnum(m.G.ratio)+'% → 연금저축·IRP 납입 연 '+fnum(m.gs*100)+'% 증가 · 국민연금 연 '+fnum(m.G.np*100)+'% (상담 때 고객과 확정)']])});
 
   S.push({tag:'요약', title:'핵심 요약 — 매월 '+man(m.gapPV)+'원의 소득 공백', lead:'국민연금이 희망 생활비의 '+pct(m.npCover,1)+'를 채우고, 나머지 월 '+man(m.gapPV)+'원을 퇴직·개인연금으로 메우는 것이 이번 설계의 핵심입니다.',
     html: ppK([{v:W(m.gapPV)+'원/월',l:'희망 생활비 대비 월 부족분 (현재가치)',st:m.gapPV?'bad':'ok'},{v:pct(m.npCover,1),l:'국민연금 커버율 (현재가치)'},{v:pct(m.fill),l:'현재 준비 충족률 (준비 ÷ 필요)',st:m.fill>=100?'ok':m.fill>=80?'warn':'bad'}])
       + ppC([{t:'현금흐름 관점',d:'희망 생활비 월 '+man(E)+'원(현재가치) 중 국민연금이 월 '+man(np)+'원을 맡고, 월 '+man(m.gapPV)+'원은 퇴직·개인연금 몫입니다.'},
         {t:'준비 수준',d:'지금 월 '+man(m.mTot)+'원씩 모으면 은퇴 시점에 필요자금의 약 '+pct(m.fill)+'가 준비됩니다.'+(m.fill<100?' 남은 차이를 채울 방법을 함께 봅니다.':'')},
         {t:'이번 설계 방향',d:['3층 연금 보강',crevY?'은퇴 크레바스('+crevY+'년 공백) 대응':'',n(v.house)&&v.hpUse?'주택연금 활용':''].filter(Boolean).join(' · ')+'을 함께 검토합니다.'}])
-      + ppSim('pen-m1','월 납입액에 따른 노후자금',[{k:'mOverride',l:'월 납입액',min:0,max:400,step:5,init:m.mTot,f:F_MM}], v,
-        x=>{ const mm=penModel(x); return ppK([{v:eok(mm.acc)+'원',l:'적립 총액 (은퇴 시점·명목)'},{v:pct(mm.fill),l:'충족률',st:mm.fill>=100?'ok':'warn'}]); })});
+      + ppSim('pen-m1','매달 모으는 돈 · 은퇴 나이 조절',[{k:'mOverride',l:'매달 모으는 돈',min:0,max:400,step:5,init:m.mTot,f:F_MM},{k:'retireAge',l:'은퇴 나이',min:Math.min(70,n(v.age)+5),max:70,step:1,f:F_AGE}], v,
+        x=>{ const mm=penModel(x); return ppK([{v:eok(mm.acc)+'원',l:'은퇴 때 모인 돈 (명목)'},{v:pct(mm.fill),l:'충족률',st:mm.fill>=100?'ok':'warn'}]); })});
 
   const privM=m.payoutM/Math.pow(1+m.i,m.yrs);
   S.push({tag:'진단', title:'현재 진단 — 소득 관점 3층 점검', lead: (m.psAcc+m.irpAcc+m.rpAcc)>0 ? '퇴직·개인연금 적립이 진행 중이지만, 이를 매월 소득으로 바꾸는 설계가 필요합니다.' : '자산은 있어도 매월 소득으로 바뀌는 재원이 국민연금 하나에 몰려 있습니다.',
@@ -2497,7 +2497,7 @@ function penSections(v, cu, opts){
       + ppC([{t:'1층 국민연금',d:'본인 월 '+man(v.npSelf)+'원('+(n(v.npStart)||65)+'세 개시).'+(spouseNo?' 배우자 임의가입 시 부부 연금이 둘이 됩니다.':'')},
         {t:'2층 퇴직연금 ('+esc(v.rpType||'')+')',d:'적립금 '+eok(v.rpBal)+'원 + 월 '+man(v.rpMonthly)+'원 납입 중. 은퇴 시점 목돈을 연금으로 나눠 받는 설계가 필요합니다.'},
         {t:'3층 개인연금',d:(n(v.psMonthly)||n(v.irpMonthly))?'연금저축 월 '+man(v.psMonthly)+' · IRP 월 '+man(v.irpMonthly)+'원으로 세액공제와 월 소득을 함께 확보합니다.':'아직 없습니다. 연금저축·IRP를 새로 시작해 세액공제와 월 소득을 함께 확보할 수 있습니다.'}])
-      + ppSim('pen-target','목표 생활비 비교 — 목표에 따른 부족액 차이',[{k:'mOverride',l:'월 납입액',min:0,max:400,step:5,init:m.mTot,f:F_MM},{k:'raAcc',l:'적립기 수익률',min:0,max:10,step:.1,f:F_PCT},{k:'expense',l:'기준 목표 생활비',min:100,max:800,step:10,init:Math.max(100,E-100),f:F_MM}], v,
+      + ppSim('pen-target','노후 생활비 눈높이를 올리면',[{k:'mOverride',l:'월 납입액',min:0,max:400,step:5,init:m.mTot,f:F_MM},{k:'raAcc',l:'적립기 수익률',min:0,max:10,step:.1,f:F_PCT},{k:'expense',l:'기준 목표 생활비',min:100,max:800,step:10,init:Math.max(100,E-100),f:F_MM}], v,
         x=>{ const b=penModel(x); return ppCompare([0,100,200].map((d,i)=>{ const mm=penModel(Object.assign({},x,{expense:n(x.expense)+d})); return {h:(n(x.expense)+d)+'만원',base:!i,tag:i?'+'+man(Math.max(0,mm.monthlyShort)-Math.max(0,b.monthlyShort)):'기준',rows:[['월 소득 부족',man(Math.max(0,mm.monthlyShort))],['월 예상 수령 (명목)',man(mm.payoutM)]]}; })); })});
 
   const reqAt=d=>{ const y=m.yrs-d; if(y<=0) return Infinity; const ex=m.existFV; return Math.max(0,(m.need-ex)/fvGrow(1,m.ra,y,m.gs)); };
@@ -2506,7 +2506,7 @@ function penSections(v, cu, opts){
     html: ppNote('같은 필요자금을 채우는 데 필요한 월 납입 비교')
       + ppK([{v:W(r0),l:'지금 시작 ('+m.yrs+'년)'},{v:isFinite(r5)?W(r5):'-',l:'5년 늦게 ('+Math.max(0,m.yrs-5)+'년)',st:'warn'},{v:isFinite(r10)?W(r10):'-',l:'10년 늦게 ('+Math.max(0,m.yrs-10)+'년)',st:'bad'}])+ppNote('단위: 원/월')
       + ppK([{v:isFinite(r5)?'+'+W(r5-r0)+'원/월':'-',l:'5년 늦출 때 추가 부담'},{v:isFinite(r10)?'+'+W(r10-r0)+'원/월':'-',l:'10년 늦출 때 추가 부담'}])
-      + ppSim('pen-timing','타이밍 비교 — 지금 시작 vs 미뤘을 때',[{k:'mOverride',l:'월 납입액',min:0,max:400,step:5,init:m.mTot,f:F_MM},{k:'raAcc',l:'적립기 수익률',min:0,max:10,step:.1,f:F_PCT}], v,
+      + ppSim('pen-timing','시작을 5년·10년 미루면',[{k:'mOverride',l:'월 납입액',min:0,max:400,step:5,init:m.mTot,f:F_MM},{k:'raAcc',l:'적립기 수익률',min:0,max:10,step:.1,f:F_PCT}], v,
         x=>{ const b=penModel(x); return ppCompare([0,5,10].map((d,i)=>{ const yy=Math.max(0,b.yrs-d), ra=n(x.raAcc)/100, accd=b.existFV+fvGrow(n(x.mOverride),ra,yy,b.gs); const pay=accd/b.af; return {h:i?d+'년 뒤':'지금 시작',base:!i,tag:i?'−'+eok(b.existFV+fvGrow(n(x.mOverride),ra,b.yrs,b.gs)-accd):'기준',rows:[['적립 총액 (명목)',eok(accd)],['월 예상 수령 (명목)',man(pay)]]}; })); })});
 
   S.push({tag:'필요자금', title:'은퇴 필요자금과 준비', lead:'지금 준비 예상은 필요자금의 약 '+pct(m.fill)+'입니다.'+(m.short>0?' 남은 차이 약 '+eok(m.short)+'원을 채우는 것이 목표입니다.':''),
@@ -2531,7 +2531,7 @@ function penSections(v, cu, opts){
           {t:'대응 ②',d:(n(v.house)?'주택연금을 일찍 시작하거나 ':'')+'금융자산 일부를 공백기 전용 재원으로 떼어 둡니다.'}])});
   }
 
-  S.push({tag:'수령시기', title:'국민연금 수령시기 — 조기·정상·연기 비교', lead:'오래 살수록 연기 수령이 유리하지만, 크레바스 기간의 소득 필요와 함께 판단해야 합니다.',
+  S.push({tag:'수령시기', title:'국민연금 개시 나이 고르기 — 당겨 받기·제때 받기·미뤄 받기', lead:'오래 살수록 연기 수령이 유리하지만, 크레바스 기간의 소득 필요와 함께 판단해야 합니다.',
     html: ppNote('명목(물가 미반영) 기준 · 조기 1년당 '+TX().npEarly+'% 감액, 연기 1년당 '+TX().npDefer+'% 증액')
       + ppK([{v:W(npT.early.m),l:'조기 ('+npT.early.age+'세)'},{v:W(npT.normal.m),l:'정상 ('+npT.normal.age+'세)'},{v:W(npT.defer.m),l:'연기 ('+npT.defer.age+'세)'}])+ppNote('단위: 원/월')
       + ppC([{t:'손익분기 (명목)',d:'정상 vs 조기 '+npT.beE.toFixed(1)+'세 · 연기 vs 정상 '+npT.beD.toFixed(1)+'세. 기대수명 '+m.L+'세 기준으로는 '+(m.L>npT.beD?'연기':m.L>npT.beE?'정상':'조기')+' 수령이 총수령에 유리한 편입니다.'},
@@ -2553,8 +2553,8 @@ function penSections(v, cu, opts){
     html: '<div class="tbl-wrap"><table class="t pp-tbl pp-alt"><tr><th>구분</th><th>월 납입</th><th>성격</th><th>이런 분께</th></tr>'
       + [['안정형','현재 '+man(m.mTot)+'원 유지','기본 방어 · 충족률 약 '+pct(m.fill),'납입을 늘리기 어려운 경우'],['기준형','약 '+man(req)+'원','필요자금 100% 목표 · 균형','저축 여력 안에서 목표를 채우려는 경우'],['적극형',man(req)+'원 + 개인연금 확대','세액공제 활용 · 3층 강화로 여유 확보','세제 혜택과 노후 여유를 함께 원하는 경우']].map(r=>'<tr><th>'+r[0]+'</th><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td>'+esc(r[3])+'</td></tr>').join('')+'</table></div>'
       + ppC([{t:'공통 전제',d:'수익률 '+n(v.raAcc)+'% · 물가 '+n(v.infl)+'% 가정입니다. 값이 확정되면 같은 방식으로 다시 계산합니다.'},{t:'세제 참고',d:'개인연금을 늘리면 연금계좌 세액공제로 실부담이 줄어듭니다 (연 '+man(TX().pensionLimit)+'원 한도).'}])
-      + ppSim('pen-m2','월 납입액에 따른 노후자금',[{k:'mOverride',l:'월 납입액',min:0,max:400,step:5,init:m.mTot,f:F_MM}], v,
-        x=>{ const mm=penModel(x); return ppK([{v:eok(mm.acc)+'원',l:'적립 총액 (은퇴 시점·명목)'},{v:pct(mm.fill),l:'충족률',st:mm.fill>=100?'ok':'warn'}]); })});
+      + ppSim('pen-m2','매달 모으는 돈 · 은퇴 나이 조절',[{k:'mOverride',l:'매달 모으는 돈',min:0,max:400,step:5,init:m.mTot,f:F_MM},{k:'retireAge',l:'은퇴 나이',min:Math.min(70,n(v.age)+5),max:70,step:1,f:F_AGE}], v,
+        x=>{ const mm=penModel(x); return ppK([{v:eok(mm.acc)+'원',l:'은퇴 때 모인 돈 (명목)'},{v:pct(mm.fill),l:'충족률',st:mm.fill>=100?'ok':'warn'}]); })});
 
   if(n(v.house)){
     const a=penModel(Object.assign({},v,{hpUse:false})), b=penModel(Object.assign({},v,{hpUse:true}));
@@ -2576,7 +2576,7 @@ function penSections(v, cu, opts){
       {t:'우선순위',d:order.map((o,i)=>'①②③④⑤'[i]+' '+o).join(' → ')},{t:'다음 행동',d:'방향을 정해 주시면 확정된 가정값으로 수령·세금 계획을 정밀하게 다시 계산해 드리겠습니다.'}])
       + ppT(['다음 상담 때 준비할 서류','확인 목적'],[['국민연금 가입내역 조회 (본인·배우자)','공적연금 예상액·임의가입 확인'],['퇴직연금 운용·적립 명세','2층 재원 확인'],['연금저축·IRP 가입 여부, 총급여 자료','세액공제 한도 산출'],[n(v.house)?'주택 공시가격·시세 자료':'금융자산 잔고','주택연금·준비자산 추정 정밀화']])
       + ppC([{t:'추가 확인 사항',d:'수익률·물가 확정값, 총급여와 실제 납입액, '+(spouseNo?'배우자 임의가입 의사.':'배우자 연금 개시 시기.')}])
-      + ppNote('이 자료는 의사결정을 돕기 위한 참고 자료이며 시뮬레이션 결과입니다. 실제 결과는 시장·제도·약관에 따라 달라질 수 있습니다.')});
+      + ppNote('이 자료는 상담용 참고 자료이며 시뮬레이션 결과입니다. 실제 결과는 시장·제도·약관에 따라 달라질 수 있습니다.')});
 
   S.push({tag:'참고', title:'근거자료', lead:'이번 설계와 관련된 주요 법령입니다.', html: ppRefs([
     {t:'소득세법 제59조의3 (연금계좌세액공제)', src:'국가법령정보센터', url:'https://www.law.go.kr/법령/소득세법/제59조의3'},
@@ -2665,8 +2665,8 @@ function astSections(v, cu){
       ['은퇴 목표',n(v.retireAge)+'세 은퇴 · 희망 생활비 월 '+man(E)+' · 기대수명 '+m.L+'세'],
       ['현금흐름','고정 생활비 월 '+man(v.fixedMonthly)+' · 저축여력 월 '+man(v.saveMonthly)+' (주담대 상환 후)'],
       ['금융소득','이자 '+man(v.interest)+' + 배당 '+man(v.dividend)+' (합 '+man(m.fin)+') · '+esc(v.profile||'')]])
-      + ppC([{t:'가정값 (고객 확정 시 교체)',d:'운용 기대수익률 '+n(v.ret)+'% · 물가 '+n(v.infl)+'% · 할인율 '+n(v.disc)+'% → 실질수익률 '+fnum(m.real*100)+'%'},
-        {t:'인상률 가정 (고객 확정 시 교체)',d:'급여 '+fnum(m.gw*100)+'% (회사 부담금 반영) · 저축 반영 비율 '+fnum(m.G.ratio)+'% → 월 저축 연 '+fnum(m.gs*100)+'% 증가 · 부동산 '+fnum(m.G.re*100)+'% · 국민연금 '+fnum(m.G.np*100)+'%'}])});
+      + ppC([{t:'가정값 (상담 때 고객과 확정)',d:'운용 기대수익률 '+n(v.ret)+'% · 물가 '+n(v.infl)+'% · 할인율 '+n(v.disc)+'% → 실질수익률 '+fnum(m.real*100)+'%'},
+        {t:'인상률 가정 (상담 때 고객과 확정)',d:'급여 '+fnum(m.gw*100)+'% (회사 부담금 반영) · 저축 반영 비율 '+fnum(m.G.ratio)+'% → 월 저축 연 '+fnum(m.gs*100)+'% 증가 · 부동산 '+fnum(m.G.re*100)+'% · 국민연금 '+fnum(m.G.np*100)+'%'}])});
 
   S.push({tag:'요약', title:'오늘의 핵심 메시지', lead:'소득과 저축여력은 '+(n(v.saveMonthly)>0?'안정적이며':'점검이 필요하며')+', 자산배분 조정·연금 개시 전 공백 대비·절세계좌 활용을 함께 설계하면 목표에 더 가까워집니다.',
     html: ppK([{v:pct(m.rePct,1),l:'총자산 대비 부동산 비중',st:m.rePct>70?'warn':'ok'},{v:rt?pct(fill):'-',l:'은퇴자금 충족률 (명목)',st:fill>=100?'ok':fill>=80?'warn':'bad'},{v:E?pct(np/E*100,1):'-',l:'국민연금 목표 커버율 (부부·현재가치)'}])
@@ -2689,7 +2689,7 @@ function astSections(v, cu){
       + ppC([{t:'부채 진단',d:'주담대 금리 '+n(v.mortRate)+'%, 잔여 '+n(v.mortYears)+'년 — 운용 기대수익률 '+n(v.ret)+'%와 '+(Math.abs(rateGap)<1?'비슷합니다':'차이가 '+Math.abs(rateGap).toFixed(1)+'%p 납니다')+'.'+(n(v.age)+n(v.mortYears)>n(v.retireAge)?' 상환이 '+(n(v.age)+n(v.mortYears))+'세까지 이어져 은퇴 후에도 남습니다.':'')},
         {t:'판단 방향',d:rateGap<=0?'금리가 기대수익률보다 높아 여유 자금은 상환을 먼저 검토합니다.':rateGap<1?'금리와 기대수익률 차이가 크지 않아 상환과 투자를 유동성·마음의 안정까지 고려해 나눕니다.':'기대수익률이 금리보다 높아 상환보다 운용을 우선하되, 은퇴 전 상환 계획은 세워 둡니다.'}])});
 
-  S.push({tag:'배분', title:'자산배분 재설계 — 현재와 권장', lead:esc(v.profile||'위험중립형')+'·'+n(v.age)+'세 기준으로 '+m.alloc.filter(a=>Math.abs(a.diff)>=n(v.finTotal)*.03).map(a=>a.nm+(a.diff>0?' 확대':' 축소')).join(', ')+' 방향을 권합니다.',
+  S.push({tag:'배분', title:'자산 나눠 담기 — 지금과 권장안', lead:esc(v.profile||'위험중립형')+'·'+n(v.age)+'세 기준으로 '+m.alloc.filter(a=>Math.abs(a.diff)>=n(v.finTotal)*.03).map(a=>a.nm+(a.diff>0?' 확대':' 축소')).join(', ')+' 방향을 권합니다.',
     html: ppStack(m.alloc.map((a,i)=>({l:a.nm,v:a.curP,t:a.curP+'%',c:'c'+(i+1)}))) + ppNote('현재 배분 · 단위 %')
       + ppSim('ast-alloc','투자성향별 권장 배분 — 성향을 바꿔 보세요',[{k:'profileIdx',l:'투자성향',min:0,max:4,step:1,init:Math.max(0,PROFILES.indexOf(v.profile)),f:i=>PROFILES[i]}], v,
         x=>{ const mm=astModel(Object.assign({},x,{profile:PROFILES[x.profileIdx]})); return ppT(['자산군','현재 → 권장','조정 금액'],mm.alloc.map(a=>[a.nm,a.curP+'% → '+a.recP.toFixed(0)+'%',(a.diff>=0?'+':'−')+Math.abs(a.recP-a.curP).toFixed(0)+'%p · '+(a.diff>=0?'확대 ':'축소 ')+eok(Math.abs(a.diff))])); })});
@@ -2701,7 +2701,7 @@ function astSections(v, cu){
         x=>{ const t=taxFin(x.interest,x.dividend,x.otherIncome,x.personalDeduct); return ppK([{v:t.mode,l:'과세 방식',st:t.mode==='분리과세'?'ok':'warn'},{v:man(t.tax)+'원',l:'금융소득 관련 세금 (연)'},{v:t.marginal.toFixed(1)+'%',l:'적용 한계세율'}]); })});
 
   if(rt){
-    S.push({tag:'은퇴', title:m.R+'세 은퇴자금 적정성 점검', lead:'지금 저축 흐름을 유지하면 은퇴 시점에 필요자금의 약 '+pct(fill)+'가 준비됩니다'+(short>0?'. 남은 차이는 '+eok(short)+'원입니다.':'.'),
+    S.push({tag:'은퇴', title:m.R+'세 은퇴, 모아 둔 돈으로 충분한가', lead:'지금 저축 흐름을 유지하면 은퇴 시점에 필요자금의 약 '+pct(fill)+'가 준비됩니다'+(short>0?'. 남은 차이는 '+eok(short)+'원입니다.':'.'),
       html: ppK([{v:eok(need)+'원',l:'필요 총자금 (명목)'},{v:eok(m.acc)+'원',l:'현재 준비 예상 (명목)'},{v:(short>0?'':'+')+eok(Math.abs(short))+'원',l:short>0?'부족분':'여유분',st:short>0?'bad':'ok'}])
         + ppC([{t:'기준',d:'은퇴 시점 명목 기준 · 목표 생활비 월 '+man(E)+'원(오늘 가치)을 물가 '+n(v.infl)+'%로 환산한 월 '+man(E*Math.pow(1+m.i,m.yrs))+'원 기준 · '+m.R+'~'+m.L+'세 · 부부 국민연금 차감'},
           {t:'필요한 월 저축',d:isFinite(reqM(0))?'목표 달성에 필요한 월 저축 약 '+man(Math.max(n(v.saveMonthly),reqM(0)))+'원 — 현재 '+man(v.saveMonthly)+'원'+(reqM(0)>n(v.saveMonthly)?' 대비 '+man(reqM(0)-n(v.saveMonthly))+'원 추가 필요':'으로 충분'):'-'},
@@ -2739,7 +2739,7 @@ function astSections(v, cu){
           {t:'연금계좌로 과세이연',d:'연금저축·IRP 안의 운용수익은 꺼낼 때까지 세금이 없고, 연금으로 받으면 '+TX().annTaxU70+'~'+TX().annTax80+'%의 낮은 세율이 적용됩니다.'},
           {t:'비과세 저축성보험',d:'월적립식(5년 이상 납입·10년 유지, 월 150만원 이하)이나 종신형 연금보험의 보험차익은 비과세입니다. 요건은 소득세법 시행령 제25조를 확인합니다.'}])
       + ppRefs([{t:'소득세법 제14조 (과세표준의 계산)',src:'국가법령정보센터',url:'https://www.law.go.kr/법령/소득세법/제14조'},{t:'소득세법 제62조 (이자소득 등에 대한 종합과세 시 세액 계산의 특례)',src:'국가법령정보센터',url:'https://www.law.go.kr/법령/소득세법/제62조'}])
-      + ppSim('ast-tax2','금융소득에 따른 세금',[{k:'interest',l:'연 이자소득',min:0,max:5000,step:50,f:F_MM}], v,
+      + ppSim('ast-tax2','이자·배당이 늘면 세금은?',[{k:'interest',l:'1년 이자',min:0,max:5000,step:50,f:F_MM},{k:'dividend',l:'1년 배당',min:0,max:5000,step:50,f:F_MM}], v,
         x=>{ const t=taxFin(x.interest,x.dividend,x.otherIncome,x.personalDeduct); return ppK([{v:man(t.fin)+'원',l:'연 금융소득'},{v:man(t.tax)+'원',l:'예상 세금 (연)',st:t.mode==='분리과세'?'ok':'warn'}]); })});
 
   S.push({tag:'절세', title:'절세계좌 활용 — ISA·연금저축·IRP', lead:/미개설/.test(v.accOpen||'')?'세 계좌 모두 미개설 상태로, 과세이연·세액공제 관점에서 새로 활용할 여지가 큽니다.':'보유 계좌의 납입 한도를 점검해 세제 혜택을 최대로 씁니다.',
@@ -2777,7 +2777,7 @@ function astSections(v, cu){
   if(crevY) steps.push({t:'공백기 브리지 재원 설계',d:m.R+'~'+m.npStart+'세 (퇴직연금·주택연금 등)'});
   S.push({tag:'실행', title:'권장안과 실행 순서', lead:steps.map(s=>s.t).join(' → ')+' 순으로 진행하시길 권합니다.',
     html: ppSteps(steps) + ppT(['다음 상담 때 준비할 서류','확인 목적'],[['본인 총급여·원천징수영수증','연금계좌 세액공제 정밀 산출'],['퇴직연금(DC) 운용·수령 조건 명세','공백기 재원 설계'],['국민연금 가입내역 조회','수령시기 시뮬레이션 확정'],['주담대 상환 스케줄','상환 vs 투자 판단']])
-      + ppNote('이 자료는 의사결정을 돕기 위한 참고 자료입니다. 수익률·물가·세법은 가정이며 투자에는 원금 손실 위험이 있습니다.')});
+      + ppNote('이 자료는 상담용 참고 자료입니다. 수익률·물가·세법은 가정이며 투자에는 원금 손실 위험이 있습니다.')});
 
   S.push({tag:'참고', title:'근거자료', lead:'본문에서 인용한 주요 법령입니다.', html: ppRefs([
     {t:'소득세법 제14조 (과세표준의 계산)', src:'국가법령정보센터', url:'https://www.law.go.kr/법령/소득세법/제14조'},
@@ -2853,7 +2853,7 @@ function lawsFor(field, v){
   }
   return out;
 }
-const ppLawRefs = list => list.length ? '<div class="pp-refs">'+list.map(r=>'<a class="pp-ref" href="'+r.url+'" target="_blank" rel="noopener"><b>'+esc(r.t)+'</b><span>연결 이유: '+esc(r.why)+'</span><em>열기 →</em></a>').join('')+'</div>'+ppNote('입력값과 계산 결과가 조건에 맞는 조문만 연결했습니다. 링크는 국가법령정보센터 현행 조문이며, 개별 사안에 따라 결론이 달라질 수 있습니다. 세법 수치: '+esc(TX().basis)) : ppNote('이번 입력값에는 연결할 조문이 없습니다.');
+const ppLawRefs = list => list.length ? '<div class="pp-refs">'+list.map(r=>'<a class="pp-ref" href="'+r.url+'" target="_blank" rel="noopener"><b>'+esc(r.t)+'</b><span>연결 이유: '+esc(r.why)+'</span><em>열기 →</em></a>').join('')+'</div>'+ppNote('입력값과 계산 결과가 조건에 맞는 조문만 연결했습니다. 링크는 국가법령정보센터 현행 조문이며, 고객 상황마다 적용 결과는 다를 수 있습니다. 세법 수치: '+esc(TX().basis)) : ppNote('이번 입력값에는 연결할 조문이 없습니다.');
 
 /* ════════ 발표 노트 (규칙 기반) ════════
    섹션 태그별로 계산값을 비교해 '말할 내용 · 강조할 숫자 · 예상 질문 · 다음 장 연결'을 만든다. */
@@ -2874,9 +2874,9 @@ function covNotes(v){
     '현황':ppN({say:['오늘 말씀해 주신 내용이 맞는지 한 줄씩 확인합니다. 숫자가 다르면 이 자리에서 고칩니다.',v.earner==='외벌이'?'외벌이 가정이라 가장의 소득이 끊길 때의 대비가 이번 설계의 중심입니다.':'맞벌이 가정이라 두 사람 중 한 명의 소득이 끊길 때를 기준으로 봅니다.'],emph:['월소득 '+man(m.incM)+'원','기존 사망보장 '+eok(v.exDeath)+'원','대출 '+eok(v.mortgage)+'원'],qa:[['소득은 세전인가요, 세후인가요?','상담 때 말씀하신 금액 기준입니다. 급여명세서를 받으면 다시 계산합니다.']],next:'이 사실을 바탕으로 어디가 가장 비어 있는지 요약해 보겠습니다.'}),
     '요약':ppN({say:['세 영역 중 '+doms[0][0]+' 부족액이 '+eok(doms[0][1])+'원으로 가장 큽니다.',m.gap>m.incM*12*10?'필요액이 크게 보이는 건 '+dep+'년 동안의 생활비 때문입니다. 숫자를 줄이는 방법도 함께 보여 드립니다.':'예산 안에서 충분히 채울 수 있는 수준입니다.','슬라이더로 기존 보장을 올려 보면 부족액이 바로 줄어드는 걸 보여 주세요.'],emph:['사망 '+eok(m.gap),'진단 '+eok(m.ciGap),'간병 '+eok(m.careGap)],qa:[['이걸 다 보험으로 채워야 하나요?','아닙니다. 월 '+n(v.budgetMin)+'~'+n(v.budgetMax)+'만원 예산 안에서 정기보험 중심으로 우선순위를 나눠 채웁니다.']],next:'왜 이런 차이가 생겼는지 사망보장부터 진단해 보겠습니다.'}),
     '진단':ppN({say:[n(v.exDeath)<n(v.mortgage)?'지금 보장으로는 대출도 다 갚지 못합니다. 이 점을 먼저 짚어 주세요.':'대출은 갚을 수 있지만 생활비와 교육비가 비어 있습니다.','유족 생활비를 월 100만원 줄이면 부족액이 '+eok(m.gap)+' → '+eok(lower.gap)+'원으로 바뀝니다. 슬라이더로 직접 보여 주세요.'],emph:['필요 '+eok(m.total),'부족 '+eok(m.gap)],qa:[['대출은 꼭 보험으로 갚아야 하나요?','대출이 남으면 유족이 집을 지키기 어렵습니다. 대출 잔액만큼은 우선 확보하는 것을 권합니다.']],next:'부족액이 어떻게 계산됐는지 항목별로 보겠습니다.'}),
-    '산출':ppN({say:['필요액의 '+pct(m.surv/m.total*100)+'가 유족 생활비입니다. 부양기간과 생활비가 가장 큰 변수입니다.','할인율 '+n(v.disc)+'%와 물가 '+n(v.infl)+'%는 가정값입니다. 고객이 원하면 바꿔서 다시 보여 드립니다.'],emph:['생활비 현재가치 '+eok(m.surv),'교육비 '+eok(v.edu),'부족 '+eok(m.gap)],qa:[['왜 '+dep+'년이나 잡았나요?','막내가 독립하고 배우자가 노후에 들어가기까지의 기간입니다. 교육비 비교 슬라이더로 조건을 바꿔 볼 수 있습니다.']],next:'이 보장을 언제 준비하는 게 좋은지 보겠습니다.'}),
+    '산출':ppN({say:['필요액의 '+pct(m.surv/m.total*100)+'가 유족 생활비입니다. 부양기간과 생활비가 가장 큰 변수입니다.','할인율 '+n(v.disc)+'%와 물가 '+n(v.infl)+'%는 가정값입니다. 고객이 원하면 바꿔서 다시 보여 드립니다.'],emph:['생활비 현재가치 '+eok(m.surv),'교육비 '+eok(v.edu),'부족 '+eok(m.gap)],qa:[['왜 '+dep+'년이나 잡았나요?','막내가 독립하고 배우자가 노후에 들어가기까지의 기간입니다. 「자녀 교육비가 1억·2억 더 들면」 슬라이더로 조건을 바꿔 볼 수 있습니다.']],next:'이 보장을 언제 준비하는 게 좋은지 보겠습니다.'}),
     '시점':ppN({say:[goodTime?'지금이 표준체로 심사받기 좋은 조건이라는 점을 강조하세요.':'병력·흡연 여부에 따라 인수 조건이 달라질 수 있어 사전 심사를 권하세요.','나이가 한 살 오르면 같은 보장의 보험료가 오릅니다.'],emph:[n(v.age)+'세',esc(v.smoke||'')],qa:[['나중에 들어도 되지 않나요?','건강에 변화가 생기면 가입이 거절되거나 조건이 붙을 수 있습니다. 지금 조건을 확보해 두는 게 유리합니다.']],next:'그럼 사망보장을 어떤 상품으로 채울지 비교해 보겠습니다.'}),
-    '비교':ppN({say:['종신은 총 '+eok(m.wlTot)+'원, 정기는 '+eok(m.termTot)+'원을 냅니다. 차이는 '+eok(m.wlTot-m.termTot)+'원입니다.','차액 월 '+m.diffM+'만원을 굴리면 약 '+eok(m.diffFV)+'원(가정)이 됩니다. 수익률 슬라이더로 보여 주세요.','부양기간 비교 슬라이더로 기간이 10년 늘 때 필요액이 얼마나 느는지 보여 주세요.'],emph:['종신 '+eok(m.wlTot),'정기 '+eok(m.termTot)],qa:[['정기는 소멸성이라 아깝지 않나요?','책임 기간에만 크게 보장받고 차액을 따로 모으는 방식입니다. 평생 필요한 부분은 종신으로 남깁니다.']],next:'사망 다음으로 큰 위험인 중대질병을 보겠습니다.'}),
+    '비교':ppN({say:['종신은 총 '+eok(m.wlTot)+'원, 정기는 '+eok(m.termTot)+'원을 냅니다. 차이는 '+eok(m.wlTot-m.termTot)+'원입니다.','차액 월 '+m.diffM+'만원을 굴리면 약 '+eok(m.diffFV)+'원(가정)이 됩니다. 수익률 슬라이더로 보여 주세요.','「가족을 10년·20년 더 지켜야 한다면」 슬라이더로 기간이 10년 늘 때 필요액이 얼마나 느는지 보여 주세요.'],emph:['종신 '+eok(m.wlTot),'정기 '+eok(m.termTot)],qa:[['정기는 소멸성이라 아깝지 않나요?','책임 기간에만 크게 보장받고 차액을 따로 모으는 방식입니다. 평생 필요한 부분은 종신으로 남깁니다.']],next:'사망 다음으로 큰 위험인 중대질병을 보겠습니다.'}),
     '질병':ppN({say:[m.ciLoss>n(v.ciCost)?'치료비보다 소득 손실이 더 크다는 점이 핵심입니다.':'치료비와 소득 손실을 함께 봐야 합니다.','실손은 쓴 만큼 돌려받고, 진단비는 생활비로 쓸 목돈이라는 차이를 설명하세요.'],emph:['필요 '+eok(m.ciNeed),'부족 '+eok(m.ciGap)],qa:[['실손이 있는데 진단비가 왜 필요한가요?','실손은 치료비만 돌려줍니다. 쉬는 동안의 생활비와 비급여는 진단비로 메웁니다.']],next:'오래 아플 때 드는 간병비도 보겠습니다.'}),
     '간병':ppN({say:[n(v.exCare)?'기존 간병 보장이 있지만 예상 비용의 일부만 대비합니다.':'간병 보장이 비어 있습니다. 가족이 직접 부담하게 된다는 점을 짚어 주세요.','간병비 슬라이더로 월 비용을 바꿔 보면 필요액이 바로 바뀝니다.'],emph:['간병 필요 '+eok(m.carePV),'부족 '+eok(m.careGap)],qa:[['장기요양보험이 있지 않나요?','등급을 받아도 본인부담금과 간병인 비용은 따로 듭니다. 요양병원 간병비는 대부분 건강보험이 적용되지 않습니다.']],next:'이 보장들을 무리 없이 낼 수 있는지 보험료 부담을 보겠습니다.'}),
     '부담':ppN({say:['예산은 월소득의 '+m.pLow.toFixed(0)+'~'+m.pHigh.toFixed(0)+'%입니다. '+(m.pHigh<=10?'무리 없는 수준입니다.':'상단 예산은 부담이 될 수 있어 하단부터 시작하는 것도 방법입니다.')],emph:[m.pLow.toFixed(0)+'~'+m.pHigh.toFixed(0)+'%'],qa:[['보험료가 오르지는 않나요?','핵심 보장은 비갱신형으로 고정해 오르지 않게 설계합니다.']],next:'예산에 맞춘 세 가지 설계안을 비교해 보겠습니다.'}),
@@ -2895,8 +2895,8 @@ function penNotes(v){
     '현황':ppN({say:[m.R+'세 은퇴, '+m.L+'세까지를 전제로 한 설계라는 점을 먼저 확인하세요.','희망 생활비 월 '+man(v.expense)+'원이 현재 소득의 '+pct(n(v.expense)/Math.max(1,n(v.incomeM))*100)+'라는 점을 함께 확인합니다.'],emph:['은퇴까지 '+m.yrs+'년','월 납입 '+man(m.mTot)+'원'],qa:[['수익률 '+n(v.raAcc)+'%는 너무 높지 않나요?','가정값입니다. 슬라이더로 낮춰서 바로 보여 드릴 수 있습니다.']],next:'이 조건에서 노후 소득이 얼마나 비는지 요약하겠습니다.'}),
     '요약':ppN({say:['국민연금이 생활비의 '+pct(m.npCover,1)+'만 채우고 월 '+man(m.gapPV)+'원이 빕니다.','지금 계획으로 필요자금의 '+pct(m.fill)+'를 준비합니다.','월 납입 슬라이더를 올려 충족률이 바뀌는 걸 보여 주세요.'],emph:['월 부족 '+man(m.gapPV),'충족률 '+pct(m.fill)],qa:[['국민연금이 더 오르지 않나요?','물가만큼은 오른다고 가정했습니다. 그래도 생활비도 같이 오르기 때문에 비율은 비슷합니다.']],next:'소득 구조를 층별로 진단해 보겠습니다.'}),
     '진단':ppN({say:['노후 소득이 국민연금 한 곳에 몰려 있다는 점을 짚으세요.','지금 모으는 돈을 연금으로 나눠 받으면 월 '+man(m.payoutM/Math.pow(1+m.i,m.yrs))+'원(현재가치)이 더해집니다.'],emph:['국민연금 월 '+man(np)],qa:[],next:'세 층이 각각 얼마나 채워져 있는지 보겠습니다.'}),
-    '3층 연금':ppN({say:[(m.psAcc+m.irpAcc)>0?'3층 개인연금이 시작돼 있어 금액을 키우는 단계입니다.':'3층이 비어 있다는 점을 강조하세요.','목표 생활비 비교 슬라이더로 목표를 낮추거나 높일 때 부족액 차이를 보여 주세요.'],emph:['부족 '+man(Math.max(0,m.monthlyShort))+'원/월 (명목)'],qa:[['연금저축과 IRP는 뭐가 다른가요?','둘 다 세액공제를 받는 연금계좌입니다. IRP는 퇴직금도 받을 수 있고 위험자산 비중 제한이 있습니다.']],next:'언제 시작하느냐가 왜 중요한지 보겠습니다.'}),
-    '시점':ppN({say:['5년만 늦춰도 같은 목표에 매달 더 많이 넣어야 합니다.','타이밍 비교 슬라이더로 적립액 차이를 보여 주세요.'],emph:['지금 월 '+man(req),'5년 뒤 시작 시 부담 증가'],qa:[['지금은 여유가 없는데요?','소액이라도 지금 시작하고, 소득이 오를 때 늘리는 방법이 있습니다.']],next:'필요자금과 준비액을 정확히 비교하겠습니다.'}),
+    '3층 연금':ppN({say:[(m.psAcc+m.irpAcc)>0?'3층 개인연금이 시작돼 있어 금액을 키우는 단계입니다.':'3층이 비어 있다는 점을 강조하세요.','「노후 생활비 눈높이를 올리면」 슬라이더로 목표를 낮추거나 높일 때 부족액 차이를 보여 주세요.'],emph:['부족 '+man(Math.max(0,m.monthlyShort))+'원/월 (명목)'],qa:[['연금저축과 IRP는 뭐가 다른가요?','둘 다 세액공제를 받는 연금계좌입니다. IRP는 퇴직금도 받을 수 있고 위험자산 비중 제한이 있습니다.']],next:'언제 시작하느냐가 왜 중요한지 보겠습니다.'}),
+    '시점':ppN({say:['5년만 늦춰도 같은 목표에 매달 더 많이 넣어야 합니다.','「시작을 5년·10년 미루면」 슬라이더로 적립액 차이를 보여 주세요.'],emph:['지금 월 '+man(req),'5년 뒤 시작 시 부담 증가'],qa:[['지금은 여유가 없는데요?','소액이라도 지금 시작하고, 소득이 오를 때 늘리는 방법이 있습니다.']],next:'필요자금과 준비액을 정확히 비교하겠습니다.'}),
     '필요자금':ppN({say:['필요 '+eok(m.need)+' 대 준비 '+eok(m.acc)+'원입니다.',m.short>0?'목표를 채우려면 월 '+man(req)+'원이 필요합니다. 지금보다 '+man(req-m.mTot)+'원 많습니다.':'지금 계획으로 충분합니다.','부족액 시뮬레이션에서 은퇴 나이·수익률을 함께 움직여 보세요.'],emph:['부족 '+eok(Math.max(0,m.short)),'필요 월 납입 '+man(req)],qa:[['은퇴를 늦추면 어떻게 되나요?','은퇴 나이 슬라이더를 올리면 적립 기간이 늘고 쓰는 기간이 줄어 부족액이 크게 줄어듭니다.']],next:crevY?'은퇴 직후 '+crevY+'년의 공백을 보겠습니다.':'국민연금을 언제 받을지 보겠습니다.'}),
     '크레바스':ppN({say:[m.R+'~'+m.npStart+'세에는 국민연금이 없습니다. 이 기간 생활비를 따로 떼어 둬야 합니다.','퇴직·개인연금을 먼저 받는 방법이 가장 무난하다는 점을 설명하세요.'],emph:[crevY+'년 공백'],qa:[['국민연금을 일찍 받으면 안 되나요?','가능하지만 1년당 '+TX().npEarly+'%씩 평생 줄어듭니다. 다음 장에서 비교해 드립니다.']],next:'국민연금 수령 시기를 비교해 보겠습니다.'}),
     '수령시기':ppN({say:['기대수명 '+m.L+'세 기준으로는 '+best+' 수령이 총수령에 유리합니다.','손익분기 나이(조기 '+t.beE.toFixed(1)+'세, 연기 '+t.beD.toFixed(1)+'세)를 기준으로 설명하세요.','수령 시뮬레이션에서 기대수명을 바꿔 보면 유리한 선택이 바뀝니다.'],emph:['조기 '+man(t.early.m),'정상 '+man(t.normal.m),'연기 '+man(t.defer.m)],qa:[['건강이 안 좋으면요?','오래 살지 못할 것 같다면 조기 수령이 유리할 수 있습니다. 건강 상태를 같이 봐야 합니다.']],next:'부족분을 메우는 방향을 정리하겠습니다.'}),
@@ -2944,7 +2944,7 @@ function renderProposal(){
   doc.sections.forEach(s=>{ if(s.tag==='참고') s.html=ppLawRefs(lawsFor(field,Object.assign({},v,{__rec:withRec}))); s.note=NOTES[s.tag]||''; });
   const name=esc(cu.name||'고객');
   let h='<div class="pp-cover"><span class="pp-eyebrow">'+PLAN_FORMS[field].name+' 제안서</span><p class="pp-for">'+name+'님을 위한</p><h1>'+esc(doc.title)+'</h1><div class="pp-meta">'+today()+(fc.org||fc.name?'<br>'+esc([fc.org,fc.name].filter(Boolean).join(' ')):'')+(field!=='coverage'?'<br><span class="pp-basis">세법 기준: '+esc(T.basis)+(T.verified||/확인/.test(T.basis||'')?'':' · 확인 필요')+'</span>':'')+'</div>'+(cur().example?'<span class="example-flag">예시 데이터</span>':'')+'</div>';
-  h+='<nav class="pp-toc" id="pp-toc"><span class="pp-tag">목차</span><h2>제안 구성</h2><ol>'+doc.sections.map((s,i)=>'<li><button type="button" data-goto="'+i+'"><i class="num">'+String(i+1).padStart(2,'0')+'</i>'+esc(s.title.split(' — ')[0])+'</button></li>').join('')+'</ol></nav>';
+  h+='<nav class="pp-toc" id="pp-toc"><span class="pp-tag">목차</span><h2>오늘 함께 볼 순서</h2><ol>'+doc.sections.map((s,i)=>'<li><button type="button" data-goto="'+i+'"><i class="num">'+String(i+1).padStart(2,'0')+'</i>'+esc(s.title.split(' — ')[0])+'</button></li>').join('')+'</ol></nav>';
   doc.sections.forEach((s,i)=>{ h+='<section class="pp-sec" id="pp-s'+i+'" data-i="'+i+'"><span class="pp-tag">'+esc(s.tag)+'</span><h2>'+esc(s.title)+'</h2><p class="pp-lead">'+s.lead+'</p>'+s.html+(s.note?'<div class="pp-notewrap no-print"><button type="button" class="pp-notebtn" data-note="'+i+'" aria-expanded="'+!!PP.notesOpen+'">✎ 발표 노트</button><div class="pp-notebox" id="pp-note-'+i+'"'+(PP.notesOpen?'':' hidden')+'>'+s.note+'</div></div>':'')+'<button type="button" class="pp-top no-print" data-goto="toc">↑ 목차</button></section>'; });
   root.innerHTML=h;
   PP.count=doc.sections.length; PP.cur=Math.min(PP.cur,PP.count-1); applyPresent();
