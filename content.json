@@ -379,28 +379,32 @@
    "files/mats/2026-10/10월_한국보험금융_상품전략_1001_v1ywx.pptx"
   ],
   [
-   "PPT",
+   "PDF",
    "보험비교분석 발표자료",
    "사례",
-   "김OO님 항암 강화·동시지급·매년 반복"
+   "김OO님 항암 강화·동시지급·매년 반복",
+   "files/samples/2026-10/김OO님_보험비교분석_발표자료_s1k7m.pdf"
   ],
   [
    "PDF",
-   "상품비교분석 PPT",
+   "상품비교분석 보고서",
    "사례",
-   "고OO님 상품 비교"
+   "고OO님 상품 비교",
+   "files/samples/2026-10/고OO님_상품비교분석_보고서_s2q4x.pdf"
   ],
   [
    "PDF",
    "간편건강보험 담보 비교",
    "상품",
-   "보험사별 간편건강 담보 비교표"
+   "보험사별 간편건강 담보 비교표",
+   "files/samples/2026-10/간편건강보험_담보비교_s3w8n.pdf"
   ],
   [
    "PDF",
    "실손종합 설계 2안 비교",
    "사례",
-   "조OO님 실손종합 설계안 비교"
+   "조OO님 실손종합 설계안 비교",
+   "files/samples/2026-10/조OO님_실손종합_설계2안_비교_s4c9h.pdf"
   ]
  ],
  "lect": [
@@ -2552,7 +2556,11 @@
  "onepicks": [],
  "thumbs": {
   "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm.pdf": "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm_thumb.jpg",
-  "files/mats/2026-10/10월_한국보험금융_상품전략_1001_0i65r.pdf": "files/mats/2026-10/10월_한국보험금융_상품전략_1001_0i65r_thumb.jpg"
+  "files/mats/2026-10/10월_한국보험금융_상품전략_1001_0i65r.pdf": "files/mats/2026-10/10월_한국보험금융_상품전략_1001_0i65r_thumb.jpg",
+  "files/samples/2026-10/김OO님_보험비교분석_발표자료_s1k7m.pdf": "files/samples/2026-10/김OO님_보험비교분석_발표자료_s1k7m_thumb.jpg",
+  "files/samples/2026-10/고OO님_상품비교분석_보고서_s2q4x.pdf": "files/samples/2026-10/고OO님_상품비교분석_보고서_s2q4x_thumb.jpg",
+  "files/samples/2026-10/간편건강보험_담보비교_s3w8n.pdf": "files/samples/2026-10/간편건강보험_담보비교_s3w8n_thumb.jpg",
+  "files/samples/2026-10/조OO님_실손종합_설계2안_비교_s4c9h.pdf": "files/samples/2026-10/조OO님_실손종합_설계2안_비교_s4c9h_thumb.jpg"
  },
  "sched": [
   {
