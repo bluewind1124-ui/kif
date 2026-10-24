@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-24.8">
+<meta name="kif-build" content="2026-10-24.9">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -3701,7 +3701,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function relayAdapter(c){return {json:async function(prompt,o){var imgs=await Promise.all(((o&&o.images)||[]).map(blobB64));return pickJson(await relayCall(c,prompt,imgs));},
     limits:async function(){return {images:{maxCount:4}};}};}
   /* 복사·붙여넣기: 질문을 만들어 주고, FC가 AI 사이트에서 받은 답을 붙여넣으면 이어서 처리한다 */
-  var PASTE_HEAD='[한국보험금융 FC 포털 요청] 아래 지시를 그대로 따르고, 설명 없이 JSON 하나만 답하세요.\n\n',PASTE_FILE='';
+  var PASTE_HEAD='[한국보험금융 FC 포털 요청] 아래 지시를 그대로 따르고, 설명 없이 JSON 하나만 답하세요. 함께 첨부된 샘플 파일이 있으면 그 구성·문장 형식을 따르되, 샘플의 고객 이름·숫자는 옮기지 마세요. 표·그림·파일은 만들지 마세요 — 분석표·제안서 출력과 저장은 포털이 합니다.\n\n',PASTE_FILE='';
+  /* 복사·붙여넣기 때: 질문에 들어간 샘플의 원본 파일을 받아 AI에 함께 첨부할 수 있게 한다 (글은 이미 질문 안에 있음) */
+  function smpFilesHtml(L){L=(L||[]).filter(function(s){return s&&s.file;});if(!L.length)return '';
+    return '<p class="note" style="margin-top:6px">형식을 더 정확히 맞추려면 이 고객에게 쓰는 <b>샘플 원본</b>도 받아서 AI에 같이 첨부하세요(선택): '+L.map(function(s,i){var nm=String(s.file).split('/').pop();return '<a href="'+esc(s.file)+'" download="'+esc(nm)+'" target="_blank" rel="noopener">샘플 '+(i+1)+' · '+esc(s.title)+' ↓</a>';}).join(' · ')+'</p>';}
   function pasteAdapter(){return {paste:true,json:function(prompt,o){return pasteAsk(PASTE_HEAD+prompt,o||{});},limits:async function(){return {images:{maxCount:12}};}};}
   /* 두 단계: ① AI 버튼 하나로 질문 복사+사이트 열기 ② 버튼 하나로 복사한 답 가져오기 */
   function pasteAsk(q,o){
@@ -3710,12 +3713,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       w.className='pmodal';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label','AI에게 읽히기');
       w.innerHTML='<div class="pbox"><h3>AI에게 읽히기'+(o.part?' <span class="note">'+esc(o.part)+' 부분</span>':'')+'</h3><ol class="psteps">'+
         '<li><b>AI를 눌러 질문 보내기</b><p class="note">누르면 질문이 복사되고 AI 창이 열립니다. 입력칸에 <b>붙여넣기</b>(Ctrl+V, 휴대폰은 길게 눌러 붙여넣기) 후 보내세요.'+
-        (img?' 이 자료는 스캔본이라 <b>'+esc(PASTE_FILE||'원본 파일')+'</b> 파일도 함께 첨부해 주세요.':'')+'</p><div class="row">'+
+        (img?' 이 자료는 스캔본이라 <b>'+esc(PASTE_FILE||'원본 파일')+'</b> 파일도 함께 첨부해 주세요.':'')+'</p>'+smpFilesHtml(o.smp)+'<div class="row">'+
         PASTE_SITES.map(function(x){return '<button class="btn sm'+(x[0]===c.site?'':' ghost')+'" type="button" data-p="go" data-v="'+x[0]+'">'+x[1]+'로 보내기 ↗</button>';}).join('')+
         '</div><p class="note" data-p="cmsg" role="status"></p><details data-p="det"><summary class="note">질문 내용 보기</summary><textarea class="in" rows="4" readonly data-p="q"></textarea></details></li>'+
         '<li><b>AI의 답을 복사한 뒤 가져오기</b><p class="note">AI 답 아래의 <b>복사</b> 아이콘을 누르고 이 창으로 돌아오면 <b>자동으로 반영</b>됩니다. 안 되면 아래 버튼을 누르세요.</p>'+
         '<div class="row"><button class="btn" type="button" data-p="grab">복사한 답 가져오기</button><button class="btn ghost" type="button" data-p="cancel">취소</button></div>'+
-        '<p class="note" data-p="amsg" role="status"></p><details data-p="man"><summary class="note">가져오기가 안 되면: 직접 붙여넣기</summary><textarea class="in" rows="4" data-p="ans" placeholder="AI 답 전체를 붙여넣기 ( { 로 시작 )"></textarea><div class="row"><button class="btn sm" type="button" data-p="ok">반영</button></div></details></li></ol></div>';
+        '<p class="note" data-p="amsg" role="status"></p><details data-p="man"><summary class="note">가져오기가 안 되면: 직접 붙여넣기</summary><textarea class="in" rows="4" data-p="ans" placeholder="AI 답 전체를 붙여넣기 ( { 로 시작 )"></textarea><div class="row"><button class="btn sm" type="button" data-p="ok">반영</button></div></details><details data-p="fdet"><summary class="note">AI가 답을 파일(.json·.txt·.md)로 만들어 줬다면: 파일로 올리기</summary><input type="file" class="in" data-p="afile" accept=".json,.txt,.md,application/json,text/plain"></details></li></ol></div>';
       document.body.appendChild(w);
       var $=function(k){return w.querySelector('[data-p="'+k+'"]');};$('q').value=q;
       var sent=false,onF=function(){if(!sent||!(navigator.clipboard&&navigator.clipboard.readText))return;setTimeout(function(){navigator.clipboard.readText().then(function(t){var r;try{r=pickJson(t);}catch(er){return;}if(t===q)return;fin();res(r);},function(){});},400);};window.addEventListener('focus',onF);
@@ -3725,6 +3728,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var copyNow=function(){var t=document.createElement('textarea');t.value=q;t.setAttribute('readonly','');t.style.cssText='position:fixed;left:-9999px;top:0';w.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}t.remove();
         if(!ok&&navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(q).catch(function(){});ok=true;}return ok;};
       var tryApply=function(txt,fromClip){var r;try{r=pickJson(txt);}catch(er){$('amsg').textContent=fromClip?'복사된 내용이 AI 답이 아닙니다. AI 답의 복사 아이콘을 누른 뒤 다시 가져오세요.':'JSON 형식의 답을 찾지 못했습니다. AI 답 전체를 복사했는지 확인하세요.';return;}fin();res(r);};
+      $('afile').addEventListener('change',function(){var f=this.files&&this.files[0];if(!f)return;f.text().then(function(t){tryApply(t,false);},function(){$('amsg').textContent='파일을 읽지 못했습니다. 답을 복사해서 가져오세요.';});});
       w.addEventListener('click',function(e){var b=e.target.closest('[data-p]');if(!b)return;var k=b.dataset.p;
         if(k==='go'){var x=PASTE_SITES.filter(function(y){return y[0]===b.dataset.v;})[0];var ok=copyNow();
           var sv=load(KEY_AI,null)||{};sv.site=x[0];save(KEY_AI,sv);w.querySelectorAll('[data-p="go"]').forEach(function(y){y.classList.toggle('ghost',y!==b);});
@@ -4053,7 +4057,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       월보험료합계:R.prem.old,포털이먼저찾은유리:PC.P,포털이먼저찾은불리:PC.C};
     var IMG;
     try{
-      var r=await cap.sample.json('너는 한국보험금융 FC의 기계약 보장분석 조수다. '+smpLead(c)+(smpMode(c)==='none'?'':'(샘플의 고객·숫자는 문체 참고용)')+'.\n'+aiGuide(selIds(c),1,c)+'\n\n아래 데이터만 근거로 기존 계약의 유리한 부분과 불리한 부분을 정리하라. 분석관점(옵션)의 중심 영역(관점중심=true)을 각 목록의 앞쪽에 두고 더 자세히 쓴다. 샘플이 있으면 그 고객·숫자는 문체 참고용일 뿐 이 고객 분석에 옮겨 쓰지 마라. "포털이먼저찾은" 항목은 참고하되 빠진 것이 있으면 보태고, 틀린 것은 빼라. JSON 하나로만 답하라: {"pros":[["제목","설명 1문장"], 최대 6개],"cons":[["제목","설명 1문장"], 최대 6개],"conclusion":"1단계 결론 2문장 (지금 보험의 중심 + 2단계에서 조정·보완할 점)"}\n\n데이터:\n'+JSON.stringify(data),Object.assign({modelTier:'default'},(IMG=await refImgs(o)).length?{images:IMG}:{}));
+      var r=await cap.sample.json('너는 한국보험금융 FC의 기계약 보장분석 조수다. '+smpLead(c)+(smpMode(c)==='none'?'':'(샘플의 고객·숫자는 문체 참고용)')+'.\n'+aiGuide(selIds(c),1,c)+'\n\n아래 데이터만 근거로 기존 계약의 유리한 부분과 불리한 부분을 정리하라. 분석관점(옵션)의 중심 영역(관점중심=true)을 각 목록의 앞쪽에 두고 더 자세히 쓴다. 샘플이 있으면 그 고객·숫자는 문체 참고용일 뿐 이 고객 분석에 옮겨 쓰지 마라. "포털이먼저찾은" 항목은 참고하되 빠진 것이 있으면 보태고, 틀린 것은 빼라. JSON 하나로만 답하라: {"pros":[["제목","설명 1문장"], 최대 6개],"cons":[["제목","설명 1문장"], 최대 6개],"conclusion":"1단계 결론 2문장 (지금 보험의 중심 + 2단계에서 조정·보완할 점)"}\n\n데이터:\n'+JSON.stringify(data),Object.assign({modelTier:'default'},(IMG=await refImgs(o)).length?{images:IMG,smp:smpFor(c,1)}:{smp:smpFor(c,1)}));
       var ok=function(L){return Array.isArray(L)?L.filter(function(x){return Array.isArray(x)&&x[0];}).slice(0,6).map(function(x){return [String(x[0]),String(x[1]||'')];}):[];};
       var P=ok(r&&r.pros),C=ok(r&&r.cons);if(!P.length&&!C.length)throw {code:'bad_json'};
       /* AI마다 개수가 달라도 결과 모양이 같도록: 2개보다 적으면 포털이 찾은 항목으로 채운다 */
@@ -5130,7 +5134,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       월보험료:{Before:vA._B.R0.prem.old,유지기존:R.prem.old,신규:R.prem.neu,After:R.prem.old+R.prem.neu},정리한담보:vA._B.drop.map(function(x){return x.it.name+' '+n(x.it.amt)+'만';}),동시지급:R.scen.length?{기존:R.sOld,신규:R.sNeu}:null,연간반복:(R.ann+R.ann10)?{연간:R.ann,십년한도:R.ann10,누적:R.years}:null,가족력:c.famHx,상담내용:c.memo,
       옵션별:(o.list||[o]).map(function(q){var S=spotInfo(q,R);return {옵션:q.title,보장공백:S.gap,기준미달:S.weak,점검포인트:q.points||[],관련기사:newsTxt(q)};})};
     try{
-      var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. '+smpLead(c)+(smpMode(c)==='none'?'':'(샘플의 고객·숫자는 옮겨 쓰지 마라)')+'.\n'+aiGuide(selIds(c),2,c)+'\n\nBefore(기존 그대로)와 After(조정한 기존 + 신계약)를 비교하는 관점으로 쓴다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션을 가장 강조한다: 포인트의 절반 이상은 고른 옵션의 중심 영역에 대한 것으로 옵션 순서대로 쓰고(옵션마다 최소 한 개), 결론에도 고른 옵션을 짚어라. 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 규칙 8대로만 쓴다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
+      var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. '+smpLead(c)+(smpMode(c)==='none'?'':'(샘플의 고객·숫자는 옮겨 쓰지 마라)')+'.\n'+aiGuide(selIds(c),2,c)+'\n\nBefore(기존 그대로)와 After(조정한 기존 + 신계약)를 비교하는 관점으로 쓴다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션을 가장 강조한다: 포인트의 절반 이상은 고른 옵션의 중심 영역에 대한 것으로 옵션 순서대로 쓰고(옵션마다 최소 한 개), 결론에도 고른 옵션을 짚어라. 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 규칙 8대로만 쓴다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default',smp:smpFor(c,2)});
       if(r&&r.points&&r.points.length){var pts=r.points.slice(0,6).map(String),cc2=String(r.conclusion||''),W2=aiCheck(pts.concat([cc2]),JSON.stringify(data)+JSON.stringify(defText(vA,o,R)));
         if(pts.length<3)W2.unshift('포인트가 '+pts.length+'개뿐 — 샘플은 4~5개');
         c.ai={opt:o.id,s2:1,points:pts,conclusion:cc2,warn:W2,by:provName()};touch(c);render();toast(W2.length?'AI 문구로 바꿨습니다. 화면의 「AI 답 점검」을 확인하세요.':'AI 문구로 바꿨습니다.');return;}
