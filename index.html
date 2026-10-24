@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-24.1">
+<meta name="kif-build" content="2026-10-24.2">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1221,6 +1221,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var V1=new URL('classic/',location.href).href; /* 상품 비교(v1.0): 같은 사이트라 포털 로그인으로 바로 열림 */
   var EDU='https://kif.fnkorea.com/index.asp';
   var me=null;
+  var LECT_AT='';
+  /* 교육센터 화면에서 「한보금on으로 강의 보내기」 즐겨찾기를 누르면 #lectpaste=글 로 열린다: 로그인 전에 받아 두고 관리자 페이지에서 바로 읽는다 */
+  (function(){var h=location.hash||'';if(h.indexOf('#lectpaste=')!==0)return;
+    try{sessionStorage.setItem('kif_lect_paste',decodeURIComponent(h.slice(11)));}catch(e){}
+    try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}})();
 
   function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){return null;}}
 
@@ -1429,7 +1434,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<div class="tbl hm-tbl"><table><thead><tr><th>보험사</th><th>자료명</th><th>구분</th><th class="r">등록일</th></tr></thead><tbody>'+nr+'</tbody></table></div></div>'+
         '<div class="panel"><h3>시상 · 공지 <button class="more" data-go="award">전체 보기 ›</button></h3><ul class="hm-aw">'+ar+'</ul><div class="hm-nt"><b>본사 공지</b><ul class="list noticeList"></ul></div></div></section>';
       h+='<section class="hm-two"><div class="panel"><h3>교육 자료 <span class="note">상담·교육용 PT와 비교 자료</span> <button class="more" data-go="mats">교육 자료실 ›</button></h3><div class="mats4">'+matsShown().filter(function(m){return m[4];}).slice(0,8).map(function(m){return matCard(m,false);}).join('')+'</div></div>'+
-        '<div class="panel"><h3>교육센터 새 강의 <button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E(l[2])+'</i></div></a>';}).join('')+'</div></div></section>';
+        '<div class="panel"><h3>교육센터 새 강의 '+(LECT_AT?'<span class="note">'+E(LECT_AT)+' 확인</span> ':'')+'<button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects">'+LECT.slice(0,6).map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E([l[3],l[2]].filter(Boolean).join(' · '))+'</i></div></a>';}).join('')+'</div></div></section>';
       h+='<section class="panel smp-home">'+smpHome()+'</section>';
       h+='<footer class="pfoot">한국보험금융(주) 한보금on 활동지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
       return '<div class="hm">'+h+'</div>';
@@ -1548,8 +1553,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       h+='<div class="panel ext"><span class="ic">敎</span><div class="form"><b>한국보험금융 온라인 교육센터</b><span class="note">아래 분류를 누르면 교육센터가 새 창으로 열립니다. 교육센터 첫 화면에서 해당 메뉴를 고르세요.</span><div class="row"><a class="btn sm" style="text-decoration:none" target="_blank" rel="noopener" href="'+U+'">교육센터 바로가기 ↗</a><span class="pill">새 창으로 열림</span></div></div></div>';
       h+='<div class="grid">';
       CATS.forEach(function(c){h+='<a class="tile" target="_blank" rel="noopener" href="'+U+'"><span class="no">교육센터 메뉴</span><h3>'+c[0]+'</h3><span class="d">'+c[1]+'</span><span class="go">교육센터에서 보기 ↗</span></a>';});
-      h+='</div><div class="panel"><h3>최근 올라온 강의 <span class="note">2026.10 기준 교육센터 화면에서 옮김</span></h3><ul class="list">'+
-        [['2026-10-14','주간생생정보','[10월 2주] 이달의 건강플러스 - 사망원인 3위의 현실'],['2026-10-07','주간생생정보','[10월 1주] 10월 경제이슈와 자산관리'],['2026-10-07','지식한입','10월 바뀌는 금융정책'],['2026-09-30','주간생생정보','[9월 5주] 기사로 알아보는 10월 보험업권 전망'],['2026-09-23','주간생생정보','[9월 4주] 보험영업의 정석 - 킬링포인트']].map(function(x){return '<li><span class="dt">'+x[0]+'</span><span class="t"><span class="pill">'+x[1]+'</span> '+x[2]+'</span></li>';}).join('')+
+      h+='</div><div class="panel"><h3>최근 올라온 강의 <span class="note">'+(LECT_AT?esc(LECT_AT)+' 교육센터 화면 기준':'교육센터 화면에서 옮김')+'</span></h3><ul class="list">'+
+        LECT.map(function(x){return '<li><span class="dt">'+esc(x[3]||'')+'</span><span class="t">'+(x[0]?'<span class="pill">'+esc(x[0])+'</span> ':'')+esc(x[1])+(x[2]?' <span class="note">'+esc(x[2])+'</span>':'')+'</span></li>';}).join('')+
         '</ul></div>';
       return h;
     },
@@ -1682,7 +1687,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function applyContent(c,redraw){
     if(!c||typeof c!=='object')return;SITE=c;
     if(Array.isArray(c.news))NEWS=c.news;if(Array.isArray(c.awards))AWARDS=c.awards;if(Array.isArray(c.mats))MATS=c.mats;
-    if(Array.isArray(c.lect))LECT=c.lect;if(Array.isArray(c.hypo))HYPO=c.hypo;if(Array.isArray(c.notices))NOTICES=c.notices;
+    if(Array.isArray(c.lect))LECT=c.lect;LECT_AT=c.lectAt||'';if(Array.isArray(c.hypo))HYPO=c.hypo;if(Array.isArray(c.notices))NOTICES=c.notices;
     if(c.concept)CONCEPT=Object.assign({},CONCEPT,c.concept);if(c.banner)BANNER=Object.assign({},BANNER,c.banner);if(c.sangjo)SANGJO=Object.assign({},SANGJO,c.sangjo);if(c.car)CARQ=Object.assign({},CARQ,c.car);
     if(Array.isArray(c.compare)&&c.compare.length)CMPL=c.compare;if(Array.isArray(c.sched))SCHED=c.sched;
     if(window.AIMOD&&AIMOD.content)AIMOD.content(c);
@@ -1695,6 +1700,62 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   })(0);
   function lines(a){return (a||[]).map(function(r){return Array.isArray(r)?r.join(' | '):String(r);}).join('\n');}
   function rows(t,n){return String(t||'').split('\n').map(function(x){return x.trim();}).filter(Boolean).map(function(x){var p=x.split('|').map(function(y){return y.trim();});while(p.length<n)p.push('');return p.slice(0,n);});}
+  function nowTxt(){var d=new Date(),z=function(n){return (n<10?'0':'')+n;};return d.getFullYear()+'.'+z(d.getMonth()+1)+'.'+z(d.getDate())+' '+z(d.getHours())+':'+z(d.getMinutes());}
+  /* 교육센터 새 강의: 교육센터는 다른 회사 사이트라 포털이 직접 읽을 수 없다.
+     관리자가 교육센터에 접속한 그 순간의 화면 글(Ctrl+A·Ctrl+C 또는 즐겨찾기 버튼)을 받아 강의 제목·길이·날짜를 뽑는다. */
+  function lectParse(t){
+    var L=String(t||'').replace(/\r/g,'').split('\n').map(function(x){return x.replace(/ /g,' ').trim();}).filter(Boolean);
+    var DUR=/(\d{1,2}:\d{2}:\d{2})/,DT=/(20\d{2})[.\-\/]\s?(\d{1,2})[.\-\/]\s?(\d{1,2})/,
+        NOISE=/^(NEW|N|new|신규|HOT|수강하기|수강신청|바로가기|보기|더보기|상세보기|학습하기|이어보기|재생|▶|>|›|\+|more|MORE)$/,
+        CATS=['주간생생정보','보험HOT이슈','보험영업백서','1분 성공노트','보장설계 세일즈스킬','재무/은퇴설계','법인영업','신인교육과정','생·손보 자격과정','금융자격과정','지식한입','알·쓸·지','쉽게 푸는 경제용어','직영채널','보험사 영업방향','WEEKLY FUN'];
+    var ko=function(x){return (String(x).match(/[가-힣]/g)||[]).length;};
+    var clean=function(x){return String(x||'').replace(DUR,'').replace(DT,'').replace(/\b(NEW|HOT)\b/g,'').replace(/(수강하기|바로가기|학습하기|상세보기)/g,'').replace(/\s{2,}/g,' ').replace(/^[\s|·:\-]+|[\s|·:\-]+$/g,'').trim();};
+    var catOf=function(x){x=String(x||'');for(var i=0;i<CATS.length;i++)if(x.indexOf(CATS[i])>=0)return CATS[i];return '';};
+    var onlyCat=function(x){var c=clean(x);return !!c&&catOf(c)===c;};
+    var isTitle=function(x){var c=clean(x);return ko(c)>=5&&c.length<=80&&!NOISE.test(c)&&!onlyCat(x);};
+    var fmt=function(m){return m?m[1]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[3]).slice(-2):'';};
+    var out=[],seen={};
+    var add=function(cat,title,dur,date){title=clean(title);if(!title||seen[title])return;seen[title]=1;out.push([cat||'',title,dur||'',date||'']);};
+    L.forEach(function(x,i){
+      var m=x.match(DUR);if(!m)return;
+      var cells=x.split(/\t+/),title='',ti=-1,cat='',date=fmt(x.match(DT));
+      if(cells.length>1){cells.forEach(function(c){if(isTitle(c)&&clean(c).length>clean(title).length)title=c;});
+        cells.forEach(function(c){c=clean(c);if(!cat&&c&&c!==clean(title)&&c.length<=14&&ko(c)>=2)cat=c;});}
+      if(!title&&isTitle(x)){title=x;ti=i;}
+      for(var k=i-1;!title&&k>=Math.max(0,i-3);k--){if(isTitle(L[k])){title=L[k];ti=k;}}
+      for(var q=i+1;!date&&q<=Math.min(L.length-1,i+2);q++)date=fmt(L[q].match(DT));
+      for(var q2=i-1;!date&&q2>=Math.max(0,i-3);q2--)date=fmt(L[q2].match(DT));
+      if(!cat)cat=(ti>0?catOf(L[ti-1]):'')||(ti>1?catOf(L[ti-2]):'')||catOf(clean(title));
+      if(title)add(cat,title,m[1],date);
+    });
+    if(!out.length)L.forEach(function(x,i){if(/^\[\s*\d{1,2}월\s*\d\s*주\s*\]/.test(x)){var date='';for(var q=Math.max(0,i-1);!date&&q<=Math.min(L.length-1,i+2);q++)date=fmt(L[q].match(DT));add(catOf(L[i-1]||'')||'주간생생정보',x,'',date);}});
+    return out.slice(0,12);
+  }
+  function lectBm(){
+    var home=location.origin+location.pathname;
+    var js="(function(){var t=[];function g(d){try{t.push(d.body.innerText);[].forEach.call(d.querySelectorAll('iframe,frame'),function(f){try{g(f.contentDocument);}catch(e){}});}catch(e){}}g(document);window.open('"+home+"#lectpaste='+encodeURIComponent(t.join('\\n').slice(0,20000)));})();";
+    return 'javascript:'+encodeURIComponent(js);
+  }
+  function lectHtml(){
+    return '<div class="panel" id="lectBox"><h3>교육센터 새 강의 <span class="note">'+(LECT_AT?'마지막 확인: '+esc(LECT_AT):'아직 확인 기록이 없습니다')+'</span></h3>'+
+      '<p class="note">교육센터는 다른 회사 사이트라 포털이 혼자 읽을 수는 없습니다. 관리자가 교육센터에 접속한 <b>그 순간의 화면</b>을 가져와 새 강의를 뽑고, 「확인 시각」과 함께 홈·교육센터 화면에 보여 줍니다.</p>'+
+      '<ol class="note" style="margin:4px 0 8px;padding-left:1.2em;line-height:1.9"><li><a class="btn sm" style="text-decoration:none" target="_blank" rel="noopener" href="'+EDU+'">① 교육센터 열기 ↗</a> 로그인 후 새 강의(최신 강의) 목록 화면으로 갑니다.</li>'+
+      '<li>그 화면에서 <b>Ctrl+A</b>(전체 선택) → <b>Ctrl+C</b>(복사)</li><li>아래 칸에 <b>Ctrl+V</b>로 붙여 넣고 「② 강의 찾기」를 누릅니다.</li><li>찾은 목록을 확인하고 맨 아래 「저장」을 누르면 모든 FC 화면에 바뀝니다.</li></ol>'+
+      '<textarea class="in" id="lectPaste" rows="4" placeholder="교육센터 화면에서 복사한 글을 여기에 붙여 넣으세요"></textarea>'+
+      '<div class="row" style="margin:6px 0;gap:8px;flex-wrap:wrap"><button class="btn" type="button" id="lectGo">② 강의 찾기</button><span class="note" id="lectMsg" role="status"></span></div>'+
+      '<label class="f">찾은 강의 (고쳐도 됩니다) <span class="note">한 줄에 한 건 · 분류 | 제목 | 길이(00:07:14) | 날짜(2026-10-14)</span><textarea class="in" id="cLect" rows="5">'+esc(lines(LECT))+'</textarea></label>'+
+      '<details class="note"><summary>더 편하게: 즐겨찾기 버튼 하나로 보내기</summary><p style="margin:6px 0">아래 버튼을 브라우저 <b>즐겨찾기 막대로 끌어다 놓으세요</b>(한 번만). 이후 교육센터 새 강의 화면에서 그 즐겨찾기를 누르면 화면 글이 포털로 바로 넘어와 강의를 찾아 줍니다. 복사·붙여넣기가 필요 없습니다.</p>'+
+      '<a class="btn sm ghost" id="lectBm" href="'+lectBm()+'" onclick="return false" draggable="true">📌 한보금on으로 강의 보내기</a> <span>교육센터 화면이 바뀌어 강의를 못 찾으면 붙여넣기 방법을 쓰세요.</span></details></div>';
+  }
+  function bindLect(mark){
+    var go2=document.getElementById('lectGo'),pa=document.getElementById('lectPaste'),ta=document.getElementById('cLect'),m=document.getElementById('lectMsg');if(!go2)return;
+    var run=function(txt){var r=lectParse(txt);
+      if(!r.length){m.innerHTML='⚠ 강의를 찾지 못했습니다. 교육센터의 <b>강의 목록 화면</b>(제목과 재생 시간이 보이는 화면)에서 다시 복사해 보세요. 직접 적어도 됩니다.';return;}
+      ta.value=lines(r);mark({target:ta});m.innerHTML='✓ 강의 <b>'+r.length+'건</b>을 찾았습니다 ('+nowTxt()+' 기준). 목록을 확인하고 맨 아래 「저장」을 누르세요.';};
+    go2.onclick=function(){run(pa.value);};
+    var pend='';try{pend=sessionStorage.getItem('kif_lect_paste')||'';sessionStorage.removeItem('kif_lect_paste');}catch(e){}
+    if(pend){pa.value=pend.slice(0,20000);run(pend);var bx=document.getElementById('lectBox');if(bx&&bx.scrollIntoView)setTimeout(function(){bx.scrollIntoView({block:'start'});},50);}
+  }
   function cmsHtml(){
     var ta=function(id,lab,help,val,h){return '<label class="f">'+lab+' <span class="note">'+help+'</span><textarea class="in" id="'+id+'" rows="'+(h||4)+'">'+esc(val)+'</textarea></label>';};
     var inp=function(id,lab,val,ph){return '<label class="f">'+lab+'<input class="in" id="'+id+'" value="'+esc(val||'')+'" placeholder="'+esc(ph||'')+'"></label>';};
@@ -1707,8 +1768,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       ta('cAward','시상 공지','제목 | 기간 | 내용 | 상태(진행 중/발표) | 파일',lines(AWARDS))+
       ta('cHypo','대표 상품 가설','고객 유형 | 대표 상품 | 첫 화법 | 파일',lines(HYPO))+
       ta('cMats','교육 자료','종류(PPT/PDF) | 제목 | 분류 | 설명 | 파일',lines(MATS))+
-      ta('cLect','교육센터 강의','분류 | 제목 | 길이(00:07:14)',lines(LECT),3)+
-      '</div><div class="panel"><h3>이달의 컨셉</h3><div class="fgrid">'+
+      '</div>'+lectHtml()+'<div class="panel"><h3>이달의 컨셉</h3><div class="fgrid">'+
       inp('kMonth','달',CONCEPT.month,'2026.11')+inp('kTitle','제목',CONCEPT.title)+inp('kTarget','대상',CONCEPT.target)+inp('kProduct','핵심 상품',CONCEPT.product)+
       '</div>'+inp('kDesc','한 줄 설명',CONCEPT.desc)+'<div class="cols">'+ta('kSteps','주요 내용 (컨셉 자료 목차)','한 줄에 하나 · 제목 | 세부 내용 | 쪽',CONCEPT.steps.join('\n'),3)+ta('kMats','컨셉 교육 자료','종류 | 제목 | 파일',lines(CONCEPT.mats),3)+'</div></div>'+
       '<div class="panel"><h3>상품 개정 일정 배너</h3><div class="fgrid">'+inp('bTitle','제목',BANNER.title)+inp('bSub','설명',BANNER.sub)+'</div></div>'+
@@ -1719,7 +1779,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       inp('mClaude','Claude API',md.claude,'claude-opus-5-5')+inp('mOpenai','ChatGPT',md.openai,'gpt-4.1')+inp('mGemini','Gemini',md.gemini,'gemini-2.5-flash')+'</div>'+
       '<label class="row"><input type="checkbox" id="cOpts"> 이 기기의 <b>분석 옵션</b>(AI보장분석 기본형 › 옵션 관리)을 모든 FC에게 배포</label></div>'+
       '<div class="panel"><h3>보장분석 샘플 <span class="pill new">모든 FC 공용</span></h3>'+
-      '<p class="note">보장분석 샘플은 <b>한 화면</b>(왼쪽 메뉴 관리자 › 보장분석 샘플 올리기)에서 두 가지를 함께 관리합니다. 파일을 고른 뒤 「저장」을 누르면 모든 FC에게 올라갑니다(1~2분 뒤 반영).</p>'+
+      '<p class="note">보장분석 샘플은 <b>한 화면</b>(아래 「보장분석 샘플 올리기 열기」)에서 두 가지를 함께 관리합니다. 파일을 고른 뒤 「저장」을 누르면 모든 FC에게 올라갑니다(1~2분 뒤 반영).</p>'+
       '<ul class="note" style="margin:4px 0 10px;padding-left:1.2em;line-height:1.9"><li><b>① AI가 따라 쓰는 샘플</b> — 제안서·분석 엑셀의 형식과 문장을 AI에게 보여 주는 글입니다. FC 제안서에 직접 붙지 않습니다. 지금 <b>'+((SITE&&Array.isArray(SITE.aiSamples))?SITE.aiSamples.length:0)+'건</b></li>'+
       '<li><b>② 니즈환기 참고자료</b> — 그림·PDF 장표로, FC 제안서에 그대로 한 장씩 붙습니다. 지금 <b>'+((window.AIMOD&&AIMOD.getRefs)?AIMOD.getRefs().refs.length:0)+'건</b></li></ul>'+
       '<div class="row"><button class="btn" type="button" id="cmsRefs">보장분석 샘플 올리기 열기</button></div></div>'+
@@ -1734,7 +1794,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function cmsCollect(){
     var v=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
     var c={ver:Date.now(),updated:new Date().toLocaleString('ko-KR'),
-      notices:rows(v('cNotice'),3),news:rows(v('cNews'),7),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),3),
+      notices:rows(v('cNotice'),3),news:rows(v('cNews'),7),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),4),lectAt:CMS_D.lect?nowTxt():((SITE&&SITE.lectAt)||LECT_AT||undefined),
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
       aiProxy:v('mProxy'),aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,car:(SITE&&SITE.car)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
@@ -1758,6 +1818,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     try{var cur=await KIFPUB.patch(function(c){keys.forEach(function(k){
           if(k==='concept'){c.concept=Object.assign({},c.concept||{},n.concept);}
           else if(k==='opts'){if(n.opts){c.opts=n.opts;c.optsVer=n.optsVer;}}
+          else if(k==='lect'){c.lect=n.lect;c.lectAt=n.lectAt;}
           else if(n[k]===undefined)delete c[k];else c[k]=n[k];});},[],[],'관리자 페이지: '+keys.map(function(k){return CMS_N[k]||k;}).join(', '));
       CMS_D={};applyContent(cur,false);KS.done(lab,cur);msg.textContent='✓ 저장 완료 · 모든 FC 화면에는 1~2분 뒤 보입니다.';return true;}
     catch(e){KS.fail(lab,e);msg.textContent='⚠ 저장하지 못했습니다: '+(e.message||e);return false;}
@@ -1768,6 +1829,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var mark=function(e){var f=CMS_F[e.target&&e.target.id];if(!f)return;CMS_D[f]=1;msg.innerHTML='<b>저장하지 않은 변경이 있습니다.</b> 「저장」을 눌러야 모든 FC에게 올라갑니다.';if(window.KSAVE)KSAVE.pend('cms',cmsLabel(),cmsPublish);};
     if(box){box.addEventListener('input',mark);box.addEventListener('change',mark);}
     var rb=document.getElementById('cmsRefs');if(rb)rb.onclick=function(){go('refadmin');};
+    bindLect(mark);
     document.getElementById('cmsPrev').onclick=function(){applyContent(cmsCollect(),false);msg.textContent='이 기기에서만 바뀌었습니다. 다른 FC에게 보이려면 ①②로 사이트에 반영하세요.';};
     document.getElementById('cmsDl').onclick=function(){var c=cmsCollect(),b=new Blob([JSON.stringify(c,null,1)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='content.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);};
     document.getElementById('cmsCopy').onclick=function(){
