@@ -32,6 +32,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script src="../ai-connect.js"></script>
+<script src="../archive.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <!--
   보장분석 플래너 (프로토타입 v0.1)
@@ -616,6 +617,7 @@ body.pp-presenting .top{display:none}
       <button type="button" class="btn sm" id="ppNotes">노트 모두 열기</button>
       <button type="button" class="btn sm" id="ppPresent">발표</button>
       <button type="button" class="btn sm" id="ppPrint">A4 인쇄</button>
+      <button type="button" class="btn sm" id="ppArc" title="이 제안서를 포털 「내 자료함」에 날짜별로 남깁니다">자료함에 보관</button>
     </div>
     <div class="pp" id="ppRoot"></div>
     <div class="pp-pnav no-print" id="ppPresentNav" hidden>
@@ -632,6 +634,7 @@ body.pp-presenting .top{display:none}
       <label class="chk"><input type="checkbox" id="rp-ast" data-rp="ast">자산</label>
       <button class="btn sm" type="button" id="btnPrint" style="margin-left:auto">인쇄 · PDF 저장</button>
       <button class="btn sm" type="button" id="btnCopyReport">요약 문자 복사</button>
+      <button class="btn sm" type="button" id="btnArcReport" title="이 리포트를 포털 「내 자료함」에 날짜별로 남깁니다">자료함에 보관</button>
     </div>
     <div class="report" id="reportRoot"></div>
     <div class="panel no-print" style="max-width:860px;margin:12px auto 0">
@@ -1510,7 +1513,23 @@ $('#rp-comment').addEventListener('input',e=>{ cur().comment=e.target.value; tou
 let rpT; function renderReportDebounced(){ clearTimeout(rpT); rpT=setTimeout(()=>{ const a=document.activeElement, id=a&&a.id, s=a&&a.selectionStart; renderReport(); if(id){ const el=document.getElementById(id); if(el){ el.focus(); try{ el.setSelectionRange(s,s); }catch(e){} } } },300); }
 // 아티팩트 미리보기(iframe) 안에서는 인쇄가 막혀 있어 버튼을 숨김. 포탈에 이식하면 보입니다.
 if(inForeignFrame()) $('#btnPrint').hidden=true;
-$('#btnPrint').addEventListener('click',()=>window.print());
+/* 포털 「내 자료함」(../archive.js)에 지금 리포트·제안서를 보관 — 인쇄할 때와 「자료함에 보관」을 누를 때 */
+function arcAdv(what, say){
+  const c=cur(); if(!c||!window.KIFARC) { if(say) toast('이 화면에서는 자료함을 쓸 수 없습니다'); return; }
+  const src=what==='proposal'?$('#ppRoot'):$('#reportRoot'); if(!src||!src.innerHTML.trim()) return;
+  const cl=src.cloneNode(true);
+  cl.querySelectorAll('.no-print').forEach(x=>x.remove());
+  cl.querySelectorAll('[hidden]').forEach(x=>x.removeAttribute('hidden'));
+  cl.querySelectorAll('input[type=range]').forEach(x=>x.setAttribute('value',x.value));
+  let kind, title;
+  if(what==='proposal'){ const f=PP.field||plans().field; kind=(PLAN_FORMS[f]?PLAN_FORMS[f].name:'')+' 제안서'; title=kind+(f==='pension'&&PP.withRec?' (추천안 포함)':''); }
+  else { const parts=[['rp-cov','보장'],['rp-pen','연금'],['rp-ast','자산']].filter(([id])=>{ const b=document.getElementById(id); return b&&b.checked; }).map(x=>x[1]); kind='고객 리포트'; title='고객 리포트'+(parts.length?' · '+parts.join('·'):''); }
+  KIFARC.add({src:'adv',cid:c.id,cname:(c.customer&&c.customer.name)||'',kind,title,html:cl.innerHTML,wrap:what==='proposal'?'pp':'report',css:KIFARC.pageCss(document),bg:getComputedStyle(document.body).backgroundColor})
+    .then(r=>{ if(say&&r) toast(r.dup?'자료함의 최신 보관본과 같아 시간만 고쳤습니다':'포털 「내 자료함」에 보관했습니다'); })
+    .catch(e=>{ if(say) toast('보관하지 못했습니다: '+((e&&e.message)||'저장 공간 부족')); });
+}
+$('#btnPrint').addEventListener('click',()=>{ arcAdv('report'); window.print(); });
+$('#btnArcReport').addEventListener('click',()=>arcAdv('report',true));
 $('#btnCopyReport').addEventListener('click',()=>{
   const c=cur(), A=analyze(c), fc=store.consultant;
   let t = '['+(c.customer.name||'고객')+'님 보장 점검 요약]\n보장 점수 '+A.score+'점 ('+grade(A.score).t+')\n'+summaryLine(A)+'\n';
@@ -2975,7 +2994,8 @@ $('#v-proposal').addEventListener('click',e=>{
   if(e.target.id==='ppPresent'){ PP.present=!PP.present; PP.cur=0; applyPresent(); window.scrollTo(0,0); }
   if(e.target.id==='ppPrev'){ PP.cur=Math.max(0,PP.cur-1); applyPresent(); window.scrollTo(0,0); }
   if(e.target.id==='ppNext'){ PP.cur=Math.min(PP.count-1,PP.cur+1); applyPresent(); window.scrollTo(0,0); }
-  if(e.target.id==='ppPrint') window.print();
+  if(e.target.id==='ppPrint'){ arcAdv('proposal'); window.print(); }
+  if(e.target.id==='ppArc') arcAdv('proposal',true);
 });
 document.addEventListener('keydown',e=>{
   if(view!=='proposal'||!PP.present||/INPUT|TEXTAREA|SELECT/.test((e.target.tagName||''))) return;
