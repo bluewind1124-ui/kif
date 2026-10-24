@@ -223,8 +223,9 @@ table.cmp td.hl{background:var(--accent-soft);font-weight:700}
 <p class="foot-note">본 자료는 한국보험금융 「생명·손해보험 비교 가이드북(26.09)」의 담보·보험료 표를 옮긴 것으로, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다. 보험료는 월납 기준이며 총납입보험료 = 월보험료 합계 × 240회(20년)로 계산합니다.</p>
 
 
+<script src="cmpdata.js?v=20261024a"></script>
 <script>
-const DATA = {
+let DATA = {
  "meta": {
   "기준": "40세 · 20년납 · 100세만기 · 월납보험료 기준 (총납입 = 월보험료 × 240회)",
   "U/W기준일": "2026.09.04"
@@ -25623,6 +25624,7 @@ const DATA = {
   }
  ]
 };
+if(window.KIFCMP_LOAD)DATA=KIFCMP_LOAD('nonlife',DATA);
 const money = n => n==null ? "—" : n.toLocaleString("ko-KR");
 const wonMan = n => n==null ? "—" : money(n);
 

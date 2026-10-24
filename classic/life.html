@@ -268,8 +268,9 @@ table.cmp-info td{white-space:normal;vertical-align:top}
   <div class="step" id="s3" hidden><div class="step-head"><span class="step-num">3</span><h2>전체 상품 비교</h2><span class="hint" id="s3hint"></span></div><div class="fbar" id="s3filter"></div><div id="s3body"></div></div>
 </div>
 <p class="foot-note">한국보험금융 「생명보험 비교 가이드북 09.04」 자료. 각 보험사 대표 상품·기본형/보증형 기준으로 설계했으며, 환급금(률)은 조건에 따라 달라지므로 상품 비교 이해용 참고자료입니다. 가이드북의 종신보험(공시이율·저해약 환급형·중장기납·상속·납면강화·간편심사·변액유니버셜·CI(GI)) · 정기보험 · 연금(즉시연금·환급률(공시이율형·변액형)·공시이율 금리·주요특징·변액연금 특징) · 참고 가입나이표를 모두 반영했습니다. 「(상세)」 표시 구분은 회사·항목 비교표입니다. 각 표 위의 「전체 / 회사명」 필터로 볼 상품을 좁힐 수 있고, 필요한 상품만 화면에 맞춰 표시됩니다. 달러 상품은 현재 환율로 환산해 함께 비교합니다.</p>
+<script src="cmpdata.js?v=20261024a"></script>
 <script>
-const DATA = {
+let DATA = {
  "meta": {
   "기준": "40세 남/여 · 주계약 1억원(별도 표기 제외) · 20년납 · 할인 후 보험료 · U/W 2026.09.04",
   "fxRate": 1342,
@@ -7031,6 +7032,7 @@ const DATA = {
   }
  }
 };
+if(window.KIFCMP_LOAD)DATA=KIFCMP_LOAD('life',DATA);
 const won = n => n==null ? "—" : Math.round(n).toLocaleString("ko-KR")+"원";
 const pct = n => n==null ? "—" : n.toFixed(1)+"%";
 const state = { sec:null, sub:{}, sort:null, picks:[], show:[], catsOpen:false };
