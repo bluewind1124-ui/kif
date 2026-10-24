@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-24.14">
+<meta name="kif-build" content="2026-10-24.18">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -938,7 +938,12 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .hm-lrail{display:grid!important;grid-template-columns:none!important;grid-auto-flow:column;grid-auto-columns:calc((100% - 10px)/2);grid-template-rows:repeat(2,auto);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:6px}.hm-lrail>.lect{scroll-snap-align:start}
 .hm-vs{max-height:300px;overflow-y:auto;scrollbar-width:thin}.hm-vs.sm{max-height:170px}.hm-vs thead th{position:sticky;top:0;z-index:1}
 @media (max-width:900px){.hm-rail{grid-auto-columns:calc((100% - 16px)/3)}}@media (max-width:600px){.hm-rail{grid-auto-columns:calc((100% - 8px)/2)}.hm-lrail{grid-auto-columns:85%}}
-.hm-two{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:start}
+.hm-two{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:stretch}
+.hm-colr{grid-template-rows:auto 1fr}.hm-colr .hm-tools{grid-auto-rows:1fr;align-content:stretch}
+.hm-colr .hm-tool{flex-direction:column;justify-content:center;text-align:center;padding:20px 16px}.hm-colr .hm-tool .tt{flex:none}.hm-colr .hm-tool .ti{width:56px;height:56px}.hm-colr .hm-tool .ti svg{width:28px;height:28px}
+.hm-rail,.hm-lrail{scrollbar-width:none}.hm-rail::-webkit-scrollbar,.hm-lrail::-webkit-scrollbar{display:none}
+.hm-sbar{position:relative;height:10px;margin-top:8px;background:var(--line);border-radius:5px;cursor:pointer;touch-action:none}
+.hm-sbar i{position:absolute;top:0;bottom:0;left:0;width:100%;background:var(--navy);border-radius:5px;opacity:.75}.hm-sbar:hover i{opacity:1}.hm-sbar.full i{opacity:.35}
 .hm-two .panel h3{display:flex;align-items:baseline;gap:8px}
 .hm-two .panel h3 .more{margin-left:auto}
 .hm-tbl{border:0;border-radius:0}
@@ -1457,9 +1462,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<div class="tbl hm-tbl hm-vs"><table><thead><tr><th>보험사</th><th>자료명</th><th>구분</th><th class="r">등록일</th></tr></thead><tbody>'+nr+'</tbody></table></div></div>'+
         '<div class="panel"><h3>시상 · 공지 <button class="more" data-go="award">전체 보기 ›</button></h3><ul class="hm-aw hm-vs sm">'+ar+'</ul><div class="hm-nt"><b>본사 공지</b><ul class="list noticeList hm-vs sm"></ul></div></div></section>';
       var ML=matsShown().filter(function(m){return m[4];});
-      h+='<section class="hm-two"><div class="hm-col"><div class="panel"><h3>교육 자료 <span class="note">상담·교육용 PT와 비교 자료 '+ML.length+'건</span>'+railNav('railMats',ML.length>4)+' <button class="more" data-go="mats">교육 자료실 ›</button></h3><div class="hm-rail" id="railMats">'+ML.map(function(m){return matCard(m,false);}).join('')+'</div></div>'+
-        '<div class="panel"><h3>대표 상품 가설 <span class="note">고객 유형별 대표 상품과 첫 화법 '+HYPO.length+'건</span>'+railNav('railHypo',HYPO.length>4)+' <button class="more" data-go="hypo">전체 보기 ›</button></h3>'+(HYPO.length?'<div class="hm-rail" id="railHypo">'+HYPO.map(hypoCard).join('')+'</div>':'<p class="note">아직 등록된 가설이 없습니다.</p>')+'</div></div>'+
-        '<div class="hm-col"><div class="panel"><h3>교육센터 새 강의 '+(LECT_AT?'<span class="note">'+E(LECT_AT)+' 확인</span> ':'')+''+railNav('railLect',LECT.length>4)+'<button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects hm-lrail" id="railLect">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E([l[3],l[2]].filter(Boolean).join(' · '))+'</i></div></a>';}).join('')+'</div></div>'+
+      h+='<section class="hm-two"><div class="hm-col"><div class="panel"><h3>교육 자료 <span class="note">상담·교육용 PT와 비교 자료 '+ML.length+'건</span>'+railNav('railMats',ML.length>4)+' <button class="more" data-go="mats">교육 자료실 ›</button></h3><div class="hm-rail" id="railMats">'+ML.map(function(m){return matCard(m,false);}).join('')+'</div>'+sbar('railMats')+'</div>'+
+        '<div class="panel"><h3>대표 상품 가설 <span class="note">고객 유형별 대표 상품과 첫 화법 '+HYPO.length+'건</span>'+railNav('railHypo',HYPO.length>0)+' <button class="more" data-go="hypo">전체 보기 ›</button></h3>'+(HYPO.length?'<div class="hm-rail" id="railHypo">'+HYPO.map(hypoCard).join('')+'</div>'+sbar('railHypo'):'<p class="note">아직 등록된 가설이 없습니다.</p>')+'</div></div>'+
+        '<div class="hm-col hm-colr"><div class="panel"><h3>교육센터 새 강의 '+(LECT_AT?'<span class="note">'+E(LECT_AT)+' 확인</span> ':'')+''+railNav('railLect',LECT.length>4)+'<button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects hm-lrail" id="railLect">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E([l[3],l[2]].filter(Boolean).join(' · '))+'</i></div></a>';}).join('')+'</div>'+sbar('railLect')+'</div>'+
         /* 홈 도구 카드 줄: 약관 분석(policy.js) · 금융계산기 등 같은 모양(.hm-tool)으로 나란히 */
         '<div class="hm-tools" id="hmTools">'+(window.KIFPOL?KIFPOL.card():'')+calcCard()+'</div></div></section>';
       h+='<section class="panel smp-home">'+smpHome()+'</section>';
@@ -1635,6 +1640,14 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return h;
   }
   /* 홈 박스 좌우 넘기기: ◀ ▶ 버튼 + 손가락·마우스 휠 가로 스크롤 */
+  /* 박스 아래 가로 슬라이드바: 끌거나 눌러서 좌우 이동, 모두 보이면 막대가 꽉 참 */
+  function sbar(id){return '<div class="hm-sbar" data-sbar="'+id+'" role="scrollbar" aria-controls="'+id+'" aria-orientation="horizontal"><i></i></div>';}
+  function sbarSync(r){var b=document.querySelector('[data-sbar="'+r.id+'"]');if(!b)return;var t=b.firstChild,sw=r.scrollWidth,cw=r.clientWidth,w=sw>cw?Math.max(12,cw/sw*100):100,mx=sw-cw;t.style.width=w+'%';t.style.left=(mx>0?r.scrollLeft/mx*(100-w):0)+'%';b.classList.toggle('full',mx<=1);}
+  function sbarInit(){document.querySelectorAll('[data-sbar]').forEach(function(b){var r=document.getElementById(b.getAttribute('data-sbar'));if(!r)return;if(!r._sb){r._sb=1;r.addEventListener('scroll',function(){sbarSync(r);},{passive:true});}
+    if(!b._sb){b._sb=1;var dn=false,mv=function(e){var q=b.getBoundingClientRect(),t=b.firstChild.getBoundingClientRect(),f=(e.clientX-q.left-t.width/2)/Math.max(1,q.width-t.width);r.scrollLeft=Math.max(0,Math.min(1,f))*(r.scrollWidth-r.clientWidth);};
+      b.addEventListener('pointerdown',function(e){dn=true;try{b.setPointerCapture(e.pointerId);}catch(_){ }mv(e);});b.addEventListener('pointermove',function(e){if(dn)mv(e);});b.addEventListener('pointerup',function(){dn=false;});b.addEventListener('pointercancel',function(){dn=false;});}
+    sbarSync(r);});}
+  window.addEventListener('resize',function(){document.querySelectorAll('.hm-rail,.hm-lrail').forEach(sbarSync);});
   function railNav(id,on){return on?'<span class="smp-nav"><button class="btn sm ghost" type="button" data-rmv="-1" data-rail="'+id+'" aria-label="이전">◀</button><button class="btn sm ghost" type="button" data-rmv="1" data-rail="'+id+'" aria-label="다음">▶</button></span>':'';}
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-rmv]');if(!b)return;var r=document.getElementById(b.getAttribute('data-rail'));if(r)r.scrollBy({left:(+b.getAttribute('data-rmv'))*Math.max(200,r.clientWidth*0.9),behavior:'smooth'});});
   /* 홈 「대표 상품 가설」 카드: AI 보장분석 샘플처럼 첫 장 그림 + 제목. 올릴 때 만든 첫 장 그림(thumbs)이 없으면 화면에서 PDF 첫 장을 그려 넣는다 */
@@ -1728,7 +1741,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!pBack&&me&&cur&&cur!==id){PST.push(cur);if(PST.length>40)PST.shift();}
     cur=id;renderSide();updPBack();
     document.getElementById('view').innerHTML=PAGES[id]();
-    if(id==='home'){renderNotices();setTimeout(hyThumbs,30);}
+    if(id==='home'){renderNotices();setTimeout(hyThumbs,30);setTimeout(sbarInit,40);setTimeout(sbarInit,800);}
     bindPage(id);
     var on=document.querySelector('#side button.on');if(on&&on.scrollIntoView)on.scrollIntoView({block:'nearest',inline:'center'});
     if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
