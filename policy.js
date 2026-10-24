@@ -108,7 +108,7 @@ function docsHtml(){
 }
 function linksHtml(){
   var L=S.tab==='life'?LINKS.life:LINKS.nonlife;
-  return '<details class="pol-dir" id="polDir"><summary>🔗 약관은 어디서 받나요? — 보험사 공시실 바로가기</summary><div class="in">'+
+  return '<details class="pol-dir" id="polDir"><summary>🔗 약관 PDF 내려받는 곳 (생보·손보 공시실)</summary><div class="in">'+
     '<p class="note" style="margin:0 0 8px">협회 공시실에서는 모든 회사의 판매 중·판매 중지 상품 약관을 한곳에서 찾을 수 있습니다. 회사 홈페이지는 보통 맨 아래 <b>공시실 › 상품공시</b>에 약관이 있습니다.</p>'+
     '<div class="pol-co wide">'+LINKS.common.map(function(x){return '<a target="_blank" rel="noopener" href="'+esc(x[1])+'">'+esc(x[0])+' ↗</a>';}).join('')+'</div>'+
     '<div class="pol-tabs" role="tablist"><button type="button" role="tab" data-pol="tab" data-v="life" class="'+(S.tab==='life'?'on':'')+'" aria-selected="'+(S.tab==='life')+'">생명보험</button><button type="button" role="tab" data-pol="tab" data-v="nonlife" class="'+(S.tab==='nonlife'?'on':'')+'" aria-selected="'+(S.tab==='nonlife')+'">손해보험</button></div>'+
@@ -133,11 +133,11 @@ function html(){
       '<div class="bt"><button type="button" class="btn sm ghost" data-pol="guide">📖 이용 가이드</button><button type="button" class="btn sm ghost" data-go="home">✕ 닫기</button></div></div>'+
     '<div class="pol-cta"><span style="font-size:1.5rem" aria-hidden="true">💡</span><div class="note"><b>상담에 이렇게 써 보세요</b><br>고객이 "이것도 보험금 나와요?"라고 물을 때, 가입한 상품의 약관을 올리고 그대로 물어보면 해당 조항을 찾아 줍니다. 답은 참고용이니 최종 확인은 약관 원문으로 하세요.</div><button type="button" class="btn sm" data-pol="guide">사용 순서 보기</button></div>'+
     '<section class="pol-st'+(a.ok?' done':'')+'"><div class="pol-sh"><span class="n">1</span><h3>AI 연결하기</h3><span class="note">AI보장분석과 같은 AI를 씁니다 · 따로 등록할 필요 없음</span></div><div class="pol-sb">'+aiBox()+'</div></section>'+
-    '<section class="pol-st'+(has?' done':'')+'"><div class="pol-sh"><span class="n">2</span><h3>약관 PDF 올리기</h3><span class="note">파일은 이 브라우저 안에서만 읽습니다</span></div><div class="pol-sb">'+
+    '<section class="pol-st'+(has?' done':'')+'"><div class="pol-sh"><span class="n">2</span><h3>약관 PDF 올리기</h3><span class="note">올린 파일은 내 컴퓨터 밖으로 나가지 않습니다</span></div><div class="pol-sb">'+
       '<label class="pol-drop" id="polDrop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M12 17v-6M9.5 13.5L12 11l2.5 2.5"/></svg><b>약관 PDF를 여기에 끌어다 놓거나 눌러서 고르기</b><span class="note">주계약·특약 약관을 여러 개 함께 올려도 됩니다 · 서버로 보내지 않습니다</span><input type="file" id="polFile" accept="application/pdf,.pdf" multiple></label>'+
       '<div id="polDocs">'+docsHtml()+'</div><div class="pol-msg" id="polMsg" role="status">'+esc(S.msg)+'</div>'+linksHtml()+'</div></section>'+
-    '<section class="pol-st'+(S.qa.length?' done':'')+'"><div class="pol-sh"><span class="n">3</span><h3>질문하기</h3><span class="note">약관에서 근거를 찾아 답합니다</span></div><div class="pol-sb">'+
-      '<b style="font-size:.92rem">이렇게 물어보세요</b><div class="pol-ex">'+EX.map(function(x,i){return '<button type="button" data-pol="ex" data-i="'+i+'">'+esc(x[0])+'</button>';}).join('')+'</div>'+
+    '<section class="pol-st'+(S.qa.length?' done':'')+'"><div class="pol-sh"><span class="n">3</span><h3>약관에 묻기</h3><span class="note">답마다 근거 조항과 쪽을 붙입니다</span></div><div class="pol-sb">'+
+      '<b style="font-size:.92rem">FC가 자주 찾는 질문</b> <span class="note">누르면 질문 칸에 들어갑니다</span><div class="pol-ex">'+EX.map(function(x,i){return '<button type="button" data-pol="ex" data-i="'+i+'">'+esc(x[0])+'</button>';}).join('')+'</div>'+
       '<textarea class="pol-q" id="polQ" placeholder="예) 유방암 수술 후 재발하면 암 진단비를 또 받을 수 있나요?"></textarea>'+
       '<div class="pol-qr"><span class="note" id="polHint">'+(has?'올린 약관 '+S.docs.length+'개 · '+totalPages()+'쪽을 기준으로 답합니다.':'먼저 2번에서 약관 PDF를 올려 주세요.')+'</span><button type="button" class="btn gold" id="polAsk" data-pol="ask">약관에서 찾기</button></div>'+
       '<div class="pol-ans" id="polAns">'+ansHtml()+'</div>'+
@@ -166,7 +166,7 @@ function guide(){
   modal('약관 분석 이용 가이드',
     '<h4>① AI 연결</h4><p style="margin:0">AI보장분석에서 등록한 AI를 그대로 씁니다(따로 등록할 필요 없음). 관리자는 회사 AI로 바로 씁니다. 연결이 「복사·붙여넣기」로 나오면 질문을 AI 사이트에 붙여넣고 답을 가져오는 방식입니다.</p>'+
     '<h4>② 약관 받기 → 올리기</h4><p style="margin:0">고객이 가입한 상품의 <b>판매 시기에 맞는 약관</b>을 공시실에서 내려받아 올립니다. (같은 상품도 판매 시기마다 약관이 다릅니다. 가입일을 꼭 확인하세요.) 주계약과 특약 약관이 따로 있으면 함께 올리세요.</p>'+
-    '<h4>③ 질문</h4><p style="margin:0">「이렇게 물어보세요」 버튼을 누르거나 고객이 물은 말을 그대로 적고 <b>약관에서 찾기</b>를 누릅니다. 답에는 근거 조항과 원문 인용이 붙습니다.</p>'+
+    '<h4>③ 질문</h4><p style="margin:0">「FC가 자주 찾는 질문」 버튼을 누르거나 고객이 물은 말을 그대로 적고 <b>약관에서 찾기</b>를 누릅니다. 답에는 근거 조항과 원문 인용이 붙습니다.</p>'+
     '<h4>스캔본(그림) PDF</h4><p style="margin:0">글자를 고를 수 없는 스캔본은 이 브라우저에서 문자 인식으로 읽습니다(앞 40쪽까지, 시간이 조금 걸림). 가능하면 공시실의 원본 PDF를 쓰세요.</p>'+
     '<h4>긴 약관</h4><p style="margin:0">약관이 아주 길면 질문과 관련이 깊은 쪽(목차 포함)만 골라 AI에 보냅니다. 답 아래에 몇 쪽을 읽혔는지 표시됩니다. 원하는 내용이 빠지면 질문에 <b>담보 이름·조항 이름</b>을 넣어 다시 물어보세요.</p>'+
     '<div class="pol-tip">고객 개인정보(이름·주민번호)가 담긴 증권이 아니라 <b>약관</b>만 올리세요. 답은 상담 참고용이며 지급 여부의 최종 판단은 보험사가 합니다.</div>');
