@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-10-24.7">
+<meta name="kif-build" content="2026-10-24.8">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -4056,7 +4056,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var r=await cap.sample.json('너는 한국보험금융 FC의 기계약 보장분석 조수다. '+smpLead(c)+(smpMode(c)==='none'?'':'(샘플의 고객·숫자는 문체 참고용)')+'.\n'+aiGuide(selIds(c),1,c)+'\n\n아래 데이터만 근거로 기존 계약의 유리한 부분과 불리한 부분을 정리하라. 분석관점(옵션)의 중심 영역(관점중심=true)을 각 목록의 앞쪽에 두고 더 자세히 쓴다. 샘플이 있으면 그 고객·숫자는 문체 참고용일 뿐 이 고객 분석에 옮겨 쓰지 마라. "포털이먼저찾은" 항목은 참고하되 빠진 것이 있으면 보태고, 틀린 것은 빼라. JSON 하나로만 답하라: {"pros":[["제목","설명 1문장"], 최대 6개],"cons":[["제목","설명 1문장"], 최대 6개],"conclusion":"1단계 결론 2문장 (지금 보험의 중심 + 2단계에서 조정·보완할 점)"}\n\n데이터:\n'+JSON.stringify(data),Object.assign({modelTier:'default'},(IMG=await refImgs(o)).length?{images:IMG}:{}));
       var ok=function(L){return Array.isArray(L)?L.filter(function(x){return Array.isArray(x)&&x[0];}).slice(0,6).map(function(x){return [String(x[0]),String(x[1]||'')];}):[];};
       var P=ok(r&&r.pros),C=ok(r&&r.cons);if(!P.length&&!C.length)throw {code:'bad_json'};
-      c.ai1={opt:o.id,P:P.length?P:PC.P,C:C.length?C:PC.C,conclusion:String((r&&r.conclusion)||''),by:provName(),at:nowStr()};touch(c);render();toast(provName()+'가 포털 규칙으로 보장분석을 정리했습니다.');
+      /* AI마다 개수가 달라도 결과 모양이 같도록: 2개보다 적으면 포털이 찾은 항목으로 채운다 */
+      var fill=function(L,D){var t=L.map(function(x){return x[0];});D.forEach(function(x){if(L.length<2&&t.indexOf(x[0])<0)L.push(x);});return L;};
+      P=fill(P.length?P:[],PC.P);C=fill(C.length?C:[],PC.C);
+      var cc=String((r&&r.conclusion)||''),W=aiCheck(P.concat(C).map(function(x){return x.join(' ');}).concat([cc]),JSON.stringify(data)+JSON.stringify(PC));
+      c.ai1={opt:o.id,P:P,C:C,conclusion:cc,by:provName(),at:nowStr(),warn:W};touch(c);render();toast(provName()+'가 포털 규칙으로 보장분석을 정리했습니다.');
     }catch(e){if(note)note.textContent=errMsg(e)+' 규칙으로 정리한 기본 결과를 그대로 씁니다.';if(btn)btn.disabled=false;}
   }
   /* ---- 1단계·2단계 데이터 보기 ----
@@ -4075,6 +4079,18 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   function dataC(c){return st.step===3?vOld(c):st.step===4?vAfter(c):c;}
   function kTerm(it,k){return String((it.term||'')+' '+((k&&k.term)||''));}
+  /* AI 답 점검: 어떤 AI가 썼든 같은 기준으로 확인한다 — 데이터에 없는 숫자, 금지 표현 */
+  var AI_BAN=/무조건|반드시\s*(받|보장|지급)|100\s*%\s*(보장|지급)|확실히\s*(받|보장)|평생\s*걱정\s*없|절대\s*(손해|안)/;
+  function aiCheck(texts,ref){
+    var R=String(ref).replace(/,/g,''),bad=[],ban=[];
+    texts.forEach(function(t){t=String(t||'');
+      (t.replace(/(\d),(?=\d{3})/g,'$1').match(/\d+(?:\.\d+)?/g)||[]).forEach(function(x){if(x.length<2||/^0/.test(x))return;if(R.indexOf(x)<0&&bad.indexOf(x)<0)bad.push(x);});
+      var m=t.match(AI_BAN);if(m&&ban.indexOf(m[0])<0)ban.push(m[0]);});
+    var w=[];if(bad.length)w.push('자료에 없는 숫자 '+bad.slice(0,4).join('·')+(bad.length>4?' 외 '+(bad.length-4)+'개':'')+' — 분석표와 맞는지 확인');
+    if(ban.length)w.push('금지 표현 「'+ban.join('」「')+'」 — 고쳐 쓰기');
+    return w;
+  }
+  function aiWarn(w){return w&&w.length?'<span class="warnline" style="display:block;margin-top:4px;color:#b45309">⚠ AI 답 점검: '+w.map(esc).join(' / ')+'</span>':'';}
   /* 기계약의 유리한 부분 / 불리한 부분 (규칙으로 뽑음, 숫자는 분석값 그대로) */
   function prosCons(v,o,R){
     if(v.ai1&&v.ai1.opt===o.id&&(v.ai1.P||[]).length)return {P:v.ai1.P,C:v.ai1.C,ai:v.ai1};
@@ -4109,7 +4125,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+='<div class="panel"><h3>분석 관점(옵션) 선택 <span class="note">여러 개 선택 가능 · 지금 '+selIds(c).length+'개</span><span class="sp"></span><button class="btn sm ghost" data-a="step" data-s="5">옵션 내용 바꾸기</button></h3><p class="note">고른 옵션의 중심 영역을 더 자세히 봅니다. 2단계 제안서도 같은 옵션으로 만듭니다.</p>'+optCards(c)+'</div>'+smpPanel(c);
     if(!K.length)return h+'<div class="panel"><h3>기존 계약이 없습니다</h3><p class="note">먼저 "기계약 자료"에 증권·보장분석표를 첨부하세요.</p><div class="row"><button class="btn" data-a="step" data-s="2">기계약 자료 첨부하기 ▸</button></div></div>';
     h+='<div class="kpis"><div><span>기존 월보험료</span><b>'+fmt(R.prem.old)+'<small>원</small></b><em>계약 '+K.length+'건</em></div><div><span>담보</span><b>'+R.cnt.old+'<small>개</small></b><em>'+AREAS.filter(function(a){return R.A[a].old;}).length+'개 영역</em></div><div class="t"><span>점검 결과</span><b>유리 '+PC.P.length+' · 불리 '+PC.C.length+'</b><em>아래 정리 참고</em></div></div>';
-    h+='<div class="panel ai1"><div class="row"><b>내 AI로 보장분석</b><span class="note">'+(PC.ai?'✓ '+esc(PC.ai.by)+'가 포털 규칙으로 정리 ('+esc(PC.ai.at)+')':'지금은 포털 규칙으로 자동 정리한 결과입니다. 버튼을 누르면 내 AI('+esc(provName())+')가 같은 규칙으로 다시 정리합니다.')+'</span><span class="sp"></span><button class="btn sm" data-a="ai1" id="ai1Btn">'+(PC.ai?'다시 분석':'보장분석 실행')+'</button>'+(PC.ai?'<button class="btn sm ghost" data-a="ai1off">규칙 기본 결과로</button>':'')+'</div><p class="note" id="ai1Note">어떤 AI를 쓰든 숫자는 포털이 계산하고, 문장은 관리자가 정한 <b>보장분석 규칙</b>을 그대로 지켜 씁니다. 출력물 모양은 샘플 형식 그대로입니다.</p></div>';
+    h+='<div class="panel ai1"><div class="row"><b>내 AI로 보장분석</b><span class="note">'+(PC.ai?'✓ '+esc(PC.ai.by)+'가 포털 규칙으로 정리 ('+esc(PC.ai.at)+')'+aiWarn(PC.ai.warn):'지금은 포털 규칙으로 자동 정리한 결과입니다. 버튼을 누르면 내 AI('+esc(provName())+')가 같은 규칙으로 다시 정리합니다.')+'</span><span class="sp"></span><button class="btn sm" data-a="ai1" id="ai1Btn">'+(PC.ai?'다시 분석':'보장분석 실행')+'</button>'+(PC.ai?'<button class="btn sm ghost" data-a="ai1off">규칙 기본 결과로</button>':'')+'</div><p class="note" id="ai1Note">어떤 AI를 쓰든 숫자·표·출력물 모양은 포털이 정하고, AI는 유리·불리·결론 <b>문장</b>만 씁니다. 문장은 관리자가 정한 <b>보장분석 규칙</b>과 샘플을 함께 보내 맞추고, 받은 답은 포털이 다시 점검합니다(자료에 없는 숫자·금지 표현·개수).</p></div>';
     h+='<div class="cols"><div class="panel"><h3>👍 유리한 부분 <span class="note">유지할 가치가 있는 보장</span></h3><ul class="list pc pc-g">'+PC.P.map(function(x){return '<li><span class="pill ok">유리</span><span class="t"><b>'+esc(x[0])+'</b><br><span class="note">'+esc(x[1])+'</span></span></li>';}).join('')+'</ul></div>'+
       '<div class="panel"><h3>⚠ 불리한 부분 <span class="note">2단계에서 조정·보완할 곳</span></h3><ul class="list pc pc-r">'+PC.C.map(function(x){return '<li><span class="pill warn">불리</span><span class="t"><b>'+esc(x[0])+'</b><br><span class="note">'+esc(x[1])+'</span></span></li>';}).join('')+'</ul></div></div>';
     h+='<div class="cols"><div class="panel"><h3>보장 지도 <span class="note">굵은 줄 = 옵션 중심 영역</span></h3>'+bars1(R,R.focus)+'</div>';
@@ -4218,7 +4234,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function viewReport(c){
     var o=opt(c),v=vAfter(c),R=analyze(v,o),T=(c.ai&&c.ai.opt===o.id&&c.ai.s2)?c.ai:defText(v,o,R);
     var h='<div class="aiwho"><b>2단계 · Before / After 제안서</b> — 기존 계약은 이랬는데(Before), 컨설팅 후 조정 계약은 이렇게 됩니다(After).</div>'+rptBar(c,'Before/After 제안서',o.title)+
-      '<p class="note" id="rptNote">'+(c.ai&&c.ai.opt===o.id&&c.ai.s2?'AI가 다듬은 문구입니다. 숫자는 분석표에서 계산한 값입니다.':'기본 문구입니다. 숫자는 분석표에서 계산한 값입니다.')+' 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.<br>샘플: <b>'+smpSum(c)+'</b> <button class="chkgo" data-a="step" data-s="3">바꾸기 ▸</button></p></div>';
+      '<p class="note" id="rptNote">'+(c.ai&&c.ai.opt===o.id&&c.ai.s2?(c.ai.by?esc(c.ai.by)+'가 ':'AI가 ')+'다듬은 문구입니다. 숫자는 분석표에서 계산한 값입니다.'+aiWarn(c.ai.warn):'기본 문구입니다. 숫자는 분석표에서 계산한 값입니다.')+' 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.<br>샘플: <b>'+smpSum(c)+'</b> <button class="chkgo" data-a="step" data-s="3">바꾸기 ▸</button></p></div>';
     h+=newsPanel(c,o);
     h+='<div class="rpt" id="rpt">'+reportHtml(v,o,R,T)+'</div>';
     return h;
@@ -5115,7 +5131,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       옵션별:(o.list||[o]).map(function(q){var S=spotInfo(q,R);return {옵션:q.title,보장공백:S.gap,기준미달:S.weak,점검포인트:q.points||[],관련기사:newsTxt(q)};})};
     try{
       var r=await cap.sample.json('너는 보험 제안서를 쓰는 FC의 조수다. '+smpLead(c)+(smpMode(c)==='none'?'':'(샘플의 고객·숫자는 옮겨 쓰지 마라)')+'.\n'+aiGuide(selIds(c),2,c)+'\n\nBefore(기존 그대로)와 After(조정한 기존 + 신계약)를 비교하는 관점으로 쓴다. 아래 분석 데이터만 근거로, 옵션 설명에 적힌 방향대로 고객용 제안서 문구를 한국어로 써라. 숫자는 데이터에 있는 값만 쓰고 새 숫자를 만들지 마라(단위: 만원, 보험료는 원). 과장·단정 표현(무조건, 반드시 받습니다 등) 금지. 고른 옵션을 가장 강조한다: 포인트의 절반 이상은 고른 옵션의 중심 영역에 대한 것으로 옵션 순서대로 쓰고(옵션마다 최소 한 개), 결론에도 고른 옵션을 짚어라. 보장공백 영역은 "[보장 공백]"으로 분명히 짚어라. 관련기사는 규칙 8대로만 쓴다. JSON 하나로만 답하라: {"points":["핵심 포인트 4~5개, 각 1~2문장, [키워드]로 시작 가능"],"conclusion":"한 줄 결론 1~2문장"}\n\n데이터:\n'+JSON.stringify(data),{modelTier:'default'});
-      if(r&&r.points&&r.points.length){c.ai={opt:o.id,s2:1,points:r.points.slice(0,6).map(String),conclusion:String(r.conclusion||'')};touch(c);render();toast('AI 문구로 바꿨습니다.');return;}
+      if(r&&r.points&&r.points.length){var pts=r.points.slice(0,6).map(String),cc2=String(r.conclusion||''),W2=aiCheck(pts.concat([cc2]),JSON.stringify(data)+JSON.stringify(defText(vA,o,R)));
+        if(pts.length<3)W2.unshift('포인트가 '+pts.length+'개뿐 — 샘플은 4~5개');
+        c.ai={opt:o.id,s2:1,points:pts,conclusion:cc2,warn:W2,by:provName()};touch(c);render();toast(W2.length?'AI 문구로 바꿨습니다. 화면의 「AI 답 점검」을 확인하세요.':'AI 문구로 바꿨습니다.');return;}
       throw {code:'x'};
     }catch(e){note.textContent=errMsg(e)+' 기본 문구를 그대로 씁니다.';btn.disabled=false;}
   }
