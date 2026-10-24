@@ -1224,7 +1224,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
 })();
 </script>
 <script src="ai-connect.js?v=20261024ad"></script>
-<script src="policy.js?v=20261024a"></script>
+<script src="policy.js?v=20261024b"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
@@ -2174,6 +2174,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* 보장분석 샘플(참고자료) 바로 반영: 그림은 refs/<id>.jpg 파일로, 목록은 content.json refs에 한 번에 커밋 */
   window.KIFPUB={
     ready:function(){return !!ghTok();},
+    admin:function(){return !!(me&&me.role==='admin');},
+    /* 약관 분석 「보험사 공시실 바로가기」 목록을 content.json의 policyLinks로 올린다 */
+    policyLinks:async function(o){
+      if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다. 관리자 › 자료 올리기 › GitHub 연결 설정에서 먼저 연결해 주세요.');
+      var r=await ghLand([],function(cur){cur.policyLinks=o;},'약관 분석 공시실 바로가기 수정');SITE=r.cur;return r.cur;
+    },
     /* AI 보장분석 샘플 목록(글)을 content.json의 aiSamples로 올린다 */
     samples:async function(list){
       if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다');
