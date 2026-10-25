@@ -91,7 +91,10 @@ function card(){
 /* ---------- 화면 ---------- */
 function aiState(){
   var K=window.KIFAI;if(!K)return {ok:false,html:'AI 연결 도구를 불러오지 못했습니다. 새로고침해 주세요.'};
-  var c=K.cfg(),ok=K.chosen()&&c.mode==='ai'&&!(K.AIP[c.prov]&&K.AIP[c.prov].key&&!c.keys[c.prov]);
+  var c=K.cfg();
+  /* 아직 AI를 정하지 않았으면 키 없이 되는 복사·붙여넣기로 바로 쓴다 */
+  if(!K.chosen())return {ok:true,paste:true,html:'연결된 AI: <b>복사·붙여넣기</b> (기본 · 키 없이 무료로 ChatGPT·Gemini·Claude 사이트에 붙여넣어 씁니다) · <button type="button" class="kai-link" data-kai-open>바꾸기</button>'};
+  var ok=c.mode==='ai'&&!(K.AIP[c.prov]&&K.AIP[c.prov].key&&!c.keys[c.prov]);
   return {ok:ok,paste:c.prov==='paste',html:K.statusHTML()};
 }
 function aiBox(){
