@@ -83,6 +83,8 @@ var css='.kai-ov{position:fixed;inset:0;background:rgba(10,18,26,.55);z-index:99
 '.kai-nav li.on{color:#0f2240;font-weight:700}.kai-nav li.on i{color:#b07d1c}.kai-nav li.done{color:#1d7f47}.kai-nav li.dim{opacity:.45}'+
 '.kai-ol{margin:8px 0 14px;padding-left:20px}.kai-ol li{margin:6px 0}.kai-ol a,.kai-note a{color:#b07d1c}'+
 '.kai-btn.gold{display:inline-block;background:#cb9c3a;border-color:#cb9c3a;color:#1b1206;text-decoration:none;padding:11px 18px}'+
+'.kai-big{background:#fdf3dc;border:2px solid #cb9c3a;color:#3d2d0c;border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.7;margin:4px 0 12px}.kai-big b{color:#0f2240}'+
+'.kai-cmsg{font-size:14px;font-weight:700;color:#0f7a48;margin:8px 0 0}'+
 '.kai-tip{background:#fbf3e3;color:#5a4416;border-radius:10px;padding:12px 14px;font-size:13px;margin-top:14px}'+
 '.kai-opt em{display:block;font-style:normal;font-size:12px;font-weight:700;color:#b07d1c;margin-top:6px}'+
 '.kai-krow{display:flex;gap:6px;margin-top:4px}.kai-krow input{margin-top:0!important;flex:1;font-family:ui-monospace,monospace}'+
@@ -320,11 +322,13 @@ function pasteAsk(q,scanned){
   return new Promise(function(res,rej){
     var c=cfg(),w=document.createElement('div');
     w.className='kai-ov';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label','AI에게 읽히기');
-    w.innerHTML='<div class="kai-box"><div class="kai-hd"><h2>AI에게 읽히기</h2><button type="button" class="kai-btn g kai-x" data-q="cancel" aria-label="닫기">✕</button></div><ol class="kai-steps">'+
-      '<li><b>AI를 골라 질문 보내기</b><p class="kai-note">누르면 질문이 복사되고 AI 창이 열립니다. 입력칸에 <b>붙여넣기</b>(Ctrl+V, 휴대폰은 길게 눌러 붙여넣기)한 뒤 보내세요.'+
+    w.innerHTML='<div class="kai-box"><div class="kai-hd"><h2>AI에게 읽히기</h2><button type="button" class="kai-btn g kai-x" data-q="cancel" aria-label="닫기">✕</button></div>'+
+      '<div class="kai-big"><b>질문은 포털이 이미 만들어 두었습니다. 새로 쓰지 마세요.</b><br>① 아래 버튼을 누르면 질문이 복사되고 AI 창이 열립니다 → ② 열린 창의 입력칸을 한 번 누르고 <b>Ctrl+V</b>(붙여넣기, 휴대폰은 길게 눌러 「붙여넣기」) → ③ <b>보내기</b>(Enter) → ④ 답이 나오면 답 아래 <b>복사</b> 아이콘을 누르고 이 창으로 돌아오기</div>'+
+      '<ol class="kai-steps">'+
+      '<li><b>AI를 골라 질문 보내기</b><p class="kai-note">입력칸이 비어 있는 게 정상입니다. 거기에 붙여넣기만 하면 됩니다.'+
       (scanned.length?' 사진·스캔 자료는 <b>'+esc(scanned.join(', '))+'</b> 파일도 그 창에 함께 첨부해 주세요.':'')+'</p><div class="kai-row">'+
       PASTE_SITES.map(function(x){return '<button type="button" class="kai-btn'+(x[0]===c.site?' p':'')+'" data-q="go" data-v="'+x[0]+'">'+x[1]+'로 보내기 ↗</button>';}).join('')+
-      '</div><p class="kai-note" data-q="cmsg" role="status"></p><details data-q="det"><summary class="kai-note">질문 내용 보기</summary><textarea rows="4" readonly data-q="qtext"></textarea></details></li>'+
+      '</div><p class="kai-cmsg" data-q="cmsg" role="status"></p><div class="kai-row" style="margin-top:6px"><button type="button" class="kai-btn g" data-q="dl">질문을 파일(.txt)로 받기</button><span class="kai-note">붙여넣기가 안 되거나 너무 길면, 이 파일을 AI 창에 첨부해 보내세요.</span></div><details data-q="det"><summary class="kai-note">질문 내용 보기</summary><textarea rows="4" readonly data-q="qtext"></textarea></details></li>'+
       '<li><b>AI 답을 복사한 뒤 가져오기</b><p class="kai-note">AI 답 아래의 <b>복사</b> 아이콘을 누르고 이 창으로 돌아오면 자동으로 반영됩니다. 안 되면 아래 버튼을 누르세요.</p>'+
       '<div class="kai-row"><button type="button" class="kai-btn p" data-q="grab">복사한 답 가져오기</button><button type="button" class="kai-btn g" data-q="cancel">취소</button></div><p class="kai-note" data-q="amsg" role="status"></p>'+
       '<details data-q="man"><summary class="kai-note">가져오기가 안 되면: 직접 붙여넣기</summary><textarea rows="4" data-q="ans" placeholder="AI 답 전체를 붙여넣기 ( { 로 시작 )"></textarea><div class="kai-row"><button type="button" class="kai-btn" data-q="ok">반영</button></div></details></li></ol></div>';
@@ -342,8 +346,10 @@ function pasteAsk(q,scanned){
       var b=e.target.closest('[data-q]');if(!b)return;var k=b.dataset.q;
       if(k==='go'){var x=PASTE_SITES.filter(function(y){return y[0]===b.dataset.v;})[0],ok=copyNow(),sv=raw();sv.site=x[0];try{localStorage.setItem(AIK,JSON.stringify(sv));}catch(er){}
         w.querySelectorAll('[data-q="go"]').forEach(function(y){y.classList.toggle('p',y===b);});
-        g('cmsg').textContent=ok?'✓ 질문을 복사했습니다. 열린 '+x[1]+' 창에 붙여넣고 보내세요.':'자동 복사가 막혔습니다. "질문 내용 보기"를 열어 직접 복사하세요.';if(!ok)g('det').open=true;
+        g('cmsg').textContent=ok?'✓ 질문을 복사했습니다. 이제 열린 '+x[1]+' 창의 입력칸을 누르고 Ctrl+V → 보내기를 누르세요.':'자동 복사가 막혔습니다. "질문 내용 보기"를 열어 직접 복사하세요.';if(!ok)g('det').open=true;
         sent=true;window.open(x[2],'_blank','noopener');}
+      else if(k==='dl'){var bl=new Blob([q],{type:'text/plain;charset=utf-8'}),u=URL.createObjectURL(bl),a=document.createElement('a');a.href=u;a.download='KIF_question_'+Date.now()+'.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);
+        g('cmsg').textContent='✓ 질문 파일을 내려받았습니다. AI 창의 + (파일 첨부)로 올리고 "첨부한 지시대로 답해 주세요"라고 보내세요.';}
       else if(k==='grab'){if(!(navigator.clipboard&&navigator.clipboard.readText)){g('man').open=true;g('amsg').textContent='이 브라우저는 자동 가져오기를 막습니다. 아래 칸에 직접 붙여넣으세요.';return;}
         navigator.clipboard.readText().then(function(t){tryApply(t,true);},function(){g('man').open=true;g('amsg').textContent='붙여넣기 허용이 필요합니다. 브라우저가 물으면 "허용"을 누르거나, 아래 칸에 직접 붙여넣으세요.';});}
       else if(k==='ok')tryApply(g('ans').value,false);
