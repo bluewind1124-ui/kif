@@ -206,8 +206,10 @@ function words(q){
   var w=String(q).replace(/[^가-힣a-zA-Z0-9\s]/g,' ').split(/\s+/).filter(function(x){return x.length>=2;});
   var stop=/^(이|그|저|어떤|어떻게|무엇|알려|주세요|정리해|찾아|있나요|되나요|경우|약관|에서|보험|이것|것|수|등|및|해|좀|대해|관련)$/;
   var out=[];w.forEach(function(x){x=x.replace(/(은|는|이|가|을|를|의|에|와|과|도|로|으로|에서|까지|부터|만|이나|나|요|인가요|인지|하면|되면|하는|되는|할|된)$/,'');if(x.length>=2&&!stop.test(x))out.push(x);});
-  var extra={'진단비':['진단','확정'],'면책':['지급하지','면책','보장개시'],'감액':['감액','50%'],'납입면제':['납입면제','납입을 면제'],'해지':['해지환급금','해지'],'고지':['알릴 의무','고지'],'청구':['청구','서류','소멸시효'],'소액암':['갑상선','기타피부암','제자리암','경계성']};
+  var extra={'재발':['재진단','재발','전이','계속','2차','수술','항암','방사선','표적'],'추가':['재진단','추가','수술','항암','방사선'],'또 받':['재진단','계속','2차','최초 1회'],'수술':['수술'],'치료':['치료','항암','방사선','표적'],'진단비':['진단','확정'],'면책':['지급하지','면책','보장개시'],'감액':['감액','50%'],'납입면제':['납입면제','납입을 면제'],'해지':['해지환급금','해지'],'고지':['알릴 의무','고지'],'청구':['청구','서류','소멸시효'],'소액암':['갑상선','기타피부암','제자리암','경계성']};
   Object.keys(extra).forEach(function(k){if(String(q).indexOf(k)>=0)out=out.concat(extra[k]);});
+  /* '유방암'·'갑상선암'처럼 암 이름을 물으면 '암' 담보 전체도 찾는다 */
+  if(/[가-힣]+암/.test(q))out.push('암');
   return out.filter(function(x,i){return out.indexOf(x)===i;});
 }
 function pick(q,budget){
@@ -215,13 +217,16 @@ function pick(q,budget){
   var total=all.reduce(function(a,x){return a+x.t.length+20;},0);
   var fmt=function(L){var by={};return L.map(function(x){var h=by[x.d]?'':'\n===== '+x.name+' =====\n';by[x.d]=1;return h+'[p.'+x.p+'] '+x.t;}).join('\n');};
   if(total<=budget)return {text:fmt(all),part:'',used:all.length,all:all.length};
-  var W=words(q),sc=all.map(function(x,i){var s=0;W.forEach(function(w){var m=x.t.split(w).length-1;if(m)s+=Math.min(m,6)*(w.length>=3?2:1);});if(/목\s*차|차\s*례/.test(x.t.slice(0,200)))s+=3;return {i:i,s:s};});
+  /* 각 특약의 「보험금의 지급사유」 쪽은 그 특약의 핵심이라, 질문 단어가 하나라도 있으면 먼저 고른다 */
+  var W=words(q),sc=all.map(function(x,i){var s=0,hit=0;W.forEach(function(w){var m=x.t.split(w).length-1;if(m){hit++;s+=Math.min(m,6)*(w.length>=3?2:1);}});s+=hit*3;if(hit&&/보험금의\s*지급\s*사유/.test(x.t))s+=12;if(/목\s*차|차\s*례/.test(x.t.slice(0,200)))s+=3;return {i:i,s:s};});
   var keep={};all.forEach(function(x,i){if(x.p<=2)keep[i]=1;});
   sc.sort(function(a,b){return b.s-a.s;});
   var used=Object.keys(keep).reduce(function(a,i){return a+all[i].t.length;},0);
   for(var k=0;k<sc.length&&used<budget;k++){if(!sc[k].s)break;[sc[k].i,sc[k].i+1].forEach(function(i){if(i<all.length&&!keep[i]&&all[i].d===all[sc[k].i].d&&used+all[i].t.length<=budget){keep[i]=1;used+=all[i].t.length;}});}
   var L=all.filter(function(x,i){return keep[i];});
-  return {text:fmt(L),part:'약관 '+all.length+'쪽 중 관련 '+L.length+'쪽 읽힘',used:L.length,all:all.length};
+  /* 보내지 않은 쪽에 어떤 특약이 있는지 이름만이라도 알려, AI가 '범위 밖에 이런 특약이 있음'을 말할 수 있게 한다 */
+  var names=[],seen={};all.forEach(function(x,i){if(keep[i])return;var m=x.t.match(/([가-힣A-Za-z0-9·]{3,30}(?:\([^)]{0,30}\))?)\s?특별약관/);if(m){var n=m[1].replace(/\s+/g,' ').trim();if(!seen[n]&&names.length<80){seen[n]=1;names.push(n+' 특별약관(p.'+x.p+')');}}});
+  return {text:fmt(L)+(names.length?'\n\n[보내지 않은 쪽에 있는 특별약관 이름 — 내용은 없음]\n'+names.join(', '):''),part:'약관 '+all.length+'쪽 중 관련 '+L.length+'쪽 읽힘',used:L.length,all:all.length};
 }
 
 /* ---------- 질문 → AI ---------- */
@@ -231,7 +236,7 @@ function prompt(q,part){
     '2) 금액·기간·비율은 약관 문구 그대로 옮긴다. 상품마다 가입금액이 다르면 "가입금액의 OO%"처럼 쓴다.\n'+
     '3) 근거는 조항 이름(예: 제3조(보험금의 지급사유))과 쪽([p.숫자] 표시)을 함께 적고, 핵심 문구를 짧게(80자 이내) 그대로 인용한다.\n'+
     '4) FC가 고객에게 바로 설명할 수 있게 쉬운 말로, 존댓말로 쓴다. 지급을 보장하는 표현("무조건 나옵니다")은 쓰지 않는다.\n'+
-    (part?'5) 약관이 길어 질문과 관련된 쪽만 보냈다('+part+'). 빠진 부분이 있을 수 있으면 caution에 적는다.\n':'')+
+    (part?'5) 약관이 길어 질문과 관련된 쪽만 보냈다('+part+'). 빠진 부분이 있을 수 있으면 caution에 적고, 맨 끝 [보내지 않은 쪽에 있는 특별약관 이름] 중 질문과 관련 있어 보이는 특약 이름과 쪽을 caution에 함께 적어 FC가 따로 확인하게 한다.\n':'')+
     '\n답은 설명 없이 JSON 하나로만: {"answer":"질문에 대한 답(3~8문장)","points":["상담 때 짚을 핵심 2~5개"],"refs":[{"where":"조항 이름 (p.쪽)","quote":"약관 원문 인용"}],"caution":"주의할 점이나 확인이 더 필요한 것(없으면 빈 글자)"}\n\n'+
     '[질문]\n'+q+'\n\n[약관]';
 }
@@ -242,11 +247,12 @@ async function ask(root){
   if(!q){qEl.focus();setMsg(root,'질문을 적어 주세요.');return;}
   if(!S.docs.length){setMsg(root,'먼저 2번에서 약관 PDF를 올려 주세요.');var d=root.querySelector('#polDrop');d&&d.scrollIntoView({block:'center',behavior:'smooth'});return;}
   var a=aiState();if(!a.ok){setMsg(root,'먼저 1번에서 AI를 연결해 주세요.');if(window.KIFAI)KIFAI.open();return;}
-  var paste=a.paste,budget=paste?28000:(KIFAI.cfg().prov==='openai'?150000:220000);
+  var paste=a.paste,budget=paste?45000:(KIFAI.cfg().prov==='openai'?150000:220000);
   var sel=pick(q,budget);S.busy=true;var b=root.querySelector('#polAsk');b.disabled=true;b.textContent='찾는 중…';setMsg(root,'AI가 약관을 읽고 있습니다'+(sel.part?' ('+sel.part+')':'')+'…');
   var item={q:q,at:now(),part:sel.part};
   try{var r=await KIFAI.ask(prompt(q,sel.part),{text:sel.text,images:[],scanned:[]});
-    if(!r||typeof r!=='object')throw {code:'bad_json'};if(!r.answer&&r.text)r.answer=r.text;item.r=r;setMsg(root,'');qEl.value='';}
+    if(!r||typeof r!=='object')throw {code:'bad_json'};
+    if(/^질문에 대한 답\(3~8문장\)$/.test(String(r.answer||'').trim()))throw {code:'echo',message:'AI 답 대신 보낸 질문의 형식 틀이 들어왔습니다. AI 창에서 답 아래의 복사 아이콘을 누른 뒤 다시 가져와 주세요.'};if(!r.answer&&r.text)r.answer=r.text;item.r=r;setMsg(root,'');qEl.value='';}
   catch(e){if(e&&e.code==='paste_cancel'){setMsg(root,KIFAI.err(e));item=null;}else{item.err=KIFAI.err(e);setMsg(root,'');}}
   S.busy=false;b.disabled=false;b.textContent='약관에서 찾기';
   if(item){S.qa.unshift(item);var an=root.querySelector('#polAns');an.innerHTML=ansHtml();an.scrollIntoView({block:'start',behavior:'smooth'});}
