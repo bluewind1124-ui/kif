@@ -338,7 +338,9 @@ async function relayCall(c,prompt,imgs){
   return j.text||'';
 }
 var PASTE_HEAD='[한국보험금융 FC 포털 요청] 아래 지시를 그대로 따르고, 설명 없이 JSON 하나만 답하세요.\n\n';
-function pasteAsk(q,scanned,step){
+function pasteAsk(q,scanned,step,parse){
+  /* parse: 답 모양이 조금 어긋나도(따옴표 깨짐 등) 필요한 것만 꺼내는 보조 읽기. 없으면 JSON만 받는다 */
+  var rd=function(t,explicit){try{return pickJson(t);}catch(e){var r=parse&&parse(t,explicit);if(r)return r;throw e;}};
   addCss();
   return new Promise(function(res,rej){
     var c=cfg(),w=document.createElement('div');
@@ -357,10 +359,10 @@ function pasteAsk(q,scanned,step){
     document.body.appendChild(w);
     var g=function(k){return w.querySelector('[data-q="'+k+'"]');};g('qtext').value=q;
     var sent=false;
-    var onF=function(){if(!sent||!(navigator.clipboard&&navigator.clipboard.readText))return;setTimeout(function(){navigator.clipboard.readText().then(function(t){if(t===q||isQuestion(t,q))return;var r;try{r=pickJson(t);}catch(e){return;}fin();res(r);},function(){});},400);};
+    var onF=function(){if(!sent||!(navigator.clipboard&&navigator.clipboard.readText))return;setTimeout(function(){navigator.clipboard.readText().then(function(t){if(t===q||isQuestion(t,q)){g('amsg').textContent='아직 AI 답이 복사되지 않았습니다. AI 답 아래의 복사 아이콘을 누른 뒤 돌아오거나 「복사한 답 가져오기」를 누르세요.';return;}var r;try{r=rd(t,false);}catch(e){if(String(t||'').trim())g('amsg').textContent='복사된 내용을 답으로 읽지 못했습니다. AI 답 아래의 복사 아이콘을 다시 누르고 「복사한 답 가져오기」를 누르세요.';return;}fin();res(r);},function(){g('amsg').textContent='자동으로 가져오지 못했습니다. 「복사한 답 가져오기」를 누르세요.';});},400);};
     var esck=function(e){if(e.key==='Escape'){fin();rej({code:'paste_cancel'});}};
     var fin=function(){w.remove();window.removeEventListener('focus',onF);document.removeEventListener('keydown',esck);};
-    var tryApply=function(t,clip){if(isQuestion(t,q)){g('amsg').textContent='지금 복사돼 있는 것은 보낸 질문입니다. AI 창에서 답 아래의 복사 아이콘을 누른 뒤 다시 가져오세요.';return;}var r;try{r=pickJson(t);}catch(e){g('amsg').textContent=clip?'복사된 내용이 AI 답이 아닙니다. AI 답의 복사 아이콘을 누른 뒤 다시 가져오세요.':'JSON 형식의 답을 찾지 못했습니다. AI 답 전체를 복사했는지 확인하세요.';return;}fin();res(r);};
+    var tryApply=function(t,clip){if(isQuestion(t,q)){g('amsg').textContent='지금 복사돼 있는 것은 보낸 질문입니다. AI 창에서 답 아래의 복사 아이콘을 누른 뒤 다시 가져오세요.';return;}var r;try{r=rd(t,true);}catch(e){g('amsg').textContent=clip?'복사된 내용이 AI 답이 아닙니다. AI 답의 복사 아이콘을 누른 뒤 다시 가져오세요.':'JSON 형식의 답을 찾지 못했습니다. AI 답 전체를 복사했는지 확인하세요.';return;}fin();res(r);};
     window.addEventListener('focus',onF);document.addEventListener('keydown',esck);
     var copyNow=function(){var t=document.createElement('textarea');t.value=q;t.setAttribute('readonly','');t.style.cssText='position:fixed;left:-9999px;top:0';w.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}t.remove();
       if(!ok&&navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(q).catch(function(){});ok=true;}return ok;};
@@ -384,12 +386,13 @@ async function ask(prompt,mat){
   var c=cfg(),p=c.prov;mat=mat||{text:'',images:[],scanned:[]};
   if(c.mode!=='ai')throw {code:'ai_off'};
   var full=prompt+(mat.text?'\n\n자료:\n'+mat.text:'')+(mat.images.length?'\n\n(첨부한 사진·스캔 '+mat.images.length+'장도 함께 읽으세요)':'');
-  if(p==='paste')return await pasteAsk(PASTE_HEAD+full,mat.scanned||[],mat.step||'');
+  var rd=function(t){try{return pickJson(t);}catch(e){var r=mat.parse&&mat.parse(t,true);if(r)return r;throw e;}};
+  if(p==='paste')return await pasteAsk(PASTE_HEAD+full,mat.scanned||[],mat.step||'',mat.parse);
   if(p==='claudeapp'){var h=claudeHost(),s=h&&await h.use('sample');if(!s)throw {code:'unavailable'};var o={};if(mat.images.length)o.images=mat.images;return await s.json(full,o);}
   var imgs=await Promise.all(mat.images.map(b64));
-  if(p==='company'){if(!companyOk())throw {code:AI_PROXY?'admin_only':'no_proxy'};return pickJson(await relayCall(c,full,imgs));}
+  if(p==='company'){if(!companyOk())throw {code:AI_PROXY?'admin_only':'no_proxy'};return rd(await relayCall(c,full,imgs));}
   if(!c.keys[p])throw {code:'no_key'};
-  return pickJson(await apiCall(p,c.keys[p],model(c,p),full,imgs));
+  return rd(await apiCall(p,c.keys[p],model(c,p),full,imgs));
 }
 function err(e){
   var M={ai_off:'「AI 없이 쓰기」로 되어 있습니다. 「내 AI 등록」에서 AI를 고르세요.',no_key:'AI 키가 없습니다. 「내 AI 등록」에서 키를 넣어 주세요.',
