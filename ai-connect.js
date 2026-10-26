@@ -277,7 +277,11 @@ async function read(files){
   return out;
 }
 function b64(b){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){var u=String(r.result);res({mime:b.type||'image/jpeg',data:u.slice(u.indexOf(',')+1)});};r.onerror=rej;r.readAsDataURL(b);});}
-function pickJson(t){t=String(t||'').replace(/```(json)?/g,'');var i=t.indexOf('{'),j=t.lastIndexOf('}');if(i<0||j<i)throw {code:'bad_json'};try{return JSON.parse(t.slice(i,j+1));}catch(e){throw {code:'bad_json'};}}
+function pickJson(t){t=String(t||'').replace(/```(json)?/g,'');var i=t.indexOf('{'),j=t.lastIndexOf('}');if(i<0||j<i)throw {code:'bad_json'};var b=t.slice(i,j+1);try{return JSON.parse(b);}catch(e){}
+  /* 화면에서 긁어 복사하면 따옴표가 “ ” 로 바뀌어 오는 경우: 곧은 따옴표로 바꿔 한 번 더 읽는다 */
+  try{return JSON.parse(b.replace(/[\u201C\u201D\u201E\u201F\u2033]/g,'"'));}catch(e){throw {code:'bad_json'};}}
+/* 붙여넣기 방식에서 클립보드에 아직 '보낸 질문'이 남아 있으면 답으로 착각하지 않게 한다 */
+function isQuestion(t,q){t=String(t||'');return t.indexOf('[한국보험금융 FC 포털 요청]')>=0||t.indexOf('<<KIF-PACKAGE')>=0||t.replace(/\s+/g,'')===String(q||'').replace(/\s+/g,'');}
 
 /* ---------- AI 부르기 ---------- */
 async function apiCall(p,key,mdl,prompt,imgs){
@@ -335,10 +339,10 @@ function pasteAsk(q,scanned){
     document.body.appendChild(w);
     var g=function(k){return w.querySelector('[data-q="'+k+'"]');};g('qtext').value=q;
     var sent=false;
-    var onF=function(){if(!sent||!(navigator.clipboard&&navigator.clipboard.readText))return;setTimeout(function(){navigator.clipboard.readText().then(function(t){if(t===q)return;var r;try{r=pickJson(t);}catch(e){return;}fin();res(r);},function(){});},400);};
+    var onF=function(){if(!sent||!(navigator.clipboard&&navigator.clipboard.readText))return;setTimeout(function(){navigator.clipboard.readText().then(function(t){if(t===q||isQuestion(t,q))return;var r;try{r=pickJson(t);}catch(e){return;}fin();res(r);},function(){});},400);};
     var esck=function(e){if(e.key==='Escape'){fin();rej({code:'paste_cancel'});}};
     var fin=function(){w.remove();window.removeEventListener('focus',onF);document.removeEventListener('keydown',esck);};
-    var tryApply=function(t,clip){var r;try{r=pickJson(t);}catch(e){g('amsg').textContent=clip?'복사된 내용이 AI 답이 아닙니다. AI 답의 복사 아이콘을 누른 뒤 다시 가져오세요.':'JSON 형식의 답을 찾지 못했습니다. AI 답 전체를 복사했는지 확인하세요.';return;}fin();res(r);};
+    var tryApply=function(t,clip){if(isQuestion(t,q)){g('amsg').textContent='지금 복사돼 있는 것은 보낸 질문입니다. AI 창에서 답 아래의 복사 아이콘을 누른 뒤 다시 가져오세요.';return;}var r;try{r=pickJson(t);}catch(e){g('amsg').textContent=clip?'복사된 내용이 AI 답이 아닙니다. AI 답의 복사 아이콘을 누른 뒤 다시 가져오세요.':'JSON 형식의 답을 찾지 못했습니다. AI 답 전체를 복사했는지 확인하세요.';return;}fin();res(r);};
     window.addEventListener('focus',onF);document.addEventListener('keydown',esck);
     var copyNow=function(){var t=document.createElement('textarea');t.value=q;t.setAttribute('readonly','');t.style.cssText='position:fixed;left:-9999px;top:0';w.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}t.remove();
       if(!ok&&navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(q).catch(function(){});ok=true;}return ok;};
