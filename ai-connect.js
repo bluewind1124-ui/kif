@@ -234,6 +234,23 @@ async function officeText(buf){
 }
 /* 글자 정보 없이 모양만 저장된 PDF: AI 없이 이 브라우저에서 문자 인식(OCR)으로 글자를 읽는다 (한국어+영어, 처음 한 번 인식 데이터 내려받기) */
 var TESS='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+/* 고른 쪽만 문자 인식 (약관 분석: 글자 없는 쪽만 골라 읽기). 결과 {쪽번호:글자} */
+async function ocrPages(buf,list,prog){
+  await loadLib(PDFJS,'pdfjsLib');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  try{await loadLib(TESS,'Tesseract');}catch(e){throw {code:'ocr_lib',message:'문자 인식 도구를 불러오지 못했습니다(인터넷 연결 확인).'};}
+  var doc=await pdfjsLib.getDocument({data:buf.slice(0)}).promise,out={};
+  prog&&prog('문자 인식 준비 중… (처음 한 번은 인식 데이터를 내려받아 조금 걸립니다)');
+  var w=await Tesseract.createWorker('kor+eng',1,{workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1'});
+  try{
+    for(var k=0;k<list.length;k++){var i=list[k];if(i<1||i>doc.numPages)continue;prog&&prog('문자 인식 중… '+(k+1)+'/'+list.length+'쪽 (p.'+i+')');
+      var pg=await doc.getPage(i),v0=pg.getViewport({scale:1}),vp=pg.getViewport({scale:Math.min(3,2000/v0.width)}),cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;
+      var g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);await pg.render({canvasContext:g,viewport:vp}).promise;
+      var r=await w.recognize(cv),t=String(r.data.text||'');
+      t=t.split('\n').map(function(l){var parts=l.trim().split(/\s+/),one=parts.filter(function(x){return /^[가-힣]$/.test(x);}).length;return parts.length>3&&one/parts.length>0.6?l.replace(/([가-힣])\s(?=[가-힣])/g,'$1'):l.trim();}).filter(Boolean).join('\n');
+      out[i]=t;}
+  }finally{try{await w.terminate();}catch(e){}}
+  return out;
+}
 async function ocrPdf(buf,maxPages,prog){
   await loadLib(PDFJS,'pdfjsLib');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   try{await loadLib(TESS,'Tesseract');}catch(e){throw {code:'ocr_lib',message:'문자 인식 도구를 불러오지 못했습니다(인터넷 연결 확인).'};}
@@ -321,12 +338,13 @@ async function relayCall(c,prompt,imgs){
   return j.text||'';
 }
 var PASTE_HEAD='[한국보험금융 FC 포털 요청] 아래 지시를 그대로 따르고, 설명 없이 JSON 하나만 답하세요.\n\n';
-function pasteAsk(q,scanned){
+function pasteAsk(q,scanned,step){
   addCss();
   return new Promise(function(res,rej){
     var c=cfg(),w=document.createElement('div');
     w.className='kai-ov';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label','AI에게 읽히기');
     w.innerHTML='<div class="kai-box"><div class="kai-hd"><h2>AI에게 읽히기</h2><button type="button" class="kai-btn g kai-x" data-q="cancel" aria-label="닫기">✕</button></div>'+
+      (step?'<div class="kai-big" style="background:#e8eef7;border-color:#0f2240"><b>'+esc(step)+'</b></div>':'')+
       '<div class="kai-big"><b>질문은 포털이 이미 만들어 두었습니다. 새로 쓰지 마세요.</b><br>① 아래 버튼을 누르면 질문이 복사되고 AI 창이 열립니다 → ② 열린 창의 입력칸을 한 번 누르고 <b>Ctrl+V</b>(붙여넣기, 휴대폰은 길게 눌러 「붙여넣기」) → ③ <b>보내기</b>(Enter) → ④ 답이 나오면 답 아래 <b>복사</b> 아이콘을 누르고 이 창으로 돌아오기</div>'+
       '<ol class="kai-steps">'+
       '<li><b>AI를 골라 질문 보내기</b><p class="kai-note">입력칸이 비어 있는 게 정상입니다. 거기에 붙여넣기만 하면 됩니다.'+
@@ -366,7 +384,7 @@ async function ask(prompt,mat){
   var c=cfg(),p=c.prov;mat=mat||{text:'',images:[],scanned:[]};
   if(c.mode!=='ai')throw {code:'ai_off'};
   var full=prompt+(mat.text?'\n\n자료:\n'+mat.text:'')+(mat.images.length?'\n\n(첨부한 사진·스캔 '+mat.images.length+'장도 함께 읽으세요)':'');
-  if(p==='paste')return await pasteAsk(PASTE_HEAD+full,mat.scanned||[]);
+  if(p==='paste')return await pasteAsk(PASTE_HEAD+full,mat.scanned||[],mat.step||'');
   if(p==='claudeapp'){var h=claudeHost(),s=h&&await h.use('sample');if(!s)throw {code:'unavailable'};var o={};if(mat.images.length)o.images=mat.images;return await s.json(full,o);}
   var imgs=await Promise.all(mat.images.map(b64));
   if(p==='company'){if(!companyOk())throw {code:AI_PROXY?'admin_only':'no_proxy'};return pickJson(await relayCall(c,full,imgs));}
@@ -422,5 +440,5 @@ function fdBox(){
 var folder={name:FD_NAME,ok:fdOk,get:fdGet,label:fdLabel,pick:fdPick,write:fdWrite,clear:fdClear,perm:fdPerm,err:fdErr};
 if(document.readyState!=='loading')addCss();else document.addEventListener('DOMContentLoaded',addCss);
 window.addEventListener('storage',function(e){if(e.key===AIK)fire();});
-window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,err:err,migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
+window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,ocrPages:ocrPages,err:err,migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
 })();
