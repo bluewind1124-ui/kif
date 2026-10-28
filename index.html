@@ -1791,6 +1791,15 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* 교육센터 새 강의: 교육센터는 다른 회사 사이트라 포털이 직접 읽을 수 없다.
      관리자가 교육센터에 접속한 그 순간의 화면 글(Ctrl+A·Ctrl+C 또는 즐겨찾기 버튼)을 받아 강의 제목·길이·날짜를 뽑는다. */
   function lectParse(t){
+    t=String(t||'');
+    if(t.indexOf('##KIFLECT##')>=0){
+      var S=t.split('##RAW##'),rs=[],seenS={};
+      S[0].split('\n').forEach(function(x){var c=x.split('\t');if(c[0]!=='S'||!c[3])return;var ti=c[3].replace(/\s+/g,' ').trim();if(seenS[ti])return;seenS[ti]=1;rs.push({sec:c[1]||'',r:[c[2]||'',ti,c[4]||'',c[5]||'']});});
+      var nw=rs.filter(function(o){return /신규|최신|새\s*강의|NEW/i.test(o.sec);});
+      var pick=(nw.length?nw:rs).map(function(o){return o.r;});
+      if(pick.length)return pick.slice(0,12);
+      t=S[1]||'';
+    }
     var L=String(t||'').replace(/\r/g,'').split('\n').map(function(x){return x.replace(/ /g,' ').trim();}).filter(Boolean);
     var DUR=/(\d{1,2}:\d{2}:\d{2})/,DT=/(20\d{2})[.\-\/]\s?(\d{1,2})[.\-\/]\s?(\d{1,2})/,
         NOISE=/^(NEW|N|new|신규|HOT|수강하기|수강신청|바로가기|보기|더보기|상세보기|학습하기|이어보기|재생|▶|>|›|\+|more|MORE)$/,
@@ -1799,7 +1808,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var clean=function(x){return String(x||'').replace(DUR,'').replace(DT,'').replace(/\b(NEW|HOT)\b/g,'').replace(/(수강하기|바로가기|학습하기|상세보기)/g,'').replace(/\s{2,}/g,' ').replace(/^[\s|·:\-]+|[\s|·:\-]+$/g,'').trim();};
     var catOf=function(x){x=String(x||'');for(var i=0;i<CATS.length;i++)if(x.indexOf(CATS[i])>=0)return CATS[i];return '';};
     var onlyCat=function(x){var c=clean(x);return !!c&&catOf(c)===c;};
-    var isTitle=function(x){var c=clean(x);return ko(c)>=5&&c.length<=80&&!NOISE.test(c)&&!onlyCat(x);};
+    var isTitle=function(x){var c=clean(x);return !/썸네일|이미지$|콘텐츠$|Shorts|바로가기|반갑습니다|로그아웃|강의실|마이페이지/.test(c)&&ko(c)>=5&&c.length<=80&&!NOISE.test(c)&&!onlyCat(x);};
     var fmt=function(m){return m?m[1]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[3]).slice(-2):'';};
     var out=[],seen={};
     var add=function(cat,title,dur,date){title=clean(title);if(!title||seen[title])return;seen[title]=1;out.push([cat||'',title,dur||'',date||'']);};
@@ -1818,10 +1827,41 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!out.length)L.forEach(function(x,i){if(/^\[\s*\d{1,2}월\s*\d\s*주\s*\]/.test(x)){var date='';for(var q=Math.max(0,i-1);!date&&q<=Math.min(L.length-1,i+2);q++)date=fmt(L[q].match(DT));add(catOf(L[i-1]||'')||'주간생생정보',x,'',date);}});
     return out.slice(0,12);
   }
+  /* 교육센터 화면에서 실행되는 즐겨찾기 코드: 재생시간 표시(00:07:14·카드뉴스)를 찾고, 그 표시 하나만 들어 있는 가장 큰 칸(강의 카드)에서
+     제목(숨겨진 글·title 속성 포함)·분류·날짜를 읽어 「##KIFLECT##」 형식으로 포털에 보낸다. 화면 글 전체도 예비로 함께 보낸다. */
+  function lectBmSrc(home){
+    var DUR=/(\d{1,2}:\d{2}:\d{2})/,BADGE=/\d{1,2}:\d{2}:\d{2}|카드뉴스/g,DT=/(20\d{2})[.\-\/]\s?(\d{1,2})[.\-\/]\s?(\d{1,2})/,
+        HEAD=/(신규\s*콘텐츠|최신\s*강의|새\s*강의|신규\s*강의|인기\s*콘텐츠|금주의\s*Shorts|추천\s*콘텐츠)/i;
+    var sp=function(x){return String(x||'').replace(/\s+/g,' ').trim();};
+    var ko=function(x){return (String(x).match(/[가-힣]/g)||[]).length;};
+    var bad=function(x){return !x||/썸네일|이미지$|바로가기|로그아웃|강의실|반갑습니다/.test(x)||sp(x.replace(DUR,'').replace('카드뉴스','')).length<2;};
+    var nb=function(a){return (sp(a.textContent).match(BADGE)||[]).length;};
+    var texts=function(a){var o=[],n=[a].concat([].slice.call(a.querySelectorAll('*')));n.forEach(function(e){
+        if(!e.children.length)o.push(sp(e.textContent));['title','data-title','aria-label','alt'].forEach(function(k){var v=e.getAttribute&&e.getAttribute(k);if(v)o.push(sp(v));});});return o;};
+    var head=function(el){for(var a=el,k=0;a&&k<15;a=a.parentElement,k++){for(var p=a.previousElementSibling,j=0;p&&j<5;p=p.previousElementSibling,j++){var t=sp(p.textContent);if(t&&t.length<=40){var m=t.match(HEAD);if(m)return m[1];}}}return '';};
+    var rows=[],raw=[],seen={};
+    var scan=function(d){
+      try{raw.push(d.body.innerText);}catch(e){}
+      var all=d.body?d.body.getElementsByTagName('*'):[];
+      for(var i=0;i<all.length;i++){var el=all[i];if(el.children.length)continue;var t=sp(el.textContent);if(!t||t.length>24)continue;
+        var m=t.match(DUR),dur=m?m[1]:(t.indexOf('카드뉴스')>=0?'카드뉴스':'');if(!dur)continue;
+        var card=null;for(var a=el.parentElement,k=0;a&&k<8&&a!==d.body;a=a.parentElement,k++){if(nb(a)>1)break;card=a;}
+        if(!card)continue;
+        var tx=texts(card).filter(function(x){return !bad(x)&&ko(x)>=2&&x.length<=120;}),title='',cat='';
+        tx.forEach(function(x){if(ko(x)>=4&&x.length>title.length)title=x;});
+        if(!title||seen[title])continue;seen[title]=1;
+        tx.forEach(function(x){if(!cat&&x!==title&&x.length<=14&&title.indexOf(x)<0)cat=x;});
+        var dm=sp(card.textContent).match(DT);
+        rows.push(['S',head(card),cat,title.replace(DUR,'').trim(),dur,dm?dm[1]+'-'+('0'+dm[2]).slice(-2)+'-'+('0'+dm[3]).slice(-2):''].join('\t'));}
+      [].forEach.call(d.querySelectorAll('iframe,frame'),function(f){try{if(f.contentDocument)scan(f.contentDocument);}catch(e){}});
+    };
+    scan(document);
+    var out='##KIFLECT##\n'+rows.join('\n')+'\n##RAW##\n'+raw.join('\n');
+    window.open(home+'#lectpaste='+encodeURIComponent(out.slice(0,20000)));
+  }
   function lectBm(){
     var home=location.origin+location.pathname;
-    var js="(function(){var t=[];function g(d){try{t.push(d.body.innerText);[].forEach.call(d.querySelectorAll('iframe,frame'),function(f){try{g(f.contentDocument);}catch(e){}});}catch(e){}}g(document);window.open('"+home+"#lectpaste='+encodeURIComponent(t.join('\\n').slice(0,20000)));})();";
-    return 'javascript:'+encodeURIComponent(js);
+    return 'javascript:'+encodeURIComponent('('+lectBmSrc.toString()+')('+JSON.stringify(home)+');void 0');
   }
   function lectHtml(){
     return '<div class="panel" id="lectBox"><h3>교육센터 새 강의 <span class="note">'+(LECT_AT?'마지막 확인: '+esc(LECT_AT):'아직 확인 기록이 없습니다')+'</span></h3>'+
@@ -1837,9 +1877,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function bindLect(mark){
     var go2=document.getElementById('lectGo'),pa=document.getElementById('lectPaste'),ta=document.getElementById('cLect'),m=document.getElementById('lectMsg');if(!go2)return;
     var run=function(txt){var r=lectParse(txt);
+      if(!r.length&&/썸네일/.test(txt)){m.innerHTML='⚠ 복사한 글에 <b>강의 제목이 들어 있지 않습니다</b>(교육센터는 제목을 그림 위에 숨겨 두어 Ctrl+C로는 재생시간만 복사됩니다). 아래 「즐겨찾기 버튼 하나로 보내기」를 쓰면 제목까지 읽습니다.';return;}
       if(!r.length){m.innerHTML='⚠ 강의를 찾지 못했습니다. 교육센터의 <b>강의 목록 화면</b>(제목과 재생 시간이 보이는 화면)에서 다시 복사해 보세요. 직접 적어도 됩니다.';return;}
       ta.value=lines(r);mark({target:ta});m.innerHTML='✓ 강의 <b>'+r.length+'건</b>을 찾았습니다 ('+nowTxt()+' 기준). 목록을 확인하고 맨 아래 「저장」을 누르세요.';};
     go2.onclick=function(){run(pa.value);};
+    ta.addEventListener('paste',function(e){var t=(e.clipboardData||window.clipboardData);t=t?t.getData('text'):'';
+      if(t&&t.indexOf('|')<0&&t.split('\n').filter(function(x){return x.trim();}).length>3){e.preventDefault();pa.value=t;run(t);}});
     var pend='';try{pend=sessionStorage.getItem('kif_lect_paste')||'';sessionStorage.removeItem('kif_lect_paste');}catch(e){}
     if(pend){pa.value=pend.slice(0,20000);run(pend);var bx=document.getElementById('lectBox');if(bx&&bx.scrollIntoView)setTimeout(function(){bx.scrollIntoView({block:'start'});},50);}
   }
@@ -1881,7 +1924,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function cmsCollect(){
     var v=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
     var c={ver:Date.now(),updated:new Date().toLocaleString('ko-KR'),
-      notices:rows(v('cNotice'),3),news:rows(v('cNews'),7),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),4),lectAt:CMS_D.lect?nowTxt():((SITE&&SITE.lectAt)||LECT_AT||undefined),
+      notices:rows(v('cNotice'),3),news:rows(v('cNews'),7),awards:rows(v('cAward'),5),hypo:rows(v('cHypo'),4),mats:rows(v('cMats'),5),lect:rows(v('cLect'),4).filter(function(r){return r[1]&&!/썸네일/.test(r[1]);}).slice(0,12),lectAt:CMS_D.lect?nowTxt():((SITE&&SITE.lectAt)||LECT_AT||undefined),
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
       aiProxy:v('mProxy'),aiProxyFor:(document.getElementById('mProxyFor')||{}).value==='admin'?'admin':'all',aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,car:(SITE&&SITE.car)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
@@ -1901,7 +1944,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   async function cmsPublish(){
     var KS=window.KSAVE,keys=Object.keys(CMS_D),lab=cmsLabel(),msg=document.getElementById('cmsMsg')||{};if(!keys.length)return true;
     if(!ghTok()){KS.fail(lab,new Error('GitHub 연결(토큰)이 아직 없습니다. 관리자 페이지 › 자료 올리기 › GitHub 연결 설정에서 저장하세요.'));msg.textContent='⚠ GitHub 연결(토큰)을 먼저 저장하세요.';return false;}
-    var n=cmsCollect();KS.start(lab);msg.textContent='저장 중…';
+    var n=cmsCollect();
+    if(CMS_D.lect&&!n.lect.length){msg.textContent='⚠ 교육센터 강의 칸에 저장할 강의가 없습니다. 「② 강의 찾기」로 찾은 목록(분류 | 제목 | 길이 | 날짜)을 확인한 뒤 저장하세요.';return false;}
+    KS.start(lab);msg.textContent='저장 중…';
     try{var cur=await KIFPUB.patch(function(c){keys.forEach(function(k){
           if(k==='concept'){c.concept=Object.assign({},c.concept||{},n.concept);}
           else if(k==='opts'){if(n.opts){c.opts=n.opts;c.optsVer=n.optsVer;}}
