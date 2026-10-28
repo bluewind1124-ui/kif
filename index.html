@@ -1792,6 +1792,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
      관리자가 교육센터에 접속한 그 순간의 화면 글(Ctrl+A·Ctrl+C 또는 즐겨찾기 버튼)을 받아 강의 제목·길이·날짜를 뽑는다. */
   function lectParse(t){
     t=String(t||'');
+    if(t.indexOf('##KIFLECT##')<0&&/<(html|body|div|li|ul|a)[\s>]/i.test(t)){try{t=lectBmSrc('',new DOMParser().parseFromString(t,'text/html'));}catch(e){}}
     if(t.indexOf('##KIFLECT##')>=0){
       var S=t.split('##RAW##'),rs=[],seenS={};
       S[0].split('\n').forEach(function(x){var c=x.split('\t');if(c[0]!=='S'||!c[3])return;var ti=c[3].replace(/\s+/g,' ').trim();if(seenS[ti])return;seenS[ti]=1;rs.push({sec:c[1]||'',r:[c[2]||'',ti,c[4]||'',c[5]||'']});});
@@ -1829,7 +1830,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   /* 교육센터 화면에서 실행되는 즐겨찾기 코드: 재생시간 표시(00:07:14·카드뉴스)를 찾고, 그 표시 하나만 들어 있는 가장 큰 칸(강의 카드)에서
      제목(숨겨진 글·title 속성 포함)·분류·날짜를 읽어 「##KIFLECT##」 형식으로 포털에 보낸다. 화면 글 전체도 예비로 함께 보낸다. */
-  function lectBmSrc(home){
+  function lectBmSrc(home,doc){
     var DUR=/(\d{1,2}:\d{2}:\d{2})/,BADGE=/\d{1,2}:\d{2}:\d{2}|카드뉴스/g,DT=/(20\d{2})[.\-\/]\s?(\d{1,2})[.\-\/]\s?(\d{1,2})/,
         HEAD=/(신규\s*콘텐츠|최신\s*강의|새\s*강의|신규\s*강의|인기\s*콘텐츠|금주의\s*Shorts|추천\s*콘텐츠)/i;
     var sp=function(x){return String(x||'').replace(/\s+/g,' ').trim();};
@@ -1839,7 +1840,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var texts=function(a){var o=[],n=[a].concat([].slice.call(a.querySelectorAll('*')));n.forEach(function(e){
         if(!e.children.length)o.push(sp(e.textContent));['title','data-title','aria-label','alt'].forEach(function(k){var v=e.getAttribute&&e.getAttribute(k);if(v)o.push(sp(v));});});return o;};
     var head=function(el){for(var a=el,k=0;a&&k<15;a=a.parentElement,k++){for(var p=a.previousElementSibling,j=0;p&&j<5;p=p.previousElementSibling,j++){var t=sp(p.textContent);if(t&&t.length<=40){var m=t.match(HEAD);if(m)return m[1];}}}return '';};
-    if(!/fnkorea/i.test(location.hostname)){alert('교육센터(kif.fnkorea.com) 화면이 아닙니다.\n지금 화면: '+location.hostname+'\n\n교육센터 탭을 앞에 띄운 상태에서 이 즐겨찾기를 눌러 주세요.');return;}
+    if(!doc&&!/fnkorea/i.test(location.hostname)){alert('교육센터(kif.fnkorea.com) 화면이 아닙니다.\n지금 화면: '+location.hostname+'\n\n교육센터 탭을 앞에 띄운 상태에서 이 즐겨찾기를 눌러 주세요.');return;}
     var rows=[],raw=[],seen={};
     var scan=function(d){
       try{raw.push(d.body.innerText);}catch(e){}
@@ -1856,8 +1857,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         rows.push(['S',head(card),cat,title.replace(DUR,'').trim(),dur,dm?dm[1]+'-'+('0'+dm[2]).slice(-2)+'-'+('0'+dm[3]).slice(-2):''].join('\t'));}
       [].forEach.call(d.querySelectorAll('iframe,frame'),function(f){try{if(f.contentDocument)scan(f.contentDocument);}catch(e){}});
     };
-    scan(document);
-    var out='##KIFLECT## '+location.hostname+'\n'+rows.join('\n')+'\n##RAW##\n'+raw.join('\n');
+    scan(doc||document);
+    var out='##KIFLECT## '+(doc?'source':location.hostname)+'\n'+rows.join('\n')+'\n##RAW##\n'+raw.join('\n');
+    if(doc)return out;
     window.open(home+'#lectpaste='+encodeURIComponent(out.slice(0,20000)));
   }
   function lectBm(){
@@ -1868,7 +1870,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return '<div class="panel" id="lectBox"><h3>교육센터 새 강의 <span class="note">'+(LECT_AT?'마지막 확인: '+esc(LECT_AT):'아직 확인 기록이 없습니다')+'</span></h3>'+
       '<p class="note">교육센터는 다른 회사 사이트라 포털이 혼자 읽을 수는 없습니다. 관리자가 교육센터에 접속한 <b>그 순간의 화면</b>을 가져와 새 강의를 뽑고, 「확인 시각」과 함께 홈·교육센터 화면에 보여 줍니다.</p>'+
       '<ol class="note" style="margin:4px 0 8px;padding-left:1.2em;line-height:1.9"><li><a class="btn sm" style="text-decoration:none" target="_blank" rel="noopener" href="'+EDU+'">① 교육센터 열기 ↗</a> 로그인 후 새 강의(최신 강의) 목록 화면으로 갑니다.</li>'+
-      '<li>그 화면에서 <b>Ctrl+A</b>(전체 선택) → <b>Ctrl+C</b>(복사)</li><li>아래 칸에 <b>Ctrl+V</b>로 붙여 넣고 「② 강의 찾기」를 누릅니다.</li><li>찾은 목록을 확인하고 맨 아래 「저장」을 누르면 모든 FC 화면에 바뀝니다.</li></ol>'+
+      '<li>그 화면에서 <b>Ctrl+U</b>(소스 보기 창이 열림) → 열린 창에서 <b>Ctrl+A</b>(전체 선택) → <b>Ctrl+C</b>(복사)<br><span style="color:#8a6d1f">※ 그냥 화면에서 Ctrl+A·Ctrl+C를 하면 교육센터가 강의 제목을 숨겨 두어 제목이 복사되지 않습니다.</span></li><li>아래 칸에 <b>Ctrl+V</b>로 붙여 넣고 「② 강의 찾기」를 누릅니다.</li><li>찾은 목록을 확인하고 맨 아래 「저장」을 누르면 모든 FC 화면에 바뀝니다.</li></ol>'+
       '<textarea class="in" id="lectPaste" rows="4" placeholder="교육센터 화면에서 복사한 글을 여기에 붙여 넣으세요"></textarea>'+
       '<div class="row" style="margin:6px 0;gap:8px;flex-wrap:wrap"><button class="btn" type="button" id="lectGo">② 강의 찾기</button><span class="note" id="lectMsg" role="status"></span></div>'+
       '<label class="f">찾은 강의 (고쳐도 됩니다) <span class="note">한 줄에 한 건 · 분류 | 제목 | 길이(00:07:14) | 날짜(2026-10-14)</span><textarea class="in" id="cLect" rows="5">'+esc(lines(LECT))+'</textarea></label>'+
@@ -1885,7 +1887,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       ta.value=lines(r);mark({target:ta});m.innerHTML='✓ 강의 <b>'+r.length+'건</b>을 찾았습니다 ('+nowTxt()+' 기준). 목록을 확인하고 맨 아래 「저장」을 누르세요.';};
     go2.onclick=function(){run(pa.value);};
     ta.addEventListener('paste',function(e){var t=(e.clipboardData||window.clipboardData);t=t?t.getData('text'):'';
-      if(t&&t.indexOf('|')<0&&t.split('\n').filter(function(x){return x.trim();}).length>3){e.preventDefault();pa.value=t;run(t);}});
+      if(t&&(t.indexOf('|')<0||/<(html|body|div)[\s>]/i.test(t))&&t.split('\n').filter(function(x){return x.trim();}).length>3){e.preventDefault();pa.value=t;run(t);}});
     var pend='';try{pend=sessionStorage.getItem('kif_lect_paste')||'';sessionStorage.removeItem('kif_lect_paste');}catch(e){}
     if(pend){pa.value=pend.slice(0,20000);run(pend);var bx=document.getElementById('lectBox');if(bx&&bx.scrollIntoView)setTimeout(function(){bx.scrollIntoView({block:'start'});},50);}
   }
