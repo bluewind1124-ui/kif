@@ -47,6 +47,10 @@ button,input,select{font:inherit;color:inherit}
 .card .ci svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .card b{font-size:15px}
 .card p{margin:0;color:var(--muted);font-size:13px}
+.claimbox{background:linear-gradient(135deg,var(--navy),var(--navy-2));border-radius:8px;padding:14px 14px 12px;margin:16px 0 4px;color:#fff}
+.claimbox .sec{margin:0 0 10px;color:#fff}.claimbox .sec span{color:var(--gold)}.claimbox .sec em{font-style:normal;font-weight:400;font-size:12.5px;opacity:.8}
+.claimbox .card{text-decoration:none;color:var(--ink);min-height:104px}
+.claimbox .more{margin:10px 0 0;font-size:12.5px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}.claimbox .more a{color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:3px 10px;text-decoration:none}.claimbox .more a:hover{border-color:var(--gold)}
 .card .tag{position:absolute;top:12px;right:40px;font-size:11px;color:var(--gold-ink);background:var(--gold-soft);padding:1px 7px;border-radius:999px}
 .star{position:absolute;top:8px;right:8px;border:0;background:none;font-size:18px;cursor:pointer;color:var(--line-2);padding:2px 4px}
 .star.on{color:var(--gold)}
@@ -219,6 +223,9 @@ function rateList(T){return T.map(function(r){return r[1];}).join('·')+'%';}
 
 /* ---------- 아이콘 ---------- */
 var ICO={
+  car:'<path d="M5 16h14M6 16l1.5-5h9L18 16M5 16v3h2v-2M19 16v3h-2v-2M8 13.5h.01M16 13.5h.01M8 11l1-3h6l1 3"/>',
+  hosp:'<path d="M4 21V7l8-4 8 4v14M10 21v-5h4v5M12 8v4M10 10h4"/>',
+  work:'<path d="M4 14h16v6H4zM8 14V9a4 4 0 018 0v5M12 5V3"/>',
   shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
   heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/><path d="M8 11h2l1-2 2 4 1-2h2"/>',
   care:'<path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0"/><path d="M17 3l2 2-2 2"/>',
@@ -666,6 +673,17 @@ function card(c){var on=favs().indexOf(c.id)>-1;
   return '<div class="card" role="button" tabindex="0" data-open="'+c.id+'"><span class="ci">'+svg(c.ic)+'</span><span class="tag">'+catName(c.cat)+'</span>'+
     '<button class="star'+(on?' on':'')+'" data-fav="'+c.id+'" aria-label="즐겨찾기">'+(on?'★':'☆')+'</button><b>'+esc(c.name)+'</b><p>'+esc(c.d)+'</p></div>';}
 
+/* ---------- 보험금 계산기 묶음 (claim.html) — 금융계산기 맨 앞에 따로 둔다 ---------- */
+var CLAIM=[['silson','hosp','실손의료비','병원 영수증 칸을 옮겨 넣으면 1~5세대 실손 보험금을 계산합니다.','실손 실비 실손의료비 영수증 도수 비급여 급여 통원 입원 세대 보험금 청구'],
+  ['car','car','자동차보험','사고 개요 → 과실 → 대인·대물 → 종합 결과까지 단계로 합의금을 짚어 봅니다.','자동차 교통사고 합의금 대인 대물 과실 위자료 휴업손해 상해급수 대차료 시세하락'],
+  ['work','work','산재 · 근재 · 배상책임(민사)','산재 휴업·장해급여, 근재보험 추가 청구, 민사 손해배상액을 계산합니다.','산재 근재 산업재해 휴업급여 장해급여 사용자배상 배상책임 민사 손해배상 일실수입 위자료']];
+function claimHref(h){return 'claim.html'+(EMB?'?embed=1':'')+'#'+h;}
+function claimHtml(q){
+  var list=CLAIM.filter(function(c){if(!q)return true;return q.split(/\s+/).every(function(w){return (c[2]+' '+c[4]).toLowerCase().indexOf(w)>-1;});});
+  if(!list.length)return '';
+  return '<div class="claimbox"><div class="sec">보험금 계산기 <span>'+list.length+'개</span><em>· 고객이 받을 보험금을 영수증·진단서로 먼저 짚어 봅니다</em></div><div class="grid">'+
+    list.map(function(c){return '<a class="card" href="'+claimHref(c[0])+'"><span class="ci">'+svg(c[1])+'</span><span class="tag">보험금</span><b>'+esc(c[2])+'</b><p>'+esc(c[3])+'</p></a>';}).join('')+'</div>'+
+    (q?'':'<div class="more">함께 쓰는 화면 <a href="'+claimHref('diag')+'">상황 진단</a><a href="'+claimHref('liab')+'">배상책임(민사)</a><a href="'+claimHref('fixed')+'">후유장해·입원일당</a><a href="'+claimHref('receipt')+'">병원 영수증 보는 법</a><a href="'+claimHref('tables')+'">기준표</a></div>')+'</div>';}
 function renderList(){
   var q=st.q.trim().toLowerCase(),list=C.filter(function(c){
     if(st.cat!=='all'&&st.cat!=='fav'&&c.cat!==st.cat)return false;
@@ -680,12 +698,12 @@ function renderList(){
   var fv=favs();
   document.getElementById('cats').innerHTML=[['all','전체',C.length],['fav','★ 즐겨찾기',fv.length]].concat(CATS.map(function(k){return [k[0],k[1],C.filter(function(c){return c.cat===k[0];}).length];}))
     .map(function(k){return '<button data-cat="'+k[0]+'" class="'+(st.cat===k[0]?'on':'')+'">'+k[1]+'<em>'+k[2]+'</em></button>';}).join('');
-  var h='';
+  var h=(st.cat==='all'&&st.sit<0&&!isCho(q))?claimHtml(q):'';
   if(!q&&st.cat==='all'&&st.sit<0){var rc=recent().map(byId).filter(Boolean).slice(0,4);
     if(rc.length)h+='<div class="sec">최근 사용 <span>'+rc.length+'</span></div><div class="grid">'+rc.map(card).join('')+'</div>';
     CATS.forEach(function(k){var g=list.filter(function(c){return c.cat===k[0];});h+='<div class="sec">'+k[1]+' <span>'+g.length+'개</span></div><div class="grid">'+g.map(card).join('')+'</div>';});}
-  else h=list.length?'<div class="sec">'+(st.sit>-1?SITS[st.sit][0]:q?'"'+esc(st.q)+'" 찾은 결과':st.cat==='fav'?'즐겨찾기':catName(st.cat))+' <span>'+list.length+'개</span></div><div class="grid">'+list.map(card).join('')+'</div>'
-    :'<div class="empty">'+(st.cat==='fav'?'카드 오른쪽 위 ☆를 누르면 즐겨찾기에 담깁니다.':'찾는 계산기가 없습니다. 다른 낱말이나 초성으로 찾아 보세요.')+'</div>';
+  else h+=list.length?'<div class="sec">'+(st.sit>-1?SITS[st.sit][0]:q?'"'+esc(st.q)+'" 찾은 결과':st.cat==='fav'?'즐겨찾기':catName(st.cat))+' <span>'+list.length+'개</span></div><div class="grid">'+list.map(card).join('')+'</div>'
+    :h?'':'<div class="empty">'+(st.cat==='fav'?'카드 오른쪽 위 ☆를 누르면 즐겨찾기에 담깁니다.':'찾는 계산기가 없습니다. 다른 낱말이나 초성으로 찾아 보세요.')+'</div>';
   document.getElementById('lists').innerHTML=h;
 }
 
