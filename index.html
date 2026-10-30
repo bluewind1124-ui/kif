@@ -587,6 +587,9 @@ tr.dup td{background:#fff3c4}tr.dup.ok td{background:#eef1f6}
 .smpi{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:9px 11px;background:var(--surface);cursor:pointer}
 .smpi.on{border-color:var(--kgold);background:var(--gold-soft)}.smpi.off{opacity:.6;cursor:default}
 .smpk{display:flex;gap:6px;align-items:center;flex:none;cursor:pointer}.smpi.off .smpk{cursor:default}.smpi input{flex:none;width:18px;height:18px}.smpn{flex:none;min-width:44px;font-size:.75rem;font-weight:700;color:var(--gold)}.smpb{flex:1;min-width:0}
+.smpbt{display:flex;flex-wrap:wrap;align-items:flex-start;gap:4px 10px;margin-top:6px}.smpbt details{flex:1 1 220px;min-width:0}.smpbt .btn{flex:none}
+.smpth{flex:none;position:relative;width:96px;height:72px;padding:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff;cursor:zoom-in}.smpth img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}.smpth span{position:absolute;right:0;bottom:0;background:rgba(20,40,75,.85);color:#fff;font-size:.7rem;padding:1px 6px;border-top-left-radius:4px}
+@media (max-width:600px){.smpth{width:64px;height:56px}.smpi{padding:8px}}
 .smpv{white-space:pre-wrap;font:inherit;font-size:.8rem;max-height:220px;overflow:auto;background:var(--bg,#f6f6f6);padding:8px;border-radius:4px;margin:6px 0 0}
 .optc b{font-size:.98rem}
 .optc .d{font-size:.8rem;color:var(--muted);line-height:1.45}
@@ -3044,15 +3047,22 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       if(x.thumb)return '<button type="button" class="mat smp-card" data-smpv="'+i+'"><div class="th img"><img loading="lazy" alt="" src="'+fileHref(x.thumb)+'"><span>'+esc(x.type||'')+'</span></div><div class="mt"><b class="mtt">'+esc(smpTitle(x))+'</b>'+esc(stg[x.stage||'all']||'')+(o.length?' · '+esc(o.join(', ')):'')+' <span class="pill new">보기</span></div></button>';
       return '<button type="button" class="mat smp-card" data-smpv="'+i+'">'+(pv?'<div class="th paper"><span>'+esc(x.type||'')+'</span><div class="smd smd-mini">'+smpDocHtml({text:String(x.text).slice(0,1600),type:x.type,textFrom:x.textFrom},smpNames(x.title))+'</div></div><div class="mt"><b class="mtt">'+esc(smpTitle(x))+'</b>':'<div class="th '+esc(x.type||'')+'"><span>'+esc(x.type||'')+'</span><b>'+esc(smpTitle(x))+'</b></div><div class="mt">')+esc(stg[x.stage||'all']||'')+(o.length?' · '+esc(o.join(', ')):'')+' <span class="pill new">보기</span></div></button>';}).join('')+'</div>';
   }
-  function smpView(i){
-    var x=smpList()[i];if(!x)return;var N=smpNames(x.title),ok=smpReadable(x.text);
+  function smpView(i,from){
+    var x=typeof i==='object'?i:smpList()[i];if(!x)return;var N=smpNames(x.title),ok=smpReadable(x.text);
     var w=document.createElement('div');w.className='mview';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label',smpTitle(x));
-    w.innerHTML='<div class="mvh"><b>'+esc(smpTitle(x))+'</b><span class="note">AI 보장분석 샘플 · '+esc(x.type||'')+'</span><span class="sp"></span><button class="btn sm" type="button" data-go="ai" data-v="x">AI 보장분석 하러 가기</button><button class="btn sm ghost" type="button" data-v="x">닫기 ✕</button></div>'+
+    w.innerHTML='<div class="mvh"><b>'+esc(smpTitle(x))+'</b><span class="note">AI 보장분석 샘플 · '+esc(x.type||'')+'</span><span class="sp"></span>'+(from==='ai'?'':'<button class="btn sm" type="button" data-go="ai" data-v="x">AI 보장분석 하러 가기</button>')+'<button class="btn sm ghost" type="button" data-v="x">닫기 ✕</button></div>'+
       '<div class="mvb"><div class="smp-txt">'+(ok?'<p class="note">AI가 분석·제안서를 쓸 때 형식과 문장을 따라 하는 견본입니다. 고객 이름은 가렸습니다.'+(x.textFrom==='md'||x.type==='MD'?' 마크다운 글을 문서 모양으로 정리해 보여 줍니다. 원본 PDF를 같은 이름으로 올리면 원본 모양으로 바뀝니다.':' 원본 파일이 함께 저장되지 않은 샘플이라 읽은 글을 표·문단으로 정리해 보여 줍니다.')+'</p><div class="smd">'+smpDocHtml(x,N)+'</div>':'<p>이 샘플은 글자를 읽을 수 없는 형식(그림·암호화 문서 등)으로 등록되어 미리보기가 없습니다.</p><p class="note">관리자 › 보장분석 샘플 올리기에서 PDF로 다시 올리면 여기서 볼 수 있습니다.</p>')+'</div></div>';
     document.body.appendChild(w);var prev=document.body.style.overflow;document.body.style.overflow='hidden';
     var close=function(){w.remove();document.body.style.overflow=prev;document.removeEventListener('keydown',ek);},ek=function(e){if(e.key==='Escape')close();};
     document.addEventListener('keydown',ek);w.addEventListener('click',function(e){if(e.target.closest('[data-v="x"]')||e.target.classList.contains('mvb'))close();});
   }
+  /* AI 보장분석 「샘플 직접 고르기」에서 쓰는 샘플 보기: 원본 파일이 있으면 원본(PDF·엑셀·PPT)을, 없으면 읽은 글을 문서 모양으로 */
+  window.KIFSMP={
+    open:function(x){if(!x)return;if(x.file){openMat([x.type||'PDF',smpTitle(x),'','',x.file]);return;}smpView(x,'ai');},
+    href:function(f){return f?fileHref(f):'';},
+    title:function(x){return x?smpTitle(x):'';},
+    mask:function(t,title){return smpMask(t,smpNames(title));}
+  };
   document.addEventListener('click',function(e){
     var b=e.target.closest&&e.target.closest('[data-smpv],[data-smpmv]');if(!b)return;
     if(b.hasAttribute('data-smpv')){var sx=smpList()[+b.getAttribute('data-smpv')];if(sx&&sx.file){openMat([sx.type||'PDF',smpTitle(sx),'','',sx.file]);return;}smpView(+b.getAttribute('data-smpv'));return;}
@@ -4270,6 +4280,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return '<div class="optg" id="aiOptg">'+st.opts.map(function(o,i){var on=ids.indexOf(o.id)>-1,k=ids.indexOf(o.id)+1;return '<label class="optc'+(on?' on':'')+'"><input type="checkbox" name="aiOpt" value="'+o.id+'"'+(on?' checked':'')+'><span class="ck" aria-hidden="true">'+(on?(ids.length>1?k:'✓'):'')+'</span><span class="on-n">옵션 '+(i+1)+'</span><b>'+esc(o.title)+'</b><span class="d">'+esc(o.desc)+'</span>'+(function(){var n=allRefs().filter(function(x){return x.opts&&x.opts.indexOf(o.id)>-1;}).length;return n?'<span class="pill">참고자료 '+n+'건 연결</span>':'';})()+'</label>';}).join('')+'</div>';
   }
   /* 제안서에 쓸 보장분석 샘플: 맡기기 / 직접 고르기 / 사용 안 함 */
+  function smpT(s){return window.KIFSMP?KIFSMP.title(s):s.title;}
+  function smpM(t,title){return window.KIFSMP?KIFSMP.mask(t,title):t;}
   function smpSum(c){var m=smpMode(c),L=smpChosen(c);return m==='none'?'사용 안 함':m==='pick'&&L.length?'직접 고름 · '+esc(L[0].title)+(L.length>1?' 외 '+(L.length-1)+'개':''):'맡기기 (자동)';}
   function smpPanel(c){
     var m=smpMode(c),rec=smpPick(selIds(c),2).map(function(s){return s.id;}),sel=(c.smpIds||[]);
@@ -4280,9 +4292,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var L=SMP.filter(function(s){return s.on!==false&&String(s.text||'').trim();});
     if(m==='auto'){var A=smpPick(selIds(c),2);h+='<p class="note" style="margin-top:8px">지금 옵션 기준 자동 후보: '+(A.length?A.map(function(s,i){return '<b>'+(i+1)+'. '+esc(s.title)+'</b>';}).join(' · '):'맞는 샘플이 없어 기본 규칙으로 씁니다')+'</p>';}
     if(m==='pick'){
-      h+='<div class="smpl">'+(L.length?L.map(function(s){var ok=smpOk(s),k=sel.indexOf(s.id),on=k>-1&&ok,o=(s.opts||[]).map(optName).filter(Boolean).join(', ')||'모든 옵션 공통';
-        return '<div class="smpi'+(on?' on':'')+(ok?'':' off')+'"><label class="smpk"><input type="checkbox" name="smpSel" value="'+s.id+'"'+(on?' checked':'')+(ok?'':' disabled')+'><span class="smpn">'+(on?'샘플 '+(k+1):'고르기')+'</span></label><span class="smpb"><b>'+esc(s.title)+'</b> <span class="pill">'+esc(s.type||'')+'</span>'+(rec.indexOf(s.id)>-1&&ok?' <span class="pill ok">옵션에 맞음 · 추천</span>':'')+(ok?'':' <span class="pill warn">글자를 못 읽은 파일 · 선택 불가</span>')+'<br><span class="note">연결 옵션: '+esc(o)+'</span>'+
-          (ok?'<details><summary class="note">형식 미리보기</summary><pre class="smpv">'+esc(String(s.text).trim().slice(0,600))+'</pre></details>':'')+'</span></div>';}).join(''):'<p class="note">등록된 샘플이 없습니다.</p>')+'</div>'+
+      h+='<p class="note" style="margin:8px 0 0">고르기 전에 <b>🔍 샘플 보기</b>나 오른쪽 작은 그림을 누르면 샘플 원본을 크게 볼 수 있습니다(고객 이름은 가려져 있습니다).</p><div class="smpl">'+(L.length?L.map(function(s){var ok=smpOk(s),k=sel.indexOf(s.id),on=k>-1&&ok,o=(s.opts||[]).map(optName).filter(Boolean).join(', ')||'모든 옵션 공통';
+        return '<div class="smpi'+(on?' on':'')+(ok?'':' off')+'"><label class="smpk"><input type="checkbox" name="smpSel" value="'+s.id+'"'+(on?' checked':'')+(ok?'':' disabled')+'><span class="smpn">'+(on?'샘플 '+(k+1):'고르기')+'</span></label><span class="smpb"><b>'+esc(smpT(s))+'</b> <span class="pill">'+esc(s.type||'')+'</span>'+(rec.indexOf(s.id)>-1&&ok?' <span class="pill ok">옵션에 맞음 · 추천</span>':'')+(ok?'':' <span class="pill warn">글자를 못 읽은 파일 · 선택 불가</span>')+'<br><span class="note">연결 옵션: '+esc(o)+'</span>'+
+          '<span class="smpbt"><button type="button" class="btn sm ghost" data-a="smpLook" data-id="'+esc(s.id)+'">🔍 샘플 보기</button>'+
+          (ok?'<details><summary class="note">AI가 따라 쓸 글 보기</summary><pre class="smpv">'+esc(smpM(String(s.text).trim().slice(0,600),s.title))+'</pre></details>':'')+'</span></span>'+
+          (s.thumb&&window.KIFSMP?'<button type="button" class="smpth" data-a="smpLook" data-id="'+esc(s.id)+'" aria-label="'+esc(smpT(s))+' 샘플 보기"><img loading="lazy" alt="" src="'+esc(KIFSMP.href(s.thumb))+'"><span>보기</span></button>':'')+'</div>';}).join(''):'<p class="note">등록된 샘플이 없습니다.</p>')+'</div>'+
         (smpChosen(c).length?'':'<p class="note" style="margin-top:6px;color:#b42318">아직 고른 샘플이 없어 지금은 「맡기기」처럼 자동으로 고릅니다.</p>');
     }
     return h+'</div>';
@@ -5529,6 +5543,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function onClick(e){
     var b=e.target.closest('[data-a]');if(!b||!root.contains(b))return;
     var a=b.dataset.a,c=cust();
+    if(a==='smpLook'){e.preventDefault();var sl=SMP.filter(function(x){return x.id===b.dataset.id;})[0];if(sl&&window.KIFSMP)KIFSMP.open(sl);return;}
     if(a==='pubRefs'){pubNow();return;}
     if(a==='pkgGrab'){pkgGrab();return;}
     if(a==='smpAdd'){if(!isAdm())return;var ti=document.getElementById('smTitle');SMP.push({id:'s'+Date.now().toString(36),title:(ti&&ti.value.trim())||'새 샘플',type:'글',on:true,text:'',at:new Date().toISOString().slice(0,10)});smpSave('새 샘플 추가');setTimeout(function(){var d=root.querySelectorAll('.smp-c details');if(d.length){d[d.length-1].open=true;d[d.length-1].querySelector('textarea').focus();}},50);return;}
