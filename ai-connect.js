@@ -92,6 +92,11 @@ var css='.kai-ov{position:fixed;inset:0;background:rgba(10,18,26,.55);z-index:99
 '.kai-fd{border:1px solid #e3e7ec;border-radius:10px;padding:12px 14px;margin:10px 0;background:#f8fafc}.kai-fdl{font-size:14px}.kai-fdl span{color:#9aa3ae}.kai-fd .kai-row{margin-top:8px}'+
 '.kai-ul{padding-left:20px;font-size:13px}.kai-faq h3{margin-top:0;font-size:16px}.kai-faq p{font-size:13px;margin:10px 0}'+
 '@media (max-width:640px){.kai-grid{grid-template-columns:1fr;gap:8px}.kai-main{border-left:0;padding-left:0}.kai-nav{display:flex;gap:4px;overflow-x:auto}.kai-nav li{flex:none;padding:4px 8px;border-radius:6px;background:#f2f4f7;font-size:12px}.kai-nav li.on{background:#fdf7ea}}'+
+'.kai-pt{font-size:14px;line-height:1.65;color:inherit}.kai-pt p{margin:0 0 6px}.kai-pt ul{margin:4px 0 6px;padding-left:20px}.kai-pt-h{font-weight:700;margin:10px 0 4px;color:var(--navy-ink,#0f2240)}'+
+'.kai-pt-o{display:grid;gap:8px}.kai-pt-k{border-left:3px solid var(--kgold,#c9a227);padding:2px 0 2px 10px}.kai-pt-k.w{border-color:#b45309;background:var(--warn-soft,#fff7ed)}.kai-pt-l{font-weight:700;font-size:.85rem;color:var(--navy-ink,#0f2240)}.kai-pt-k.w .kai-pt-l{color:var(--warn,#9a3412)}'+
+'.kai-pt-tw{overflow-x:auto;margin:4px 0}.kai-pt-t{border-collapse:collapse;width:100%;font-size:.85rem;min-width:480px}.kai-pt-t th,.kai-pt-t td{border:1px solid var(--line,#d7dde5);padding:5px 8px;text-align:left;vertical-align:top}.kai-pt-t th{background:var(--surface-2,#eef2f7);white-space:nowrap}'+
+'.kai-pt-raw{margin-top:10px;font-size:.8rem}.kai-pt-raw summary{cursor:pointer;color:var(--muted,#5b6b7d)}.kai-pt-raw pre{white-space:pre-wrap;word-break:break-all;background:var(--surface-2,#f4f6f9);border-radius:6px;padding:8px;max-height:300px;overflow:auto;margin:6px 0 0}'+
+'.kai-box .kai-pt{--navy-ink:#0f2240;--surface-2:#eef2f7;--line:#d7dde5;--warn-soft:#fff7ed;--warn:#9a3412;--muted:#5b6b7d;--kgold:#c9a227}'+
 '@media (max-width:560px){.kai-box{padding:16px}.kai-opts{grid-template-columns:1fr}}';
 function addCss(){if(document.getElementById('kai-css'))return;var s=document.createElement('style');s.id='kai-css';s.textContent=css;(document.head||document.documentElement).appendChild(s);}
 
@@ -354,7 +359,7 @@ async function relayCall(c,prompt,imgs){
 }
 var PASTE_HEAD='[한국보험금융 FC 포털 요청] 아래 지시를 그대로 따르고, 설명 없이 JSON 하나만 답하세요.\n\n';
 /* 직전에 받은 답(여러 번 붙여넣는 작업에서 이전 단계 답이 클립보드에 남아 다시 들어오는 것 막기) */
-var LAST_ANS='';
+var LAST_ANS='',RETRY=3;
 /* 받은 글 → 답. parse: 모양이 조금 어긋나도 필요한 것만 꺼내는 보조 읽기, check: 이번 단계에 맞는 모양인지 */
 function readAns(t,parse,check,explicit){
   var r=null,err={code:'bad_json'};
@@ -366,9 +371,10 @@ function readAns(t,parse,check,explicit){
 function pasteAsk(q,scanned,step,parse,check,want){
   var rd=function(t,explicit){return readAns(t,parse,check,explicit);};
   var goBtn=function(){var c0=cfg(),x=PASTE_SITES.filter(function(y){return y[0]===c0.site;})[0]||PASTE_SITES[0];return '<br><button type="button" class="kai-btn p" data-q="go" data-v="'+x[0]+'" style="margin-top:6px">① 이번 질문 복사하고 '+x[1]+' 새 창 열기 ↗</button> <span style="font-weight:400">② 새 창에 붙여넣고 보내기 → ③ 새 답을 복사해 여기로</span>';};
+  var badT='',pv=function(t){badT=String(t||'');return badT.trim().length>20?'<br><button type="button" class="kai-btn g" data-q="pv" style="margin-top:6px">붙여넣은 답 내용 정리해서 보기</button>':'';};
   var why=function(e,t){if(String(t||'').trim()===LAST_ANS)return '이것은 <b>앞 단계에서 이미 넣은 답</b>입니다. 지금은 다음 단계라 <b>새 질문</b>을 AI에 보내고 그 새 답을 넣어야 합니다.'+goBtn();
-    if(e&&e.code==='wrong_shape')return '이 답은 <b>이번 단계에 맞는 모양이 아닙니다</b>'+(want?' (이번에는 '+esc(want)+'(으)로 답해야 함)':'')+'. 앞 단계 답을 다시 넣었거나, AI가 앞 대화를 보고 다른 모양으로 답했을 수 있습니다. <b>새 AI 창</b>에 이번 질문을 보내 주세요.'+goBtn();
-    return '복사된 내용에서 AI 답을 찾지 못했습니다. AI 답 아래의 복사 아이콘을 누른 뒤 다시 가져오거나, 답 전체를 아래 칸에 붙여넣어 주세요.';};
+    if(e&&e.code==='wrong_shape')return '이 답은 <b>이번 단계에 맞는 모양이 아닙니다</b>'+(want?' (이번에는 '+esc(want)+'(으)로 답해야 함)':'')+'. 앞 단계 답을 다시 넣었거나, AI가 앞 대화를 보고 다른 모양으로 답했을 수 있습니다. <b>새 AI 창</b>에 이번 질문을 보내 주세요.'+goBtn()+pv(t);
+    return '복사된 내용에서 AI 답을 찾지 못했습니다. AI 답 아래의 복사 아이콘을 누른 뒤 다시 가져오거나, 답 전체를 아래 칸에 붙여넣어 주세요.'+pv(t);};
   addCss();
   return new Promise(function(res,rej){
     var c=cfg(),w=document.createElement('div');
@@ -406,6 +412,7 @@ function pasteAsk(q,scanned,step,parse,check,want){
       else if(k==='grab'){if(!(navigator.clipboard&&navigator.clipboard.readText)){g('man').open=true;g('amsg').textContent='이 브라우저는 자동 가져오기를 막습니다. 아래 칸에 직접 붙여넣으세요.';return;}
         navigator.clipboard.readText().then(function(t){tryApply(t,true);},function(){g('man').open=true;g('amsg').textContent='붙여넣기 허용이 필요합니다. 브라우저가 물으면 "허용"을 누르거나, 아래 칸에 직접 붙여넣으세요.';});}
       else if(k==='ok')tryApply(g('ans').value,false);
+      else if(k==='pv')view(badT,'붙여넣은 AI 답 정리','이번 단계에 넣을 모양은 아니지만, 내용은 이렇게 정리됩니다.');
       else if(k==='cancel'){fin();rej({code:'paste_cancel'});}
     });
   });
@@ -415,14 +422,70 @@ async function ask(prompt,mat){
   var c=cfg(),p=c.prov;mat=mat||{text:'',images:[],scanned:[]};
   if(c.mode!=='ai')throw {code:'ai_off'};
   var full=prompt+(mat.text?'\n\n자료:\n'+mat.text:'')+(mat.images.length?'\n\n(첨부한 사진·스캔 '+mat.images.length+'장도 함께 읽으세요)':'');
-  var rd=function(t){try{return readAns(t,mat.parse,mat.check,true);}catch(e){if(e.code==='wrong_shape')throw {code:'wrong_shape',message:'AI 답의 모양이 이번 단계와 맞지 않습니다'+(mat.want?' (필요: '+mat.want+')':'')+'. 다시 눌러 주세요.'};throw e;}};
+  var rd=function(t){try{return readAns(t,mat.parse,mat.check,true);}catch(e){if(e.code==='wrong_shape')throw {code:'wrong_shape',raw:t,message:'AI 답의 모양이 이번 단계와 맞지 않습니다'+(mat.want?' (필요: '+mat.want+')':'')+'. 다시 눌러 주세요.'};if(e&&e.code==='bad_json')e.raw=t;throw e;}};
   if(p==='paste')return await pasteAsk(PASTE_HEAD+full,mat.scanned||[],mat.step||'',mat.parse,mat.check,mat.want);
   if(p==='claudeapp'){var h=claudeHost(),s=h&&await h.use('sample');if(!s)throw {code:'unavailable'};var o={};if(mat.images.length)o.images=mat.images;return await s.json(full,o);}
   var imgs=await Promise.all(mat.images.map(b64));
-  if(p==='company'){if(!companyOk())throw {code:AI_PROXY?'admin_only':'no_proxy'};return rd(await relayCall(c,full,imgs));}
-  if(!c.keys[p])throw {code:'no_key'};
-  return rd(await apiCall(p,c.keys[p],model(c,p),full,imgs));
+  if(p==='company'){if(!companyOk())throw {code:AI_PROXY?'admin_only':'no_proxy'};}
+  else if(!c.keys[p])throw {code:'no_key'};
+  /* 공통 규칙: API(키·회사 AI)로 묻는 경우 쓸 수 있는 답이 나올 때까지 스스로 다시 묻는다.
+     모양이 틀린 답 → 바로 다시 묻기(앞 두 번은 엄격하게, 마지막은 너그럽게 읽기) · 사용량 한도/연결 끊김 → 잠시 쉬고 다시. 비용이 커지지 않게 최대 RETRY번까지만 */
+  var extra='',tries=0,last=null;
+  for(;;){tries++;var fin2=tries>=RETRY;
+    try{var t=p==='company'?await relayCall(c,full+extra,imgs):await apiCall(p,c.keys[p],model(c,p),full+extra,imgs);
+      if(!fin2){try{return readAns(t,null,mat.check,true);}catch(e1){if(e1&&(e1.code==='bad_json'||e1.code==='wrong_shape')){last={code:e1.code,raw:t};
+        try{var r1=readAns(t,mat.parse,mat.check,true);if(!mat.parse)return r1;last.loose=r1;}catch(e2){}
+        extra='\n\n[다시 요청 '+tries+'] 앞의 답은 정해진 모양이 아니어서 쓰지 못했다. 설명·머리말 없이 '+(mat.want||'위에서 정한 JSON')+' 하나로만 다시 답하라.';continue;}throw e1;}}
+      return rd(t);}
+    catch(e){if(e&&e.raw==null&&last&&last.raw)e.raw=last.raw;
+      if(e&&(e.code==='rate_limited'||e.code==='network'||e.code==='relay_down')&&!fin2){await new Promise(function(r){setTimeout(r,e.code==='rate_limited'?20000:3000);});continue;}
+      if(last&&last.loose&&e&&(e.code==='bad_json'||e.code==='wrong_shape'))return last.loose;
+      if(e&&typeof e==='object'&&tries>1)e.tries=tries;throw e;}}
 }
+/* ---------- 공통 규칙: AI 답이 어떤 모양으로 오든(JSON·굽은 따옴표·마크다운·글) 읽기 쉽게 정리해 보여 준다. 원문은 「원문 보기」로 접어 둔다 ---------- */
+var PLBL={answer:'요약 답',summary:'요약',conclusion:'결론',points:'상담 핵심',refs:'근거',caution:'주의할 점',warns:'주의사항',cautions:'주의사항',pages:'찾은 관련 쪽',sections:'고른 항목',
+  where:'위치',why:'핵심 내용',quote:'인용 원문',p:'쪽',page:'쪽',d:'문서',item:'구분',point:'핵심 내용',comment:'의견',fields:'입력값',products:'상품',product:'상품',name:'이름',
+  month:'기준월',upd:'업데이트',text:'내용',reason:'이유',note:'메모',title:'제목',amount:'금액',premium:'보험료',company:'보험사',co:'보험사',prod:'상품명',contracts:'계약',coverages:'담보',
+  ok:'확인',error:'오류',message:'메시지',items:'항목',rows:'줄',cols:'열',value:'값',type:'종류',kind:'종류'};
+var PFIRST=['answer','summary','conclusion','comment','points','rows','refs','items','pages','sections','warns','cautions','caution'];
+function plbl(k){return PLBL[k]||k;}
+function prim(v){return v==null||typeof v!=='object';}
+function pcell(k,v){if(v==null||v==='')return '-';if(prim(v))return (k==='p'||k==='page')&&/^\d+$/.test(String(v))?'p.'+esc(v):mdInline(String(v));return prender(v,2);}
+function mdInline(s){return esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/`([^`]+)`/g,'$1').replace(/\\n/g,'<br>').replace(/\n/g,'<br>');}
+/* 글 답(마크다운 포함)을 단락·목록·표·제목으로 */
+function mdBlock(t){
+  var L=String(t).replace(/\r/g,'').split('\n'),h='',list=null,tb=null;
+  var flush=function(){if(list){h+='<ul>'+list.map(function(x){return '<li>'+mdInline(x)+'</li>';}).join('')+'</ul>';list=null;}if(tb){var rows=tb.filter(function(r){return !/^[\s|:-]+$/.test(r.join(''));});
+    if(rows.length)h+='<div class="kai-pt-tw"><table class="kai-pt-t"><thead><tr>'+rows[0].map(function(c){return '<th>'+mdInline(c)+'</th>';}).join('')+'</tr></thead><tbody>'+rows.slice(1).map(function(r){return '<tr>'+r.map(function(c){return '<td>'+mdInline(c)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';tb=null;}};
+  L.forEach(function(l){var s=l.trim();
+    if(/^\|.*\|$/.test(s)){if(list){var tt=tb;tb=null;flush();tb=tt;}(tb=tb||[]).push(s.slice(1,-1).split('|').map(function(c){return c.trim();}));return;}
+    if(tb){var keep=list;list=null;flush();list=keep;}
+    var m=s.match(/^(?:[-*•·]|\d+[.)])\s+(.*)$/);if(m){(list=list||[]).push(m[1]);return;}
+    flush();if(!s)return;
+    var hd=s.match(/^#{1,6}\s*(.*)$/);if(hd){h+='<div class="kai-pt-h">'+mdInline(hd[1])+'</div>';return;}
+    h+='<p>'+mdInline(s)+'</p>';});
+  flush();return h;}
+function prender(v,depth){depth=depth||0;
+  if(v==null||v==='')return '<span class="kai-note">-</span>';
+  if(typeof v==='string'){var s=v.trim();if(/^[\[{]/.test(s)&&depth<3){try{return prender(pickJson(s.charAt(0)==='['?'{"items":'+s+'}':s),depth+1);}catch(e){}}return depth?mdInline(s):mdBlock(s);}
+  if(prim(v))return esc(v);
+  if(Array.isArray(v)){if(!v.length)return '<span class="kai-note">없음</span>';
+    if(v.every(prim))return '<ul>'+v.map(function(x){return '<li>'+mdInline(String(x))+'</li>';}).join('')+'</ul>';
+    if(v.every(function(x){return x&&typeof x==='object'&&!Array.isArray(x);})){var ks=[];v.forEach(function(x){Object.keys(x).forEach(function(k){if(ks.indexOf(k)<0)ks.push(k);});});ks=ks.slice(0,8);
+      return '<div class="kai-pt-tw"><table class="kai-pt-t"><thead><tr>'+ks.map(function(k){return '<th>'+esc(plbl(k))+'</th>';}).join('')+'</tr></thead><tbody>'+v.map(function(x){return '<tr>'+ks.map(function(k){return '<td>'+pcell(k,x[k])+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
+    return '<ul>'+v.map(function(x){return '<li>'+prender(x,depth+1)+'</li>';}).join('')+'</ul>';}
+  var keys=Object.keys(v).sort(function(a,b){var i=PFIRST.indexOf(a),j=PFIRST.indexOf(b);return (i<0?99:i)-(j<0?99:j);});
+  if(!keys.length)return '<span class="kai-note">-</span>';
+  return '<div class="kai-pt-o">'+keys.map(function(k){var x=v[k];return '<div class="kai-pt-k'+(/caution|warn/.test(k)?' w':'')+'"><div class="kai-pt-l">'+esc(plbl(k))+'</div><div class="kai-pt-v">'+(prim(x)?(typeof x==='string'&&!depth&&/\n/.test(x)?mdBlock(x):pcell(k,x)):prender(x,depth+1))+'</div></div>';}).join('')+'</div>';}
+/* x: AI 답 원문(글) 또는 읽은 값. raw를 주면 「원문 보기」에 그 글을 그대로 둔다 */
+function pretty(x,raw){addCss();var v=x,r=raw;if(typeof x==='string'){r=r==null?x:r;try{v=pickJson(x);}catch(e){v=x;}}
+  if(r==null)try{r=JSON.stringify(x,null,1);}catch(e){r=String(x);}
+  return '<div class="kai-pt">'+prender(v,0)+(r&&String(r).trim()?'<details class="kai-pt-raw"><summary>원문 보기 (AI가 보낸 그대로)</summary><pre>'+esc(r)+'</pre></details>':'')+'</div>';}
+/* 정리한 답을 창으로 보여 준다 (어느 화면에서든) */
+function view(x,title,note){addCss();var w=document.createElement('div');w.className='kai-ov';w.style.zIndex='10001';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label',title||'AI 답 정리');
+  w.innerHTML='<div class="kai-box" style="max-width:860px"><div class="kai-hd"><h2>'+esc(title||'AI 답 정리')+'</h2><button type="button" class="kai-btn g kai-x" data-v="x" aria-label="닫기">✕</button></div>'+(note?'<p class="kai-note" style="margin:0 0 10px">'+note+'</p>':'')+pretty(x)+'</div>';
+  var close=function(){w.remove();document.removeEventListener('keydown',k,true);},k=function(e){if(e.key==='Escape'){e.stopPropagation();close();}};
+  w.addEventListener('click',function(e){if(e.target===w||e.target.closest('[data-v="x"]'))close();});document.addEventListener('keydown',k,true);document.body.appendChild(w);}
 function err(e){
   var M={ai_off:'「AI 없이 쓰기」로 되어 있습니다. 「내 AI 등록」에서 AI를 고르세요.',no_key:'AI 키가 없습니다. 「내 AI 등록」에서 키를 넣어 주세요.',
     bad_key:'AI 키가 맞지 않거나 사용 권한이 없습니다. 「내 AI 등록」에서 키를 확인하세요.',bad_model:'모델 이름을 찾지 못했습니다. 「내 AI 등록」의 모델 이름을 확인하세요.',
@@ -430,7 +493,11 @@ function err(e){
     rate_limited:'AI 사용량 한도에 걸렸습니다. 잠시 뒤 다시 해 보세요.',relay_down:'회사 AI 서버에 연결하지 못했습니다. 관리자에게 알려 주세요.',need_code:'회사 접속코드가 맞지 않습니다. 「내 AI 등록 › 회사 AI」에서 코드를 넣으세요.',
     need_login:'회사 AI는 포털에 로그인한 사람만 씁니다. 로그아웃 후 다시 로그인해 주세요.',admin_only:'회사 AI는 지금 관리자 전용입니다. 「내 AI 등록」에서 내 AI를 등록해 주세요.',no_proxy:'관리자가 아직 회사 AI를 켜지 않았습니다. 「내 AI 등록」에서 복사·붙여넣기를 고르세요.',paste_cancel:'AI 답을 가져오기 전에 창을 닫았습니다. 다시 눌러 주세요.',
     unavailable:'이 화면에서는 Claude 화면 연결을 쓸 수 없습니다. 「내 AI 등록」에서 다른 방식을 고르세요.',lib:'파일 읽기 도구를 불러오지 못했습니다(인터넷 연결 확인).'};
-  var c=e&&e.code;return M[c]||(e&&e.message)||('AI 읽기 실패'+(c?' ('+c+')':''));
+  var c=e&&e.code,m=M[c]||(e&&e.message)||('AI 읽기 실패'+(c?' ('+c+')':''));
+  if(e&&e.tries>1)m='AI에 자동으로 '+e.tries+'번까지 다시 물었지만 끝내지 못했습니다(비용이 커지지 않게 여기서 멈춤). '+m;
+  /* 공통 규칙: 쓸 수 없는 모양의 답이 와도 내용은 정리해서 보여 준다 */
+  if(e&&e.raw&&String(e.raw).trim().length>20&&!e.shown){e.shown=true;try{view(e.raw,'AI 답 정리','이 답은 이 화면에 바로 넣을 모양이 아니라 자동 반영은 하지 못했습니다. 대신 AI가 보낸 내용을 읽기 쉽게 정리해 보여 드립니다.');}catch(er){}m+=' (AI가 보낸 내용은 정리해서 창으로 보여 드렸습니다)';}
+  return m;
 }
 
 /* ---------- 고객 자료 저장 폴더 (PC 크롬·엣지) ----------
@@ -472,5 +539,5 @@ function fdBox(){
 var folder={name:FD_NAME,ok:fdOk,get:fdGet,label:fdLabel,pick:fdPick,write:fdWrite,clear:fdClear,perm:fdPerm,err:fdErr};
 if(document.readyState!=='loading')addCss();else document.addEventListener('DOMContentLoaded',addCss);
 window.addEventListener('storage',function(e){if(e.key===AIK)fire();});
-window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,ocrPages:ocrPages,err:err,migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
+window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,ocrPages:ocrPages,err:err,pretty:pretty,view:view,pickJson:function(t){return pickJson(t);},migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
 })();
