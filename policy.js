@@ -202,7 +202,7 @@ function ansHtml(){
       rowsHtml(r.rows)+
       (r.warns.length||r.caution?'<div class="pol-blk pol-wn"><div class="lb">⚠ 주의사항 (면책·감액·보장개시·지급 횟수 등)</div>'+(r.warns.length?'<ul>'+r.warns.map(function(w){return '<li>'+esc(w)+'</li>';}).join('')+'</ul>':'')+(r.caution?'<div class="tx">'+esc(r.caution)+'</div>':'')+'</div>':'')+
       (r.extra&&window.KIFAI&&KIFAI.pretty?'<div class="pol-blk"><div class="lb">그 밖에 AI가 보낸 내용</div>'+KIFAI.pretty(r.extra,'')+'</div>':'')+
-      (r.fromPages&&r.fromPages.length?'<div class="pol-blk"><button type="button" class="btn sm gold" data-pol="sum" data-i="'+i+'">찾은 쪽으로 요약 답 받기</button> <span class="note">위 '+r.fromPages.length+'곳의 약관 원문을 AI에 다시 보내 결론을 정리합니다'+(aiState().paste?' (붙여넣기 1번)':'')+'</span></div>':'')+
+      (r.fromPages&&r.fromPages.length?'<div class="pol-blk"><button type="button" class="btn sm gold" data-pol="sum" data-i="'+i+'">찾은 쪽으로 요약 답 받기</button> <span class="note">위 '+r.fromPages.length+'쪽의 약관 원문을 AI에 다시 보내 결론을 정리합니다'+(aiState().paste?' (붙여넣기 1번)':'')+'</span></div>':'')+
       covHtml(a,i)+
       (r.raw?'<details class="pol-raw"><summary>원문 보기 (AI가 보낸 그대로)</summary><pre>'+esc(r.raw)+'</pre></details>':''))+
       '<div class="ft"><span class="note">'+esc(a.at)+(a.part?' · '+esc(a.part):'')+'</span>'+(a.err?'':'<button type="button" class="btn sm ghost" data-pol="copy" data-i="'+i+'">답 복사</button>')+'<button type="button" class="btn sm ghost" data-pol="del" data-i="'+i+'">지우기</button></div></div>';
