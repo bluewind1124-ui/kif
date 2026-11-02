@@ -1,16 +1,26 @@
 {
- "ver": 1793606221820,
- "updated": "2026. 11. 2. 오후 4:57:01",
+ "ver": 1793606370307,
+ "updated": "2026. 11. 2. 오후 4:59:30",
  "notices": [
   [
    "2026.11.02",
-   "KakaoTalk 20261031 095608915",
-   "files/notice/2026-11/KakaoTalk_20261031_095608915_onk77.png"
+   "KakaoTalk 20261031 095608915 02",
+   "files/notice/2026-11/KakaoTalk_20261031_095608915_02_unpi7.png"
+  ],
+  [
+   "2026.11.02",
+   "KakaoTalk 20261031 095608915 03",
+   "files/notice/2026-11/KakaoTalk_20261031_095608915_03_ai7kz.png"
   ],
   [
    "2026.11.02",
    "KakaoTalk 20261031 095608915 01",
-   "files/notice/2026-11/KakaoTalk_20261031_095608915_01_agaip.png"
+   "files/notice/2026-11/KakaoTalk_20261031_095608915_01_2elyp.png"
+  ],
+  [
+   "2026.11.02",
+   "KakaoTalk 20261031 095608915",
+   "files/notice/2026-11/KakaoTalk_20261031_095608915_onk77.png"
   ],
   [
    "2026. 10. 26. 10시 : 4/4분기 추진 방향 발표",
@@ -939,7 +949,8 @@
  ],
  "off": {
   "hypo": [],
-  "award": []
+  "award": [],
+  "notice": []
  },
  "concepts": [
   {
@@ -2847,42 +2858,6 @@
   ]
  },
  "onepicks": [],
- "thumbs": {
-  "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm.pdf": "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm_thumb.jpg",
-  "files/mats/2026-10/10월_한국보험금융_상품전략_1001_0i65r.pdf": "files/mats/2026-10/10월_한국보험금융_상품전략_1001_0i65r_thumb.jpg",
-  "files/samples/2026-10/김OO님_보험비교분석_발표자료_s1k7m.pdf": "files/samples/2026-10/김OO님_보험비교분석_발표자료_s1k7m_thumb.jpg",
-  "files/samples/2026-10/고OO님_상품비교분석_보고서_s2q4x.pdf": "files/samples/2026-10/고OO님_상품비교분석_보고서_s2q4x_thumb.jpg",
-  "files/samples/2026-10/간편건강보험_담보비교_s3w8n.pdf": "files/samples/2026-10/간편건강보험_담보비교_s3w8n_thumb.jpg",
-  "files/samples/2026-10/조OO님_실손종합_설계2안_비교_s4c9h.pdf": "files/samples/2026-10/조OO님_실손종합_설계2안_비교_s4c9h_thumb.jpg",
-  "news/2026-11/DB손해보험_202611_월간_elfgh.pdf": "news/2026-11/DB손해보험_202611_월간_elfgh_thumb.jpg",
-  "news/2026-11/KB라이프_202611_월간_ib8jc.pdf": "news/2026-11/KB라이프_202611_월간_ib8jc_thumb.jpg",
-  "news/2026-11/KB손해보험_202611_월간_rnc4d.pdf": "news/2026-11/KB손해보험_202611_월간_rnc4d_thumb.jpg",
-  "news/2026-11/KDB생명_202611_월간_7mrr8.pdf": "news/2026-11/KDB생명_202611_월간_7mrr8_thumb.jpg",
-  "news/2026-11/교보생명_202611_월간_tlexi.pdf": "news/2026-11/교보생명_202611_월간_tlexi_thumb.jpg",
-  "news/2026-11/ABL생명_202611_월간_l7xtj.pdf": "news/2026-11/ABL생명_202611_월간_l7xtj_thumb.jpg",
-  "news/2026-11/AIA생명_202611_월간_nv4fy.pdf": "news/2026-11/AIA생명_202611_월간_nv4fy_thumb.jpg",
-  "news/2026-11/DB생명_202611_월간_8swaj.pdf": "news/2026-11/DB생명_202611_월간_8swaj_thumb.jpg",
-  "news/2026-11/라이나생명_202611_월간_7zmlv.pdf": "news/2026-11/라이나생명_202611_월간_7zmlv_thumb.jpg",
-  "news/2026-11/라이나생명_202611_월간_sl1yg.pdf": "news/2026-11/라이나생명_202611_월간_sl1yg_thumb.jpg",
-  "news/2026-11/롯데손해보험_202611_월간_rv3xm.pdf": "news/2026-11/롯데손해보험_202611_월간_rv3xm_thumb.jpg",
-  "news/2026-11/메트라이프생명_202611_월간_64a6z.pdf": "news/2026-11/메트라이프생명_202611_월간_64a6z_thumb.jpg",
-  "news/2026-11/미래에셋생명_202611_월간_zddi9.pdf": "news/2026-11/미래에셋생명_202611_월간_zddi9_thumb.jpg",
-  "news/2026-10/NH농협생명_202610_월간_0q9gw.pdf": "news/2026-10/NH농협생명_202610_월간_0q9gw_thumb.jpg",
-  "news/2026-11/NH농협생명_202611_월간_fwggd.pdf": "news/2026-11/NH농협생명_202611_월간_fwggd_thumb.jpg",
-  "news/2026-11/동양생명_202611_월간_1c643.pdf": "news/2026-11/동양생명_202611_월간_1c643_thumb.jpg",
-  "news/2026-11/삼성생명_202611_월간_s5x73.pdf": "news/2026-11/삼성생명_202611_월간_s5x73_thumb.jpg",
-  "news/2026-11/삼성화재_202611_월간_yrxaz.pdf": "news/2026-11/삼성화재_202611_월간_yrxaz_thumb.jpg",
-  "news/2026-11/신한라이프_202611_월간_5jhed.pdf": "news/2026-11/신한라이프_202611_월간_5jhed_thumb.jpg",
-  "news/2026-11/처브라이프_202611_월간_7ilh2.pdf": "news/2026-11/처브라이프_202611_월간_7ilh2_thumb.jpg",
-  "news/2026-11/한화손해보험_202611_월간_ozf3d.pdf": "news/2026-11/한화손해보험_202611_월간_ozf3d_thumb.jpg",
-  "news/2026-11/현대해상_202611_월간_ua7ml.pdf": "news/2026-11/현대해상_202611_월간_ua7ml_thumb.jpg",
-  "news/2026-11/흥국생명_202611_월간_xnxgv.pdf": "news/2026-11/흥국생명_202611_월간_xnxgv_thumb.jpg",
-  "news/2026-11/흥국화재_202611_월간_o2993.pdf": "news/2026-11/흥국화재_202611_월간_o2993_thumb.jpg",
-  "news/2026-11/푸본현대생명_202611_월간_hc4bm.pdf": "news/2026-11/푸본현대생명_202611_월간_hc4bm_thumb.jpg",
-  "news/2026-11/하나생명_202611_월간_mpn48.pdf": "news/2026-11/하나생명_202611_월간_mpn48_thumb.jpg",
-  "news/2026-11/하나손해보험_202611_월간_al8gm.pdf": "news/2026-11/하나손해보험_202611_월간_al8gm_thumb.jpg",
-  "news/2026-11/한화생명_202611_월간_9ywg6.pdf": "news/2026-11/한화생명_202611_월간_9ywg6_thumb.jpg"
- },
  "sched": [
   {
    "d": "2026.10",
@@ -3035,5 +3010,42 @@
  "aiProxy": "",
  "aiProxyFor": "admin",
  "aiProxyOff": "https://fc-ai.bluewind1124.workers.dev",
- "lectAt": "2026.10.30 09:06"
+ "lectAt": "2026.10.30 09:06",
+ "thumbs": {
+  "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm.pdf": "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm_thumb.jpg",
+  "files/mats/2026-10/10월_한국보험금융_상품전략_1001_0i65r.pdf": "files/mats/2026-10/10월_한국보험금융_상품전략_1001_0i65r_thumb.jpg",
+  "files/samples/2026-10/김OO님_보험비교분석_발표자료_s1k7m.pdf": "files/samples/2026-10/김OO님_보험비교분석_발표자료_s1k7m_thumb.jpg",
+  "files/samples/2026-10/고OO님_상품비교분석_보고서_s2q4x.pdf": "files/samples/2026-10/고OO님_상품비교분석_보고서_s2q4x_thumb.jpg",
+  "files/samples/2026-10/간편건강보험_담보비교_s3w8n.pdf": "files/samples/2026-10/간편건강보험_담보비교_s3w8n_thumb.jpg",
+  "files/samples/2026-10/조OO님_실손종합_설계2안_비교_s4c9h.pdf": "files/samples/2026-10/조OO님_실손종합_설계2안_비교_s4c9h_thumb.jpg",
+  "news/2026-11/DB손해보험_202611_월간_elfgh.pdf": "news/2026-11/DB손해보험_202611_월간_elfgh_thumb.jpg",
+  "news/2026-11/KB라이프_202611_월간_ib8jc.pdf": "news/2026-11/KB라이프_202611_월간_ib8jc_thumb.jpg",
+  "news/2026-11/KB손해보험_202611_월간_rnc4d.pdf": "news/2026-11/KB손해보험_202611_월간_rnc4d_thumb.jpg",
+  "news/2026-11/KDB생명_202611_월간_7mrr8.pdf": "news/2026-11/KDB생명_202611_월간_7mrr8_thumb.jpg",
+  "news/2026-11/교보생명_202611_월간_tlexi.pdf": "news/2026-11/교보생명_202611_월간_tlexi_thumb.jpg",
+  "news/2026-11/ABL생명_202611_월간_l7xtj.pdf": "news/2026-11/ABL생명_202611_월간_l7xtj_thumb.jpg",
+  "news/2026-11/AIA생명_202611_월간_nv4fy.pdf": "news/2026-11/AIA생명_202611_월간_nv4fy_thumb.jpg",
+  "news/2026-11/DB생명_202611_월간_8swaj.pdf": "news/2026-11/DB생명_202611_월간_8swaj_thumb.jpg",
+  "news/2026-11/라이나생명_202611_월간_7zmlv.pdf": "news/2026-11/라이나생명_202611_월간_7zmlv_thumb.jpg",
+  "news/2026-11/라이나생명_202611_월간_sl1yg.pdf": "news/2026-11/라이나생명_202611_월간_sl1yg_thumb.jpg",
+  "news/2026-11/롯데손해보험_202611_월간_rv3xm.pdf": "news/2026-11/롯데손해보험_202611_월간_rv3xm_thumb.jpg",
+  "news/2026-11/메트라이프생명_202611_월간_64a6z.pdf": "news/2026-11/메트라이프생명_202611_월간_64a6z_thumb.jpg",
+  "news/2026-11/미래에셋생명_202611_월간_zddi9.pdf": "news/2026-11/미래에셋생명_202611_월간_zddi9_thumb.jpg",
+  "news/2026-10/NH농협생명_202610_월간_0q9gw.pdf": "news/2026-10/NH농협생명_202610_월간_0q9gw_thumb.jpg",
+  "news/2026-11/NH농협생명_202611_월간_fwggd.pdf": "news/2026-11/NH농협생명_202611_월간_fwggd_thumb.jpg",
+  "news/2026-11/동양생명_202611_월간_1c643.pdf": "news/2026-11/동양생명_202611_월간_1c643_thumb.jpg",
+  "news/2026-11/삼성생명_202611_월간_s5x73.pdf": "news/2026-11/삼성생명_202611_월간_s5x73_thumb.jpg",
+  "news/2026-11/삼성화재_202611_월간_yrxaz.pdf": "news/2026-11/삼성화재_202611_월간_yrxaz_thumb.jpg",
+  "news/2026-11/신한라이프_202611_월간_5jhed.pdf": "news/2026-11/신한라이프_202611_월간_5jhed_thumb.jpg",
+  "news/2026-11/처브라이프_202611_월간_7ilh2.pdf": "news/2026-11/처브라이프_202611_월간_7ilh2_thumb.jpg",
+  "news/2026-11/한화손해보험_202611_월간_ozf3d.pdf": "news/2026-11/한화손해보험_202611_월간_ozf3d_thumb.jpg",
+  "news/2026-11/현대해상_202611_월간_ua7ml.pdf": "news/2026-11/현대해상_202611_월간_ua7ml_thumb.jpg",
+  "news/2026-11/흥국생명_202611_월간_xnxgv.pdf": "news/2026-11/흥국생명_202611_월간_xnxgv_thumb.jpg",
+  "news/2026-11/흥국화재_202611_월간_o2993.pdf": "news/2026-11/흥국화재_202611_월간_o2993_thumb.jpg",
+  "news/2026-11/푸본현대생명_202611_월간_hc4bm.pdf": "news/2026-11/푸본현대생명_202611_월간_hc4bm_thumb.jpg",
+  "news/2026-11/하나생명_202611_월간_mpn48.pdf": "news/2026-11/하나생명_202611_월간_mpn48_thumb.jpg",
+  "news/2026-11/하나손해보험_202611_월간_al8gm.pdf": "news/2026-11/하나손해보험_202611_월간_al8gm_thumb.jpg",
+  "news/2026-11/한화생명_202611_월간_9ywg6.pdf": "news/2026-11/한화생명_202611_월간_9ywg6_thumb.jpg",
+  "files/notice/2026-09/조진열_병원서류001_241k0.pdf": "files/notice/2026-09/조진열_병원서류001_241k0_thumb.jpg"
+ }
 }
