@@ -296,7 +296,22 @@ async function read(files){
 function b64(b){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){var u=String(r.result);res({mime:b.type||'image/jpeg',data:u.slice(u.indexOf(',')+1)});};r.onerror=rej;r.readAsDataURL(b);});}
 function pickJson(t){t=String(t||'').replace(/```(json)?/g,'');var i=t.indexOf('{'),j=t.lastIndexOf('}');if(i<0||j<i)throw {code:'bad_json'};var b=t.slice(i,j+1);try{return JSON.parse(b);}catch(e){}
   /* 화면에서 긁어 복사하면 따옴표가 “ ” 로 바뀌어 오는 경우: 곧은 따옴표로 바꿔 한 번 더 읽는다 */
-  try{return JSON.parse(b.replace(/[\u201C\u201D\u201E\u201F\u2033]/g,'"'));}catch(e){throw {code:'bad_json'};}}
+  try{return JSON.parse(b.replace(/[\u201C\u201D\u201E\u201F\u2033]/g,'"'));}catch(e){}
+  /* 따옴표가 모두 “ ”로 바뀌고 글 속에도 “ ”가 섞인 경우: 자리로 보아 구분 따옴표와 글 속 따옴표를 가려 다시 읽는다 */
+  try{return JSON.parse(looseQuotes(b));}catch(e){throw {code:'bad_json'};}}
+function looseQuotes(b){
+  var Q=/["\u201C\u201D\u201E\u201F\u2033]/,out='',st=[],inS=false,key=/^\s*["\u201C\u201D\u201E\u201F\u2033][A-Za-z_]+["\u201C\u201D\u201E\u201F\u2033]\s*:/;
+  for(var i=0;i<b.length;i++){var c=b[i];
+    if(!inS){if(Q.test(c)){inS=true;out+='"';continue;}if(c==='{'||c==='[')st.push(c);else if(c==='}'||c===']')st.pop();out+=c;continue;}
+    if(c==='\\'){out+=c+(b[i+1]||'');i++;continue;}
+    if(c==='\n'){out+='\\n';continue;}if(c==='\r'||c==='\t'){out+=' ';continue;}
+    if(Q.test(c)){var j=i+1;while(j<b.length&&/\s/.test(b[j]))j++;var n=b[j],top=st[st.length-1],close=false;
+      if(j>=b.length||n===':'||n==='}'||n===']')close=true;
+      else if(n===','){var rest=b.slice(j+1);close=top==='['?/^\s*(["\u201C\u201D\u201E\u201F\u2033{\[]|-?\d)/.test(rest):key.test(rest);}
+      if(close){inS=false;out+='"';}else out+='\\"';continue;}
+    out+=c;}
+  return out;
+}
 /* 붙여넣기 방식에서 클립보드에 아직 '보낸 질문'이 남아 있으면 답으로 착각하지 않게 한다 */
 function isQuestion(t,q){t=String(t||'');return t.indexOf('[한국보험금융 FC 포털 요청]')>=0||t.indexOf('<<KIF-PACKAGE')>=0||t.replace(/\s+/g,'')===String(q||'').replace(/\s+/g,'');}
 
@@ -355,7 +370,7 @@ function pasteAsk(q,scanned,step,parse){
       '</div><p class="kai-cmsg" data-q="cmsg" role="status"></p><div class="kai-row" style="margin-top:6px"><button type="button" class="kai-btn g" data-q="dl">질문을 파일(.txt)로 받기</button><span class="kai-note">붙여넣기가 안 되거나 너무 길면, 이 파일을 AI 창에 첨부해 보내세요.</span></div><details data-q="det"><summary class="kai-note">질문 내용 보기</summary><textarea rows="4" readonly data-q="qtext"></textarea></details></li>'+
       '<li><b>AI 답을 복사한 뒤 가져오기</b><p class="kai-note">AI 답 아래의 <b>복사</b> 아이콘을 누르고 이 창으로 돌아오면 자동으로 반영됩니다. 안 되면 아래 버튼을 누르세요.</p>'+
       '<div class="kai-row"><button type="button" class="kai-btn p" data-q="grab">복사한 답 가져오기</button><button type="button" class="kai-btn g" data-q="cancel">취소</button></div><p class="kai-note" data-q="amsg" role="status"></p>'+
-      '<details data-q="man"><summary class="kai-note">가져오기가 안 되면: 직접 붙여넣기</summary><textarea rows="4" data-q="ans" placeholder="AI 답 전체를 붙여넣기 ( { 로 시작 )"></textarea><div class="kai-row"><button type="button" class="kai-btn" data-q="ok">반영</button></div></details></li></ol></div>';
+      '<details data-q="man" open><summary class="kai-note"><b>또는 여기에 직접 붙여넣기</b> — AI 답 전체를 복사해 아래 칸에 붙여넣고 「반영」</summary><textarea rows="4" data-q="ans" placeholder="여기에 AI 답 전체를 붙여넣기 (Ctrl+V, 휴대폰은 길게 눌러 붙여넣기)"></textarea><div class="kai-row"><button type="button" class="kai-btn" data-q="ok">반영</button></div></details></li></ol></div>';
     document.body.appendChild(w);
     var g=function(k){return w.querySelector('[data-q="'+k+'"]');};g('qtext').value=q;
     var sent=false;
