@@ -140,11 +140,11 @@ function render(){
   if(step===1){
     var card=function(k){return '<button type="button" class="kai-opt'+(k===p?' on':'')+'" data-kai-p="'+k+'"><b>'+(k===p?'✓ ':'')+AIP[k].name+'</b><span>'+AIP[k].help+'</span>'+(AIP[k].key?'<em>'+(c.keys[k]?'키 등록됨 · 바꾸기':'키 발급 안내 따라 하기 ›')+'</em>':'')+'</button>';};
     var easy=['company','paste','claudeapp'].filter(function(k){return (k!=='company'||companyOk())&&(k!=='claudeapp'||host);});
-    h='<h2>1. 쓸 AI 고르기</h2><p class="kai-note">한 번 등록하면 <b>AI보장분석 기본형</b>과 <b>고급형</b>이 같은 AI를 씁니다. 기본형은 등록된 기준·샘플대로 분석하고, 고급형은 고급형 계산 규칙대로 제안서를 만듭니다.</p>'+
-      '<h3>키 없이 쓰기 <span class="kai-note">추천 · 바로 시작</span></h3><div class="kai-opts">'+easy.map(card).join('')+'</div>'+
-      '<h3>내 API 키로 쓰기 <span class="kai-note">더 빠르고 자동 · 발급 안내가 이어집니다</span></h3><div class="kai-opts">'+['claude','openai','gemini'].map(card).join('')+'</div>';
+    h='<h2>1. 쓸 AI 고르기</h2><p class="kai-note">여기서 <b>한 번만</b> 등록하면 <b>AI보장분석(기본형·고급형)</b>, <b>약관 분석</b>, <b>상품 비교</b> 등 포털의 모든 AI 기능이 같은 AI를 씁니다. 다른 화면에서 다시 등록할 필요가 없습니다.</p>'+
+      '<h3>내 API 키로 쓰기 <span class="kai-note" style="color:#b45309;font-weight:700">추천 · 끝까지 자동으로 진행</span></h3><p class="kai-note" style="margin:-4px 0 6px">셋 중 하나만 고르면 됩니다. 고르면 키 발급 방법이 화면별로 이어집니다.</p><div class="kai-opts">'+['claude','openai','gemini'].map(card).join('')+'</div>'+
+      '<h3>키 없이 쓰기 <span class="kai-note">예비 방법 · 단계마다 직접 복사·붙여넣기</span></h3><div class="kai-opts">'+easy.map(card).join('')+'</div>';
     if(p==='company')h+='<label class="kai-f">회사 접속코드 <span class="kai-note">관리자가 알려준 경우만</span><input type="password" id="kaiCode" autocomplete="off" value="'+esc(c.code||'')+'"></label>';
-    else if(p==='paste')h+='<div class="kai-tip"><b>쓰는 법</b> 자료를 올리면 「AI에게 읽히기」 창이 뜹니다. <b>ChatGPT로 보내기</b> → 열린 창에 붙여넣고 보내기 → AI 답의 <b>복사</b> 아이콘 → 포털로 돌아오면 자동으로 들어갑니다. 무료 계정도 됩니다.</div>';
+    else if(p==='paste')h+='<div class="kai-tip"><b>예비 방법입니다.</b> 약관 분석처럼 여러 단계인 기능은 단계마다 붙여넣기를 해야 해서 번거롭습니다. 가능하면 위의 <b>내 API 키</b>를 등록하세요.<br><b>쓰는 법</b> 자료를 올리면 「AI에게 읽히기」 창이 뜹니다. <b>ChatGPT로 보내기</b> → 열린 창에 붙여넣고 보내기 → AI 답의 <b>복사</b> 아이콘 → 포털로 돌아오면 자동으로 들어갑니다. 무료 계정도 됩니다.</div>';
     h+='<div class="kai-warn">고객 증권·병력·재무 자료가 고른 AI 회사로 보내집니다. 개인정보 동의를 받은 고객 자료만 AI로 읽히세요.</div>';
     if(AIP[p].key)h+='<div class="kai-row"><button type="button" class="kai-btn p" data-kai="next">다음: 키 발급받기 ›</button>'+(c.keys[p]?'<button type="button" class="kai-btn" data-kai="have">이미 받은 키가 있어요</button>':'<button type="button" class="kai-btn" data-kai="have">키가 이미 있어요</button>')+'</div>';
     else h+='<div class="kai-row"><button type="button" class="kai-btn p" data-kai="save">이 방식으로 저장</button>'+(p==='company'?'<button type="button" class="kai-btn" data-kai="test">연결 시험</button>':'')+(raw().mode==='manual'?'':'<button type="button" class="kai-btn g" data-kai="off">AI 없이 쓰기</button>')+'<span class="kai-note" id="kaiMsg" role="status"></span></div>';
@@ -166,9 +166,9 @@ function render(){
   }else{
     var man=c.mode!=='ai';
     h='<h2>4. 고객 자료 저장 폴더 정하기</h2>'+(man?'<div class="kai-done"><b>✓ AI 없이 쓰기로 저장했습니다</b><span>값은 직접 입력합니다. 나중에 왼쪽 메뉴 아래 「AI 연결」에서 언제든 AI를 연결할 수 있습니다.</span></div>':
-      '<div class="kai-done"><b>✓ '+esc(AIP[p].name)+' 연결됨</b><span>이제 AI보장분석 <b>기본형</b>과 <b>고급형</b>에서 자료를 올리면 이 AI가 읽습니다.</span></div>')+
+      '<div class="kai-done"><b>✓ '+esc(AIP[p].name)+' 연결됨</b><span>이제 AI보장분석(기본형·고급형), 약관 분석, 상품 비교 등 포털의 모든 AI 기능이 이 AI를 씁니다.'+(AIP[p].key?' 여러 단계도 끝까지 자동으로 진행합니다.':'')+'</span></div>')+
       '<p class="kai-note">상담한 고객 자료는 회사 서버에 올라가지 않고 <b>이 기기</b>에만 있습니다. 내 PC나 내 클라우드(OneDrive·Google Drive) 안에 <b>보관 폴더</b>를 한 번 정해 두면, 「내 정보 · 자료 보관」에서 저장할 때마다 그 폴더에 날짜별 파일로 바로 저장됩니다.</p>'+fdBox()+
-      (man?'':'<ul class="kai-ul"><li>기본형: 증권·가입설계서를 올리면 등록된 기준·샘플대로 분석합니다.</li><li>고급형: 「증권·설계서 AI 판독」, 「자료로 채우기 (AI)」, 「AI 의견 초안 받기」에서 씁니다.</li><li>바꾸고 싶으면 왼쪽 메뉴 아래 「AI 연결」(폰은 「내 정보」)에서 언제든 다시 엽니다.</li></ul>')+
+      (man?'':'<ul class="kai-ul"><li>기본형: 증권·가입설계서를 올리면 등록된 기준·샘플대로 분석합니다.</li><li>고급형: 「증권·설계서 AI 판독」, 「자료로 채우기 (AI)」, 「AI 의견 초안 받기」에서 씁니다.</li><li>약관 분석: 약관 PDF를 올리고 물으면 이 AI가 읽고 보고서를 만듭니다.</li><li>바꾸고 싶으면 왼쪽 메뉴 아래 「AI 연결」(폰은 「내 정보」)에서 언제든 다시 엽니다.</li></ul>')+
       '<div class="kai-row"><button type="button" class="kai-btn p" data-kai="x">닫기</button></div>';
   }
   var faq=(step===2||step===3)?'<div class="kai-box kai-faq"><h3>자주 묻는 것</h3>'+FAQ.map(function(f){return '<p><b>'+f[0]+'</b><br>'+f[1]+'</p>';}).join('')+'</div>':'';

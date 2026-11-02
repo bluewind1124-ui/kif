@@ -1242,7 +1242,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
 })();
 </script>
 <script src="archive.js?v=20261024a"></script>
-<script src="ai-connect.js?v=20261102e"></script>
+<script src="ai-connect.js?v=20261102h"></script>
 <script src="policy.js?v=20261102g"></script>
 <script src="cmp-ai.js?v=20261024a"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1432,8 +1432,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* 홈 「내 AI 등록」: 기본형·고급형이 함께 쓰는 AI 설정 (ai-connect.js) */
   function hmAi(){
     var K=window.KIFAI;if(!K)return '';var first=!K.chosen();
-    return '<section class="hm-ai'+(first?' first':'')+'" id="hmAi"><span class="t">'+(first?'처음 한 번: 내 AI 등록':'내 AI')+'</span><div class="s">'+(first?'AI보장분석에서 쓸 AI를 먼저 정해 주세요. 한 번 등록하면 <b>기본형</b>과 <b>고급형</b>이 같은 AI를 씁니다.':K.statusHTML())+
-      '<small>기본형은 등록된 기준·샘플대로 분석하고, 고급형은 고급형 계산 규칙대로 제안서를 만듭니다.</small></div><button type="button" class="btn'+(first?' gold':'')+'" data-kai-open>'+(first?'내 AI 등록하기':'내 AI 바꾸기')+'</button></section>';
+    return '<section class="hm-ai'+(first?' first':'')+'" id="hmAi"><span class="t">'+(first?'처음 한 번: 내 AI 등록':'내 AI')+'</span><div class="s">'+(first?'내 AI API 키를 한 번 등록해 주세요(추천). 한 번 등록하면 <b>AI보장분석(기본형·고급형)</b>, <b>약관 분석</b>, <b>상품 비교</b>가 모두 같은 AI를 씁니다.':K.statusHTML())+
+      '<small>한 곳에서 한 번만 등록하면 포털의 모든 AI 기능에 자동으로 연결됩니다. API 키를 등록하면 여러 단계도 끝까지 자동으로 진행합니다.</small></div><button type="button" class="btn'+(first?' gold':'')+'" data-kai-open>'+(first?'내 AI 등록하기':'내 AI 바꾸기')+'</button></section>';
   }
   if(window.KIFAI)KIFAI.onChange(function(){var el=document.getElementById('hmAi');if(el)el.outerHTML=hmAi();
     try{if(me&&document.getElementById('side').innerHTML)renderSide();}catch(e){}
