@@ -87,6 +87,7 @@ var CSS='.pol{max-width:880px;margin:0 auto}'+
 '.pol-mode{display:grid;gap:6px;margin:10px 0 0;font-size:.9rem}.pol-mode label{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--surface);cursor:pointer}.pol-mode label.on{border-color:var(--kgold);background:var(--gold-soft)}.pol-mode input{margin-top:3px}.pol-mode .ok{color:var(--good);font-weight:600}'+
 '.pol-kw{margin:8px 0 0;font-size:.9rem;display:grid;gap:4px}.pol-kw:empty{display:none}.pol-kwin{width:100%;box-sizing:border-box;border:1px solid var(--line-strong);border-radius:6px;padding:6px 10px;background:var(--surface);color:var(--ink);font-size:.92rem}'+
 '.pol-a .cov{margin-top:10px;font-size:.85rem;border-radius:5px;padding:8px 12px;background:var(--good-soft);color:var(--ink)}.pol-a .cov.w{background:var(--warn-soft)}.pol-a .cov b{color:var(--navy-ink)}.pol-a .cov details{margin-top:4px}.pol-a .cov .btn{margin-top:6px}'+
+'.pol-rec{border-color:var(--kgold);background:var(--gold-soft)}.pol-alt{flex-basis:100%;font-size:.85rem;color:var(--muted);border-top:1px dashed var(--line-strong);padding-top:8px}'+
 '@media (max-width:640px){.pol-sh .note{margin-left:0;flex-basis:100%}.pol-sb{padding:14px}.pol-top .bt{margin-left:0}}';
 function addCss(){if(document.getElementById('polCss'))return;var s=document.createElement('style');s.id='polCss';s.textContent=CSS;document.head.appendChild(s);}
 
@@ -107,8 +108,13 @@ function aiState(){
 }
 function aiBox(){
   var a=aiState();
-  return '<div class="pol-ai" id="polAi"><div class="s">'+a.html+(a.ok&&a.paste?'<br><span class="note">복사·붙여넣기 방식은 질문을 AI 사이트에 붙여넣고 답을 다시 가져옵니다. 약관이 길면 여러 번 나눠 붙여넣어 전체를 읽힙니다. 자주 쓰면 무료 Gemini 키를 등록해 두면 버튼 한 번에 전체를 읽습니다.</span>':'')+'</div>'+
-    '<button type="button" class="btn sm'+(a.ok?' ghost':' gold')+'" data-kai-open>'+(a.ok?'AI 바꾸기':'내 AI 등록')+'</button><button type="button" class="btn sm ghost" data-pol="keyhelp">AI 연결 방법</button></div>';
+  /* 키가 없으면(복사·붙여넣기) 「내 AI 키 등록 = 자동」을 먼저 권하고, 붙여넣기는 예비 방법으로 둔다. 어떤 AI 키든 된다 */
+  if(a.ok&&a.paste)return '<div class="pol-ai pol-rec" id="polAi"><div class="s"><b style="font-size:1rem">추천: 내 AI 키를 한 번 등록하세요 → 약관 찾기가 자동으로 끝납니다</b><br>'+
+    '<span class="note">Claude · ChatGPT · Gemini 중 쓰시는 AI의 API 키를 넣으면 「약관에서 찾기」 한 번으로 여러 단계를 포털이 알아서 반복하고 1~3분 뒤 답이 나옵니다. (Gemini는 무료로 시작할 수 있습니다) 키는 이 기기 브라우저에만 저장됩니다.</span></div>'+
+    '<button type="button" class="btn sm gold" data-kai-open>내 AI 키 등록</button><button type="button" class="btn sm ghost" data-pol="keyhelp">키 받는 방법</button>'+
+    '<div class="pol-alt">지금은 <b>예비 방법(복사·붙여넣기)</b>으로 되어 있습니다 — 키 없이 무료지만, 단계마다 AI 사이트에 직접 붙여넣고 답을 가져와야 합니다.</div></div>';
+  return '<div class="pol-ai" id="polAi"><div class="s">'+a.html+(a.ok?'<br><span class="note">「약관에서 찾기」 한 번으로 여러 단계를 자동으로 반복해 답합니다.</span>':'')+'</div>'+
+    '<button type="button" class="btn sm'+(a.ok?' ghost':' gold')+'" data-kai-open>'+(a.ok?'AI 바꾸기':'내 AI 키 등록')+'</button><button type="button" class="btn sm ghost" data-pol="keyhelp">AI 연결 방법</button></div>';
 }
 function docsHtml(){
   if(!S.docs.length)return '';
@@ -211,8 +217,8 @@ function modal(title,body){
 function keyHelp(){
   modal('AI 연결 방법',
     '<p style="margin:0">약관 분석은 <b>AI보장분석과 같은 「내 AI 등록」</b>을 씁니다. 보장분석에서 이미 AI를 등록했다면 <b>여기서 따로 할 일은 없습니다.</b> 관리자는 회사 AI로 바로 씁니다.</p>'+
-    '<h4>아직 등록 전이라면 (셋 중 하나)</h4><ol><li><b>복사·붙여넣기</b> — 키 없이 무료. 평소 쓰는 ChatGPT·Gemini·Claude 사이트에 질문을 붙여넣고 답을 가져옵니다.</li><li><b>내 API 키</b> — Claude·ChatGPT·Gemini 중 하나의 키를 넣으면 버튼 한 번에 바로 답이 나옵니다. 아래는 무료로 시작할 수 있는 Gemini 예시입니다.</li><li><b>회사 AI</b> — 관리자가 켜 둔 경우 등록 없이 씁니다.</li></ol>'+
-    '<h4>(선택) Gemini 키 받기 — 무료, 약 3분</h4><ol><li>구글 계정으로 <a target="_blank" rel="noopener" href="https://aistudio.google.com/apikey">Google AI Studio ↗</a>에 들어갑니다.</li><li><b>Create API key</b>(API 키 만들기)를 누르면 긴 글자(키)가 나옵니다.</li><li>그 키를 <b>복사</b>합니다.</li><li>포털 <b>「내 AI 등록」 › Gemini (Google)</b>을 고르고 키를 붙여넣은 뒤 <b>저장</b>합니다.</li></ol>'+
+    '<h4>아직 등록 전이라면</h4><ol><li><b>내 API 키 (추천 · 자동)</b> — Claude·ChatGPT·Gemini 중 쓰시는 AI의 키를 넣으면 「약관에서 찾기」 한 번으로 여러 단계를 포털이 자동으로 반복해 답합니다. 어느 AI든 됩니다.</li><li><b>복사·붙여넣기 (예비)</b> — 키 없이 무료. 대신 단계마다 AI 사이트에 질문을 붙여넣고 답을 가져와야 합니다(웹 보안상 포털이 다른 사이트에 대신 입력할 수 없음).</li></ol>'+
+    '<h4>Gemini 키 받기 — 무료로 시작, 약 3분</h4><ol><li>구글 계정으로 <a target="_blank" rel="noopener" href="https://aistudio.google.com/apikey">Google AI Studio ↗</a>에 들어갑니다.</li><li><b>Create API key</b>(API 키 만들기)를 누르면 긴 글자(키)가 나옵니다.</li><li>그 키를 <b>복사</b>합니다.</li><li>포털 <b>「내 AI 등록」 › Gemini (Google)</b>을 고르고 키를 붙여넣은 뒤 <b>저장</b>합니다.</li></ol>'+
     '<h4>Claude · ChatGPT 키 (유료)</h4><ol><li><a target="_blank" rel="noopener" href="https://console.anthropic.com/settings/keys">Anthropic 콘솔 ↗</a> 또는 <a target="_blank" rel="noopener" href="https://platform.openai.com/api-keys">OpenAI 플랫폼 ↗</a>에서 키를 만듭니다.</li><li>「내 AI 등록」에서 해당 AI를 고르고 키를 붙여넣습니다.</li></ol>'+
     '<div class="pol-tip"><b>주의</b> 키는 비밀번호와 같습니다. 남에게 알려 주거나 단톡방·인터넷에 올리지 마세요. 키는 이 기기 브라우저에만 저장되니 공용 PC에서는 쓰고 나서 「내 AI 등록」에서 지워 주세요.</div>'+
     '<div class="row" style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn sm gold" data-kai-open>내 AI 등록 열기</button></div>');
