@@ -318,7 +318,7 @@ function keyHelp(){
     '<h4>Gemini 키 받기 — 무료로 시작, 약 3분</h4><ol><li>구글 계정으로 <a target="_blank" rel="noopener" href="https://aistudio.google.com/apikey">Google AI Studio ↗</a>에 들어갑니다.</li><li><b>Create API key</b>(API 키 만들기)를 누르면 긴 글자(키)가 나옵니다.</li><li>그 키를 <b>복사</b>합니다.</li><li>포털 <b>「내 AI 등록」 › Gemini (Google)</b>을 고르고 키를 붙여넣은 뒤 <b>저장</b>합니다.</li></ol>'+
     '<h4>Claude · ChatGPT 키 (유료)</h4><ol><li><a target="_blank" rel="noopener" href="https://console.anthropic.com/settings/keys">Anthropic 콘솔 ↗</a> 또는 <a target="_blank" rel="noopener" href="https://platform.openai.com/api-keys">OpenAI 플랫폼 ↗</a>에서 키를 만듭니다.</li><li>「내 AI 등록」에서 해당 AI를 고르고 키를 붙여넣습니다.</li></ol>'+
     '<div class="pol-tip"><b>주의</b> 키는 비밀번호와 같습니다. 남에게 알려 주거나 단톡방·인터넷에 올리지 마세요. 키는 이 기기 브라우저에만 저장되니 공용 PC에서는 쓰고 나서 「내 AI 등록」에서 지워 주세요.</div>'+
-    '<div class="row" style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn sm gold" data-kai-open>내 AI 등록 열기</button></div>');
+    '<div class="row" style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn sm gold" data-kai-open>내 AI 등록 열기</button><a class="btn sm ghost" href="'+(window.KIFAI&&KIFAI.guideDoc||'docs/ai-key-guide.html')+'" target="_blank" rel="noopener">📖 그림으로 보는 키 등록 설명서</a></div>');
 }
 function guide(){
   modal('약관 분석 이용 가이드',

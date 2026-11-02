@@ -102,6 +102,9 @@ function addCss(){if(document.getElementById('kai-css'))return;var s=document.cr
 
 /* ---------- 내 AI 등록 창 ----------
    1 AI 고르기 → (API 키 방식이면) 2 키 발급받기 → 3 붙여넣고 확인 → 4 완료.  키 없이 쓰는 방식은 1단계에서 바로 저장 */
+/* 그림으로 보는 키 등록 설명서(docs/ai-key-guide.html) — 이 스크립트 위치 기준으로 찾는다 */
+var GUIDE_DOC=(function(){var s=document.currentScript&&document.currentScript.src;return s?s.replace(/ai-connect\.js[^/]*$/,'docs/ai-key-guide.html'):'docs/ai-key-guide.html';})();
+function docLink(p,t){return '<a class="kai-link" href="'+GUIDE_DOC+(p?'#ai='+p:'')+'" target="_blank" rel="noopener">📖 '+(t||'그림으로 보는 설명서 (새 창)')+'</a>';}
 var GUIDE={
   claude:{site:'Anthropic 콘솔',url:'https://console.anthropic.com/settings/keys',bill:'https://console.anthropic.com/settings/billing',pre:/^sk-ant-/,preTxt:'sk-ant-',
     steps:['아래 <b>[발급 페이지 열기]</b>를 누르고 Anthropic 계정으로 로그인합니다. 계정이 없으면 이메일로 가입합니다(Claude 앱 계정과 같은 이메일을 써도 됩니다).',
@@ -141,7 +144,7 @@ function render(){
     var card=function(k){return '<button type="button" class="kai-opt'+(k===p?' on':'')+'" data-kai-p="'+k+'"><b>'+(k===p?'✓ ':'')+AIP[k].name+'</b><span>'+AIP[k].help+'</span>'+(AIP[k].key?'<em>'+(c.keys[k]?'키 등록됨 · 바꾸기':'키 발급 안내 따라 하기 ›')+'</em>':'')+'</button>';};
     var easy=['company','paste','claudeapp'].filter(function(k){return (k!=='company'||companyOk())&&(k!=='claudeapp'||host);});
     h='<h2>1. 쓸 AI 고르기</h2><p class="kai-note">여기서 <b>한 번만</b> 등록하면 <b>AI보장분석(기본형·고급형)</b>, <b>약관 분석</b>, <b>상품 비교</b> 등 포털의 모든 AI 기능이 같은 AI를 씁니다. 다른 화면에서 다시 등록할 필요가 없습니다.</p>'+
-      '<h3>내 API 키로 쓰기 <span class="kai-note" style="color:#b45309;font-weight:700">추천 · 끝까지 자동으로 진행</span></h3><p class="kai-note" style="margin:-4px 0 6px">셋 중 하나만 고르면 됩니다. 고르면 키 발급 방법이 화면별로 이어집니다.</p><div class="kai-opts">'+['claude','openai','gemini'].map(card).join('')+'</div>'+
+      '<h3>내 API 키로 쓰기 <span class="kai-note" style="color:#b45309;font-weight:700">추천 · 끝까지 자동으로 진행</span></h3><p class="kai-note" style="margin:-4px 0 6px">셋 중 하나만 고르면 됩니다. 고르면 키 발급 방법이 화면별로 이어집니다. '+docLink('','처음이면: 화면마다 그림으로 따라 하는 설명서 (새 창)')+'</p><div class="kai-opts">'+['claude','openai','gemini'].map(card).join('')+'</div>'+
       '<h3>키 없이 쓰기 <span class="kai-note">예비 방법 · 단계마다 직접 복사·붙여넣기</span></h3><div class="kai-opts">'+easy.map(card).join('')+'</div>';
     if(p==='company')h+='<label class="kai-f">회사 접속코드 <span class="kai-note">관리자가 알려준 경우만</span><input type="password" id="kaiCode" autocomplete="off" value="'+esc(c.code||'')+'"></label>';
     else if(p==='paste')h+='<div class="kai-tip"><b>예비 방법입니다.</b> 약관 분석처럼 여러 단계인 기능은 단계마다 붙여넣기를 해야 해서 번거롭습니다. 가능하면 위의 <b>내 API 키</b>를 등록하세요.<br><b>쓰는 법</b> 자료를 올리면 「AI에게 읽히기」 창이 뜹니다. <b>ChatGPT로 보내기</b> → 열린 창에 붙여넣고 보내기 → AI 답의 <b>복사</b> 아이콘 → 포털로 돌아오면 자동으로 들어갑니다. 무료 계정도 됩니다.</div>';
@@ -152,6 +155,7 @@ function render(){
     var G=GUIDE[p];
     h='<h2>2. '+esc(AIP[p].name.replace(/ \(.*\)$/,''))+' 키 발급받기</h2><p class="kai-note">'+G.site+'에서 내 키를 만듭니다. 처음 한 번만 하면 됩니다.</p><ol class="kai-ol">'+G.steps.map(function(s){return '<li>'+s+'</li>';}).join('')+'</ol>'+
       '<a class="kai-btn gold" href="'+G.url+'" target="_blank" rel="noopener" data-kai="opened">발급 페이지 열기 (새 창) ↗</a>'+
+      '<p class="kai-note" style="margin:8px 0 0">발급 사이트 화면이 헷갈리면 '+docLink(p,'이 AI 발급 화면을 그림으로 보기')+'</p>'+
       '<div class="kai-tip">'+G.tip+'</div>'+
       '<div class="kai-row"><button type="button" class="kai-btn" data-kai="prev">이전</button><button type="button" class="kai-btn p" data-kai="copied">키를 복사했어요 ›</button></div>';
   }else if(step===3){
@@ -539,5 +543,5 @@ function fdBox(){
 var folder={name:FD_NAME,ok:fdOk,get:fdGet,label:fdLabel,pick:fdPick,write:fdWrite,clear:fdClear,perm:fdPerm,err:fdErr};
 if(document.readyState!=='loading')addCss();else document.addEventListener('DOMContentLoaded',addCss);
 window.addEventListener('storage',function(e){if(e.key===AIK)fire();});
-window.KIFAI={AIP:AIP,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,ocrPages:ocrPages,err:err,pretty:pretty,view:view,pickJson:function(t){return pickJson(t);},migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
+window.KIFAI={AIP:AIP,guideDoc:GUIDE_DOC,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,ocrPages:ocrPages,err:err,pretty:pretty,view:view,pickJson:function(t){return pickJson(t);},migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
 })();
