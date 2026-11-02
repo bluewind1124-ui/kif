@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-11-02.4">
+<meta name="kif-build" content="2026-11-02.5">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -59,6 +59,8 @@
 .nt-th{position:relative;flex:0 0 64px;width:64px;height:80px;border:1px solid #d9dee7;border-radius:6px;overflow:hidden;background:#f3f5f9}.nt-th img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
 .nt-th em{position:absolute;left:3px;top:3px;font-style:normal;font-size:9px;font-weight:700;color:#fff;background:rgba(16,32,64,.75);padding:1px 4px;border-radius:3px}.nt-th.wait::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#eef1f6,#f8f9fb,#eef1f6);background-size:200% 100%;animation:ntw 1.2s linear infinite}@keyframes ntw{to{background-position:-200% 0}}
 .nt-tx{display:flex;flex-direction:column;gap:2px;min-width:0}.nt-tx b{font-weight:600;font-size:.92rem;line-height:1.35;word-break:break-all}.nt-tx .pill{align-self:flex-start}
+.ft{display:inline-flex;align-items:center;gap:8px;vertical-align:middle;text-decoration:none}.ft .ft-t{min-width:0}.nt-th.sm{flex:0 0 44px;width:44px;height:56px}.nt-th.sm em{font-size:8px}
+.hy-f .ft{display:flex;margin:3px 0}.mat .th.wait{background:linear-gradient(90deg,#eef1f6,#f8f9fb,#eef1f6);background-size:200% 100%;animation:ntw 1.2s linear infinite}
 </style>
 </head>
 <body>
@@ -1499,7 +1501,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     hypo:function(){
       var h=head('영업 도구','대표 상품 가설','고객 유형별로 "이 고객에게는 이 상품부터"라는 가설과 첫 화법을 정리합니다. 관리자가 매달 바꿀 수 있습니다.');
       h+='<div class="tbl"><table><thead><tr><th>고객 유형</th><th>대표 상품 가설</th><th>첫 화법</th><th>자료</th></tr></thead><tbody>'+
-        HYPO.map(function(r){var F=hypoFiles(r);return '<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td class="hy-f">'+(F.length?F.map(function(f){return fileA(f,esc(fileLabel(f)));}).join('<br>'):'<span class="note">—</span>')+'</td></tr>';}).join('')+
+        HYPO.map(function(r){var F=hypoFiles(r);return '<tr><td><b>'+esc(r[0])+'</b></td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td class="hy-f">'+(F.length?F.map(function(f){return fileT(f,esc(fileLabel(f)));}).join(''):'<span class="note">—</span>')+'</td></tr>';}).join('')+
         '</tbody></table></div><p class="note">관리자가 콘텐츠 관리에서 바꾼 내용이 모든 FC에게 보입니다.</p>';
       return h;
     },
@@ -1641,7 +1643,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     award:function(){
       var h=head('공지','시상 공지','진행 중인 시상과 결과 발표를 확인합니다.');
       h+='<div class="grid">';
-      AWARDS.forEach(function(a){h+='<div class="tile"><span class="no">'+esc(a[1])+'</span><h3>'+fileA(a[4],esc(a[0]))+' <span class="pill '+(a[3]==='진행 중'?'new':'ok')+'">'+esc(a[3])+'</span></h3><span class="d">'+esc(a[2])+'</span></div>';});
+      AWARDS.forEach(function(a){h+='<div class="tile"><span class="no">'+esc(a[1])+'</span><h3>'+fileT(a[4],esc(a[0]))+' <span class="pill '+(a[3]==='진행 중'?'new':'ok')+'">'+esc(a[3])+'</span></h3><span class="d">'+esc(a[2])+'</span></div>';});
       return h+'</div>';
     },
     admin:function(){
@@ -2015,6 +2017,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function cut(x){return x.length>42?x.slice(0,41)+'…':x;}
   /* 화면에서 파일 열기: 저장소 안 경로(news/… files/…)·미리보기(blob:)·외부 주소 모두 새 창으로 */
   function fileHref(f){return !f?'':/^(blob:|https?:)/.test(f)?f:encodeURI(f);}
+  /* 첫 장 그림이 붙은 자료 링크(FC 화면 목록용). 그림은 ntThumb·ntMake가 채운다 */
+  function thBox(f,cls){var ty=(String(f).split('.').pop()||'').toUpperCase(),th=ntThumb(f);
+    return '<span class="nt-th'+(cls?' '+cls:'')+(th?'':' wait')+'"'+(th?'':' data-ntmk="'+esc(f)+'"')+'>'+(th?'<img loading="lazy" alt="" src="'+(/^blob:/.test(th)?th:fileHref(th))+'">':'')+'<em>'+esc(ty)+'</em></span>';}
+  function fileT(f,inner){var h=fileHref(f);if(!h)return inner;return '<a class="flink ft" target="_blank" rel="noopener" href="'+h+'">'+thBox(f,'sm')+'<span class="ft-t">'+inner+' <span class="pill new">열기</span></span></a>';}
   function fileA(f,inner,cls){var h=fileHref(f);return h?'<a class="'+(cls||'flink')+'" target="_blank" rel="noopener" href="'+h+'">'+inner+' <span class="pill new">열기</span></a>':inner;}
 
   function pdfLib(){if(window.pdfjsLib&&!pdfjsLib.GlobalWorkerOptions.workerSrc)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';return window.pdfjsLib;}
@@ -2121,8 +2127,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function cptMatFile(m){if(m&&m[2])return m[2];var r=cptMatRow(m);return r?r[4]:'';}
   function cptMatLink(m){
     var r=cptMatRow(m);
-    if(r)return '<a class="flink" target="_blank" rel="noopener" href="'+fileHref(r[4])+'" data-mview="'+MATS.indexOf(r)+'">'+esc(m[1])+' <span class="pill new">열기</span></a>';
-    return m[2]?fileA(m[2],esc(m[1])):esc(m[1])+' <span class="pill warn">파일 준비 중</span>';
+    if(r)return '<a class="flink ft" target="_blank" rel="noopener" href="'+fileHref(r[4])+'" data-mview="'+MATS.indexOf(r)+'">'+thBox(r[4],'sm')+'<span class="ft-t">'+esc(m[1])+' <span class="pill new">열기</span></span></a>';
+    return m[2]?fileT(m[2],esc(m[1])):esc(m[1])+' <span class="pill warn">파일 준비 중</span>';
   }
   /* 올리기 전에 그 메뉴에 지금 올라가 있는 자료를 같은 화면에서 보여 준다 (고르기 전엔 「판단이 안 될 때 넣을 메뉴」 기준) */
   function nuNow(k){
@@ -3032,7 +3038,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     CM_TABS.length=0;[['compare',menuName('compare','상품 비교')],['onepick','이번 달의 원픽'],['cmpdata','비교자료 업로드']].concat(base.filter(function(x){return x[0]==='hypo'||x[0]==='concept';}),base.filter(function(x){return x[0]!=='hypo'&&x[0]!=='concept'&&x[0]!=='onepick';}),bl).forEach(function(x){CM_TABS.push(x);});
     bl.forEach(function(x){var b=x[0];CM_KEY[b]='board:'+b;CM_COLS[b]=[[0,'날짜','96px'],[1,'제목','w'],[2,'설명','a']];CM_FI[b]=3;CM_LEN[b]=4;CM_HELP[b]='「'+x[1]+'」 메뉴에 보이는 자료입니다.';
       if(!PAGES[b])PAGES[b]=function(){var L=((SITE&&SITE.boards)||{})[b]||[];
-        return head(menuGroup(b)||'자료',esc(BOARD[b]||b),'관리자가 올린 자료입니다. 제목을 누르면 열립니다.')+'<div class="panel"><ul class="list">'+(L.length?L.map(function(r){return '<li><span class="dt">'+esc(r[0]||'')+'</span><span class="t">'+fileA(r[3],'<b>'+esc(r[1]||'')+'</b>')+(r[2]?'<br><span class="note">'+esc(r[2])+'</span>':'')+'</span></li>';}).join(''):'<li class="note">아직 올라온 자료가 없습니다.</li>')+'</ul></div>';};});
+        return head(menuGroup(b)||'자료',esc(BOARD[b]||b),'관리자가 올린 자료입니다. 제목을 누르면 열립니다.')+'<div class="panel"><ul class="list">'+(L.length?L.map(function(r){return '<li><span class="dt">'+esc(r[0]||'')+'</span><span class="t">'+fileT(r[3],'<b>'+esc(r[1]||'')+'</b>')+(r[2]?'<br><span class="note">'+esc(r[2])+'</span>':'')+'</span></li>';}).join(''):'<li class="note">아직 올라온 자료가 없습니다.</li>')+'</ul></div>';};});
     if(KINDS.every(function(k){return k[0]!==CM.tab;})&&CM.tab!=='compare'&&CM.tab!=='cmpdata')CM.tab='compare';
   }
   menuSync();
@@ -3071,7 +3077,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function sumText(x){x=String(x||'');return /본문 글자를 읽지 못했/.test(x)?'':x;}
   function newsRow(m){
     var n=m.n,lab=(m.ym||esc(n[0]||''))+(m.wk?' · '+m.wk+'주차':n[4]?' · 월간':'');
-    var body=m.title?fileA(n[3],'<b>'+esc(m.title)+'</b>'):'<b>'+esc(sumText(n[2]))+'</b>';
+    var body=m.title?fileT(n[3],'<b>'+esc(m.title)+'</b>'):'<b>'+esc(sumText(n[2]))+'</b>';
     var sm=m.title?sumText(n[2]):'';
     return '<li data-co="'+esc(m.co)+'" data-ym="'+esc(m.ym)+'" data-wk="'+esc(m.wk||(n[4]?'':'-'))+'"><span class="dt">'+lab+'</span><span class="t"><span class="pill">'+esc(m.co)+'</span> '+body+(sm?'<br><span class="note">'+esc(sm)+'</span>':'')+'</span></li>';
   }
@@ -3156,7 +3162,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function matThumb(m){var f=m&&m[4];if(!f)return '';if(isImg(f))return f;var T=(SITE&&SITE.thumbs)||{};if(T[f])return T[f];if(isPpt(f)){var tw=matTwin(m,isPdf);if(tw&&T[tw[4]])return T[tw[4]];}return '';}
   function matCard(m,full){
     var th=matThumb(m);
-    var inner=(th?'<div class="th img '+esc(m[0])+'"><img loading="lazy" alt="" src="'+fileHref(th)+'"><span>'+esc(m[0])+'</span></div><div class="mt"><b class="mtt">'+esc(m[1])+'</b>':'<div class="th '+esc(m[0])+'"><span>'+esc(m[0])+'</span><b>'+esc(m[1])+'</b></div><div class="mt">')+
+    var inner=(th?'<div class="th img '+esc(m[0])+'"><img loading="lazy" alt="" src="'+fileHref(th)+'"><span>'+esc(m[0])+'</span></div><div class="mt"><b class="mtt">'+esc(m[1])+'</b>':(m[4]?'<div class="th img wait '+esc(m[0])+'" data-ntmk="'+esc(m[4])+'"><span>'+esc(m[0])+'</span></div><div class="mt"><b class="mtt">'+esc(m[1])+'</b>':'<div class="th '+esc(m[0])+'"><span>'+esc(m[0])+'</span><b>'+esc(m[1])+'</b></div><div class="mt">'))+
       (full?(matMonth(m)?'<span class="pill">'+esc(matMonth(m))+'</span> ':''):'<span class="pill">'+esc(matCatName(m[2]))+'</span> ')+esc(m[3]||'')+(m[4]?' <span class="pill new">열기</span>':'')+'</div>';
     return m[4]?'<a class="mat" target="_blank" rel="noopener" href="'+fileHref(m[4])+'" data-mview="'+MATS.indexOf(m)+'">'+inner+'</a>':'<div class="mat">'+inner+'</div>';
   }
@@ -3578,12 +3584,23 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   /* 본사 공지 첫 장 그림: 그림은 그대로, 올릴 때 만든 첫 장(thumbs)이 있으면 그것, 없으면 이 화면에서 파일을 읽어 만든다(PDF·엑셀·워드·PPT) */
   var NT_TH={};
-  function ntThumb(f){if(isImg(f))return f;var T=(SITE&&SITE.thumbs)||{};return T[f]||NT_TH[f]||'';}
-  function ntMake(){Array.prototype.forEach.call(document.querySelectorAll('[data-ntmk]'),function(el){var f=el.getAttribute('data-ntmk');if(NT_TH[f]===0)return;NT_TH[f]=0;
-    fetch(fileHref(f)).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();}).then(function(buf){return anyThumb(f,buf,(f.split('.').pop()||'').toUpperCase(),'','');})
-      .then(function(t){if(!t)return;var u=URL.createObjectURL(new Blob([t],{type:'image/jpeg'}));NT_TH[f]=u;
-        Array.prototype.forEach.call(document.querySelectorAll('[data-ntmk]'),function(x){if(x.getAttribute('data-ntmk')===f){x.classList.remove('wait');x.insertAdjacentHTML('afterbegin','<img alt="" src="'+u+'">');x.removeAttribute('data-ntmk');}});})
-      .catch(function(){NT_TH[f]=undefined;});});}
+  function ntThumb(f){if(isImg(f))return f;var T=(SITE&&SITE.thumbs)||{};return T[f]||(typeof NT_TH[f]==='string'?NT_TH[f]:'');}
+  /* 한 번에 2개씩만 만든다(휴대폰에서 큰 PDF 여러 개를 한꺼번에 읽지 않게) */
+  var NT_Q=[],NT_RUN=0;
+  function ntDone(f,u){Array.prototype.forEach.call(document.querySelectorAll('[data-ntmk]'),function(x){if(x.getAttribute('data-ntmk')!==f)return;x.classList.remove('wait');if(u){x.insertAdjacentHTML('afterbegin','<img alt="" src="'+u+'">');x.removeAttribute('data-ntmk');}});}
+  function ntPump(){while(NT_RUN<2&&NT_Q.length){(function(f){NT_RUN++;
+    var get=function(u){return fetch(u,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();});};
+    get(fileHref(f)).catch(function(){return get(rawUrl(f));}).then(function(buf){return anyThumb(f,buf,(f.split('.').pop()||'').toUpperCase(),'','');})
+      .then(function(t){if(!t)throw 0;var u=URL.createObjectURL(new Blob([t],{type:'image/jpeg'}));NT_TH[f]=u;ntDone(f,u);})
+      .catch(function(){NT_TH[f]=-1;ntDone(f,'');}).then(function(){NT_RUN--;ntPump();});})(NT_Q.shift());}}
+  function ntMake(){Array.prototype.forEach.call(document.querySelectorAll('[data-ntmk]'),function(el){var f=el.getAttribute('data-ntmk');
+    if(typeof NT_TH[f]==='string'){ntDone(f,NT_TH[f]);return;}if(NT_TH[f]===-1){el.classList.remove('wait');return;}if(NT_TH[f]===0)return;NT_TH[f]=0;NT_Q.push(f);});ntPump();}
+  /* 방금 올린 파일은 사이트 반영(1~3분)이 끝나기 전엔 사이트 주소로 안 열린다 → GitHub 원본 주소로 한 번 더 시도 */
+  function rawUrl(f){return 'https://raw.githubusercontent.com/'+GH.owner+'/'+GH.repo+'/'+GH.branch+'/'+String(f).split('/').map(encodeURIComponent).join('/');}
+  document.addEventListener('error',function(e){var im=e.target;if(!im||im.tagName!=='IMG'||im.getAttribute('data-raw'))return;
+    var a=im.getAttribute('src')||'',d=a;try{d=decodeURI(a);}catch(x){}if(!/^(files|news|refs)\//.test(d))return;im.setAttribute('data-raw','1');im.src=rawUrl(d);},true);
+  /* 어느 화면이든 첫 장 그림이 없는 자료 칸(data-ntmk)이 생기면 바로 만든다 */
+  (function(){var tm=0;try{new MutationObserver(function(){if(tm)return;tm=setTimeout(function(){tm=0;if(document.querySelector('[data-ntmk]'))ntMake();},120);}).observe(document.documentElement,{childList:true,subtree:true});}catch(e){}})();
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-ntopen]');if(!a)return;
     var l=(SITE&&Array.isArray(SITE.notices))?NOTICES:(notices()||NOTICES),n=l[+a.getAttribute('data-ntopen')];if(!n||!n[2])return;
     e.preventDefault();openMat([(String(n[2]).split('.').pop()||'').toUpperCase(),n[1],'','',n[2]]);});
