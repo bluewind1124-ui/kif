@@ -353,9 +353,21 @@ async function relayCall(c,prompt,imgs){
   return j.text||'';
 }
 var PASTE_HEAD='[한국보험금융 FC 포털 요청] 아래 지시를 그대로 따르고, 설명 없이 JSON 하나만 답하세요.\n\n';
-function pasteAsk(q,scanned,step,parse){
-  /* parse: 답 모양이 조금 어긋나도(따옴표 깨짐 등) 필요한 것만 꺼내는 보조 읽기. 없으면 JSON만 받는다 */
-  var rd=function(t,explicit){try{return pickJson(t);}catch(e){var r=parse&&parse(t,explicit);if(r)return r;throw e;}};
+/* 직전에 받은 답(여러 번 붙여넣는 작업에서 이전 단계 답이 클립보드에 남아 다시 들어오는 것 막기) */
+var LAST_ANS='';
+/* 받은 글 → 답. parse: 모양이 조금 어긋나도 필요한 것만 꺼내는 보조 읽기, check: 이번 단계에 맞는 모양인지 */
+function readAns(t,parse,check,explicit){
+  var r=null,err={code:'bad_json'};
+  try{r=pickJson(t);}catch(e){}
+  if(r&&check&&!check(r)){err={code:'wrong_shape'};r=null;}
+  if(!r&&parse){var p=parse(t,explicit);if(p&&(!check||check(p)))r=p;}
+  if(!r)throw err;return r;
+}
+function pasteAsk(q,scanned,step,parse,check,want){
+  var rd=function(t,explicit){return readAns(t,parse,check,explicit);};
+  var why=function(e,t){if(String(t||'').trim()===LAST_ANS)return '지금 복사돼 있는 것은 <b>이전 단계에서 이미 넣은 답</b>입니다. 이번 단계 질문을 AI 창에 붙여넣고, 새로 나온 답을 복사해 주세요.';
+    if(e&&e.code==='wrong_shape')return '이 답은 <b>이번 단계에 맞는 모양이 아닙니다</b>'+(want?' (이번에는 '+esc(want)+'(으)로 답해야 함)':'')+'. 이전 단계 답을 다시 넣었거나, AI가 앞 대화를 보고 다른 모양으로 답했을 수 있습니다. 위의 「…로 보내기」를 다시 눌러 <b>새 AI 창</b>에 이번 질문을 붙여넣고 새 답을 복사해 주세요.';
+    return '복사된 내용에서 AI 답을 찾지 못했습니다. AI 답 아래의 복사 아이콘을 누른 뒤 다시 가져오거나, 답 전체를 아래 칸에 붙여넣어 주세요.';};
   addCss();
   return new Promise(function(res,rej){
     var c=cfg(),w=document.createElement('div');
@@ -369,15 +381,15 @@ function pasteAsk(q,scanned,step,parse){
       PASTE_SITES.map(function(x){return '<button type="button" class="kai-btn'+(x[0]===c.site?' p':'')+'" data-q="go" data-v="'+x[0]+'">'+x[1]+'로 보내기 ↗</button>';}).join('')+
       '</div><p class="kai-cmsg" data-q="cmsg" role="status"></p><div class="kai-row" style="margin-top:6px"><button type="button" class="kai-btn g" data-q="dl">질문을 파일(.txt)로 받기</button><span class="kai-note">붙여넣기가 안 되거나 너무 길면, 이 파일을 AI 창에 첨부해 보내세요.</span></div><details data-q="det"><summary class="kai-note">질문 내용 보기</summary><textarea rows="4" readonly data-q="qtext"></textarea></details></li>'+
       '<li><b>AI 답을 복사한 뒤 가져오기</b><p class="kai-note">AI 답 아래의 <b>복사</b> 아이콘을 누르고 이 창으로 돌아오면 자동으로 반영됩니다. 안 되면 아래 버튼을 누르세요.</p>'+
-      '<div class="kai-row"><button type="button" class="kai-btn p" data-q="grab">복사한 답 가져오기</button><button type="button" class="kai-btn g" data-q="cancel">취소</button></div><p class="kai-note" data-q="amsg" role="status"></p>'+
+      '<div class="kai-row"><button type="button" class="kai-btn p" data-q="grab">복사한 답 가져오기</button><button type="button" class="kai-btn g" data-q="cancel">취소</button></div><p class="kai-note" data-q="amsg" role="status" style="color:#9a3412;font-weight:600"></p>'+
       '<details data-q="man" open><summary class="kai-note"><b>또는 여기에 직접 붙여넣기</b> — AI 답 전체를 복사해 아래 칸에 붙여넣고 「반영」</summary><textarea rows="4" data-q="ans" placeholder="여기에 AI 답 전체를 붙여넣기 (Ctrl+V, 휴대폰은 길게 눌러 붙여넣기)"></textarea><div class="kai-row"><button type="button" class="kai-btn" data-q="ok">반영</button></div></details></li></ol></div>';
     document.body.appendChild(w);
     var g=function(k){return w.querySelector('[data-q="'+k+'"]');};g('qtext').value=q;
     var sent=false;
-    var onF=function(){if(!sent||!(navigator.clipboard&&navigator.clipboard.readText))return;setTimeout(function(){navigator.clipboard.readText().then(function(t){if(t===q||isQuestion(t,q)){g('amsg').textContent='아직 AI 답이 복사되지 않았습니다. AI 답 아래의 복사 아이콘을 누른 뒤 돌아오거나 「복사한 답 가져오기」를 누르세요.';return;}var r;try{r=rd(t,false);}catch(e){if(String(t||'').trim())g('amsg').textContent='복사된 내용을 답으로 읽지 못했습니다. AI 답 아래의 복사 아이콘을 다시 누르고 「복사한 답 가져오기」를 누르세요.';return;}fin();res(r);},function(){g('amsg').textContent='자동으로 가져오지 못했습니다. 「복사한 답 가져오기」를 누르세요.';});},400);};
+    var onF=function(){if(!sent||!(navigator.clipboard&&navigator.clipboard.readText))return;setTimeout(function(){navigator.clipboard.readText().then(function(t){if(t===q||isQuestion(t,q)){g('amsg').textContent='아직 AI 답이 복사되지 않았습니다. AI 답 아래의 복사 아이콘을 누른 뒤 돌아오거나 「복사한 답 가져오기」를 누르세요.';return;}if(String(t||'').trim()===LAST_ANS){g('amsg').innerHTML=why(null,t);return;}var r;try{r=rd(t,false);}catch(e){if(String(t||'').trim())g('amsg').innerHTML=why(e,t);return;}LAST_ANS=String(t).trim();fin();res(r);},function(){g('amsg').textContent='자동으로 가져오지 못했습니다. 「복사한 답 가져오기」를 누르세요.';});},400);};
     var esck=function(e){if(e.key==='Escape'){fin();rej({code:'paste_cancel'});}};
     var fin=function(){w.remove();window.removeEventListener('focus',onF);document.removeEventListener('keydown',esck);};
-    var tryApply=function(t,clip){if(isQuestion(t,q)){g('amsg').textContent='지금 복사돼 있는 것은 보낸 질문입니다. AI 창에서 답 아래의 복사 아이콘을 누른 뒤 다시 가져오세요.';return;}var r;try{r=rd(t,true);}catch(e){g('amsg').textContent=clip?'복사된 내용이 AI 답이 아닙니다. AI 답의 복사 아이콘을 누른 뒤 다시 가져오세요.':'JSON 형식의 답을 찾지 못했습니다. AI 답 전체를 복사했는지 확인하세요.';return;}fin();res(r);};
+    var tryApply=function(t,clip){if(isQuestion(t,q)){g('amsg').textContent='지금 복사돼 있는 것은 보낸 질문입니다. AI 창에서 답 아래의 복사 아이콘을 누른 뒤 다시 가져오세요.';return;}if(String(t||'').trim()===LAST_ANS){g('amsg').innerHTML=why(null,t);return;}var r;try{r=rd(t,true);}catch(e){g('amsg').innerHTML=why(e,t);return;}LAST_ANS=String(t).trim();fin();res(r);};
     window.addEventListener('focus',onF);document.addEventListener('keydown',esck);
     var copyNow=function(){var t=document.createElement('textarea');t.value=q;t.setAttribute('readonly','');t.style.cssText='position:fixed;left:-9999px;top:0';w.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}t.remove();
       if(!ok&&navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(q).catch(function(){});ok=true;}return ok;};
@@ -401,8 +413,8 @@ async function ask(prompt,mat){
   var c=cfg(),p=c.prov;mat=mat||{text:'',images:[],scanned:[]};
   if(c.mode!=='ai')throw {code:'ai_off'};
   var full=prompt+(mat.text?'\n\n자료:\n'+mat.text:'')+(mat.images.length?'\n\n(첨부한 사진·스캔 '+mat.images.length+'장도 함께 읽으세요)':'');
-  var rd=function(t){try{return pickJson(t);}catch(e){var r=mat.parse&&mat.parse(t,true);if(r)return r;throw e;}};
-  if(p==='paste')return await pasteAsk(PASTE_HEAD+full,mat.scanned||[],mat.step||'',mat.parse);
+  var rd=function(t){try{return readAns(t,mat.parse,mat.check,true);}catch(e){if(e.code==='wrong_shape')throw {code:'wrong_shape',message:'AI 답의 모양이 이번 단계와 맞지 않습니다'+(mat.want?' (필요: '+mat.want+')':'')+'. 다시 눌러 주세요.'};throw e;}};
+  if(p==='paste')return await pasteAsk(PASTE_HEAD+full,mat.scanned||[],mat.step||'',mat.parse,mat.check,mat.want);
   if(p==='claudeapp'){var h=claudeHost(),s=h&&await h.use('sample');if(!s)throw {code:'unavailable'};var o={};if(mat.images.length)o.images=mat.images;return await s.json(full,o);}
   var imgs=await Promise.all(mat.images.map(b64));
   if(p==='company'){if(!companyOk())throw {code:AI_PROXY?'admin_only':'no_proxy'};return rd(await relayCall(c,full,imgs));}
