@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-11-02.1">
+<meta name="kif-build" content="2026-11-02.2">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -54,6 +54,7 @@
 <title>한보금on 활동지원</title>
 <!-- Claude Artifact 원본(fc-portal.html)을 감싼 파일. 예전 v1.0 화면은 classic/ 폴더에 보관 -->
 <style>body{margin:0}.rf-step{margin-top:14px;padding-top:12px;border-top:1px solid rgba(20,40,75,.12)}.rf-step h4{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;font-size:15px;font-weight:700}.rf-step h4 .note{font-weight:400}.rf-step .rf-n{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#14284b;color:#fff;font-size:13px;flex:none}.rf-step>.in{width:100%;max-width:520px;box-sizing:border-box}
+.cm-bulk{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 10px;margin:0 0 10px;border:1px dashed #c9d2e0;border-radius:8px;background:#f7f9fc}.cm-pick{display:inline-flex;align-items:center;margin-right:2px}.cm-pick input{width:18px;height:18px}.smp-c.picked{outline:2px solid #e5484d;outline-offset:-2px}
 </style>
 </head>
 <body>
@@ -2436,7 +2437,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(x&&x.on!==false)cmpOpen(x);else{CMP.open='';go('compare');}
   },true);
 
-  var CM={tab:store('kif_cm_tab')||'compare',w:null,dirty:{},add:[],del:[],t:null,busy:false,again:false,msg:'',ask:''};
+  var CM={tab:store('kif_cm_tab')||'compare',w:null,dirty:{},add:[],del:[],t:null,busy:false,again:false,msg:'',ask:'',pick:{},pickTab:''};
   var CM_TABS=[['compare','상품 비교'],['cmpdata','비교자료 업로드'],['hypo','대표 상품 가설'],['concept','이달의 컨셉'],['news','보험사 소식지'],['award','시상 공지'],['notice','본사 공지'],['mats','교육 자료']];
   var CM_KEY={news:'news',award:'awards',hypo:'hypo',mats:'mats',notice:'notices'};
   var CM_LEN={news:7,award:5,hypo:4,mats:5,notice:3}, CM_FI={news:3,award:4,hypo:3,mats:4,notice:2};
@@ -2526,12 +2527,18 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function cmRows(k){
     var W=cmW(),key=CM_KEY[k],L=W[key]=W[key]||[],O=(W.off[k]||[]),C=CM_COLS[k],fi=CM_FI[k];
     var card=function(r,i,off){var id=(off?'o':'v')+i;
-      return '<div class="smp-c'+(off?' off':'')+'"><div class="row"><span class="pill'+(off?'':' new')+'">'+(off?'꺼 둠':'보이는 중')+'</span>'+
+      return '<div class="smp-c'+(off?' off':'')+(CM.pick[id]?' picked':'')+'"><div class="row"><label class="cm-pick" title="일괄 삭제할 자료로 고르기"><input type="checkbox" data-cmpick="'+id+'"'+(CM.pick[id]?' checked':'')+' aria-label="이 자료 고르기"></label><span class="pill'+(off?'':' new')+'">'+(off?'꺼 둠':'보이는 중')+'</span>'+
         '<label class="note" style="white-space:nowrap"><input type="checkbox" data-cmon="'+id+'"'+(off?'':' checked')+'> FC에게 보이기</label>'+
         (off?'':'<span class="cm-ord"><button class="btn sm ghost" type="button" data-cmmv="'+i+'" data-d="-1" aria-label="위로"'+(i?'':' disabled')+'>▲</button><button class="btn sm ghost" type="button" data-cmmv="'+i+'" data-d="1" aria-label="아래로"'+(i<L.length-1?'':' disabled')+'>▼</button></span>')+
         '<span class="sp"></span>'+(k==='hypo'?'':cmFileBtns(r[fi],'data-cmf="'+id+'"'))+cmDelBtn(id)+'</div>'+
         '<div class="nu-x">'+C.map(function(c){return cmIn('data-cmr="'+id+'" data-c="'+c[0]+'"',r[c[0]],c[2],c[1]);}).join('')+'</div>'+(k==='hypo'?cmHypoFiles(r,id):'')+'</div>';};
-    return '<div class="smp-l">'+(L.length?L.map(function(r,i){return card(r,i,false);}).join(''):'<p class="note">보이는 자료가 없습니다.</p>')+'</div>'+
+    if(CM.pickTab!==k){CM.pick={};CM.pickTab=k;}
+    var all=L.map(function(r,i){return 'v'+i;}).concat(O.map(function(o,i){return 'o'+i;})),np=all.filter(function(id){return CM.pick[id];}).length;
+    var bar=all.length?'<div class="cm-bulk"><label class="note"><input type="checkbox" data-cmpickall'+(np&&np===all.length?' checked':'')+'> 전체 선택</label>'+
+      '<span class="note">'+(np?'<b>'+np+'건</b> 골랐습니다':'지울 자료의 왼쪽 네모를 체크하세요')+'</span><span class="sp"></span>'+
+      (CM.ask==='bulk'&&np?'<b class="note" style="color:#b42318">고른 '+np+'건과 그 파일을 지웁니다. 맞나요?</b><button class="btn sm danger" type="button" data-cmbulk="go">정말 '+np+'건 지우기</button><button class="btn sm ghost" type="button" data-cm="nodel">취소</button>':
+       '<button class="btn sm ghost danger" type="button" data-cmbulk="ask"'+(np?'':' disabled')+'>고른 자료 일괄 삭제'+(np?' ('+np+'건)':'')+'</button>')+'</div>':'';
+    return bar+'<div class="smp-l">'+(L.length?L.map(function(r,i){return card(r,i,false);}).join(''):'<p class="note">보이는 자료가 없습니다.</p>')+'</div>'+
       (O.length?'<h3 style="margin-top:16px">꺼 둔 자료 <span class="note">'+O.length+'건 · FC에게 안 보임 · 체크하면 다시 보입니다</span></h3><div class="smp-l">'+O.map(function(o,i){return card(o.r,i,true);}).join('')+'</div>':'');
   }
   function cmHypoFiles(r,id){var F=hypoFiles(r);
@@ -2903,6 +2910,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var box=document.getElementById('cmList'),W=cmW(),k=CM.tab;
     box.addEventListener('change',async function(e){
       var t=e.target,a;
+      if((a=t.getAttribute('data-cmpick'))!=null){if(t.checked)CM.pick[a]=1;else delete CM.pick[a];CM.ask='';cmRender();return;}
+      if(t.hasAttribute('data-cmpickall')){CM.pick={};CM.ask='';if(t.checked){(W[CM_KEY[k]]||[]).forEach(function(r,i){CM.pick['v'+i]=1;});(W.off[k]||[]).forEach(function(o,i){CM.pick['o'+i]=1;});}cmRender();return;}
       if((a=t.getAttribute('data-cmr'))!=null){var l=cmLoc(a),c=t.getAttribute('data-c');if(l.obj)l.obj[c]=t.value;else l.row[+c]=t.value;cmTouch(k);return;}
       if((a=t.getAttribute('data-cmop'))!=null){W.onepick[a]=t.value.trim();cmTouch('onepick');return;}
       if((a=t.getAttribute('data-cmoc'))!=null){var oc=W.onepick.cats[+a],ck=t.getAttribute('data-c');if(!oc)return;CM.opOpen=+a;
@@ -2946,8 +2955,19 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       if(b.getAttribute('data-cmview-op')){CMP.open='onepick';go('compare');return;}
       if((a=b.getAttribute('data-cmopuse'))!=null){var ob=W.onepicks.splice(+a,1)[0],cur0=cmClone(W.onepick),pd=cur0.pend;delete cur0.pend;if(cur0.cats&&cur0.cats.length)W.onepicks.unshift(cur0);if(pd)ob.pend=pd;W.onepick=ob;cmTouch('onepick');cmRender();toast(ob.month+' 원픽으로 되돌렸습니다.');return;}
       if((a=b.getAttribute('data-cmkuse'))!=null){var i2=+a,old=W.concept;W.concept=W.concepts.splice(i2,1)[0];if(old&&old.title)W.concepts.unshift(old);cmTouch('concept');cmRender();toast('이달의 컨셉을 바꿨습니다.');return;}
+      if((a=b.getAttribute('data-cmbulk'))!=null){
+        var ids=Object.keys(CM.pick);if(!ids.length)return;
+        if(a==='ask'){CM.ask='bulk';cmRender();return;}
+        CM.ask='';var gb=[],key=CM_KEY[k],V=W[key]||[],OF=W.off[k]||[];
+        /* 뒤쪽 줄부터 지워야 앞쪽 번호가 안 밀린다 */
+        ids.sort(function(x,y){return (+y.slice(1))-(+x.slice(1));}).forEach(function(id){var i=+id.slice(1),r=id[0]==='o'?(OF.splice(i,1)[0]||{}).r:V.splice(i,1)[0];if(!r)return;
+          gb.push(r[CM_FI[k]]);if(k==='hypo')hypoFiles(r).forEach(function(f){gb.push(f);});});
+        CM.pick={};cmTouch(k);
+        var used2=JSON.stringify([W.news,W.awards,W.hypo,W.mats,W.notices,W.off,W.compare,W.concept,W.concepts,W.onepick,W.onepicks,W.cmpdata]);
+        gb.forEach(function(p){if(p&&cmIsRepo(p)&&used2.indexOf(JSON.stringify(p))<0&&CM.del.indexOf(p)<0)CM.del.push(p);});
+        cmRender();toast(ids.length+'건을 지웠습니다. 위 「저장」을 눌러야 모든 FC에게 반영됩니다.');return;}
       if((a=b.getAttribute('data-cmdel'))!=null){
-        if(CM.ask!==a){CM.ask=a;cmRender();return;}CM.ask='';
+        if(CM.ask!==a){CM.ask=a;cmRender();return;}CM.ask='';CM.pick={};
         var gone=[];
         if(/^cd/.test(a)){cdDelete(a.slice(2)).forEach(function(p){gone.push(p);});}
         else if(a[0]==='p'){var it2=W.compare.splice(+a.slice(1),1)[0];gone.push(it2.file);cmTouch('compare');}
