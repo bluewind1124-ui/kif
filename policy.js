@@ -361,10 +361,10 @@ function plan(){var a=aiState(),c=caps(a.paste),all=allPages(),sz=size(all),fits
   var auto=toc&&(a.paste||n>4)?'toc':'full',m=S.mode||auto;if(m==='toc'&&!toc)m='full';
   return {paste:a.paste,fits:fits,n:n,pages:totalPages(),toc:toc,secs:toc?allSecs().length:0,mode:fits?'all':m};}
 /* 답 모양이 조금 어긋나도(따옴표가 깨지는 등) 필요한 것만 꺼내 읽는다 */
-function mapParse(t){t=String(t||'');var out=[];(t.match(/\{[^{}]*?"p"\s*:\s*\d+[^{}]*?\}/g)||[]).forEach(function(o){var p=o.match(/"p"\s*:\s*(\d+)/),d=o.match(/"d"\s*:\s*(\d+)/),w=o.match(/"where"\s*:\s*"([^"]{0,60})/);out.push({p:+p[1],d:d?+d[1]:1,where:w?w[1]:'',why:'',quote:''});});
+function mapParse(t){t=String(t||'').replace(/[\u201C\u201D\u201E\u201F\u2033]/g,'"');var out=[];(t.match(/\{[^{}]*?"p"\s*:\s*\d+[^{}]*?\}/g)||[]).forEach(function(o){var p=o.match(/"p"\s*:\s*(\d+)/),d=o.match(/"d"\s*:\s*(\d+)/),w=o.match(/"where"\s*:\s*"([^"]{0,60})/);out.push({p:+p[1],d:d?+d[1]:1,where:w?w[1]:'',why:'',quote:''});});
   if(out.length||/"pages"\s*:\s*\[\s*\]/.test(t))return {pages:out};return null;}
 function tocParse(t){var m=String(t||'').match(/\bS\d{1,4}\b/g);return m?{sections:m}:null;}
-function ansParse(t,explicit){t=String(t||'');var m=t.match(/"answer"\s*:\s*"([\s\S]*?)"\s*,\s*"(points|refs|caution)"/);
+function ansParse(t,explicit){t=String(t||'').replace(/[\u201C\u201D\u201E\u201F\u2033](answer|points|refs|caution)[\u201C\u201D\u201E\u201F\u2033]/g,'"$1"');var m=t.match(/"answer"\s*:\s*"([\s\S]*?)"\s*,\s*"(points|refs|caution)"/);
   if(m)return {answer:m[1].replace(/\\n/g,'\n'),points:[],refs:[],caution:'AI 답의 형식이 조금 달라 답 본문만 옮겼습니다. 근거 조항은 원문으로 확인하세요.'};
   if(explicit&&t.trim().length>30&&!/<<KIF|\[한국보험금융 FC 포털 요청\]/.test(t))return {answer:t.trim(),points:[],refs:[],caution:'AI 답이 정해진 형식이 아니라 그대로 옮겼습니다.'};return null;}
 function tocPrompt(q,k,n,G){
