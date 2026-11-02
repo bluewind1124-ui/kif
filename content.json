@@ -1,6 +1,6 @@
 {
- "ver": 1793609442834,
- "updated": "2026. 11. 2. 오후 5:47:11",
+ "ver": 1793663734003,
+ "updated": "2026. 11. 3. 오전 8:55:34",
  "notices": [
   [
    "2026.11.02",
@@ -531,6 +531,20 @@
   ]
  ],
  "awards": [
+  [
+   "11월 1주차 손보 직영채널시상모음",
+   "",
+   "",
+   "진행 중",
+   "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3.pptx"
+  ],
+  [
+   "11월 생보 직영채널시상 모음",
+   "",
+   "",
+   "진행 중",
+   "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pptx"
+  ],
   [
    "10월 신계약 시상",
    "2026.10.01 ~ 10.31",
@@ -3082,6 +3096,8 @@
   "news/2026-10/흥국생명_202610_월간_ljzsh.pdf": "news/2026-10/흥국생명_202610_월간_ljzsh_thumb.jpg",
   "news/2026-10/흥국화재_202610_월간_pwxkn.pdf": "news/2026-10/흥국화재_202610_월간_pwxkn_thumb.jpg",
   "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pptx": "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync_thumb.jpg",
-  "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pdf": "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync_thumb.jpg"
+  "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pdf": "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync_thumb.jpg",
+  "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3.pptx": "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3_thumb.jpg",
+  "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pptx": "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4_thumb.jpg"
  }
 }
