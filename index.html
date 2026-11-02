@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-11-02.5">
+<meta name="kif-build" content="2026-11-02.6">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -923,8 +923,9 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .hm-cpt-t span{color:var(--kgold);font-weight:700;font-size:.95rem}
 .hm-cpt-t h2{font-size:2.2rem;font-weight:900;margin:6px 0 8px;color:#fff}
 .hm-cpt-t p{margin:0;color:#c9d3e3;max-width:680px}
-.hm-cpt-art{position:absolute;right:170px;top:14px;width:200px;height:160px;fill:none;stroke:rgba(205,155,52,.55);stroke-width:2;pointer-events:none}
-.hm-cpt-b{position:relative;z-index:1}
+.hm-cpt-art{position:absolute;right:300px;top:14px;width:200px;height:160px;fill:none;stroke:rgba(205,155,52,.55);stroke-width:2;pointer-events:none}
+.hm-cpt-b{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+.hm-cpt-th{display:block;text-decoration:none}.hm-cpt-th .nt-th{display:block;width:240px;height:135px;border:2px solid rgba(205,155,52,.7);border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.35)}.hm-cpt-th:hover .nt-th{border-color:var(--kgold)}
 .hm-cpt .btn.gold{padding:12px 22px;border-radius:8px}
 .hm-h{font-size:1.1rem;color:var(--navy-ink);margin-bottom:10px}
 .hm-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
@@ -970,6 +971,7 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .hm-nt b{font-size:.9rem;color:var(--muted)}
 .hm-nt .list li{padding:8px 0}
 @media (max-width:1100px){.hm-kpi,.hm-quick{grid-template-columns:repeat(2,minmax(0,1fr))}.hm-two{grid-template-columns:1fr}.hm-cpt-art{display:none}}
+@media (max-width:720px){.hm-cpt-b{align-items:stretch}.hm-cpt-th .nt-th{width:100%;height:auto;aspect-ratio:16/9}}
 @media (max-width:560px){
   .hm-hd h1{font-size:1.45rem}.hm-srch{flex-basis:100%;min-width:0}
   .hm-kpi button{padding:14px;gap:10px}.ki{width:26px;height:26px}.hm-kpi b{font-size:1.7rem}
@@ -1462,7 +1464,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<button data-go="ai">'+ic('user','ki')+'<div><span>내 보장분석 고객</span><b>'+cust+'<small>명</small></b><em>이 기기에 저장된 고객</em></div></button></section>';
       h+='<section class="hm-cpt" id="hmCpt"><div class="cur l" aria-hidden="true"></div><div class="cur r" aria-hidden="true"></div><div class="hm-cpt-t"><span>'+E(CONCEPT.month)+' 이달의 컨셉</span><h2 data-t="'+E(CONCEPT.title)+'" aria-label="'+E(CONCEPT.title)+'">'+E(CONCEPT.title)+'</h2><p>'+E(CONCEPT.desc||'')+'</p></div>'+
         '<svg class="hm-cpt-art" viewBox="0 0 200 160" aria-hidden="true"><path d="M100 14l58 22v42c0 36-25 58-58 68-33-10-58-32-58-68V36z"/><path d="M100 54v44M78 76h44"/><path d="M20 150V120M44 150V104M156 150V96M180 150V112"/></svg>'+
-        '<div class="hm-cpt-b">'+(CONCEPT.file?'<a class="btn gold" target="_blank" rel="noopener" href="'+E(fileHref(CONCEPT.file))+'"'+cptMv(CONCEPT.file)+'>컨셉 자료 보기 ›</a>':'<button class="btn gold" data-go="concept">컨셉 자료 보기 ›</button>')+'</div></section>';
+        '<div class="hm-cpt-b">'+(CONCEPT.file?'<a class="hm-cpt-th" target="_blank" rel="noopener" href="'+E(fileHref(CONCEPT.file))+'"'+cptMv(CONCEPT.file)+' aria-label="컨셉 자료 첫 장">'+thBox(CONCEPT.file,'')+'</a>':'')+(CONCEPT.file?'<a class="btn gold" target="_blank" rel="noopener" href="'+E(fileHref(CONCEPT.file))+'"'+cptMv(CONCEPT.file)+'>컨셉 자료 보기 ›</a>':'<button class="btn gold" data-go="concept">컨셉 자료 보기 ›</button>')+'</div></section>';
       /* 빠른 실행: 영업 도구 · 공지·시상 · 교육·연계 메뉴를 무작위 순서로 섞어 천천히 흘려 보낸다 (마우스를 올리면 멈춤) */
       var Q=[],seen={};MENU.forEach(function(g){if(!g.g||g.admin||g.mobile)return;g.items.forEach(function(it){if(seen[it[0]])return;seen[it[0]]=1;Q.push([SIC[it[0]]||'star',it[1],it[0],g.g]);});});
       for(var qi=Q.length-1;qi>0;qi--){var qj=Math.floor(Math.random()*(qi+1)),qt=Q[qi];Q[qi]=Q[qj];Q[qj]=qt;}
@@ -1515,7 +1517,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     },
     concept:function(){
       var h=head('영업 도구','이달의 컨셉','한 달 동안 전 FC가 같은 메시지로 상담하도록 컨셉·대상·자료를 한곳에 모읍니다.');
-      h+='<div class="hero"><div class="k">'+esc(CONCEPT.month)+'</div><h2>'+(CONCEPT.file?'<a class="hlink" target="_blank" rel="noopener" href="'+fileHref(CONCEPT.file)+'"'+cptMv(CONCEPT.file)+'>"'+esc(CONCEPT.title)+'" <span class="pill new">열기</span></a>':'"'+esc(CONCEPT.title)+'"')+'</h2><p>'+esc(CONCEPT.desc||'')+'</p><p>대상: '+esc(CONCEPT.target)+' · 핵심 상품: '+esc(CONCEPT.product)+'</p></div>';
+      h+='<div class="hero"><div class="k">'+esc(CONCEPT.month)+'</div><h2>'+(CONCEPT.file?'<a class="hlink" target="_blank" rel="noopener" href="'+fileHref(CONCEPT.file)+'"'+cptMv(CONCEPT.file)+'>"'+esc(CONCEPT.title)+'" <span class="pill new">열기</span></a>':'"'+esc(CONCEPT.title)+'"')+'</h2><p>'+esc(CONCEPT.desc||'')+'</p>'+(CONCEPT.target||CONCEPT.product?'<p>'+[CONCEPT.target?'대상: '+esc(CONCEPT.target):'',CONCEPT.product?'핵심 상품: '+esc(CONCEPT.product):''].filter(Boolean).join(' · ')+'</p>':'')+'</div>';
       var cmv=cptMv(CONCEPT.file);
       h+='<div class="cols"><div class="panel"><h3>주요 내용 <span class="note">컨셉 자료 목차</span></h3><ul class="list">'+(CONCEPT.steps||[]).map(function(x,k){var q=String(x).split('|').map(function(y){return y.trim();}),pgn=parseInt(q[2],10);
           return '<li><span class="pill">'+(k+1)+'</span><span class="t"><b>'+esc(q[0])+'</b>'+(q[1]?'<br><span class="note">'+esc(q[1])+'</span>':'')+'</span>'+
@@ -2123,7 +2125,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return hit[0]||null;
   }
   /* 홈 배너의 컨셉 파일도 교육 자료 보기 창으로 연다 (같은 제목 PDF가 있으면 PDF로) */
-  function cptMv(f){var i=-1;MATS.some(function(r,j){if(r[4]===f){i=j;return true;}});return i<0?'':' data-mview="'+i+'"';}
+  /* 컨셉 파일을 자료 보기 창으로 연다: 같은 파일 → 이름만 같은 짝(PDF↔PPT) → 둘 다 없으면 파일 자체를 연다 */
+  function cptMv(f){if(!f)return '';var i=-1,st=String(f).replace(/\.[^.\/]+$/,'');MATS.some(function(r,j){if(r[4]===f){i=j;return true;}});
+    if(i<0)MATS.some(function(r,j){if(r[4]&&String(r[4]).replace(/\.[^.\/]+$/,'')===st){i=j;return true;}});
+    return i<0?' data-cfile="'+esc(f)+'"':' data-mview="'+i+'"';}
   function cptMatFile(m){if(m&&m[2])return m[2];var r=cptMatRow(m);return r?r[4]:'';}
   function cptMatLink(m){
     var r=cptMatRow(m);
@@ -3255,6 +3260,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       }
     }).catch(function(){B.classList.add('full');B.innerHTML='<iframe title="'+esc(m[1])+'" src="'+fileHref(show)+'"></iframe>';pg.textContent='';});
   }
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-cfile]');if(!a||e.ctrlKey||e.metaKey||e.shiftKey)return;e.preventDefault();var f=a.getAttribute('data-cfile');openMat([(String(f).split('.').pop()||'').toUpperCase(),CONCEPT.title||'이달의 컨셉','이달의 컨셉','',f],+a.getAttribute('data-pg')||0);});
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-mview]');if(!a||e.ctrlKey||e.metaKey||e.shiftKey)return;e.preventDefault();openMat(+a.getAttribute('data-mview'),+a.getAttribute('data-pg')||0);});
   /* ---------- 개인 계정 (계정 서버: auth-server/worker.js) ----------
      계정 서버에는 아이디 · 비밀번호(풀 수 없는 형태) · 권한 · 상태만 있다. 이름·고객 자료는 없다.

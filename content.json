@@ -1,5 +1,5 @@
 {
- "ver": 1793609231440,
+ "ver": 1793609442834,
  "updated": "2026. 11. 2. 오후 5:47:11",
  "notices": [
   [
@@ -584,10 +584,17 @@
  ],
  "mats": [
   [
+   "PDF",
+   "AIA 달러보험 FC교육 3",
+   "이달의 컨셉",
+   "2026.11 이달의 컨셉 자료",
+   "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pdf"
+  ],
+  [
    "PPT",
    "AIA 달러보험 FC교육 3",
-   "자료",
-   "",
+   "이달의 컨셉",
+   "2026.11 이달의 컨셉 자료",
    "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pptx"
   ],
   [
@@ -710,25 +717,24 @@
   ]
  ],
  "concept": {
-  "month": "2026.10",
-  "title": "2026년 2월 Issue & Concept",
-  "target": "단기납 종신 VS 간병 보험",
-  "product": "한화생명 케어백 간병 플러스",
-  "desc": "2026년 10월 이달의 Issue",
+  "month": "2026.11",
+  "title": "AIA 달러보험 FC교육 3",
+  "target": "달러 자산·노후 연금에 관심 있는 고객",
+  "product": "AIA 프라임 달러 종신 · 일시납 연금 · 글로벌파워 월납연금",
+  "desc": "왜 지금, 달러인가 — AIA생명 달러보험 상품 완전정복 (거시경제 흐름부터 세일즈 화법까지)",
   "steps": [
-   "노후 재정 전략 | 국민건강보험료 부과체계 · 피부양자 자격 · 과세 vs 비과세 연금 | 3",
-   "단기납 종신 vs 간병보험 | 환급률 · 절세혜택 · 보험금 비교 , 케어백 간병플러스 | 16",
-   "보험료 납입면제 활용 방안 | 생손보 비교 · 연령별 발생률 · 장애와 장해 · 상품별 납입면제 | 28",
-   "무배당 유니버셜달러종신 | 달러 자산 · 상품 포인트 · 판매 컨셉 · 가입설계 · 유의사항 | 48"
+   "PART 1 왜 지금 달러인가 | 달러의 탄생 · 물가위기 · 금리역전 · 신용등급 · 환율상승 7대 요인 · 시장의 선택 | 4",
+   "PART 2 AIA생명 달러보험 상품 라인업 | 프라임 달러 종신 · 일시납 연금 · 글로벌파워 월납연금 · 타사비교 · 헬스케어 · 절세효과 | 18",
+   "PART 3 실전 세일즈 가이드 | 핵심화법 Cheat Sheet · 고객 Q&A · 완전판매 체크리스트 | 46"
   ],
   "mats": [
    [
     "PPT",
-    "2026년 2월 Issue & Concept",
-    "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm.pptx"
+    "AIA 달러보험 FC교육 3",
+    "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pptx"
    ]
   ],
-  "file": "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm.pptx"
+  "file": "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pptx"
  },
  "banner": {
   "title": "",
@@ -925,6 +931,27 @@
   "mats": []
  },
  "concepts": [
+  {
+   "month": "2026.10",
+   "title": "2026년 2월 Issue & Concept",
+   "target": "단기납 종신 VS 간병 보험",
+   "product": "한화생명 케어백 간병 플러스",
+   "desc": "2026년 10월 이달의 Issue",
+   "steps": [
+    "노후 재정 전략 | 국민건강보험료 부과체계 · 피부양자 자격 · 과세 vs 비과세 연금 | 3",
+    "단기납 종신 vs 간병보험 | 환급률 · 절세혜택 · 보험금 비교 , 케어백 간병플러스 | 16",
+    "보험료 납입면제 활용 방안 | 생손보 비교 · 연령별 발생률 · 장애와 장해 · 상품별 납입면제 | 28",
+    "무배당 유니버셜달러종신 | 달러 자산 · 상품 포인트 · 판매 컨셉 · 가입설계 · 유의사항 | 48"
+   ],
+   "mats": [
+    [
+     "PPT",
+     "2026년 2월 Issue & Concept",
+     "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm.pptx"
+    ]
+   ],
+   "file": "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm.pptx"
+  },
   {
    "month": "2026.10",
    "title": "노후 건강 보험을 위한 새로운 제안 !!",
@@ -3054,6 +3081,7 @@
   "news/2026-10/현대해상_202610_월간_wjz34.pdf": "news/2026-10/현대해상_202610_월간_wjz34_thumb.jpg",
   "news/2026-10/흥국생명_202610_월간_ljzsh.pdf": "news/2026-10/흥국생명_202610_월간_ljzsh_thumb.jpg",
   "news/2026-10/흥국화재_202610_월간_pwxkn.pdf": "news/2026-10/흥국화재_202610_월간_pwxkn_thumb.jpg",
-  "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pptx": "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync_thumb.jpg"
+  "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pptx": "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync_thumb.jpg",
+  "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pdf": "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync_thumb.jpg"
  }
 }
