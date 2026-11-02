@@ -77,6 +77,9 @@ var CSS='.pol{max-width:880px;margin:0 auto}'+
 '.pol-a .qq{font-weight:700;color:var(--navy-ink);margin-bottom:8px}.pol-a .tx{white-space:pre-wrap}.pol-a ul{margin:8px 0 0;padding-left:20px}'+
 '.pol-a .rf{margin-top:10px;font-size:.88rem;background:var(--surface-2);border-radius:5px;padding:8px 12px}.pol-a .rf li{margin:3px 0}.pol-a .rf q{color:var(--muted)}'+
 '.pol-a .cv{margin-top:8px;font-size:.85rem;color:var(--warn)}.pol-a .ft{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.pol-a .ft .note{flex:1}'+
+'.pol-blk{margin-top:10px}.pol-blk>.lb{font-weight:700;font-size:.86rem;color:var(--navy-ink);margin-bottom:4px}.pol-wn{background:var(--warn-soft);border-radius:6px;padding:8px 12px}.pol-wn>.lb{color:var(--warn)}.pol-wn ul{margin:4px 0 0}'+
+'.pol-tw{overflow-x:auto}.pol-t{border-collapse:collapse;width:100%;min-width:560px;font-size:.85rem}.pol-t th,.pol-t td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}.pol-t th{background:var(--surface-2);white-space:nowrap}.pol-t td.c{font-weight:700;white-space:nowrap}.pol-t tr.w td.c{color:var(--warn)}.pol-t td.q{color:var(--muted)}.pol-t .pg{white-space:nowrap;color:var(--navy-ink);font-weight:700}'+
+'.pol-raw{margin-top:10px;font-size:.8rem}.pol-raw summary,.pol-paste summary{cursor:pointer;color:var(--muted)}.pol-raw pre{white-space:pre-wrap;word-break:break-all;background:var(--surface-2);border-radius:6px;padding:8px;max-height:280px;overflow:auto}.pol-paste{font-size:.88rem}.pol-paste textarea{width:100%;box-sizing:border-box}'+
 '.pol-dis{margin:18px 0 6px;font-size:.82rem;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}'+
 '.pol-ov{position:fixed;inset:0;background:rgba(10,18,26,.55);z-index:9000;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}'+
 '.pol-box{background:var(--surface);color:var(--ink);border-radius:10px;max-width:640px;width:100%;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.3)}'+
@@ -134,17 +137,69 @@ function linksHtml(){
     '<div class="pol-tabs" role="tablist"><button type="button" role="tab" data-pol="tab" data-v="life" class="'+(S.tab==='life'?'on':'')+'" aria-selected="'+(S.tab==='life')+'">생명보험</button><button type="button" role="tab" data-pol="tab" data-v="nonlife" class="'+(S.tab==='nonlife'?'on':'')+'" aria-selected="'+(S.tab==='nonlife')+'">손해보험</button></div>'+
     '<div class="pol-co">'+L.map(function(x){return '<a target="_blank" rel="noopener" href="'+esc(x[1])+'">'+esc(x[0])+' ↗</a>';}).join('')+'</div>'+adminHtml()+'</div></details>';
 }
+/* ---------- 답 정리 규칙: AI 답이 어떤 모양(답 JSON·쪽 목록 pages·굽은 따옴표·글)으로 와도
+   ① 요약 답 → ② 상담 핵심 → ③ 항목별 표(구분/약관 위치·쪽/핵심 내용/인용 원문) → ④ 주의사항(면책·감액·보장개시 등) → 원문 보기(접힘) 순서로 보여 준다 ---------- */
+var CATS=[['계약 취소·고지의무',/사기|고지의무|숨기|숨긴|은폐|계약.{0,4}취소|무효/],['지급하지 않는 경우(면책)',/지급하지\s*않|면책|보상하지\s*않/],['감액·지급률',/감액|\d+\s*%|지급률|경과기간/],
+  ['보장개시·대기기간',/보장개시|책임개시|90일|대기기간/],['지급 횟수·소멸',/최초\s*1회|1회에\s*한|1회\s*지급|소멸|총\s*\d+\s*회|한도/],['용어 정의·분류표',/분류표|별표|정의|이라\s*함은|란\s|병기|C\d{2}|판정/],
+  ['청구 서류·절차',/청구|서류|통지/],['보장 내용(지급사유)',/[\s\S]*/]];
+var WARN={'계약 취소·고지의무':1,'지급하지 않는 경우(면책)':1,'감액·지급률':1,'보장개시·대기기간':1,'지급 횟수·소멸':1};
+function catOf(t){for(var i=0;i<CATS.length;i++)if(CATS[i][1].test(t))return i;return CATS.length-1;}
+function cut(s,n){s=String(s||'').replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n)+'…':s;}
+function pgOf(x){var p=x.p!=null?x.p:x.page;if(p==null){var m=String(x.where||'').match(/p\.?\s*(\d{1,4})/);p=m?m[1]:'';}return p===''||p==null?'':String(p).replace(/^p\.?\s*/,'');}
+function fromPages(P,raw){
+  var rows=P.filter(function(h){return h&&typeof h==='object';}).map(function(h){var t=[h.where,h.why,h.quote].join(' '),c=/지급사유/.test(h.where||'')&&!/지급하지/.test(h.where||'')?CATS.length-1:catOf(t);return {c:c,item:CATS[c][0],where:String(h.where||''),p:pgOf(h),d:+h.d||1,point:String(h.why||''),quote:String(h.quote||'')};});
+  rows.sort(function(a,b){return (CATS.length-1-a.c===0?99:a.c)-(CATS.length-1-b.c===0?99:b.c)||(+a.p||0)-(+b.p||0);});
+  /* 보장 내용을 맨 앞으로, 나머지는 주의 항목 순서대로 */
+  var cov=rows.filter(function(r){return r.c===CATS.length-1;}),rest=rows.filter(function(r){return r.c!==CATS.length-1;});rows=cov.concat(rest);
+  var ps=rows.map(function(r){return +r.p;}).filter(function(x){return x>0;}),cnt={};rows.forEach(function(r){cnt[r.item]=(cnt[r.item]||0)+1;});
+  var ans='AI가 약관에서 질문과 관련된 부분 '+rows.length+'곳'+(ps.length?'(p.'+Math.min.apply(null,ps)+'~p.'+Math.max.apply(null,ps)+')':'')+'을 찾아 보냈고, 포털이 항목별로 정리했습니다.\n'+
+    Object.keys(cnt).map(function(k){return '· '+k+' '+cnt[k]+'곳';}).join('\n')+'\n\n※ AI가 결론 문장은 쓰지 않았습니다. 아래 「찾은 쪽으로 요약 답 받기」를 누르면 이 쪽들의 원문으로 결론(받을 수 있는지·얼마인지)을 정리해 드립니다.';
+  var seen={},pts=[];cov.forEach(function(r){var k=cut(r.where,40);if(k&&!seen[k]&&pts.length<6){seen[k]=1;pts.push(k+(r.p?' (p.'+r.p+')':'')+(r.point?' — '+cut(r.point,40):''));}});
+  var warns=rows.filter(function(r){return WARN[r.item];}).map(function(r){return '['+r.item+'] '+cut(r.where,40)+(r.p?' (p.'+r.p+')':'')+': '+cut(r.quote||r.point,110);});
+  return {answer:ans,points:pts,rows:rows,warns:warns,caution:'',raw:raw,fromPages:rows.filter(function(r){return r.p;}).map(function(r){return {d:r.d,p:+r.p};})};
+}
+function normRef(f){if(f==null)return null;if(typeof f!=='object')return {item:'',where:String(f),p:'',point:'',quote:''};
+  return {item:String(f.item||f.category||f.type||f['구분']||''),where:String(f.where||f.clause||f.title||f.name||''),p:pgOf(f),point:String(f.point||f.why||f.summary||f.content||''),quote:String(f.quote||f.text||f.source||'')};}
+function strArr(v){if(v==null||v==='')return [];if(Array.isArray(v))return v.map(function(x){return typeof x==='object'?(x.text||x.point||JSON.stringify(x)):String(x);}).filter(Boolean);return [String(v)];}
+function plainMd(s){return String(s||'').replace(/\*\*([^*]+)\*\*/g,'$1').replace(/^#{1,6}\s*/gm,'').trim();}
+function normAns(r,raw,depth){
+  if(!r||typeof r!=='object')return {answer:String(r||''),points:[],rows:[],warns:[],caution:'',raw:raw||String(r||'')};
+  raw=r.raw||raw||'';depth=depth||0;
+  if(r.norm)return r;
+  var ans=r.answer!=null?r.answer:(r.text!=null?r.text:(r.summary||r.conclusion||''));
+  /* 답 칸 안에 JSON이 통째로 들어온 경우(형식이 달라 그대로 옮긴 답) → 다시 읽어 정리 */
+  if(typeof ans==='string'&&depth<2&&/^\s*[\[{]/.test(ans)&&window.KIFAI&&KIFAI.pickJson){try{var o=KIFAI.pickJson(/^\s*\[/.test(ans)?'{"items":'+ans+'}':ans);var n=normAns(o,raw||ans,depth+1);n.caution=n.caution||'';return n;}catch(e){}}
+  if((ans===''||ans==null)&&Array.isArray(r.pages)){var f=fromPages(r.pages,raw||safeJson(r));f.norm=1;return f;}
+  if((ans===''||ans==null)&&Array.isArray(r.items)&&r.items.length&&r.items[0]&&typeof r.items[0]==='object'&&('p' in r.items[0]||'where' in r.items[0])){var f2=fromPages(r.items,raw||safeJson(r));f2.norm=1;return f2;}
+  var rows=(Array.isArray(r.rows)?r.rows:Array.isArray(r.refs)?r.refs:[]).map(normRef).filter(Boolean);
+  var warns=strArr(r.warns||r.cautions||r.warnings);
+  var cv=String(r.caution||'').trim();
+  var known={answer:1,text:1,summary:1,conclusion:1,points:1,rows:1,refs:1,warns:1,cautions:1,warnings:1,caution:1,raw:1,norm:1,fromPages:1},extra={},hasX=false;
+  Object.keys(r).forEach(function(k){if(!known[k]&&r[k]!=null&&r[k]!==''){extra[k]=r[k];hasX=true;}});
+  return {norm:1,answer:plainMd(ans),points:strArr(r.points).map(plainMd),rows:rows,warns:warns,caution:cv,extra:hasX?extra:null,raw:raw||safeJson(r),fromPages:r.fromPages||null};
+}
+function safeJson(o){try{return JSON.stringify(o,null,1);}catch(e){return '';}}
+function rowsHtml(rows){if(!rows.length)return '';var hasItem=rows.some(function(r){return r.item;}),hasPoint=rows.some(function(r){return r.point;}),prev='';
+  return '<div class="pol-blk"><div class="lb">항목별 정리</div><div class="pol-tw"><table class="pol-t"><thead><tr>'+(hasItem?'<th>구분</th>':'')+'<th>약관 위치·쪽</th>'+(hasPoint?'<th>핵심 내용</th>':'')+'<th>인용 원문</th></tr></thead><tbody>'+
+    rows.map(function(r){var same=hasItem&&r.item===prev;prev=r.item;var w=r.where.replace(/\s*\(?p\.?\s*\d{1,4}\)?\s*$/,'');
+      return '<tr'+(WARN[r.item]?' class="w"':'')+'>'+(hasItem?'<td class="c">'+(same?'':esc(r.item))+'</td>':'')+'<td>'+esc(w||'-')+(r.p?' <span class="pg">p.'+esc(r.p)+'</span>':'')+'</td>'+(hasPoint?'<td>'+esc(r.point)+'</td>':'')+'<td class="q">'+(r.quote?'“'+esc(r.quote)+'”':'-')+'</td></tr>';}).join('')+
+    '</tbody></table></div></div>';}
 function ansHtml(){
   return S.qa.map(function(a,i){
-    var r=a.r||{};
+    var r=a.err?null:normAns(a.r||{});
     return '<div class="pol-a"><div class="qq">Q. '+esc(a.q)+'</div>'+
       (a.err?'<div class="cv">'+esc(a.err)+'</div>':
-      '<div class="tx">'+esc(r.answer||'')+'</div>'+
-      (Array.isArray(r.points)&&r.points.length?'<ul>'+r.points.map(function(p){return '<li>'+esc(p)+'</li>';}).join('')+'</ul>':'')+
-      (Array.isArray(r.refs)&&r.refs.length?'<div class="rf"><b>약관 근거</b><ul>'+r.refs.map(function(f){f=f||{};return '<li><b>'+esc(f.where||'')+'</b>'+(f.quote?' — <q>'+esc(f.quote)+'</q>':'')+'</li>';}).join('')+'</ul></div>':'')+
-      (r.caution?'<div class="cv">⚠ '+esc(r.caution)+'</div>':'')+covHtml(a,i))+
+      '<div class="pol-blk"><div class="lb">요약 답</div><div class="tx">'+esc(r.answer||'(AI가 요약 답을 쓰지 않았습니다)')+'</div></div>'+
+      (r.points.length?'<div class="pol-blk"><div class="lb">상담 때 짚을 핵심</div><ul>'+r.points.map(function(p){return '<li>'+esc(p)+'</li>';}).join('')+'</ul></div>':'')+
+      rowsHtml(r.rows)+
+      (r.warns.length||r.caution?'<div class="pol-blk pol-wn"><div class="lb">⚠ 주의사항 (면책·감액·보장개시·지급 횟수 등)</div>'+(r.warns.length?'<ul>'+r.warns.map(function(w){return '<li>'+esc(w)+'</li>';}).join('')+'</ul>':'')+(r.caution?'<div class="tx">'+esc(r.caution)+'</div>':'')+'</div>':'')+
+      (r.extra&&window.KIFAI&&KIFAI.pretty?'<div class="pol-blk"><div class="lb">그 밖에 AI가 보낸 내용</div>'+KIFAI.pretty(r.extra,'')+'</div>':'')+
+      (r.fromPages&&r.fromPages.length?'<div class="pol-blk"><button type="button" class="btn sm gold" data-pol="sum" data-i="'+i+'">찾은 쪽으로 요약 답 받기</button> <span class="note">위 '+r.fromPages.length+'곳의 약관 원문을 AI에 다시 보내 결론을 정리합니다'+(aiState().paste?' (붙여넣기 1번)':'')+'</span></div>':'')+
+      covHtml(a,i)+
+      (r.raw?'<details class="pol-raw"><summary>원문 보기 (AI가 보낸 그대로)</summary><pre>'+esc(r.raw)+'</pre></details>':''))+
       '<div class="ft"><span class="note">'+esc(a.at)+(a.part?' · '+esc(a.part):'')+'</span>'+(a.err?'':'<button type="button" class="btn sm ghost" data-pol="copy" data-i="'+i+'">답 복사</button>')+'<button type="button" class="btn sm ghost" data-pol="del" data-i="'+i+'">지우기</button></div></div>';
-  }).join('');
+  }).join('')+
+  '<details class="pol-paste"><summary>📋 AI 답을 직접 붙여넣어 정리하기</summary><p class="note">AI 창에서 받은 답(어떤 모양이든)을 붙여넣으면 위와 같은 형태로 정리해 드립니다.</p><textarea id="polPasteIn" rows="4" placeholder="AI 답 전체를 붙여넣기"></textarea><div style="margin-top:6px"><button type="button" class="btn sm" data-pol="tidy">정리해서 보기</button></div></details>';
 }
 function kwHtml(q){
   q=q==null?(document.getElementById('polQ')||{}).value||'':q;if(!String(q).trim()&&!S.kw)return '';
@@ -380,9 +435,10 @@ function mapParse(t,explicit){t=String(t||'').replace(/[\u201C\u201D\u201E\u201F
     if(/(관련|해당)[^.\n]{0,20}(없|찾지 못)/.test(t))return {pages:[]};}
   return null;}
 function tocParse(t){var m=String(t||'').match(/\bS\d{1,4}\b/g);return m?{sections:m}:null;}
-function ansParse(t,explicit){t=String(t||'').replace(/[\u201C\u201D\u201E\u201F\u2033](answer|points|refs|caution)[\u201C\u201D\u201E\u201F\u2033]/g,'"$1"');var m=t.match(/"answer"\s*:\s*"([\s\S]*?)"\s*,\s*"(points|refs|caution)"/);
-  if(m)return {answer:m[1].replace(/\\n/g,'\n'),points:[],refs:[],caution:'AI 답의 형식이 조금 달라 답 본문만 옮겼습니다. 근거 조항은 원문으로 확인하세요.'};
-  if(explicit&&t.trim().length>30&&!/<<KIF|\[한국보험금융 FC 포털 요청\]/.test(t))return {answer:t.trim(),points:[],refs:[],caution:'AI 답이 정해진 형식이 아니라 그대로 옮겼습니다.'};return null;}
+function ansParse(t,explicit){var raw0=String(t||'');try{var o0=window.KIFAI&&KIFAI.pickJson(raw0);if(o0&&typeof o0==='object'){if(Array.isArray(o0.pages)&&o0.pages.length){var f=fromPages(o0.pages,raw0);f.answer=f.answer;return f;}if(typeof o0.answer==='string'||typeof o0.text==='string'){o0.raw=raw0;return o0;}}}catch(e){}
+  t=String(t||'').replace(/[\u201C\u201D\u201E\u201F\u2033](answer|points|refs|caution)[\u201C\u201D\u201E\u201F\u2033]/g,'"$1"');var m=t.match(/"answer"\s*:\s*"([\s\S]*?)"\s*,\s*"(points|refs|caution)"/);
+  if(m)return {answer:m[1].replace(/\\n/g,'\n'),points:[],refs:[],caution:'AI 답의 형식이 조금 달라 답 본문만 옮겼습니다. 근거 조항은 원문으로 확인하세요.',raw:raw0};
+  if(explicit&&t.trim().length>30&&!/<<KIF|\[한국보험금융 FC 포털 요청\]/.test(t))return {answer:t.trim(),points:[],refs:[],caution:'',raw:raw0};return null;}
 function tocPrompt(q,k,n,G){
   return '너는 보험 약관에서 질문에 답하는 데 필요한 부분을 고르는 도우미다. 아래 [목록]은 약관 전체를 특약·조항 단위로 나눈 목록이다(번호 | 쪽 | 제목 | 지급사유 첫 문구)'+(n>1?' — 목록이 길어 '+n+'번에 나눠 보내며 이번은 '+k+'번째':'')+'. 이번에는 답을 쓰지 말고 읽어야 할 항목 번호만 고른다.\n'+
     '규칙:\n1) 목록을 처음부터 끝까지 모두 보고, 질문에 답하려면 읽어야 할 항목을 모두 고른다. 이름이 질문의 말과 달라도 뜻이 같거나 관련되면 고른다(예: 재발→계속받는·재진단·2차, 수술→수술비, 치료→항암·방사선·표적·직접치료·주요치료).\n'+
@@ -408,12 +464,14 @@ function prompt(q,part,full){
     '4) FC가 고객에게 바로 설명할 수 있게 쉬운 말로, 존댓말로 쓴다. 지급을 보장하는 표현("무조건 나옵니다")은 쓰지 않는다.\n'+
     (full?'5) 약관 전체('+full+')를 먼저 모두 읽어 질문과 관련된 쪽을 골랐고, 아래는 그 쪽들의 원문이다. 관련 특약이 여러 개면 빠짐없이 모두 답에 넣는다. [원문을 다 싣지 못한 관련 쪽 — 찾은 문구] 가 있으면 그것도 근거로 쓰되 원문 확인이 필요하다고 caution에 적는다.\n':
      part?'5) 약관이 길어 질문과 관련된 쪽만 보냈다('+part+'). 빠진 부분이 있을 수 있으면 caution에 적고, 맨 끝 [보내지 않은 쪽에 있는 특별약관 이름] 중 질문과 관련 있어 보이는 특약 이름과 쪽을 caution에 함께 적어 FC가 따로 확인하게 한다.\n':'')+
-    '\n답은 설명 없이 JSON 하나로만: {"answer":"질문에 대한 답(3~8문장)","points":["상담 때 짚을 핵심 2~5개"],"refs":[{"where":"조항 이름 (p.쪽)","quote":"약관 원문 인용"}],"caution":"주의할 점이나 확인이 더 필요한 것(없으면 빈 글자)"}\n\n'+
+    '6) 이번은 최종 답이다. 쪽 목록({"pages":…})이나 특약 번호로 답하지 말고, 반드시 아래 모양으로 결론을 쓴다. refs는 담보·항목별로 나눠 적고, 면책·감액·보장개시(대기기간)·지급 횟수·소멸·고지의무처럼 지급을 줄이거나 막는 조건은 warns에 하나씩 적는다.\n'+
+    '\n답은 설명 없이 JSON 하나로만: {"answer":"질문에 대한 답(3~8문장)","points":["상담 때 짚을 핵심 2~5개"],"refs":[{"item":"구분(담보·항목 이름)","where":"조항 이름","p":쪽번호,"point":"핵심 내용 한 줄","quote":"약관 원문 인용"}],"warns":["면책·감액·보장개시 등 주의사항"],"caution":"확인이 더 필요한 것(없으면 빈 글자)"}\n\n'+
     '[질문]\n'+q+'\n\n[약관]';
 }
 function now(){var d=new Date(),z=function(n){return (n<10?'0':'')+n;};return (d.getMonth()+1)+'/'+d.getDate()+' '+z(d.getHours())+':'+z(d.getMinutes());}
 function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
-async function askOnce(p,mat){try{return await KIFAI.ask(p,mat);}catch(e){if(e&&(e.code==='rate_limited'||e.code==='network'||e.code==='bad_json')&&!aiState().paste){await sleep(e.code==='rate_limited'?20000:3000);return await KIFAI.ask(p,mat);}throw e;}}
+/* 형식이 틀린 답·한도·연결 끊김은 KIFAI.ask가 공통 규칙으로 스스로 다시 묻는다 */
+async function askOnce(p,mat){return await KIFAI.ask(p,mat);}
 function isEcho(r){return /^질문에 대한 답\(3~8문장\)$/.test(String(r&&r.answer||'').trim());}
 /* 지금 올린 약관에서 AI가 읽지 못하는 부분 (글자 없는 쪽, 1500쪽 넘는 부분, 문자 인식 쪽) — 답마다 항상 보여 준다 */
 function gaps(){return S.docs.map(function(d){return {name:d.name,weak:d.weak.slice(),cut:d.num>d.pages.length?[d.pages.length+1,d.num]:null,ocr:d.ocrd.length};}).filter(function(g){return g.weak.length||g.cut||g.ocr;});}
@@ -489,13 +547,16 @@ async function ask(root,force){
   if(!q){qEl.focus();setMsg(root,'질문을 적어 주세요.');return;}
   if(!S.docs.length){setMsg(root,'먼저 2번에서 약관 PDF를 올려 주세요.');var d=root.querySelector('#polDrop');d&&d.scrollIntoView({block:'center',behavior:'smooth'});return;}
   var a=aiState();if(!a.ok){setMsg(root,'먼저 1번에서 AI를 연결해 주세요.');if(window.KIFAI)KIFAI.open();return;}
-  var pl=plan(),mode=pl.fits?'all':((force&&force.mode)||pl.mode);
+  var pl=plan(),mode=force&&force.pages?'sum':(pl.fits?'all':((force&&force.mode)||pl.mode));
   S.busy=true;var b=root.querySelector('#polAsk');b.disabled=true;b.textContent='찾는 중…';
-  var lab=mode==='toc'?'키워드·특약 목차로 찾기':'빠짐없이 전체 읽기';
+  var lab=mode==='sum'?'요약 답 받기':mode==='toc'?'키워드·특약 목차로 찾기':'빠짐없이 전체 읽기';
   var step=function(t,k,n){setMsg(root,lab+' '+k+'/'+n+' · '+t+'…');b.textContent='읽는 중 '+k+'/'+n;};
   var item={q:q,at:now()},r;
   try{
-    if(mode==='full'){r=await fullRead(q,root,item,step);item.part='전체 '+item.cov.pages+'쪽 읽음';}
+    if(mode==='sum'){var W={};force.pages.forEach(function(h){W[(h.d-1)+':'+h.p]=1;W[(h.d-1)+':'+(h.p+1)]=1;});var P=allPages().filter(function(x){return W[x.d+':'+x.p];});
+      if(!P.length)throw {code:'sum_none',message:'찾은 쪽이 지금 올린 약관에 없습니다. 같은 약관 PDF를 올린 뒤 다시 눌러 주세요.'};
+      r=await fullRead(q,root,item,step,{pages:P,key:'sum',label:lab,full:'앞에서 찾은 관련 '+force.pages.length+'곳, '+P.length+'쪽'});item.part='찾은 '+P.length+'쪽 원문으로 요약';}
+    else if(mode==='full'){r=await fullRead(q,root,item,step);item.part='전체 '+item.cov.pages+'쪽 읽음';}
     else if(mode==='toc'){r=await tocRead(q,root,item,step);item.part='특약 목록 전체 확인 · 관련 '+item.cov.chosen.length+'개 원문 읽음';}
     else{var sel=pick(q,caps(a.paste).quick);item.part=sel.part;setMsg(root,'AI가 약관을 읽고 있습니다'+(sel.part?' ('+sel.part+')':'')+'…');
       r=await askOnce(prompt(q,sel.part),{text:sel.text,images:[],scanned:[],parse:ansParse,check:function(r){return typeof r.answer==='string'||typeof r.text==='string';},want:'답 {"answer":…}'});
@@ -521,7 +582,7 @@ async function addFiles(root,files){
   }
 }
 function copyText(t){try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t);return true;}}catch(e){}var x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}x.remove();return ok;}
-function answerText(a){var r=a.r||{};return 'Q. '+a.q+'\n\n'+(r.answer||'')+(r.points&&r.points.length?'\n\n'+r.points.map(function(p){return '· '+p;}).join('\n'):'')+(r.refs&&r.refs.length?'\n\n[약관 근거]\n'+r.refs.map(function(f){return '- '+(f.where||'')+(f.quote?' : "'+f.quote+'"':'');}).join('\n'):'')+(r.caution?'\n\n※ '+r.caution:'')+'\n\n(약관 분석 참고용 · 최종 확인은 약관 원문과 보험사)';}
+function answerText(a){var r=normAns(a.r||{});return 'Q. '+a.q+'\n\n[요약 답]\n'+(r.answer||'')+(r.points.length?'\n\n[상담 때 짚을 핵심]\n'+r.points.map(function(p){return '· '+p;}).join('\n'):'')+(r.rows.length?'\n\n[항목별 정리]\n'+r.rows.map(function(f){return '- '+(f.item?'['+f.item+'] ':'')+(f.where||'')+(f.p?' (p.'+f.p+')':'')+(f.point?' — '+f.point:'')+(f.quote?' : "'+f.quote+'"':'');}).join('\n'):'')+(r.warns.length||r.caution?'\n\n[주의사항]\n'+r.warns.concat(r.caution?[r.caution]:[]).map(function(w){return '※ '+w;}).join('\n'):'')+'\n\n(약관 분석 참고용 · 최종 확인은 약관 원문과 보험사)';}
 
 
 /* ---------- 관리자: 공시실 바로가기 고치기 (content.json policyLinks로 저장, 모든 FC 화면에 반영) ---------- */
@@ -568,6 +629,8 @@ function bind(root){
     else if(k==='ex'){var q=root.querySelector('#polQ');q.value=EX[i][1];S.kw='';q.focus();var kb=root.querySelector('#polKw');if(kb)kb.innerHTML=kwHtml();}
     else if(k==='ask')ask(root);
     else if(k==='ocr')ocrWeak(root,i);
+    else if(k==='sum'){var qs=S.qa[i],nr=qs&&normAns(qs.r||{});if(nr&&nr.fromPages)ask(root,{q:qs.q,pages:nr.fromPages});}
+    else if(k==='tidy'){var ta=root.querySelector('#polPasteIn'),tv=ta&&ta.value.trim();if(!tv)return;var pr=ansParse(tv,true)||{answer:tv,raw:tv};var qv=(root.querySelector('#polQ')||{}).value;S.qa.unshift({q:(qv&&qv.trim())||'(붙여넣은 AI 답)',at:now(),part:'붙여넣은 답 정리',r:pr});root.querySelector('#polAns').innerHTML=ansHtml();}
     else if(k==='redo'){var qa=S.qa[i];if(qa)ask(root,{q:qa.q,mode:'full'});}
     else if(k==='copy'){var ok=copyText(answerText(S.qa[i]));b.textContent=ok?'✓ 복사됨':'복사 실패';setTimeout(function(){b.textContent='답 복사';},1500);}
     else if(k==='del'){S.qa.splice(i,1);root.querySelector('#polAns').innerHTML=ansHtml();}
