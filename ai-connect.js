@@ -365,15 +365,16 @@ function readAns(t,parse,check,explicit){
 }
 function pasteAsk(q,scanned,step,parse,check,want){
   var rd=function(t,explicit){return readAns(t,parse,check,explicit);};
-  var why=function(e,t){if(String(t||'').trim()===LAST_ANS)return '지금 복사돼 있는 것은 <b>이전 단계에서 이미 넣은 답</b>입니다. 이번 단계 질문을 AI 창에 붙여넣고, 새로 나온 답을 복사해 주세요.';
-    if(e&&e.code==='wrong_shape')return '이 답은 <b>이번 단계에 맞는 모양이 아닙니다</b>'+(want?' (이번에는 '+esc(want)+'(으)로 답해야 함)':'')+'. 이전 단계 답을 다시 넣었거나, AI가 앞 대화를 보고 다른 모양으로 답했을 수 있습니다. 위의 「…로 보내기」를 다시 눌러 <b>새 AI 창</b>에 이번 질문을 붙여넣고 새 답을 복사해 주세요.';
+  var goBtn=function(){var c0=cfg(),x=PASTE_SITES.filter(function(y){return y[0]===c0.site;})[0]||PASTE_SITES[0];return '<br><button type="button" class="kai-btn p" data-q="go" data-v="'+x[0]+'" style="margin-top:6px">① 이번 질문 복사하고 '+x[1]+' 새 창 열기 ↗</button> <span style="font-weight:400">② 새 창에 붙여넣고 보내기 → ③ 새 답을 복사해 여기로</span>';};
+  var why=function(e,t){if(String(t||'').trim()===LAST_ANS)return '이것은 <b>앞 단계에서 이미 넣은 답</b>입니다. 지금은 다음 단계라 <b>새 질문</b>을 AI에 보내고 그 새 답을 넣어야 합니다.'+goBtn();
+    if(e&&e.code==='wrong_shape')return '이 답은 <b>이번 단계에 맞는 모양이 아닙니다</b>'+(want?' (이번에는 '+esc(want)+'(으)로 답해야 함)':'')+'. 앞 단계 답을 다시 넣었거나, AI가 앞 대화를 보고 다른 모양으로 답했을 수 있습니다. <b>새 AI 창</b>에 이번 질문을 보내 주세요.'+goBtn();
     return '복사된 내용에서 AI 답을 찾지 못했습니다. AI 답 아래의 복사 아이콘을 누른 뒤 다시 가져오거나, 답 전체를 아래 칸에 붙여넣어 주세요.';};
   addCss();
   return new Promise(function(res,rej){
     var c=cfg(),w=document.createElement('div');
     w.className='kai-ov';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label','AI에게 읽히기');
     w.innerHTML='<div class="kai-box"><div class="kai-hd"><h2>AI에게 읽히기</h2><button type="button" class="kai-btn g kai-x" data-q="cancel" aria-label="닫기">✕</button></div>'+
-      (step?'<div class="kai-big" style="background:#e8eef7;border-color:#0f2240"><b>'+esc(step)+'</b></div>':'')+
+      (step?'<div class="kai-big" style="background:#e8eef7;border-color:#0f2240">'+(LAST_ANS?'✓ 앞 단계 답은 잘 받았습니다. <b style="color:#b45309">이번은 새 질문입니다</b> — 앞 답을 다시 넣지 말고, 아래 「…로 보내기」를 눌러 이번 질문을 AI에 보내세요.<br>':'')+'<b>'+esc(step)+'</b></div>':'')+
       '<div class="kai-big"><b>질문은 포털이 이미 만들어 두었습니다. 새로 쓰지 마세요.</b><br>① 아래 버튼을 누르면 질문이 복사되고 AI 창이 열립니다 → ② 열린 창의 입력칸을 한 번 누르고 <b>Ctrl+V</b>(붙여넣기, 휴대폰은 길게 눌러 「붙여넣기」) → ③ <b>보내기</b>(Enter) → ④ 답이 나오면 답 아래 <b>복사</b> 아이콘을 누르고 이 창으로 돌아오기</div>'+
       '<ol class="kai-steps">'+
       '<li><b>AI를 골라 질문 보내기</b><p class="kai-note">입력칸이 비어 있는 게 정상입니다. 거기에 붙여넣기만 하면 됩니다.'+
@@ -386,10 +387,11 @@ function pasteAsk(q,scanned,step,parse,check,want){
     document.body.appendChild(w);
     var g=function(k){return w.querySelector('[data-q="'+k+'"]');};g('qtext').value=q;
     var sent=false;
-    var onF=function(){if(!sent||!(navigator.clipboard&&navigator.clipboard.readText))return;setTimeout(function(){navigator.clipboard.readText().then(function(t){if(t===q||isQuestion(t,q)){g('amsg').textContent='아직 AI 답이 복사되지 않았습니다. AI 답 아래의 복사 아이콘을 누른 뒤 돌아오거나 「복사한 답 가져오기」를 누르세요.';return;}if(String(t||'').trim()===LAST_ANS){g('amsg').innerHTML=why(null,t);return;}var r;try{r=rd(t,false);}catch(e){if(String(t||'').trim())g('amsg').innerHTML=why(e,t);return;}LAST_ANS=String(t).trim();fin();res(r);},function(){g('amsg').textContent='자동으로 가져오지 못했습니다. 「복사한 답 가져오기」를 누르세요.';});},400);};
+    var onF=function(){if(!sent||!(navigator.clipboard&&navigator.clipboard.readText))return;setTimeout(function(){navigator.clipboard.readText().then(function(t){if(t===q||isQuestion(t,q)){g('amsg').textContent='아직 AI 답이 복사되지 않았습니다. AI 답 아래의 복사 아이콘을 누른 뒤 돌아오거나 「복사한 답 가져오기」를 누르세요.';return;}if(String(t||'').trim()===LAST_ANS){g('amsg').innerHTML='아직 이번 단계의 새 답이 복사되지 않았습니다. 이번 질문을 AI에 보내고 새 답을 복사해 주세요.';return;}var r;try{r=rd(t,false);}catch(e){if(String(t||'').trim())g('amsg').innerHTML=why(e,t);return;}LAST_ANS=String(t).trim();fin();res(r);},function(){g('amsg').textContent='자동으로 가져오지 못했습니다. 「복사한 답 가져오기」를 누르세요.';});},400);};
     var esck=function(e){if(e.key==='Escape'){fin();rej({code:'paste_cancel'});}};
     var fin=function(){w.remove();window.removeEventListener('focus',onF);document.removeEventListener('keydown',esck);};
-    var tryApply=function(t,clip){if(isQuestion(t,q)){g('amsg').textContent='지금 복사돼 있는 것은 보낸 질문입니다. AI 창에서 답 아래의 복사 아이콘을 누른 뒤 다시 가져오세요.';return;}if(String(t||'').trim()===LAST_ANS){g('amsg').innerHTML=why(null,t);return;}var r;try{r=rd(t,true);}catch(e){g('amsg').innerHTML=why(e,t);return;}LAST_ANS=String(t).trim();fin();res(r);};
+    var say=function(h){var m=g('amsg');m.innerHTML='';setTimeout(function(){m.innerHTML=h;try{m.scrollIntoView({block:'center',behavior:'smooth'});}catch(er){}},120);};
+    var tryApply=function(t,clip){if(isQuestion(t,q)){say('지금 복사돼 있는 것은 보낸 <b>질문</b>입니다. AI 창에 붙여넣어 보낸 뒤, 나온 <b>답</b> 아래의 복사 아이콘을 누르고 다시 가져오세요.');return;}var r;try{r=rd(t,true);}catch(e){if(String(t||'').trim()===LAST_ANS){g('ans').value='';say(why(null,t));}else say(why(e,t));return;}LAST_ANS=String(t).trim();fin();res(r);};
     window.addEventListener('focus',onF);document.addEventListener('keydown',esck);
     var copyNow=function(){var t=document.createElement('textarea');t.value=q;t.setAttribute('readonly','');t.style.cssText='position:fixed;left:-9999px;top:0';w.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}t.remove();
       if(!ok&&navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(q).catch(function(){});ok=true;}return ok;};

@@ -277,7 +277,7 @@ var SYN={'재발':['재진단','계속받는','전이','2차','재발암'],'또'
   '소액암':['유사암','갑상선','기타피부암','제자리암','경계성'],'유사암':['유사암','갑상선','기타피부암','제자리암','경계성'],'뇌':['뇌혈관','뇌졸중','뇌출혈','뇌경색'],'심장':['허혈성','심근경색'],'골절':['골절'],'치매':['치매','장기요양'],'간병':['간병','장기요양'],'후유':['후유장해','장해'],'사망':['사망']};
 function kwGroups(q){
   if(S.kw)return S.kw.split(/[,，\n]/).map(function(g){var t=g.split(/[\/·]/).map(function(x){return x.trim();}).filter(function(x){return x.length>=1;});return t.length?{k:t[0],terms:t}:null;}).filter(Boolean);
-  var stop=/^(이|그|저|어떤|어떻게|무엇|뭐|알려|주세요|정리해|찾아|있나요|되나요|경우|약관|에서|보험|보험금|이것|것|수|등|및|해|좀|대해|관련|받을|받는|받나요|받을수|있는|있을|이후|후|때|시|하면|되면|나요|가능|여부|얼마|정도|무슨|어디)$/;
+  var stop=/^(이|그|저|어떤|어떻게|무엇|뭐|알려|주세요|정리해|찾아|있나요|되나요|경우|약관|에서|보험|보험금|이것|것|수|등|및|해|좀|대해|관련|받을|받는|받나요|받을수|있는|있을|이후|후|때|시|하면|되면|나요|가능|여부|얼마|정도|무슨|어디|지급|지급되는|조건|기준|내용|방법|정리|설명|주요|관련된)$/;
   var tk=[];String(q).replace(/[^가-힣a-zA-Z0-9\s]/g,' ').split(/\s+/).forEach(function(x){
     for(var r=0;r<3;r++)x=x.replace(/(은|는|이|가|을|를|의|에|와|과|도|로|으로|에서|까지|부터|만|이나|나|요|인가요|인지|하면|되면|하는|되는|할|된|시|후|때|받을|받는)$/,'');
     if(x.length>=1&&!stop.test(x)&&(x.length>=2||x==='암'||x==='뇌'))tk.push(x);});
@@ -356,7 +356,10 @@ function tocLines(secs,cap,mark){mark=mark||{};
     if(sn>20){snip=(i>=0?t.slice(i,i+sn+40):t.slice(0,sn)).replace(/\s+/g,' ').slice(0,sn);}
     return x.id+' | '+(S.docs.length>1?'문서'+(x.d+1)+' ':'')+'p.'+x.a+(x.b>x.a?'~'+x.b:'')+' | '+x.t+(mark[x.id]?' | [키워드: '+mark[x.id]+']':'')+(snip?' | '+snip:'');});
 }
-function caps(paste){var p=window.KIFAI?KIFAI.cfg().prov:'';return {quick:paste?45000:(p==='openai'?150000:220000),chunk:paste?60000:(p==='gemini'?220000:p==='openai'?120000:150000),final:paste?45000:(p==='openai'?120000:150000),toc:paste?55000:100000};}
+function caps(paste){var p=window.KIFAI?KIFAI.cfg().prov:'',site=window.KIFAI?KIFAI.cfg().site:'';
+  /* 붙여넣기: Claude·Gemini 사이트는 긴 글을 파일처럼 받아 전부 읽으므로 한 번에 더 많이 보낸다 (붙여넣기 횟수 줄이기) */
+  if(paste&&(site==='claude'||site==='gemini'))return {quick:110000,chunk:120000,final:110000,toc:60000};
+  return {quick:paste?45000:(p==='openai'?150000:220000),chunk:paste?60000:(p==='gemini'?220000:p==='openai'?120000:150000),final:paste?45000:(p==='openai'?120000:150000),toc:paste?55000:100000};}
 function plan(){var a=aiState(),c=caps(a.paste),all=allPages(),sz=size(all),fits=sz<=c.quick,n=fits?1:chunks(all,c.chunk).length,toc=!fits&&canToc();
   var auto=toc&&(a.paste||n>4)?'toc':'full',m=S.mode||auto;if(m==='toc'&&!toc)m='full';
   return {paste:a.paste,fits:fits,n:n,pages:totalPages(),toc:toc,secs:toc?allSecs().length:0,mode:fits?'all':m};}
@@ -418,8 +421,12 @@ async function fullRead(q,root,item,step,o){
   if(fits){n=0;src.forEach(function(x){hits.push({d:x.d,p:x.p,where:'',why:'',quote:''});});}
   for(var k=k0;k<n;k++){
     step('약관 묶음 '+(k+1)+'/'+n+' 읽는 중',off+k+1,tot);
-    var r;try{r=await askOnce(mapPrompt(q,k+1,n),{text:fmt(C[k]),images:[],scanned:[],parse:mapParse,check:function(r){return Array.isArray(r.pages);},want:'쪽 목록 {"pages":[…]}',step:lab+' '+(off+k+1)+'/'+tot+' — 약관 묶음 '+(k+1)+'/'+n+' — 새 AI 창에 붙여넣기'});}
+    var r;try{r=await askOnce(mapPrompt(q,k+1,n),{text:fmt(C[k]),images:[],scanned:[],parse:mapParse,check:function(r){return Array.isArray(r.pages)||Array.isArray(r.sections);},want:'쪽 목록 {"pages":[…]}',step:lab+' '+(off+k+1)+'/'+tot+' — 약관 묶음 '+(k+1)+'/'+n+' — 새 AI 창에 붙여넣기'});}
     catch(e){if(e&&e.code==='paste_cancel'&&k>0)S.resume={key:key,k:k,hits:hits,seen:seen,o:o};throw e;}
+    /* AI가 쪽 목록 대신 특약 번호({"sections":…})로 답한 경우: 그 특약에 속한 이 묶음의 쪽을 관련 쪽으로 본다 */
+    if(r&&!Array.isArray(r.pages)&&Array.isArray(r.sections)){var SS=allSecs(),ids={};r.sections.forEach(function(x){ids[String(x).trim().toUpperCase()]=1;});
+      var hitS=SS.filter(function(x){return ids[x.id];}),pg=[];C[k].forEach(function(x){if(hitS.some(function(y){return y.d===x.d&&x.p>=y.a&&x.p<=y.b;}))pg.push({d:x.d+1,p:x.p,where:'',why:'',quote:''});});
+      if(!pg.length&&o.pages)C[k].forEach(function(x){pg.push({d:x.d+1,p:x.p,where:'',why:'',quote:''});});r={pages:pg};}
     if(!r||!Array.isArray(r.pages))throw {code:'map_bad',message:'묶음 '+(k+1)+'/'+n+'의 AI 답 형식이 맞지 않습니다. 다시 눌러 주세요.'};
     var inC={};C[k].forEach(function(x){inC[x.d+':'+x.p]=1;});
     r.pages.forEach(function(h){var d=(+h.d||1)-1,p=+h.p,kk=d+':'+p;if(!inC[kk]){/* 문서번호를 틀리게 적은 경우: 쪽번호로 맞춘다 */var m=C[k].filter(function(x){return x.p===p;});if(m.length===1){d=m[0].d;kk=d+':'+p;}else return;}
@@ -442,8 +449,8 @@ async function fullRead(q,root,item,step,o){
 async function tocRead(q,root,item,step){
   var a=aiState(),c=caps(a.paste),secs=allSecs(),G=kwGroups(q),K=kwSecs(G),mark={};
   /* ① 키워드가 나오는 특약을 포털이 먼저 모은다 (제목에 나오면 꼭, 나머지는 점수 순으로 읽을 수 있는 만큼) */
-  var kw=[],kwUsed=0,kwDrop=[],lim=c.final*3;
-  K.forEach(function(r){var sz=secText(r.x).length;mark[r.x.id]=r.hit.join('·');if(r.th||kwUsed+sz<=lim){kw.push(r.x);kwUsed+=sz;}else kwDrop.push(r.x);});
+  var kw=[],kwUsed=0,kwDrop=[],lim=c.final*(a.paste?1.6:3);
+  K.forEach(function(r){var sz=secText(r.x).length;mark[r.x.id]=r.hit.join('·');if(kwUsed+sz<=lim||!kw.length){kw.push(r.x);kwUsed+=sz;}else kwDrop.push(r.x);});
   var L=tocLines(secs,c.toc,mark),parts=[],cur=[],n=0;
   L.forEach(function(l){if(n+l.length+1>c.toc&&cur.length){parts.push(cur);cur=[];n=0;}cur.push(l);n+=l.length+1;});if(cur.length)parts.push(cur);
   var key='toc|'+q+'|'+secs.length+'|'+kwText(G),chosen=[],seen={};
