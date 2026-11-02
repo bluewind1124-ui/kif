@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-11-02.2">
+<meta name="kif-build" content="2026-11-02.3">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -55,6 +55,10 @@
 <!-- Claude Artifact 원본(fc-portal.html)을 감싼 파일. 예전 v1.0 화면은 classic/ 폴더에 보관 -->
 <style>body{margin:0}.rf-step{margin-top:14px;padding-top:12px;border-top:1px solid rgba(20,40,75,.12)}.rf-step h4{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;font-size:15px;font-weight:700}.rf-step h4 .note{font-weight:400}.rf-step .rf-n{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#14284b;color:#fff;font-size:13px;flex:none}.rf-step>.in{width:100%;max-width:520px;box-sizing:border-box}
 .cm-bulk{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 10px;margin:0 0 10px;border:1px dashed #c9d2e0;border-radius:8px;background:#f7f9fc}.cm-pick{display:inline-flex;align-items:center;margin-right:2px}.cm-pick input{width:18px;height:18px}.smp-c.picked{outline:2px solid #e5484d;outline-offset:-2px}
+.noticeList li.nt-f{padding:6px 0}.nt-a{display:flex;gap:10px;align-items:center;text-decoration:none;color:inherit}.nt-a:hover b{text-decoration:underline}
+.nt-th{position:relative;flex:0 0 64px;width:64px;height:80px;border:1px solid #d9dee7;border-radius:6px;overflow:hidden;background:#f3f5f9}.nt-th img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.nt-th em{position:absolute;left:3px;top:3px;font-style:normal;font-size:9px;font-weight:700;color:#fff;background:rgba(16,32,64,.75);padding:1px 4px;border-radius:3px}.nt-th.wait::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#eef1f6,#f8f9fb,#eef1f6);background-size:200% 100%;animation:ntw 1.2s linear infinite}@keyframes ntw{to{background-position:-200% 0}}
+.nt-tx{display:flex;flex-direction:column;gap:2px;min-width:0}.nt-tx b{font-weight:600;font-size:.92rem;line-height:1.35;word-break:break-all}.nt-tx .pill{align-self:flex-start}
 </style>
 </head>
 <body>
@@ -2360,7 +2364,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var files=[], list=[];
       for(var i=0;i<NU.items.length;i++){var it=NU.items[i];msg.textContent=(i+1)+'/'+NU.items.length+' '+it.file.name+' 올리는 중…';KS.step(msg.textContent);
         var bl=await gh('POST','/git/blobs',{content:b64(it.buf),encoding:'base64'}),p=nuPath(it);files.push({path:p,sha:bl.sha});list.push({it:it,path:p});
-        if(it.ext==='pdf'){try{var tb=await pdfThumb(it.buf);if(tb){var tp=p.replace(/\.pdf$/i,'')+'_thumb.jpg',tbl=await gh('POST','/git/blobs',{content:b64(tb),encoding:'base64'});files.push({path:tp,sha:tbl.sha});list[list.length-1].thumb=tp;}}catch(e){}}}
+        if(!/^(png|jpe?g|gif|webp)$/i.test(it.ext)){try{var tb=await anyThumb(it.file.name,it.buf,it.ext.toUpperCase(),it.title,'');if(tb){var tp=p.replace(/\.[a-z0-9]+$/i,'')+'_thumb.jpg',tbl=await gh('POST','/git/blobs',{content:b64(tb),encoding:'base64'});files.push({path:tp,sha:tbl.sha});list[list.length-1].thumb=tp;}}catch(e){}}}
       msg.textContent='저장 중…';
       var names={};list.forEach(function(x){names[kindName(x.it.kind)]=(names[kindName(x.it.kind)]||0)+1;});
       var what=Object.keys(names).map(function(k){return k+' '+names[k]+'건';}).join(', ');
@@ -3561,9 +3565,24 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function notices(){var s=store('fc_notices');try{return s?JSON.parse(s):null;}catch(e){return null;}}
   function renderNotices(){
     var l=(SITE&&Array.isArray(SITE.notices))?NOTICES:(notices()||NOTICES);
-    var html=l.map(function(n){return '<li><span class="dt">'+esc(n[0])+'</span><span class="t">'+fileA(n[2],esc(n[1]))+'</span></li>';}).join('');
+    var html=l.map(function(n,i){var f=n[2];if(!f||!fileHref(f))return '<li><span class="dt">'+esc(n[0])+'</span><span class="t">'+esc(n[1])+'</span></li>';
+      var ty=(String(f).split('.').pop()||'').toUpperCase(),th=ntThumb(f);
+      return '<li class="nt-f"><a class="nt-a" target="_blank" rel="noopener" href="'+fileHref(f)+'" data-ntopen="'+i+'"><span class="nt-th'+(th?'':' wait')+'"'+(th?'':' data-ntmk="'+esc(f)+'"')+'>'+(th?'<img loading="lazy" alt="" src="'+(/^blob:/.test(th)?th:fileHref(th))+'">':'')+'<em>'+esc(ty)+'</em></span>'+
+        '<span class="nt-tx"><span class="dt">'+esc(n[0])+'</span><b>'+esc(n[1])+'</b><span class="pill new">보기</span></span></a></li>';}).join('');
     Array.prototype.forEach.call(document.querySelectorAll('.noticeList'),function(el){el.innerHTML=html;});
+    ntMake();
   }
+  /* 본사 공지 첫 장 그림: 그림은 그대로, 올릴 때 만든 첫 장(thumbs)이 있으면 그것, 없으면 이 화면에서 파일을 읽어 만든다(PDF·엑셀·워드·PPT) */
+  var NT_TH={};
+  function ntThumb(f){if(isImg(f))return f;var T=(SITE&&SITE.thumbs)||{};return T[f]||NT_TH[f]||'';}
+  function ntMake(){Array.prototype.forEach.call(document.querySelectorAll('[data-ntmk]'),function(el){var f=el.getAttribute('data-ntmk');if(NT_TH[f]===0)return;NT_TH[f]=0;
+    fetch(fileHref(f)).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();}).then(function(buf){return anyThumb(f,buf,(f.split('.').pop()||'').toUpperCase(),'','');})
+      .then(function(t){if(!t)return;var u=URL.createObjectURL(new Blob([t],{type:'image/jpeg'}));NT_TH[f]=u;
+        Array.prototype.forEach.call(document.querySelectorAll('[data-ntmk]'),function(x){if(x.getAttribute('data-ntmk')===f){x.classList.remove('wait');x.insertAdjacentHTML('afterbegin','<img alt="" src="'+u+'">');x.removeAttribute('data-ntmk');}});})
+      .catch(function(){NT_TH[f]=undefined;});});}
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('[data-ntopen]');if(!a)return;
+    var l=(SITE&&Array.isArray(SITE.notices))?NOTICES:(notices()||NOTICES),n=l[+a.getAttribute('data-ntopen')];if(!n||!n[2])return;
+    e.preventDefault();openMat([(String(n[2]).split('.').pop()||'').toUpperCase(),n[1],'','',n[2]]);});
   var tt;
   function toast(m){var t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true;},2600);}
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
