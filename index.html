@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-11-02.3">
+<meta name="kif-build" content="2026-11-02.4">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -2279,12 +2279,14 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function b64(buf){var b=new Uint8Array(buf),s='',CH=0x8000;for(var i=0;i<b.length;i+=CH)s+=String.fromCharCode.apply(null,b.subarray(i,i+CH));return btoa(s);}
   function keepCut(){var d=new Date();d.setMonth(d.getMonth()-nuMonths());return d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());}
   async function gh(method,path,body){
-    var r=await fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+path,{method:method,headers:{'Authorization':'Bearer '+ghTok(),'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},body:body?JSON.stringify(body):undefined});
+    /* cache:'no-store' — GitHub API는 읽기 결과를 브라우저에 60초 기억시킨다. 그러면 방금 저장한 뒤 예전 main을 읽어
+       다음 저장이 「Update is not a fast forward」(422)로 계속 실패하므로, 항상 최신을 읽는다 */
+    var r=await fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+path,{method:method,cache:'no-store',headers:{'Authorization':'Bearer '+ghTok(),'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},body:body?JSON.stringify(body):undefined});
     if(!r.ok){var t='';try{t=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(t?' · '+t:'')+(r.status===401?' (토큰을 확인하세요)':r.status===403||r.status===404?' (토큰 권한: kif · Contents Read and write)':''));}
     return r.json();
   }
   /* 최신 main 위에 커밋한다. 그 사이 다른 저장·배포로 main이 바뀌어 「not a fast forward」(422)가 나면
-     최신 main과 content.json을 다시 받아 같은 변경을 다시 적용해 최대 5번 자동으로 다시 시도한다.
+     최신 main과 content.json을 다시 받아 같은 변경을 다시 적용해 최대 8번 자동으로 다시 시도한다.
      files: 미리 올린 파일 [{path,sha}] (sha:null이면 삭제) · mutate(cur,have,tree): 최신 content.json(cur)에 변경 적용 */
   async function ghLand(files,mutate,message){
     for(var t=0;;t++){
@@ -2298,7 +2300,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var nt=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:tree});
       var cm=await gh('POST','/git/commits',{message:typeof message==='function'?message(out):message,tree:nt.sha,parents:[ref.object.sha]});
       try{await gh('PATCH','/git/refs/heads/'+GH.branch,{sha:cm.sha});return {cur:cur,have:have,out:out};}
-      catch(e){if(t>=4||!/422|fast.?forward/i.test(String(e&&e.message)))throw e;if(window.KSAVE)KSAVE.step('다른 저장과 겹쳐 최신 상태로 다시 저장하는 중 ('+(t+2)+'번째)');await new Promise(function(r){setTimeout(r,700*(t+1));});}
+      catch(e){if(t>=7||!/422|fast.?forward/i.test(String(e&&e.message)))throw e;if(window.KSAVE)KSAVE.step('바로 전 저장이 아직 끝나는 중이라, 최신 내용 위에 다시 저장하는 중 ('+(t+2)+'번째)');await new Promise(function(r){setTimeout(r,1000*(t+1));});}
     }
   }
   /* 보장분석 샘플(참고자료) 바로 반영: 그림은 refs/<id>.jpg 파일로, 목록은 content.json refs에 한 번에 커밋 */
@@ -2873,6 +2875,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+='<div class="panel"><h3>'+(k==='concept'?'이달의 컨셉':k==='onepick'?'이번 달의 원픽':'등록된 '+cmName(k))+' <span class="note">고친 뒤 「저장」을 누르면 모든 FC에게 올라갑니다</span></h3><div id="cmList">'+(k==='compare'?cmCompare():k==='concept'?cmConcept():k==='onepick'?cmOnepick():cmRows(k))+'</div></div>';
     return h;
   }
+  /* 자료 관리 밖에서 쓰는 파일(보장분석 샘플 원본·첫 장, 참고자료, 게시판 등)은 지우지 않도록 함께 본다 */
+  function cmUsedElse(){var S=SITE||{};return JSON.stringify([S.aiSamples,S.refs,S.boards,S.onepick,S.concepts,S.concept,S.sched]);}
   function cmRender(){var v=document.getElementById('view');if(cur!=='cadmin'||!v)return;var y=window.scrollY;CM.keep=true;v.innerHTML=PAGES.cadmin();bindCm();window.scrollTo(0,y);}
   function cmLoc(id){ /* 'v3' 보이는 줄, 'o1' 꺼 둔 줄, 'p2' 상품 비교 */
     var W=cmW(),t=id[0],i=+id.slice(1),k=CM.tab;
@@ -2967,7 +2971,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         ids.sort(function(x,y){return (+y.slice(1))-(+x.slice(1));}).forEach(function(id){var i=+id.slice(1),r=id[0]==='o'?(OF.splice(i,1)[0]||{}).r:V.splice(i,1)[0];if(!r)return;
           gb.push(r[CM_FI[k]]);if(k==='hypo')hypoFiles(r).forEach(function(f){gb.push(f);});});
         CM.pick={};cmTouch(k);
-        var used2=JSON.stringify([W.news,W.awards,W.hypo,W.mats,W.notices,W.off,W.compare,W.concept,W.concepts,W.onepick,W.onepicks,W.cmpdata]);
+        var used2=JSON.stringify([W.news,W.awards,W.hypo,W.mats,W.notices,W.off,W.compare,W.concept,W.concepts,W.onepick,W.onepicks,W.cmpdata])+cmUsedElse();
         gb.forEach(function(p){if(p&&cmIsRepo(p)&&used2.indexOf(JSON.stringify(p))<0&&CM.del.indexOf(p)<0)CM.del.push(p);});
         cmRender();toast(ids.length+'건을 지웠습니다. 위 「저장」을 눌러야 모든 FC에게 반영됩니다.');return;}
       if((a=b.getAttribute('data-cmdel'))!=null){
@@ -2982,7 +2986,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         else if(/^hf/.test(a)){var mm=a.match(/^hf([vo]\d+):(\d+)$/),hl2=cmLoc(mm[1]),F2=hypoFiles(hl2.row);gone.push(F2.splice(+mm[2],1)[0]);hypoSetFiles(hl2.row,F2);cmTouch(k);}
         else{var lc=cmLoc(a);lc.list.splice(lc.i,1);gone.push(lc.row[CM_FI[k]]);if(k==='hypo')hypoFiles(lc.row).forEach(function(f){gone.push(f);});cmTouch(k);}
         /* 다른 곳(지난 컨셉 등)에서 같은 파일을 쓰면 파일은 남긴다 */
-        var used=JSON.stringify([W.news,W.awards,W.hypo,W.mats,W.notices,W.off,W.compare,W.concept,W.concepts,W.onepick,W.onepicks,W.cmpdata]);
+        var used=JSON.stringify([W.news,W.awards,W.hypo,W.mats,W.notices,W.off,W.compare,W.concept,W.concepts,W.onepick,W.onepicks,W.cmpdata])+cmUsedElse();
         gone.forEach(function(p){if(p&&cmIsRepo(p)&&used.indexOf(JSON.stringify(p))<0)CM.del.push(p);});
         cmRender();return;}
     });
