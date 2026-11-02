@@ -228,14 +228,14 @@ function reportHtml(a,i){
 function printReport(a){
   var w=window.open('','_blank');if(!w)return false;
   var css='body{font-family:"Pretendard","Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:#18202e;margin:0;padding:28px 34px;line-height:1.65;font-size:13.5px}'+
-    'h1{font-size:20px;margin:0 0 4px;color:#0f2240}.meta{color:#667185;font-size:12px;margin-bottom:6px}.q{font-size:15px;font-weight:700;margin:10px 0 14px;padding:10px 12px;background:#f3f5f8;border-left:4px solid #cd9b34}'+
+    'h1{font-size:20px;margin:0 0 4px;color:#0f2240}.meta{color:#667185;font-size:12px;margin-bottom:6px}.qbox{font-size:15px;font-weight:700;margin:10px 0 14px;padding:10px 12px;background:#f3f5f8;border-left:4px solid #cd9b34}'+
     '.pol-rs{margin:0 0 14px;page-break-inside:avoid}.pol-rs h4{margin:0 0 6px;font-size:14px;color:#0f2240;border-bottom:1px solid #e1e6ed;padding-bottom:3px}.pol-rs h4 span{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;background:#0f2240;color:#fff;font-size:11px;margin-right:6px}'+
     '.pol-rs.concl .tx{font-size:14px}.tx{white-space:pre-wrap}ul{margin:4px 0;padding-left:20px}li{margin:2px 0}.pol-wn{background:#fbeadb;padding:8px 12px;border-radius:6px}.pol-wn h4{color:#9a3412}'+
     'table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #d7dde5;padding:5px 7px;text-align:left;vertical-align:top}th{background:#eef2f7}td.c{font-weight:700}td.q{color:#555}.pg{font-weight:700;white-space:nowrap}tr{page-break-inside:avoid}'+
     '.foot{margin-top:18px;font-size:11px;color:#667185;border-top:1px solid #e1e6ed;padding-top:8px}.bar{margin-bottom:14px}.bar button{font-size:13px;padding:6px 14px;margin-right:6px}@media print{.bar{display:none}body{padding:0}}';
   w.document.open();w.document.write('<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>약관 분석 보고서</title><style>'+css+'</style></head><body>'+
     '<div class="bar"><button onclick="print()">인쇄 · PDF로 저장</button><button onclick="close()">닫기</button></div>'+
-    '<h1>약관 분석 보고서</h1><div class="meta">'+esc(a.at)+(a.docs?' · 약관: '+esc(a.docs):'')+'</div><div class="q">Q. '+esc(a.q)+'</div>'+
+    '<h1>약관 분석 보고서</h1><div class="meta">'+esc(a.at)+(a.docs?' · 약관: '+esc(a.docs):'')+'</div><div class="qbox">Q. '+esc(a.q)+'</div>'+
     reportBody(a,0,true)+'<div class="foot">이 보고서는 상담 참고용입니다. AI가 내용을 놓치거나 잘못 해석할 수 있으니, 보험금 지급 여부는 약관 원문과 보험사 확인을 거쳐 안내하세요.'+(a.part?'<br>읽은 범위: '+esc(a.part):'')+'</div></body></html>');
   w.document.close();setTimeout(function(){try{w.focus();w.print();}catch(e){}},400);return true;
 }
