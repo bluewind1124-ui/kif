@@ -117,7 +117,7 @@ function aiBox(){
   if(a.ok&&a.paste)return '<div class="pol-ai pol-rec" id="polAi"><div class="s"><b style="font-size:1rem">추천: 내 AI 키를 한 번 등록하세요 → 약관 찾기가 자동으로 끝납니다</b><br>'+
     '<span class="note">Claude · ChatGPT · Gemini 중 쓰시는 AI의 API 키를 넣으면 「약관에서 찾기」 한 번으로 여러 단계를 포털이 알아서 반복하고 1~3분 뒤 답이 나옵니다. (Gemini는 무료로 시작할 수 있습니다) 키는 이 기기 브라우저에만 저장됩니다.</span></div>'+
     '<button type="button" class="btn sm gold" data-kai-open>내 AI 키 등록</button><button type="button" class="btn sm ghost" data-pol="keyhelp">키 받는 방법</button>'+
-    '<div class="pol-alt">지금은 <b>예비 방법(복사·붙여넣기)</b>으로 되어 있습니다 — 키 없이 무료지만, 단계마다 AI 사이트에 직접 붙여넣고 답을 가져와야 합니다.</div></div>';
+    (window.KIFAI&&KIFAI.keyRowHTML?KIFAI.keyRowHTML():'')+'<div class="pol-alt">지금은 <b>예비 방법(복사·붙여넣기)</b>으로 되어 있습니다 — 키 없이 무료지만, 단계마다 AI 사이트에 직접 붙여넣고 답을 가져와야 합니다.</div></div>';
   return '<div class="pol-ai" id="polAi"><div class="s">'+a.html+(a.ok?'<br><span class="note">「약관에서 찾기」 한 번으로 여러 단계를 자동으로 반복해 답합니다.</span>':'')+'</div>'+
     '<button type="button" class="btn sm'+(a.ok?' ghost':' gold')+'" data-kai-open>'+(a.ok?'AI 바꾸기':'내 AI 키 등록')+'</button><button type="button" class="btn sm ghost" data-pol="keyhelp">AI 연결 방법</button></div>';
 }
@@ -308,7 +308,7 @@ function modal(title,body){
   addCss();var w=document.createElement('div');w.className='pol-ov';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label',title);
   w.innerHTML='<div class="pol-box"><div class="hd"><h2>'+esc(title)+'</h2><button type="button" data-x aria-label="닫기">✕</button></div><div class="bd">'+body+'</div></div>';
   var close=function(){w.remove();document.removeEventListener('keydown',k);};var k=function(e){if(e.key==='Escape')close();};
-  w.addEventListener('click',function(e){if(e.target===w||e.target.closest('[data-x]'))close();else if(e.target.closest('[data-kai-open]'))close();});
+  w.addEventListener('click',function(e){if(e.target===w||e.target.closest('[data-x]'))close();else if(e.target.closest('[data-kai-open],[data-kai-key]'))close();});
   document.addEventListener('keydown',k);document.body.appendChild(w);w.querySelector('[data-x]').focus();
 }
 function keyHelp(){

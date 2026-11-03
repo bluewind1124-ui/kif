@@ -97,6 +97,7 @@ var css='.kai-ov{position:fixed;inset:0;background:rgba(10,18,26,.55);z-index:99
 '.kai-pt-tw{overflow-x:auto;margin:4px 0}.kai-pt-t{border-collapse:collapse;width:100%;font-size:.85rem;min-width:480px}.kai-pt-t th,.kai-pt-t td{border:1px solid var(--line,#d7dde5);padding:5px 8px;text-align:left;vertical-align:top}.kai-pt-t th{background:var(--surface-2,#eef2f7);white-space:nowrap}'+
 '.kai-pt-raw{margin-top:10px;font-size:.8rem}.kai-pt-raw summary{cursor:pointer;color:var(--muted,#5b6b7d)}.kai-pt-raw pre{white-space:pre-wrap;word-break:break-all;background:var(--surface-2,#f4f6f9);border-radius:6px;padding:8px;max-height:300px;overflow:auto;margin:6px 0 0}'+
 '.kai-box .kai-pt{--navy-ink:#0f2240;--surface-2:#eef2f7;--line:#d7dde5;--warn-soft:#fff7ed;--warn:#9a3412;--muted:#5b6b7d;--kgold:#c9a227}'+
+'.kai-keyrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}.kai-keyrow .kai-btn{padding:5px 12px;font-size:13px}'+
 '@media (max-width:560px){.kai-box{padding:16px}.kai-opts{grid-template-columns:1fr}}';
 function addCss(){if(document.getElementById('kai-css'))return;var s=document.createElement('style');s.id='kai-css';s.textContent=css;(document.head||document.documentElement).appendChild(s);}
 
@@ -215,7 +216,13 @@ function onClick(e){
     ask('연결 시험이다. JSON 하나로만 답하라: {"ok":true}').then(function(r){m2.textContent=r&&r.ok?'✓ 연결됐습니다.':'답은 왔지만 형식이 다릅니다.';},function(er){m2.textContent='✕ '+err(er);}).then(function(){b.disabled=false;});}
 }
 function note(t){addCss();var d=document.createElement('div');d.textContent=t;d.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0f2240;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;z-index:10000;box-shadow:0 8px 20px rgba(0,0,0,.25)';document.body.appendChild(d);setTimeout(function(){d.remove();},2600);}
-document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('[data-kai-open]')){e.preventDefault();open();}});
+/* 키 등록으로 바로: data-kai-key="claude|openai|gemini" → 그 AI의 키 발급 안내(2단계)부터 연다 */
+function openKey(p){open();if(p&&AIP[p]&&AIP[p].key){sel=p;step=cfg().keys[p]?3:(GUIDE[p]?2:3);draft='';render();}}
+/* 홈·약관 분석 등에서 쓰는 「API 키 등록」 줄: 키가 없으면 AI별 등록 버튼, 있으면 바꾸기 */
+function keyRowHTML(){var c=cfg(),api=AIP[c.prov]&&AIP[c.prov].key&&c.keys[c.prov]&&c.mode==='ai';
+  if(api)return '<div class="kai-keyrow"><span class="kai-note">✓ API 키로 연결됨 — 여러 단계도 끝까지 자동으로 진행합니다.</span><button type="button" class="kai-btn" data-kai-key="'+c.prov+'">'+esc(AIP[c.prov].name.replace(/ \(.*\)$/,''))+' 키 바꾸기</button></div>';
+  return '<div class="kai-keyrow"><span class="kai-note"><b style="color:#b45309">추천</b> API 키 등록 (하나만 고르면 됩니다):</span>'+['claude','openai','gemini'].map(function(k){return '<button type="button" class="kai-btn'+(c.keys[k]?'':' p')+'" data-kai-key="'+k+'">'+esc(AIP[k].name.replace(/ \(.*\)$/,''))+(c.keys[k]?' (키 있음 · 쓰기)':' 키 등록')+'</button>';}).join('')+'</div>';}
+document.addEventListener('click',function(e){if(!e.target.closest)return;var kb=e.target.closest('[data-kai-key]');if(kb){e.preventDefault();openKey(kb.getAttribute('data-kai-key'));return;}if(e.target.closest('[data-kai-open]')){e.preventDefault();open();}});
 
 /* ---------- 파일 → 글자/사진 ---------- */
 var LIBS={},PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',XLSXJS='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
@@ -543,5 +550,5 @@ function fdBox(){
 var folder={name:FD_NAME,ok:fdOk,get:fdGet,label:fdLabel,pick:fdPick,write:fdWrite,clear:fdClear,perm:fdPerm,err:fdErr};
 if(document.readyState!=='loading')addCss();else document.addEventListener('DOMContentLoaded',addCss);
 window.addEventListener('storage',function(e){if(e.key===AIK)fire();});
-window.KIFAI={AIP:AIP,guideDoc:GUIDE_DOC,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,ocrPages:ocrPages,err:err,pretty:pretty,view:view,pickJson:function(t){return pickJson(t);},migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
+window.KIFAI={AIP:AIP,guideDoc:GUIDE_DOC,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,openKey:openKey,keyRowHTML:keyRowHTML,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,ocrPages:ocrPages,err:err,pretty:pretty,view:view,pickJson:function(t){return pickJson(t);},migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
 })();
