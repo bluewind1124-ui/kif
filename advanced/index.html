@@ -436,8 +436,21 @@ body.pp-presenting .top{display:none}
 .pl-intro{text-align:center;margin:4px auto 18px;max-width:640px;display:flex;flex-direction:column;gap:6px;align-items:center}
 .pl-intro h1{font-size:24px;letter-spacing:-.03em}
 .pl-intro p{color:var(--ink-2)}
-.pl-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:780px;margin:0 auto 20px}
+.pl-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;max-width:1040px;margin:0 auto 20px}
+@media (max-width:900px){.pl-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.pl-cards{grid-template-columns:minmax(0,1fr)}}
+/* 전체 설계 진행 표시줄 */
+.flowbar{max-width:1240px;margin:0 auto 10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:10px 12px;border:1.5px solid var(--accent);border-radius:12px;background:var(--accent-soft)}
+.flowbar .fl-t{font-size:12.5px;font-weight:700;color:var(--accent);margin-right:4px}
+.flowbar .fb{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer}
+.flowbar .fb.done{color:var(--accent)}.flowbar .fb.done::after{content:' ✓'}
+.flowbar .fb.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.flowbar .fl-next{margin-left:auto}
+@media (max-width:560px){.flowbar .fl-next{margin-left:0;width:100%;justify-content:center}}
+.all-steps{list-style:none;padding:0;margin:12px 0;display:grid;gap:8px}
+.all-steps li{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.all-steps li b{min-width:92px}.all-steps li .st{margin-left:auto;font-size:12.5px;color:var(--ink-3)}.all-steps li .st.ok{color:var(--accent);font-weight:600}
+
 .pl-card{appearance:none;text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:14px 16px;cursor:pointer;display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:center}
 .pl-card:hover{border-color:var(--ink-3)}
 .pl-card svg{width:40px;height:40px}
@@ -627,6 +640,7 @@ body.pp-presenting .top{display:none}
 
   <!-- 3. 리포트 -->
   <section class="view" id="v-report" hidden>
+    <div id="rpFlow"></div>
     <div class="no-print" style="max-width:860px;margin:0 auto 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <span class="small" style="font-weight:600">리포트에 넣을 부분</span>
       <label class="chk"><input type="checkbox" id="rp-cov" data-rp="cov">보장</label>
@@ -986,7 +1000,7 @@ function go(v){
   VIEWS.forEach(x=>{ $('#v-'+x).hidden = x!==v; const t=$('#t-'+x); if(t) t.setAttribute('aria-selected', (x===v||((v==='proposal'||v==='analysis')&&x==='plan'))?'true':'false'); });
   document.body.dataset.view=v;
   if(v!=='proposal' && PP.present){ PP.present=false; document.body.classList.remove('pp-presenting'); }
-  if(v==='analysis'){ $('#covStepsA').innerHTML=covStepBar('analysis'); renderCustomer(); renderPolicies(); renderAnalysis(); }
+  if(v==='analysis'){ $('#covStepsA').innerHTML=flowBar('coverage')+covStepBar('analysis'); renderCustomer(); renderPolicies(); renderAnalysis(); }
   if(v==='plan') renderPlan();
   if(v==='proposal') renderProposal();
   if(v==='report') renderReport();
@@ -1387,17 +1401,27 @@ $('#parsePreview').addEventListener('click',e=>{
 /* ════════════════ 3. 리포트 ════════════════ */
 /* 고객 리포트 — 보장·연금·자산 중 고른 부분을 한 리포트로 묶는다 */
 function planReady(f){ const v=(cur().plans||{})[f]||{}; return f==='pension'||f==='asset' ? !!(n(v.age)&&n(v.retireAge)) : !!(n(v.survMonthly)||n(v.income)); }
-function reportParts(){ const d={cov:true, pen:planReady('pension'), ast:planReady('asset')}; return Object.assign(d, store.reportParts||{}); }
+/* 리포트에 넣을 부분 = 상담 설계에서 고른 분야(보장·연금·자산 하나 또는 전체). 리포트 화면의 체크로 바꾼 것은 고객별로 기억 */
+function reportParts(){
+  const P=plans(), s=scopeOf();
+  const d = s==='all'?{cov:true,pen:true,ast:true} : s==='coverage'?{cov:true,pen:false,ast:false} : s==='pension'?{cov:false,pen:true,ast:false} : s==='asset'?{cov:false,pen:false,ast:true}
+    : {cov:true, pen:planReady('pension'), ast:planReady('asset')};
+  return Object.assign(d, P.rp||{});
+}
 function renderReport(){
   const c=cur(), cu=c.customer, fc=store.consultant, P=reportParts();
   $('#fc-name').value=fc.name||''; $('#fc-org').value=fc.org||''; $('#fc-phone').value=fc.phone||''; $('#rp-comment').value=c.comment||'';
-  [['cov','rp-cov',true],['pen','rp-pen',planReady('pension')],['ast','rp-ast',planReady('asset')]].forEach(([k,id,ok])=>{ const el=$('#'+id); el.checked=!!P[k]&&ok; el.disabled=!ok; el.closest('label').title=ok?'':'상담 설계에서 먼저 입력하세요'; });
+  $('#rpFlow').innerHTML=flowBar('report');
+  [['cov','rp-cov',true],['pen','rp-pen',planReady('pension')],['ast','rp-ast',planReady('asset')]].forEach(([k,id,ok])=>{ const el=$('#'+id); el.checked=!!P[k]; el.closest('label').title=ok?'':'상담 설계에서 먼저 입력하세요'; });
+  const miss=[['pen','pension'],['ast','asset']].filter(([k,f])=>P[k]&&!planReady(f)).map(x=>x[1]);
   const on=[P.cov&&'cov', P.pen&&planReady('pension')&&'pen', P.ast&&planReady('asset')&&'ast'].filter(Boolean);
   const names={cov:'보장',pen:'연금',ast:'자산'};
-  const title = on.length>1 ? '종합 상담 리포트' : on[0]==='pen' ? '연금 설계 리포트' : on[0]==='ast' ? '자산 설계 리포트' : '보장분석 리포트';
-  let h='<div class="rp-head"><div><span class="eyebrow">'+title+(on.length>1?' · '+on.map(k=>names[k]).join(' · '):'')+'</span><h1 style="margin-top:4px">'+esc(cu.name||'고객')+'님의 '+(on.length>1?'재무 점검 결과':on[0]==='pen'?'은퇴 준비 점검 결과':on[0]==='ast'?'자산 점검 결과':'보장 점검 결과')+'</h1>'+(c.example?'<span class="example-flag">예시 데이터</span>':'')+'</div>';
+  const tk = on.length ? on : ['cov','pen','ast'].filter(k=>P[k]);   // 제목은 고른 분야 기준(입력 전이라도)
+  const title = tk.length>1 ? '종합 상담 리포트' : tk[0]==='pen' ? '연금 설계 리포트' : tk[0]==='ast' ? '자산 설계 리포트' : '보장분석 리포트';
+  let h='<div class="rp-head"><div><span class="eyebrow">'+title+(tk.length>1?' · '+tk.map(k=>names[k]).join(' · '):'')+'</span><h1 style="margin-top:4px">'+esc(cu.name||'고객')+'님의 '+(tk.length>1?'재무 점검 결과':tk[0]==='pen'?'은퇴 준비 점검 결과':tk[0]==='ast'?'자산 점검 결과':'보장 점검 결과')+'</h1>'+(c.example?'<span class="example-flag">예시 데이터</span>':'')+'</div>';
   h+='<div class="meta">'+today()+'<br>'+esc([fc.org,fc.name].filter(Boolean).join(' ')||'담당 컨설턴트')+(fc.phone?'<br><span class="num">'+esc(fc.phone)+'</span>':'')+'</div></div>';
-  if(!on.length) h+='<div class="rp-sec"><p class="muted">위에서 리포트에 넣을 부분을 고르세요.</p></div>';
+  if(miss.length) h+='<div class="rp-sec no-print"><p class="small" style="color:var(--warn)">'+miss.map(f=>PLAN_FORMS[f].name).join('·')+' 입력이 아직 없어 리포트에 넣지 못했습니다. 나이·은퇴 나이를 먼저 넣어 주세요.</p><div class="ai-row" style="margin-top:8px">'+miss.map(f=>'<button type="button" class="btn sm primary" data-flow="'+f+'">'+PLAN_FORMS[f].name+' 입력하러 가기 →</button>').join('')+'</div></div>';
+  if(!on.length&&!miss.length) h+='<div class="rp-sec"><p class="muted">위에서 리포트에 넣을 부분을 고르세요.</p></div>';
   let no=0;
   if(on.includes('cov')){ if(on.length>1) h+=rpPart(++no,'보장 점검'); h+=covReportHTML(c); }
   if(on.includes('pen')){ if(on.length>1) h+=rpPart(++no,'연금 · 은퇴 준비'); h+=penReportHTML(pv('pension')); }
@@ -1508,7 +1532,7 @@ function gapReason(cat, cu){
   })[cat]||'';
 }
 ['#fc-name','#fc-org','#fc-phone'].forEach(id=>$(id).addEventListener('input',()=>{ store.consultant={name:$('#fc-name').value, org:$('#fc-org').value, phone:$('#fc-phone').value}; save(); renderReportDebounced(); }));
-$('#v-report').addEventListener('change',e=>{ const k=e.target.dataset.rp; if(!k) return; store.reportParts=Object.assign(reportParts(),{[k]:e.target.checked}); save(); renderReport(); });
+$('#v-report').addEventListener('change',e=>{ const k=e.target.dataset.rp; if(!k) return; const P=plans(); P.rp=Object.assign({},P.rp,{[k]:e.target.checked}); save(); renderReport(); });
 $('#rp-comment').addEventListener('input',e=>{ cur().comment=e.target.value; touch(); renderReportDebounced(); });
 let rpT; function renderReportDebounced(){ clearTimeout(rpT); rpT=setTimeout(()=>{ const a=document.activeElement, id=a&&a.id, s=a&&a.selectionStart; renderReport(); if(id){ const el=document.getElementById(id); if(el){ el.focus(); try{ el.setSelectionRange(s,s); }catch(e){} } } },300); }
 // 아티팩트 미리보기(iframe) 안에서는 인쇄가 막혀 있어 버튼을 숨김. 포탈에 이식하면 보입니다.
@@ -1755,7 +1779,40 @@ const PL_ICONS = {
   asset:'<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="var(--warn-soft)"/><circle cx="20" cy="20" r="9" fill="none" stroke="var(--warn)" stroke-width="2.2"/><path d="M20 11v9l7 5" fill="none" stroke="var(--warn)" stroke-width="2.2" stroke-linecap="round"/></svg>'
 };
 
+PL_ICONS.all='<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="var(--accent-soft)"/><rect x="9" y="9" width="9" height="9" rx="2" fill="none" stroke="var(--accent)" stroke-width="2"/><rect x="22" y="9" width="9" height="9" rx="2" fill="none" stroke="var(--accent)" stroke-width="2"/><rect x="9" y="22" width="9" height="9" rx="2" fill="none" stroke="var(--accent)" stroke-width="2"/><path d="M23 26.5l2.5 2.5 4.5-5" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function plans(){ const c=cur(); if(!c.plans) c.plans={field:'', coverage:{}, pension:{}, asset:{}}; return c.plans; }
+/* 고른 범위: 'coverage'|'pension'|'asset'|'all'. 예전 자료(범위 없음)는 마지막으로 연 분야를 따른다 */
+function scopeOf(){ const P=plans(); return P.scope||P.field||''; }
+function isAll(){ return plans().scope==='all'; }
+function setScope(s){ const P=plans(); if(P.scope!==s){ P.scope=s; P.rp={}; } }
+/* 전체 설계: ① 보장 → ② 연금 → ③ 자산 → ④ 종합 리포트 차례로 */
+const FLOW=[['coverage','① 보장설계'],['pension','② 연금설계'],['asset','③ 자산설계'],['report','④ 종합 리포트']];
+function flowBar(at){
+  if(!isAll()) return '';
+  const i=FLOW.findIndex(f=>f[0]===at), nx=FLOW[i+1];
+  return '<div class="flowbar no-print"><span class="fl-t">전체 설계</span>'+FLOW.map(([k,l],j)=>'<button type="button" class="fb'+(j===i?' on':j<i?' done':'')+'" data-flow="'+k+'">'+l+'</button>').join('')
+    +(nx?'<button type="button" class="btn sm primary fl-next" data-flow="'+nx[0]+'">다음: '+nx[1].slice(2)+' →</button>':'')+'</div>';
+}
+function flowGo(k){
+  navBefore();
+  if(k==='report'){ go('report'); return; }
+  plans().field=k; save();
+  go(k==='coverage'?'analysis':'plan');   // 보장설계는 보장분석표(계약·담보)부터
+}
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-flow]'); if(!b) return; flowGo(b.dataset.flow); });
+function allIntroHTML(){
+  const c=cur(), cnt=f=>{ const v=pv(f); return Object.keys(v).filter(k=>k!=='products'&&v[k]!==''&&v[k]!=null&&v[k]!==false).length; };
+  const st=[
+    ['coverage','① 보장설계','계약·담보(보장분석표) → 필요보장 입력', (c.policies||[]).length+'건 계약 · '+cnt('coverage')+'칸 입력', (c.policies||[]).length||planReady('coverage')],
+    ['pension','② 연금설계','은퇴 부족자금 · 3층 연금 · 크레바스', cnt('pension')+'칸 입력', planReady('pension')],
+    ['asset','③ 자산설계','자산배분 · 은퇴자금 · 절세계좌', cnt('asset')+'칸 입력', planReady('asset')]];
+  let h='<div class="panel" style="max-width:780px;margin:0 auto"><div class="panel-h"><h2>전체 설계 · 세 분야를 차례로 입력합니다</h2></div>';
+  h+='<p class="small muted">자료가 있으면 먼저 <b>AI로 세 분야를 한 번에 채운 뒤</b>, 보장 → 연금 → 자산 화면을 차례로 넘기며 숫자만 확인하면 됩니다. 마지막에 세 분야가 모두 들어간 종합 리포트가 나옵니다.</p>';
+  h+='<ol class="all-steps">'+st.map(([f,t,d,s,ok])=>'<li><b>'+t+'</b><span class="small muted">'+d+'</span><span class="st'+(ok?' ok':'')+'">'+(ok?'✓ ':'')+s+'</span></li>').join('')+'<li><b>④ 종합 리포트</b><span class="small muted">보장·연금·자산을 한 리포트로</span></li></ol>';
+  h+='<div class="ai-row"><button type="button" class="btn primary" id="plAIAll">자료로 세 분야 한 번에 채우기 (AI)</button><button type="button" class="btn" id="plSampleAll">예시로 세 분야 채우기</button><button type="button" class="btn primary" data-flow="coverage" style="margin-left:auto">① 보장설계부터 시작 →</button></div>';
+  h+='<p class="small muted" style="margin-top:8px">※ 보험증권으로 계약·담보를 읽는 일은 ① 보장분석표 화면의 「증권 읽기」에서 따로 합니다(읽는 자료가 다릅니다).</p></div>';
+  return h;
+}
 function pv(field){ return plans()[field]||(plans()[field]={}); }
 const PF = {}; Object.keys(PLAN_FORMS).forEach(f=>{ PF[f]={}; PLAN_FORMS[f].sections.forEach(s=>s.f.forEach(x=>PF[f][x.k]=x)); });
 
@@ -2049,11 +2106,14 @@ function planFieldHTML(field, x, val){
 }
 function renderPlan(){
   const P=plans();
-  $('#plCards').innerHTML = Object.keys(PLAN_FORMS).map(f=>'<button type="button" class="pl-card" role="radio" data-field="'+f+'" aria-checked="'+(P.field===f)+'">'+PL_ICONS[f]+'<div><b>'+PLAN_FORMS[f].name+'</b><span>'+PLAN_FORMS[f].desc+'</span></div></button>').join('');
+  const all=isAll();
+  $('#plCards').innerHTML = Object.keys(PLAN_FORMS).map(f=>'<button type="button" class="pl-card" role="radio" data-field="'+f+'" aria-checked="'+(!all&&P.field===f)+'">'+PL_ICONS[f]+'<div><b>'+PLAN_FORMS[f].name+'</b><span>'+PLAN_FORMS[f].desc+'</span></div></button>').join('')
+    +'<button type="button" class="pl-card" role="radio" data-field="all" aria-checked="'+all+'">'+PL_ICONS.all+'<div><b>전체 설계</b><span>보장 → 연금 → 자산 차례로 · 종합 리포트</span></div></button>';
   const body=$('#plBody');
+  if(!P.field&&all){ body.innerHTML=allIntroHTML(); return; }
   if(!P.field){ body.innerHTML='<div class="panel" style="max-width:780px;margin:0 auto"><div class="empty"><b>분야를 먼저 고르세요</b>보장설계·연금설계·자산설계 중 하나를 고르면 입력칸이 열립니다. 한 고객에게 세 분야를 모두 입력해 둘 수 있습니다.</div></div>'; return; }
   const F=PLAN_FORMS[P.field], v=pv(P.field), filled=Object.keys(v).filter(k=>v[k]!==''&&v[k]!=null&&v[k]!==false).length;
-  let h=(P.field==='coverage'?covStepBar('covform'):'')+'<div class="pl-grid"><div class="panel" id="plForm"><div class="panel-h"><h2>'+F.name+' 입력</h2><span class="sub">'+esc(cur().customer.name||'')+' · '+filled+'개 입력됨</span>';
+  let h=flowBar(P.field)+(P.field==='coverage'?covStepBar('covform'):'')+'<div class="pl-grid"><div class="panel" id="plForm"><div class="panel-h"><h2>'+F.name+' 입력</h2><span class="sub">'+esc(cur().customer.name||'')+' · '+filled+'개 입력됨</span>';
   h+='<div class="act"><button type="button" class="btn sm primary" id="plAI" title="상담 메모·자료를 내 AI가 읽어 칸을 채웁니다">자료로 채우기 (AI)</button><button type="button" class="btn sm" id="plSample">예시로 채우기</button><button type="button" class="btn sm ghost danger" id="plClear">비우기</button></div></div>';
   F.sections.forEach(s=>{
     h+='<div class="pl-sec"><h3>'+esc(s.t)+(s.sub?'<small>'+esc(s.sub)+'</small>':'')+'</h3><div class="grid pl-f">';
@@ -2100,7 +2160,9 @@ function planText(field, rows){
   rows.forEach(r=>{ if(r.h) t+='[' +r.h+']\n'; else if(r.v) t+='- '+r.l+': '+r.v+(r.s?' ('+r.s+')':'')+'\n'; });
   return t;
 }
-$('#plCards').addEventListener('click',e=>{ const b=e.target.closest('[data-field]'); if(!b) return; pushNav(); plans().field=b.dataset.field; touch();
+$('#plCards').addEventListener('click',e=>{ const b=e.target.closest('[data-field]'); if(!b) return; pushNav();
+  if(b.dataset.field==='all'){ setScope('all'); plans().field=''; touch(); renderPlan(); return; }
+  setScope(b.dataset.field); plans().field=b.dataset.field; touch();
   if(b.dataset.field==='coverage'){ NAV.skip=true; go('analysis'); return; }   // 보장설계는 보장분석표(계약·담보)부터
   renderPlan(); });
 /* 보장설계 단계 표시줄: ① 보장분석표 → ② 필요보장 입력 → ③ 보장설계 제안서 → ④ 고객 리포트 */
@@ -2115,7 +2177,7 @@ document.addEventListener('click',e=>{
   if(s==='analysis') go('analysis');
   if(s==='covform'){ plans().field='coverage'; touch(); go('plan'); }
   if(s==='covprop'){ PP.field='coverage'; PP.withRec=false; PP.cur=0; PP.present=false; go('proposal'); }
-  if(s==='report'){ store.reportParts=Object.assign(reportParts(),{cov:true}); save(); go('report'); }
+  if(s==='report') go('report');
 });
 $('#plBody').addEventListener('input',e=>{
   const el=e.target;
@@ -2132,6 +2194,9 @@ $('#plBody').addEventListener('change',e=>{ if(e.target.tagName==='SELECT') e.ta
 let plClearArm=0;
 $('#plBody').addEventListener('click',e=>{
   const P=plans();
+  if(e.target.id==='plAIAll'){ openFill(true); return; }
+  if(e.target.id==='plSampleAll'){ Object.keys(PLAN_FORMS).forEach(f=>{ P[f]=clone(PLAN_SAMPLES[f]); }); touch(); renderPlan(); toast('세 분야에 예시 값을 채웠습니다'); return; }
+  if(!P.field) return;
   if(e.target.id==='plAI'){ openFill(); return; }
   if(e.target.id==='plSample'){ P[P.field]=clone(PLAN_SAMPLES[P.field]); touch(); renderPlan(); toast(PLAN_FORMS[P.field].name+' 예시 값을 채웠습니다'); }
   if(e.target.id==='plClear'){
@@ -3246,7 +3311,7 @@ $('#scanPreview').addEventListener('click',e=>{
 });
 
 /* ---------- ② 상담 메모·자료 → 보장·연금·자산 입력칸 ---------- */
-let fillRes=null;
+let fillRes=null, fillAll=false;
 function fieldSpec(x){ return x.t==='chk'?'true/false':x.t==='sel'?'다음 중 하나: '+x.o.join(' | '):(x.t==='text'||x.t==='area')?'글자':'숫자'+(x.u?' ('+x.u+')':''); }
 function fillPrompt(field){
   const F=PLAN_FORMS[field], cu=cur().customer;
@@ -3256,6 +3321,16 @@ function fillPrompt(field){
   F.sections.forEach(s=>{ t+='['+s.t+']\n'; s.f.forEach(x=>{ t+=x.k+': '+x.l+' · '+fieldSpec(x)+'\n'; }); });
   return t+'\n답은 JSON 하나만: {"fields":{"코드":값}, "missing":"자료에서 찾지 못한 중요한 항목(짧게)"}';
 }
+/* 전체 설계: 같은 자료를 한 번만 읽어 보장·연금·자산 입력칸을 함께 채운다 */
+function fillPromptAll(){
+  const cu=cur().customer;
+  let t='너는 보험 상담 자료(상담 메모, 가입설계서, 증권, 국민연금 예상액, 퇴직연금·연금저축 내역, 금융자산·대출 내역 등)를 읽어 「보장설계」「연금설계」「자산설계」 세 분야의 입력칸을 한 번에 채우는 도우미다.\n'
+   +'규칙:\n- 자료에 분명히 나온 값만 적는다. 추측하거나 계산해서 만들지 말고, 없는 칸은 빼고 답한다.\n- 금액 단위를 칸에 맞춘다(만원: 5,000,000원→500, 1억→10000 / 만원/월: 월 금액). 비율은 % 숫자(4.5% → 4.5).\n- 선택칸은 주어진 보기 글자 중 하나로만 답한다.\n- 나이·성별·소득처럼 여러 분야에 같은 칸이 있으면 각 분야에 같은 값을 모두 적는다.\n'
+   +'\n고객 기본 정보(참고): '+[cu.name, cu.age&&cu.age+'세', cu.sex, cu.job, cu.income&&'연소득 '+cu.income+'만원', cu.memo].filter(Boolean).join(', ')+'\n';
+  Object.keys(PLAN_FORMS).forEach(f=>{ const F=PLAN_FORMS[f]; t+='\n==== '+F.name+' (묶음 이름: '+f+') 입력칸 (코드: 이름 · 형식) ====\n';
+    F.sections.forEach(s=>{ t+='['+s.t+']\n'; s.f.forEach(x=>{ t+=x.k+': '+x.l+' · '+fieldSpec(x)+'\n'; }); }); });
+  return t+'\n답은 JSON 하나만: {"fields":{"coverage":{"코드":값},"pension":{"코드":값},"asset":{"코드":값}}, "missing":"자료에서 찾지 못한 중요한 항목(짧게)"}';
+}
 function cleanVal(x,v){
   if(v==null||v==='') return undefined;
   if(x.t==='chk') return v===true||v==='true'||v==='예';
@@ -3264,26 +3339,32 @@ function cleanVal(x,v){
   const num=Number(String(v).replace(/[^\d.\-]/g,'')); return isFinite(num)&&String(v).match(/\d/)?num:undefined;
 }
 function showVal(x,v){ if(v===''||v==null||v===false) return '<span class="muted">비어 있음</span>'; if(v===true) return '✓'; return esc(typeof v==='number'?comma(v)===String(v)?v:(Math.round(v)===v?comma(v):v):v)+(x.u&&typeof v==='number'?' '+esc(x.u):''); }
-function openFill(){
-  const P=plans(); if(!P.field) return;
-  $('#aiFillTitle').textContent=PLAN_FORMS[P.field].name+' 입력칸 채우기 (AI)';
+function openFill(all){
+  const P=plans(); fillAll=!!all; if(!fillAll&&!P.field) return;
+  $('#aiFillTitle').textContent=fillAll?'보장·연금·자산 입력칸 한 번에 채우기 (AI)':PLAN_FORMS[P.field].name+' 입력칸 채우기 (AI)';
   $('#aiFillText').value=''; $('#aiFillFiles').value=''; $('#aiFillStatus').textContent=''; $('#aiFillPreview').innerHTML=''; fillRes=null;
   aiBadges(); $('#aiFillModal').hidden=false;
 }
 async function runFill(){
-  const P=plans(), field=P.field, st=$('#aiFillStatus'), memo=$('#aiFillText').value.trim(), files=[...($('#aiFillFiles').files||[])];
+  const P=plans(), field=fillAll?'all':P.field, st=$('#aiFillStatus'), memo=$('#aiFillText').value.trim(), files=[...($('#aiFillFiles').files||[])];
   if(!memo&&!files.length){ st.textContent='상담 메모를 쓰거나 자료 파일을 골라 주세요.'; return; }
   const btn=$('#aiFillRun'); btn.disabled=true; $('#aiFillPreview').innerHTML='';
   try{
     st.textContent='자료를 준비하는 중…'; const mat=await readForAI(files);
     if(memo) mat.text='===== 상담 메모 =====\n'+memo+'\n'+mat.text;
     st.textContent='AI가 자료를 읽는 중… (30초~2분)';
-    const r=await aiAsk(fillPrompt(field), mat), got=(r&&r.fields)||{}, v=pv(field);
-    fillRes={field, rows:Object.keys(got).filter(k=>PF[field][k]).map(k=>({k, x:PF[field][k], val:cleanVal(PF[field][k],got[k])})).filter(r=>r.val!==undefined), missing:String(r&&r.missing||'')};
+    const r=await aiAsk(field==='all'?fillPromptAll():fillPrompt(field), mat), got=(r&&r.fields)||{};
+    const FS=field==='all'?Object.keys(PLAN_FORMS):[field], nested=field==='all'&&FS.some(f=>got[f]&&typeof got[f]==='object');
+    const rows=[]; FS.forEach(f=>{ const g=field==='all'?(nested?(got[f]||{}):got):got;   // 묶음 없이 온 답은 같은 코드가 있는 분야마다 넣는다
+      Object.keys(g).filter(k=>PF[f][k]).forEach(k=>{ const val=cleanVal(PF[f][k],g[k]); if(val!==undefined) rows.push({f,k,x:PF[f][k],val}); }); });
+    fillRes={field, rows, missing:String(r&&r.missing||'')};
     if(!fillRes.rows.length){ st.textContent='채울 값을 찾지 못했습니다. 자료에 숫자가 보이는지 확인하세요.'; return; }
-    st.textContent=fillRes.rows.length+'칸을 읽었습니다. 맞는 것만 골라 반영하세요.';
+    st.textContent=fillRes.rows.length+'칸을 읽었습니다'+(field==='all'?' ('+FS.map(f=>PLAN_FORMS[f].name+' '+rows.filter(x=>x.f===f).length).join(' · ')+')':'')+'. 맞는 것만 골라 반영하세요.';
     let h='<div class="tbl-wrap"><table class="t"><tr><th></th><th>항목</th><th class="r">지금 값</th><th class="r">AI가 읽은 값</th></tr>';
-    fillRes.rows.forEach((r,i)=>{ const same=String(v[r.k]??'')===String(r.val); h+='<tr><td><input type="checkbox" data-fi="'+i+'"'+(same?'':' checked')+' aria-label="반영"></td><td>'+esc(r.x.l)+'</td><td class="r num">'+showVal(r.x,v[r.k])+'</td><td class="r num"><b>'+showVal(r.x,r.val)+'</b>'+(same?' <span class="small muted">같음</span>':'')+'</td></tr>'; });
+    let lastF='';
+    fillRes.rows.forEach((r,i)=>{ const v=pv(r.f), same=String(v[r.k]??'')===String(r.val);
+      if(field==='all'&&r.f!==lastF){ lastF=r.f; h+='<tr><th colspan="4" style="text-align:left;background:var(--accent-soft);color:var(--accent)">'+PLAN_FORMS[r.f].name+' · '+fillRes.rows.filter(x=>x.f===r.f).length+'칸</th></tr>'; }
+      h+='<tr><td><input type="checkbox" data-fi="'+i+'"'+(same?'':' checked')+' aria-label="반영"></td><td>'+esc(r.x.l)+'</td><td class="r num">'+showVal(r.x,v[r.k])+'</td><td class="r num"><b>'+showVal(r.x,r.val)+'</b>'+(same?' <span class="small muted">같음</span>':'')+'</td></tr>'; });
     h+='</table></div>'+(fillRes.missing?'<p class="small muted" style="margin-top:6px">자료에 없던 항목: '+esc(fillRes.missing)+'</p>':'')+'<div class="ai-row" style="margin-top:10px"><button type="button" class="btn primary" id="aiFillApply">고른 값 반영</button></div>';
     $('#aiFillPreview').innerHTML=h;
   }catch(e){ st.textContent='✕ '+aiErr(e); }
@@ -3293,9 +3374,9 @@ $('#aiFillModal').addEventListener('click',e=>{
   if(e.target.id==='aiFillModal'||e.target.closest('#aiFillClose')){ $('#aiFillModal').hidden=true; return; }
   if(e.target.id==='aiFillRun'){ runFill(); return; }
   if(e.target.id==='aiFillApply'&&fillRes){
-    const v=pv(fillRes.field); let k=0;
-    $('#aiFillPreview').querySelectorAll('[data-fi]').forEach(cb=>{ if(cb.checked){ const r=fillRes.rows[n(cb.dataset.fi)]; v[r.k]=r.val; k++; } });
-    touch(); $('#aiFillModal').hidden=true; renderPlan(); toast(k+'칸을 채웠습니다. 계산 미리보기를 확인하세요');
+    let k=0;
+    $('#aiFillPreview').querySelectorAll('[data-fi]').forEach(cb=>{ if(cb.checked){ const r=fillRes.rows[n(cb.dataset.fi)]; pv(r.f)[r.k]=r.val; k++; } });
+    touch(); $('#aiFillModal').hidden=true; renderPlan(); toast(k+'칸을 채웠습니다. '+(fillRes.field==='all'?'① 보장설계부터 차례로 확인하세요':'계산 미리보기를 확인하세요'));
   }
 });
 
