@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-11-02.6">
+<meta name="kif-build" content="2026-11-03.1">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -2022,7 +2022,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* 첫 장 그림이 붙은 자료 링크(FC 화면 목록용). 그림은 ntThumb·ntMake가 채운다 */
   function thBox(f,cls){var ty=(String(f).split('.').pop()||'').toUpperCase(),th=ntThumb(f);
     return '<span class="nt-th'+(cls?' '+cls:'')+(th?'':' wait')+'"'+(th?'':' data-ntmk="'+esc(f)+'"')+'>'+(th?'<img loading="lazy" alt="" src="'+(/^blob:/.test(th)?th:fileHref(th))+'">':'')+'<em>'+esc(ty)+'</em></span>';}
-  function fileT(f,inner){var h=fileHref(f);if(!h)return inner;return '<a class="flink ft" target="_blank" rel="noopener" href="'+h+'">'+thBox(f,'sm')+'<span class="ft-t">'+inner+' <span class="pill new">열기</span></span></a>';}
+  function fileT(f,inner){var h=fileHref(f);if(!h)return inner;return '<a class="flink ft" target="_blank" rel="noopener" href="'+h+'" data-fview="'+esc(f)+'">'+thBox(f,'sm')+'<span class="ft-t">'+inner+' <span class="pill new">열기</span></span></a>';}
   function fileA(f,inner,cls){var h=fileHref(f);return h?'<a class="'+(cls||'flink')+'" target="_blank" rel="noopener" href="'+h+'">'+inner+' <span class="pill new">열기</span></a>':inner;}
 
   function pdfLib(){if(window.pdfjsLib&&!pdfjsLib.GlobalWorkerOptions.workerSrc)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';return window.pdfjsLib;}
@@ -2279,7 +2279,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var sa=[];list.forEach(function(x){(x.it.sched||[]).forEach(function(s){if(s.on!==false&&s.d&&s.t)sa.push({d:s.d,co:s.co||x.it.co,k:s.k,t:s.t,src:x.path});});});
     c.sched=schedMerge(Array.isArray(c.sched)?c.sched:[],sa);
     /* 바뀐 예전 파일: 다른 곳(컨셉·샘플 등)에서 더 이상 쓰지 않는 것만 지울 목록으로 넘긴다 */
-    var th0=c.thumbs;delete c.thumbs;var all=JSON.stringify(c);if(th0)c.thumbs=th0;c._gone=gone.filter(function(f,i){return f&&gone.indexOf(f)===i&&/^(news|files)\//.test(f)&&all.indexOf(JSON.stringify(f))<0;});
+    var th0=c.thumbs,vw0=c.views;delete c.thumbs;delete c.views;var all=JSON.stringify(c);if(th0)c.thumbs=th0;if(vw0)c.views=vw0;c._gone=gone.filter(function(f,i){return f&&gone.indexOf(f)===i&&/^(news|files)\//.test(f)&&all.indexOf(JSON.stringify(f))<0;});
+    if(c.views)c._gone.slice().forEach(function(f){var v=c.views[f];if(v){c._gone.push(v);delete c.views[f];}});
     if(c.thumbs)c._gone.forEach(function(f){if(c.thumbs[f]){c._gone.push(c.thumbs[f]);delete c.thumbs[f];}});
     return c;
   }
@@ -2527,7 +2528,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다');
     var files=[];
     for(var i=0;i<add.length;i++){cmMsg('파일 올리는 중… ('+(i+1)+'/'+add.length+')');if(window.KSAVE)KSAVE.step('파일 올리는 중 '+(i+1)+'/'+add.length);var bl=await gh('POST','/git/blobs',{content:add[i].b64,encoding:'base64'});files.push({path:add[i].path,sha:bl.sha});}
-    var r=await ghLand(files,function(cur,have,tree){del.forEach(function(p){if(have[p])tree.push({path:p,mode:'100644',type:'blob',sha:null});});fn(cur);},message);
+    var r=await ghLand(files,function(cur,have,tree){var VW=cur.views||{},D=del.slice();del.forEach(function(p){if(VW[p]){D.push(VW[p]);delete VW[p];}});
+      D.forEach(function(p){if(have[p])tree.push({path:p,mode:'100644',type:'blob',sha:null});});fn(cur);},message);
     return r.cur;
   };
 
@@ -3219,12 +3221,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function matTwin(m,test){return MATS.filter(function(x){return x!==m&&x[4]&&x[1]===m[1]&&test(x[4]);})[0]||null;}
   function matsShown(){return MATS.filter(function(m){return !(isPpt(m[4])&&matTwin(m,isPdf));});}
   function openMat(i,from){
-    var m=Array.isArray(i)?i:MATS[i];if(!m||!m[4])return;var f=m[4],pdfM=isPpt(f)?matTwin(m,isPdf):null,show=pdfM?pdfM[4]:f,orig=isPdf(show)?(matTwin(m,isPpt)||(isPpt(f)?m:null)):null;
+    var m=Array.isArray(i)?i:MATS[i];if(!m||!m[4])return;var f=m[4],VW=(SITE&&SITE.views)||{},pdfM=isPpt(f)||isDoc(f)?(matTwin(m,isPdf)||(VW[f]?[m[0],m[1],'','',VW[f]]:null)):null,show=pdfM?pdfM[4]:f,orig=isPdf(show)?(matTwin(m,isPpt)||(isPpt(f)||isDoc(f)?m:null)):null;
     var abs=function(x){return new URL(fileHref(x),location.href).href;};
     var w=document.createElement('div');w.className='mview';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label',m[1]);
     w.innerHTML='<div class="mvh"><b>'+esc(m[1])+'</b><span class="note" data-v="pg"></span><span class="sp"></span>'+
       '<a class="btn sm ghost" target="_blank" rel="noopener" href="'+fileHref(show)+'">새 창으로 ↗</a>'+
-      (orig?'<a class="btn sm ghost" download href="'+fileHref(orig[4])+'">원본 PPT 받기</a>':'')+(from>1&&isPdf(show)?'<button class="btn sm ghost" type="button" data-v="all">처음부터 보기</button>':'')+
+      (orig?'<a class="btn sm ghost" download href="'+fileHref(orig[4])+'">원본 '+(isDoc(orig[4])?'Word':'PPT')+' 받기</a>':'')+(from>1&&isPdf(show)?'<button class="btn sm ghost" type="button" data-v="all">처음부터 보기</button>':'')+
       '<button class="btn sm" type="button" data-v="x">닫기 ✕</button></div><div class="mvb" data-v="b"></div>';
     document.body.appendChild(w);var prevOv=document.body.style.overflow;document.body.style.overflow='hidden';
     var B=w.querySelector('[data-v="b"]'),pg=w.querySelector('[data-v="pg"]'),alive=true;
@@ -3260,6 +3262,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       }
     }).catch(function(){B.classList.add('full');B.innerHTML='<iframe title="'+esc(m[1])+'" src="'+fileHref(show)+'"></iframe>';pg.textContent='';});
   }
+  /* 공지·시상·게시판 등 파일 링크도 내려받기 대신 자료 보기 창으로 연다 (PPT는 PDF 보기본이 있으면 그걸로) */
+  document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-fview]');if(!a||e.ctrlKey||e.metaKey||e.shiftKey)return;var f=a.getAttribute('data-fview');
+    if(!/\.(pdf|pptx?|docx?|xlsx?|png|jpe?g|gif|webp)$/i.test(f))return;e.preventDefault();var t=a.querySelector('.ft-t'),ti=((t||a).textContent||'').replace(/\s*열기\s*$/,'').trim();
+    openMat([(String(f).split('.').pop()||'').toUpperCase(),ti||'자료','','',f]);});
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-cfile]');if(!a||e.ctrlKey||e.metaKey||e.shiftKey)return;e.preventDefault();var f=a.getAttribute('data-cfile');openMat([(String(f).split('.').pop()||'').toUpperCase(),CONCEPT.title||'이달의 컨셉','이달의 컨셉','',f],+a.getAttribute('data-pg')||0);});
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-mview]');if(!a||e.ctrlKey||e.metaKey||e.shiftKey)return;e.preventDefault();openMat(+a.getAttribute('data-mview'),+a.getAttribute('data-pg')||0);});
   /* ---------- 개인 계정 (계정 서버: auth-server/worker.js) ----------
