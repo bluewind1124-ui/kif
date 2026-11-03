@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-11-03.2">
+<meta name="kif-build" content="2026-11-03.3">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -3151,15 +3151,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var MATF={q:'',c:''};
   function matMonth(m){var x=String(m[3]||'').match(/^(20\d{2})\.(\d{2})/)||String(m[4]||'').match(/\/(20\d{2})-(\d{2})\//);return x?x[1]+'.'+x[2]:'';}
   /* 교육 자료실은 자료 구분(이달의 컨셉 → 상품 전략·교육 → 보장분석 사례)별로 나누고, 구분 안에서는 최신 달부터 */
-  var MAT_CAT={'이달의 컨셉':['이달의 컨셉','한 달 동안 전 FC가 같은 메시지로 상담하는 컨셉 자료'],'자료':['상품 전략 · 교육 자료','본사 상품전략·핵심상품 등 교육용 자료'],'사례':['보장분석 사례','고객 이름을 가린 보장분석·비교분석 사례와 AI 보장분석 샘플 자료']};
+  var MAT_CAT={'이달의 컨셉':['이달의 컨셉','한 달 동안 전 FC가 같은 메시지로 상담하는 컨셉 자료'],'자료':['상품 전략 · 교육 자료','본사 상품전략·핵심상품 등 교육용 자료'],'사례':['보장분석 사례','고객 이름을 가린 보장분석·비교분석 사례']};
   var MAT_ORD=['이달의 컨셉','자료','사례'];
   /* 예전 「상품 비교」 구분은 보장분석 사례로 합친다 */
   function matCatOf(m){return m[2]==='상품'?'사례':m[2];}
-  /* 관리자 › 보장분석 샘플에 올린 자료도 보장분석 사례에 함께 보여 준다 (교육 자료에 같은 파일이 있으면 한 번만) */
-  function matSampleRows(){var S=(SITE&&SITE.aiSamples)||[],have={};MATS.forEach(function(m){if(m[4]){have[m[4]]=1;have[String(m[4]).replace(/\.pptx?$/i,'.pdf')]=1;}});
-    return S.filter(function(x){return x&&x.on!==false&&x.file&&!have[x.file];}).map(function(x){var e=(String(x.file).split('.').pop()||'').toUpperCase();
-      return [/^PPT/.test(e)?'PPT':e,String(x.title||'').replace(/_/g,' ').replace(/\s+20\d{6}(\s+\d+)?$/,'').trim(),'사례','보장분석 샘플',x.file,x.thumb||''];});}
-  function matAll(){return matsShown().concat(matSampleRows());}
+  function matAll(){return matsShown();}
   function matCatName(c){return (MAT_CAT[c]||[c])[0];}
   function matLib(){
     var q=MATF.q.replace(/\s+/g,'').toLowerCase(),L=matAll().filter(function(m){return (!MATF.c||matCatOf(m)===MATF.c)&&(!q||String(m[1]+m[3]).replace(/\s+/g,'').toLowerCase().indexOf(q)>-1);});
