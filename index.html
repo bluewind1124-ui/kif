@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-11-03.1">
+<meta name="kif-build" content="2026-11-03.2">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1292,7 +1292,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var MATS=[
     ['PPT','보험비교분석 발표자료','사례','김OO님 항암 강화·동시지급·매년 반복'],
     ['PDF','상품비교분석 PPT','사례','고OO님 상품 비교'],
-    ['PDF','간편건강보험 담보 비교','상품','보험사별 간편건강 담보 비교표'],
+    ['PDF','간편건강보험 담보 비교','사례','보험사별 간편건강 담보 비교표'],
     ['PDF','실손종합 설계 2안 비교','사례','조OO님 실손종합 설계안 비교']
   ];
   var AWARDS=[
@@ -1510,7 +1510,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     /* 교육 자료실: 올린 교육 자료는 지우지 않고 모두 보관한다. 달별로 묶어 지난 자료도 계속 볼 수 있게 */
     mats:function(){
       var h=head('교육','교육 자료실','상담·교육용 자료를 구분별로 모아 둡니다. 구분 안에서는 최신 달 자료가 앞에 오고, 지난 자료도 그대로 남습니다.');
-      var cats=[];matsShown().forEach(function(m){if(m[2]&&cats.indexOf(m[2])<0)cats.push(m[2]);});cats.sort(function(a,b){var x=MAT_ORD.indexOf(a),y=MAT_ORD.indexOf(b);return (x<0?99:x)-(y<0?99:y);});
+      var cats=[];matAll().forEach(function(m){var k=matCatOf(m);if(k&&cats.indexOf(k)<0)cats.push(k);});cats.sort(function(a,b){var x=MAT_ORD.indexOf(a),y=MAT_ORD.indexOf(b);return (x<0?99:x)-(y<0?99:y);});
       h+='<div class="panel"><div class="row" style="gap:8px;flex-wrap:wrap"><input class="in" id="matQ" type="search" placeholder="자료 이름으로 찾기" value="'+esc(MATF.q)+'" style="flex:1;min-width:180px">'+
         '<div class="nchips">'+[''].concat(cats).map(function(c){return '<button type="button" class="tg'+(MATF.c===c?' on':'')+'" data-matcat="'+esc(c)+'">'+(c?esc(matCatName(c)):'전체')+'</button>';}).join('')+'</div></div></div>';
       return h+'<div id="matBox">'+matLib()+'</div>';
@@ -2111,7 +2111,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(it.kind==='concept'||it.kind==='onepick')return nuField(i,'ym',it.y+'.'+it.mo,'76px','연월');
     if(it.kind==='hypo')return nuSel(i,'into',it.into||'',[['','새 고객 유형으로 올리기']].concat(HYPO.map(function(r,j){return ['h'+j,'「'+String(r[0]).slice(0,24)+'」에 파일 추가'];})),'넣을 곳')+nuField(i,'product',it.product,'200px','대표 상품');
     if(BOARD[it.kind])return nuField(i,'date',it.date,'100px','날짜');
-    return nuField(i,'cat',it.cat,'90px','분류');
+    return nuSel(i,'cat',it.cat==='상품'?'사례':it.cat,[['자료','상품 전략·교육 자료'],['사례','보장분석 사례']].concat(it.cat&&!/^(자료|사례|상품)$/.test(it.cat)?[[it.cat,it.cat]]:[]),'분류');
   }
   /* 대표 상품 가설 파일 여러 개: 첫 파일은 줄의 4번째 칸, 나머지는 5번째 칸 [경로, …] */
   function hypoFiles(r){var X=Array.isArray(r[4])?r[4]:[];return [r[3]].concat(X.map(function(x){return Array.isArray(x)?x[2]:x;})).filter(Boolean);}
@@ -3150,14 +3150,21 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   });
   var MATF={q:'',c:''};
   function matMonth(m){var x=String(m[3]||'').match(/^(20\d{2})\.(\d{2})/)||String(m[4]||'').match(/\/(20\d{2})-(\d{2})\//);return x?x[1]+'.'+x[2]:'';}
-  /* 교육 자료실은 자료 구분(이달의 컨셉 → 상품 전략·교육 → 상품 비교 → 보장분석 사례)별로 나누고, 구분 안에서는 최신 달부터 */
-  var MAT_CAT={'이달의 컨셉':['이달의 컨셉','한 달 동안 전 FC가 같은 메시지로 상담하는 컨셉 자료'],'자료':['상품 전략 · 교육 자료','본사 상품전략·핵심상품 등 교육용 자료'],'상품':['상품 비교','보험사별 담보·상품 비교표'],'사례':['보장분석 사례','고객 이름을 가린 실제 보장분석·제안서 사례']};
-  var MAT_ORD=['이달의 컨셉','자료','상품','사례'];
+  /* 교육 자료실은 자료 구분(이달의 컨셉 → 상품 전략·교육 → 보장분석 사례)별로 나누고, 구분 안에서는 최신 달부터 */
+  var MAT_CAT={'이달의 컨셉':['이달의 컨셉','한 달 동안 전 FC가 같은 메시지로 상담하는 컨셉 자료'],'자료':['상품 전략 · 교육 자료','본사 상품전략·핵심상품 등 교육용 자료'],'사례':['보장분석 사례','고객 이름을 가린 보장분석·비교분석 사례와 AI 보장분석 샘플 자료']};
+  var MAT_ORD=['이달의 컨셉','자료','사례'];
+  /* 예전 「상품 비교」 구분은 보장분석 사례로 합친다 */
+  function matCatOf(m){return m[2]==='상품'?'사례':m[2];}
+  /* 관리자 › 보장분석 샘플에 올린 자료도 보장분석 사례에 함께 보여 준다 (교육 자료에 같은 파일이 있으면 한 번만) */
+  function matSampleRows(){var S=(SITE&&SITE.aiSamples)||[],have={};MATS.forEach(function(m){if(m[4]){have[m[4]]=1;have[String(m[4]).replace(/\.pptx?$/i,'.pdf')]=1;}});
+    return S.filter(function(x){return x&&x.on!==false&&x.file&&!have[x.file];}).map(function(x){var e=(String(x.file).split('.').pop()||'').toUpperCase();
+      return [/^PPT/.test(e)?'PPT':e,String(x.title||'').replace(/_/g,' ').replace(/\s+20\d{6}(\s+\d+)?$/,'').trim(),'사례','보장분석 샘플',x.file,x.thumb||''];});}
+  function matAll(){return matsShown().concat(matSampleRows());}
   function matCatName(c){return (MAT_CAT[c]||[c])[0];}
   function matLib(){
-    var q=MATF.q.replace(/\s+/g,'').toLowerCase(),L=matsShown().filter(function(m){return (!MATF.c||m[2]===MATF.c)&&(!q||String(m[1]+m[3]).replace(/\s+/g,'').toLowerCase().indexOf(q)>-1);});
+    var q=MATF.q.replace(/\s+/g,'').toLowerCase(),L=matAll().filter(function(m){return (!MATF.c||matCatOf(m)===MATF.c)&&(!q||String(m[1]+m[3]).replace(/\s+/g,'').toLowerCase().indexOf(q)>-1);});
     if(!L.length)return '<div class="panel"><p class="note">맞는 자료가 없습니다.</p></div>';
-    var G={},ks=[];L.forEach(function(m){var k=m[2]||'기타';if(!G[k]){G[k]=[];ks.push(k);}G[k].push(m);});
+    var G={},ks=[];L.forEach(function(m){var k=matCatOf(m)||'기타';if(!G[k]){G[k]=[];ks.push(k);}G[k].push(m);});
     var oi=function(k){var x=MAT_ORD.indexOf(k);return x<0?99:x;};ks.sort(function(a,b){return oi(a)-oi(b);});
     var now=today().slice(0,7).replace('-','.');
     return ks.map(function(k){var A=G[k].slice().sort(function(a,b){var x=matMonth(a),y=matMonth(b);return x===y?0:!x?1:!y?-1:x<y?1:-1;}),nw=A.filter(function(m){return matMonth(m)===now;}).length;
@@ -3166,12 +3173,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   document.addEventListener('input',function(e){if(e.target&&e.target.id==='matQ'){MATF.q=e.target.value;var b=document.getElementById('matBox');if(b)b.innerHTML=matLib();}});
   document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-matcat]');if(!b)return;MATF.c=b.getAttribute('data-matcat');document.querySelectorAll('[data-matcat]').forEach(function(x){x.classList.toggle('on',x===b);});var bx=document.getElementById('matBox');if(bx)bx.innerHTML=matLib();});
   /* 카드 미리보기: 그림 파일은 그대로, PDF는 올릴 때 만든 첫 장 그림(content.json thumbs), PPT는 같은 제목 PDF의 첫 장 */
-  function matThumb(m){var f=m&&m[4];if(!f)return '';if(isImg(f))return f;var T=(SITE&&SITE.thumbs)||{};if(T[f])return T[f];if(isPpt(f)){var tw=matTwin(m,isPdf);if(tw&&T[tw[4]])return T[tw[4]];}return '';}
+  function matThumb(m){var f=m&&m[4];if(!f)return '';if(isImg(f))return f;var T=(SITE&&SITE.thumbs)||{};if(T[f])return T[f];if(isPpt(f)){var tw=matTwin(m,isPdf);if(tw&&T[tw[4]])return T[tw[4]];}return m[5]||'';}
   function matCard(m,full){
     var th=matThumb(m);
     var inner=(th?'<div class="th img '+esc(m[0])+'"><img loading="lazy" alt="" src="'+fileHref(th)+'"><span>'+esc(m[0])+'</span></div><div class="mt"><b class="mtt">'+esc(m[1])+'</b>':(m[4]?'<div class="th img wait '+esc(m[0])+'" data-ntmk="'+esc(m[4])+'"><span>'+esc(m[0])+'</span></div><div class="mt"><b class="mtt">'+esc(m[1])+'</b>':'<div class="th '+esc(m[0])+'"><span>'+esc(m[0])+'</span><b>'+esc(m[1])+'</b></div><div class="mt">'))+
       (full?(matMonth(m)?'<span class="pill">'+esc(matMonth(m))+'</span> ':''):'<span class="pill">'+esc(matCatName(m[2]))+'</span> ')+esc(m[3]||'')+(m[4]?' <span class="pill new">열기</span>':'')+'</div>';
-    return m[4]?'<a class="mat" target="_blank" rel="noopener" href="'+fileHref(m[4])+'" data-mview="'+MATS.indexOf(m)+'">'+inner+'</a>':'<div class="mat">'+inner+'</div>';
+    var mi=MATS.indexOf(m);
+    return m[4]?'<a class="mat" target="_blank" rel="noopener" href="'+fileHref(m[4])+'"'+(mi<0?' data-fview="'+esc(m[4])+'" data-ftitle="'+esc(m[1])+'"':' data-mview="'+mi+'"')+'>'+inner+'</a>':'<div class="mat">'+inner+'</div>';
   }
   /* 교육 자료 보기: 누르면 내려받지 않고 화면 위에 바로 펼친다.
      PDF는 pdf.js로 쪽마다 그림으로 보여 주고, 사진은 그대로, PPT는 같은 제목의 PDF가 있으면 그 PDF를, 없으면 Office 보기 화면을 쓴다. */
@@ -3264,7 +3272,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   /* 공지·시상·게시판 등 파일 링크도 내려받기 대신 자료 보기 창으로 연다 (PPT는 PDF 보기본이 있으면 그걸로) */
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-fview]');if(!a||e.ctrlKey||e.metaKey||e.shiftKey)return;var f=a.getAttribute('data-fview');
-    if(!/\.(pdf|pptx?|docx?|xlsx?|png|jpe?g|gif|webp)$/i.test(f))return;e.preventDefault();var t=a.querySelector('.ft-t'),ti=((t||a).textContent||'').replace(/\s*열기\s*$/,'').trim();
+    if(!/\.(pdf|pptx?|docx?|xlsx?|png|jpe?g|gif|webp)$/i.test(f))return;e.preventDefault();var t=a.querySelector('.ft-t'),ti=a.getAttribute('data-ftitle')||((t||a).textContent||'').replace(/\s*열기\s*$/,'').trim();
     openMat([(String(f).split('.').pop()||'').toUpperCase(),ti||'자료','','',f]);});
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-cfile]');if(!a||e.ctrlKey||e.metaKey||e.shiftKey)return;e.preventDefault();var f=a.getAttribute('data-cfile');openMat([(String(f).split('.').pop()||'').toUpperCase(),CONCEPT.title||'이달의 컨셉','이달의 컨셉','',f],+a.getAttribute('data-pg')||0);});
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[data-mview]');if(!a||e.ctrlKey||e.metaKey||e.shiftKey)return;e.preventDefault();openMat(+a.getAttribute('data-mview'),+a.getAttribute('data-pg')||0);});
