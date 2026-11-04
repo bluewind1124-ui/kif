@@ -947,6 +947,18 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .hm-tool .tt{flex:1;min-width:0}.hm-tool .tt b{display:block;font-family:var(--font-h);font-size:1rem}.hm-tool .tt small{display:block;color:var(--muted);font-size:.8rem;line-height:1.45}
 .calc-fr{width:100%;height:calc(100vh - 200px);min-height:620px;border:1px solid var(--line);border-radius:4px;background:var(--bg);display:block}
 .hm-tool em{flex:none;font-style:normal;font-weight:700;font-size:.82rem;color:var(--gold)}
+.hm-tools.wide{grid-template-columns:1fr;gap:10px}
+.hm-tools.wide .hm-tool{padding:16px 22px;gap:18px;border-left-width:6px;width:100%}
+.hm-tools.wide .hm-tool .ti{width:52px;height:52px}.hm-tools.wide .hm-tool .ti svg{width:26px;height:26px}
+.hm-tools.wide .hm-tool .tt b{font-size:1.08rem}.hm-tools.wide .hm-tool .tt small{font-size:.86rem;margin-top:2px}
+.hm-tools.wide .hm-tool em{padding:7px 16px;border:1px solid var(--kgold);border-radius:20px;white-space:nowrap}
+.hm-tools.wide .hm-tool:hover em{background:var(--kgold);color:#fff}
+.hm-tool .tt b .pill{margin-left:6px;vertical-align:2px}
+.hm-colr>.panel:only-child{grid-row:1/-1;display:flex;flex-direction:column}.hm-colr>.panel:only-child .hm-lrail{flex:1}
+@media (min-width:1101px){.hm-colr>.panel:only-child .hm-lrail{grid-template-rows:repeat(3,1fr)!important}.hm-colr>.panel:only-child .hm-lrail>.lect{display:flex}.hm-colr>.panel:only-child .hm-lrail>.lect>.lt{flex:1;height:auto}}
+@media (max-width:600px){.hm-tools.wide .hm-tool{padding:14px;gap:12px}.hm-tools.wide .hm-tool .ti{width:44px;height:44px}.hm-tools.wide .hm-tool em{padding:6px 10px}}
+.uw-src .uw-srcl{display:flex;flex-wrap:wrap;gap:8px 14px}.uw-src .uw-srcl .ft{flex:1 1 280px;max-width:420px}
+.uw-src h3{margin-bottom:8px}
 .hm-rail{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 24px)/4);gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding-bottom:6px}
 .hm-rail>.mat{scroll-snap-align:start;text-align:left;font:inherit;padding:0;display:flex;flex-direction:column;justify-content:flex-start;cursor:pointer}
 .hm-rail .mat .th{aspect-ratio:3/4;padding:10px;min-height:0;overflow:hidden}.hm-rail .mat .th b{font-size:.92rem}.hm-rail .mat .mt{font-size:.76rem;padding:6px 8px}
@@ -1277,11 +1289,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     {g:null,items:[['home','홈']]},
     {g:'영업 도구',items:[['compare','상품 비교'],['ai','AI보장분석 기본형'],['ai2','AI보장분석 고급형','NEW'],['arcbox','내 자료함','NEW'],['hypo','대표 상품 가설'],['concept','이달의 컨셉']]},
     {g:'공지 · 시상',items:[['news','보험사 소식지'],['sched','상품 개정 일정','NEW'],['award','시상 공지']]},
-    {g:'교육 · 연계',items:[['edu','온라인 교육센터'],['policy','약관 분석','NEW'],['calc','금융계산기','NEW'],['car','자동차 비교견적'],['sangjo','상조 서비스']]},
+    {g:'교육 · 연계',items:[['edu','온라인 교육센터'],['policy','약관 분석','NEW'],['calc','금융계산기','NEW'],['uw','언더라이팅 인수기준','NEW'],['car','자동차 비교견적'],['sangjo','상조 서비스']]},
     {g:'관리자',admin:true,items:[['admin','관리자 페이지'],['cadmin','자료 관리','NEW'],['calcadmin','계산기 기준값','NEW'],['claimadmin','보험금 계산 기준값','NEW']]},
     {g:'내 정보',mobile:true,items:[['me','내 정보 · 자료 보관']]}
   ];
-  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',arcbox:'doc',hypo:'bulb',concept:'star',news:'news',sched:'cal',award:'cup',edu:'cap',car:'car',sangjo:'heart',policy:'terms',calc:'calcu',calcadmin:'calcu',claimadmin:'calcu',me:'user',admin:'gear',cadmin:'doc'};
+  var SIC={home:'home',compare:'bars',ai:'scan',ai2:'trend',arcbox:'doc',hypo:'bulb',concept:'star',news:'news',sched:'cal',award:'cup',edu:'cap',car:'car',sangjo:'heart',policy:'terms',calc:'calcu',uw:'uwck',calcadmin:'calcu',claimadmin:'calcu',me:'user',admin:'gear',cadmin:'doc'};
 
   var NEWS=[
     ['2026.10.14','삼성화재','간편건강보험 3.5.5 고지 개정, 11월 1일부터 적용'],
@@ -1292,7 +1304,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var BLOCKS=[
     ['상품 비교',[['이번 달의 원픽',V1+'onepick.html','Hot'],['생명보험 가이드북 비교',V1+'life.html'],['담보별 비교견적',V1+'nonlife.html','Best'],['단기납 종신보험 비교',V1+'wholelife.html'],['3대질병진단비 비교',V1+'critical3.html'],['경영인 정기보험 비교',V1+'ceoterm.html']]],
     ['보장분석 · 설계',[['AI보장분석 기본형','ai'],['AI보장분석 고급형','ai2','New'],['내 자료함','arcbox','New'],['대표 상품 가설','hypo'],['이달의 컨셉','concept','Hot']]],
-    ['교육 · 연계',[['온라인 교육센터','edu','New'],['약관 분석','policy','New'],['금융계산기','calc','New'],['AI보장분석 고급형','ai2','New'],['자동차 비교견적','car'],['상조 서비스','sangjo']]],
+    ['교육 · 연계',[['온라인 교육센터','edu','New'],['약관 분석','policy','New'],['금융계산기','calc','New'],['언더라이팅 인수기준','uw','New'],['AI보장분석 고급형','ai2','New'],['자동차 비교견적','car'],['상조 서비스','sangjo']]],
     ['공지 · 시상',[['보험사 소식지','news'],['시상 공지','award','Hot'],['상품 개정 일정','sched','New']]]
   ];
   var MATS=[
@@ -1332,7 +1344,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
     search:'<path d="M11 18a7 7 0 100-14 7 7 0 000 14zM20 20l-4-4"/>',
     doc:'<path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5"/>',
-    shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>'
+    shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+    uwck:'<path d="M9 3h6v3H9z"/><path d="M7 4.5H5V21h14V4.5h-2"/><path d="M8.5 13.5l2.5 2.5 4.5-5"/>'
   };
   function ic(n,c){return '<svg class="'+(c||'svg')+'" viewBox="0 0 24 24" aria-hidden="true">'+IC[n]+'</svg>';}
   var TOOLS=[
@@ -1486,9 +1499,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var ML=matsShown().filter(function(m){return m[4];});
       h+='<section class="hm-two"><div class="hm-col"><div class="panel"><h3>교육 자료 <span class="note">상담·교육용 PT와 비교 자료 '+ML.length+'건</span>'+railNav('railMats',ML.length>4)+' <button class="more" data-go="mats">교육 자료실 ›</button></h3><div class="hm-rail" id="railMats">'+ML.map(function(m){return matCard(m,false);}).join('')+'</div>'+sbar('railMats')+'</div>'+
         '<div class="panel"><h3>대표 상품 가설 <span class="note">고객 유형별 대표 상품과 첫 화법 '+HYPO.length+'건</span>'+railNav('railHypo',HYPO.length>0)+' <button class="more" data-go="hypo">전체 보기 ›</button></h3>'+(HYPO.length?'<div class="hm-rail" id="railHypo">'+HYPO.map(hypoCard).join('')+'</div>'+sbar('railHypo'):'<p class="note">아직 등록된 가설이 없습니다.</p>')+'</div></div>'+
-        '<div class="hm-col hm-colr"><div class="panel"><h3>교육센터 새 강의 '+(LECT_AT?'<span class="note">'+E(LECT_AT)+' 확인</span> ':'')+''+railNav('railLect',LECT.length>4)+'<button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects hm-lrail" id="railLect">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E([l[3],l[2]].filter(Boolean).join(' · '))+'</i></div></a>';}).join('')+'</div>'+sbar('railLect')+'</div>'+
-        /* 홈 도구 카드 줄: 약관 분석(policy.js) · 금융계산기 등 같은 모양(.hm-tool)으로 나란히 */
-        '<div class="hm-tools" id="hmTools">'+(window.KIFPOL?KIFPOL.card():'')+calcCard()+'</div></div></section>';
+        '<div class="hm-col hm-colr"><div class="panel"><h3>교육센터 새 강의 '+(LECT_AT?'<span class="note">'+E(LECT_AT)+' 확인</span> ':'')+''+railNav('railLect',LECT.length>4)+'<button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects hm-lrail" id="railLect">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E([l[3],l[2]].filter(Boolean).join(' · '))+'</i></div></a>';}).join('')+'</div>'+sbar('railLect')+'</div></div></section>';
+      /* 홈 도구 카드: 교육 자료 아래에 약관 분석(policy.js) · 금융계산기 · 언더라이팅 인수기준을 한 줄씩 가로로 길게 */
+      h+='<section class="hm-tools wide" id="hmTools">'+(window.KIFPOL?KIFPOL.card():'')+calcCard()+uwCard()+'</section>';
       h+='<section class="panel smp-home">'+smpHome()+'</section>';
       h+='<footer class="pfoot">한국보험금융(주) 한보금on 활동지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
       return '<div class="hm">'+h+'</div>';
@@ -1571,6 +1584,15 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var h=head('교육 · 연계','금융계산기','맨 앞 「보험금 계산기」(실손의료비 · 자동차보험 · 산재·근재·배상책임)와 보장·노후·저축·세금·법인 상담 계산기입니다. 상황·키워드·초성으로 찾고, 결과는 복사해서 고객에게 보내거나 인쇄할 수 있습니다.');
       h+='<div class="ai-adv-bar"><a class="btn sm" style="text-decoration:none" target="calcfr" href="calc/claim.html?embed=1#silson">실손의료비</a><a class="btn sm" style="text-decoration:none" target="calcfr" href="calc/claim.html?embed=1#car">자동차보험</a><a class="btn sm" style="text-decoration:none" target="calcfr" href="calc/claim.html?embed=1#work">산재·근재·배상책임</a><a class="btn sm ghost" style="text-decoration:none" target="calcfr" href="calc/index.html?embed=1">계산기 목록</a><a class="btn sm ghost" style="text-decoration:none" target="_blank" rel="noopener" href="calc/index.html">새 창으로 열기 ↗</a></div>';
       return h+'<iframe class="calc-fr" name="calcfr" src="calc/index.html?embed=1" title="금융계산기"></iframe>';
+    },
+    /* 언더라이팅 인수기준 — uw/index.html. 위쪽에는 관리자가 올린 회사 양식 원본 자료(content.json boards.uw, 첫 장 그림) */
+    uw:function(){
+      var L=uwFiles(),E=esc;
+      var h=head('교육 · 연계','언더라이팅 인수기준','보험사별 인수기준을 질병·회사·담보로 찾고 최대 3개사까지 나란히 비교합니다. 사내 교육용 자료이므로 고객에게 보내거나 외부에 올리지 마세요. 인수 여부와 한도는 보험사 심사 결과가 우선합니다.');
+      h+='<div class="ai-adv-bar"><button class="btn sm" type="button" id="uwFull">크게 보기 (전체 화면)</button><a class="btn sm ghost pc-only" style="text-decoration:none" target="_blank" rel="noopener" href="uw/index.html">새 창으로 열기 ↗</a><span class="note">'+E(uwMonth())+' 자료 기준</span></div>';
+      if(L.length)h+='<div class="panel uw-src"><h3>원본 자료 <span class="note">회사 양식으로 만든 언더라이팅 원본 '+L.length+'건 · 누르면 열립니다</span></h3><div class="uw-srcl">'+
+        L.map(function(r){return fileT(r[3],'<b>'+E(r[1]||'')+'</b>'+(r[2]?'<br><span class="note">'+E(r[2])+'</span>':'')+(r[0]?'<br><span class="note">'+E(r[0])+'</span>':''));}).join('')+'</div></div>';
+      return h+'<button class="adv-close" id="uwClose" type="button" hidden>✕ 작게 보기</button><iframe class="ai-adv uw-fr" src="uw/index.html?embed=1" title="언더라이팅 인수기준"></iframe>';
     },
     policy:function(){return window.KIFPOL?KIFPOL.html():head('교육 · 연계','약관 분석','약관 분석 도구를 불러오지 못했습니다. 새로고침해 주세요.');},
     car:function(){
@@ -1672,6 +1694,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* 보험금 계산기 기준값 점검: 마지막 확인일(content.json claimRules.at)이 가장 최근 1월 1일·9월 1일보다 앞이면 점검 시기 (산재 고시·최저임금 1월, 일용근로자 임금 1월·9월) */
   function claimDue(){var at=(SITE&&SITE.claimRules&&SITE.claimRules.at)||'2026-10-30',t=new Date(),c=t.getMonth()>=8?new Date(t.getFullYear(),8,1):new Date(t.getFullYear(),0,1);return {due:!(new Date(at+'T00:00:00')>=c),at:at.replace(/-/g,'.')};}
   function claimDueHtml(){var d=claimDue();return '<div class="panel"'+(d.due?' style="border-left:4px solid #b3261e"':'')+'><div class="row" style="gap:10px;flex-wrap:wrap"><b>보험금 계산 기준값'+(d.due?' 점검 시기입니다':'')+'</b><span class="note">'+(d.due?'산재 최고·최저 보상기준, 최저임금, 일용근로자 임금이 바뀌었는지 확인해 주세요. ':'산재 보상기준·일용근로자 임금·자동차 위자료 등 · ')+'마지막 확인 '+d.at+'</span><button class="btn sm'+(d.due?'':' ghost')+'" type="button" data-go="claimadmin">'+(d.due?'기준값 점검하기':'기준값 열기')+'</button></div></div>';}
+  /* 언더라이팅 인수기준 — uw/index.html (자료 기준월은 관리자가 올린 프로그램 자료 content.json uwdata.month, 없으면 처음 들어 있던 자료) */
+  var UW_BASE='2026년 11월';
+  function uwMonth(){var u=SITE&&SITE.uwdata;return (u&&u.month)||UW_BASE;}
+  function uwFiles(){var b=(SITE&&SITE.boards)||{};return Array.isArray(b.uw)?b.uw.filter(function(r){return r&&r[3];}):[];}
+  function uwCard(){return '<button type="button" class="hm-tool uw-card" data-go="uw"><span class="ti">'+ic('uwck','svg')+'</span><span class="tt"><b>언더라이팅 인수기준<span class="pill new">'+esc(uwMonth())+'</span></b><small>질병·회사·담보로 찾는 보험사별 인수기준 · 종신 주요질병 · 치매 · 무진단 한도 · BMI · 외국인 · 업계누적 · 간편 355 한도 · 실손 세대별 비교</small></span><em>열기 ›</em></button>';}
   function calcCard(){return '<button type="button" class="hm-tool calc-card" data-go="calc"><span class="ti">'+ic('calcu','svg')+'</span><span class="tt"><b>금융계산기</b><small>보험금(실손·자동차·산재) 계산기 + 사망보장·은퇴자금·상속세 등 상담용 계산기 37종</small></span><em>열기 ›</em></button>';}
   var HUBS={hub_sales:'영업 도구',hub_edu:'교육 · 연계',hub_notice:'공지 · 시상'};
   var HUB_D={compare:'보험사 상품을 한눈에 비교하는 비교 도구 모음',ai:'등록된 기준·샘플대로 보장분석과 제안서 만들기',ai2:'고급형 계산 규칙으로 보장·연금·자산 분석 제안서',
@@ -1962,7 +1989,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
       aiProxy:v('mProxy'),aiProxyFor:(document.getElementById('mProxyFor')||{}).value==='admin'?'admin':'all',aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,car:(SITE&&SITE.car)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
-    ['compare','off','concepts','aiSamples','boards','onepick','onepicks','cmpdata','thumbs'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
+    ['compare','off','concepts','aiSamples','boards','onepick','onepicks','cmpdata','uwdata','thumbs'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
     (c.hypo||[]).forEach(function(r){var o=(HYPO||[]).filter(function(x){return x[0]===r[0]&&Array.isArray(x[4]);})[0];if(o){while(r.length<4)r.push('');r[4]=o[4];}});
     var ck=document.getElementById('cOpts');
     if(ck&&ck.checked&&window.AIMOD&&AIMOD.getOpts){c.opts=AIMOD.getOpts();c.optsVer=c.ver;}
@@ -2478,12 +2505,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     news:'보험사 소식지 PDF를 올리면 회사·연월·주차를 읽어 제목을 만듭니다.',award:'시상·시책 자료를 올리면 기간을 읽어 진행 중/발표를 정합니다.',
     notice:'홈 화면 본사 공지입니다.',mats:'홈 화면 교육 자료와 교육 자료실에 보입니다.',
     onepick:'매달 「베스트 픽업 상품 비교 분석 가이드」 PDF를 여기에 올리세요. 원본으로 등록되고, 아래 「AI로 읽기」로 상품 비교 › 이번 달의 원픽 화면의 비교표를 새로 만듭니다. ⚠ 이 사이트에 올린 파일은 로그인 없이도 주소만 알면 열 수 있습니다. 외부 유출 금지 자료는 올리기 전에 한 번 더 판단하세요.'};
-  function cmName(k){for(var i=0;i<CM_TABS.length;i++)if(CM_TABS[i][0]===k)return CM_TABS[i][1];return k;}
+  function cmName(k){if(k==='uwdata')return '언더라이팅 프로그램 자료';for(var i=0;i<CM_TABS.length;i++)if(CM_TABS[i][0]===k)return CM_TABS[i][1];return k;}
   function cmClone(x){return JSON.parse(JSON.stringify(x));}
   function cmW(){
     if(CM.w)return CM.w;var S=SITE||{};
     CM.w={news:cmClone(NEWS),awards:cmClone(AWARDS),hypo:cmClone(HYPO),mats:cmClone(MATS),notices:cmClone(NOTICES),
-      off:cmClone(S.off||{}),compare:cmClone(CMPL),concept:cmClone(CONCEPT),concepts:cmClone(S.concepts||[]),onepick:cmClone(S.onepick||null),onepicks:cmClone(S.onepicks||[]),cmpdata:cmClone(S.cmpdata||{})};
+      off:cmClone(S.off||{}),compare:cmClone(CMPL),concept:cmClone(CONCEPT),concepts:cmClone(S.concepts||[]),onepick:cmClone(S.onepick||null),onepicks:cmClone(S.onepicks||[]),cmpdata:cmClone(S.cmpdata||{}),uwdata:cmClone(S.uwdata||null)};
     Object.keys(BOARD).forEach(function(b){CM.w['board:'+b]=cmClone(((S.boards||{})[b])||[]);});
     return CM.w;
   }
@@ -2518,6 +2545,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
           if(k==='compare'){c.compare=cmClone(W.compare);return;}
           if(k==='onepick'){c.onepick=cmClone(W.onepick);c.onepicks=cmClone(W.onepicks);return;}
           if(k==='cmpdata'){c.cmpdata=cmClone(W.cmpdata||{});if(!Object.keys(c.cmpdata).length)delete c.cmpdata;return;}
+          if(k==='uwdata'){if(W.uwdata)c.uwdata=cmClone(W.uwdata);else delete c.uwdata;return;}
           var key=CM_KEY[k];if(/^board:/.test(key)){c.boards=c.boards||{};c.boards[k]=cmClone(W[key]||[]);}else c[key]=cmClone(W[key]);c.off=c.off||{};c.off[k]=cmClone(W.off[k]||[]);
         });
       },add,del,'자료 관리: '+(keys.map(cmName).join(', ')||'파일 정리'));
@@ -2534,7 +2562,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!ghTok())throw new Error('GitHub 연결이 아직 없습니다');
     var files=[];
     for(var i=0;i<add.length;i++){cmMsg('파일 올리는 중… ('+(i+1)+'/'+add.length+')');if(window.KSAVE)KSAVE.step('파일 올리는 중 '+(i+1)+'/'+add.length);var bl=await gh('POST','/git/blobs',{content:add[i].b64,encoding:'base64'});files.push({path:add[i].path,sha:bl.sha});}
-    var r=await ghLand(files,function(cur,have,tree){var VW=cur.views||{},D=del.slice();del.forEach(function(p){if(VW[p]){D.push(VW[p]);delete VW[p];}});
+    var r=await ghLand(files,function(cur,have,tree){var VW=cur.views||{},TH=cur.thumbs||{},D=del.slice();del.forEach(function(p){if(VW[p]){D.push(VW[p]);delete VW[p];}if(TH[p]){D.push(TH[p]);delete TH[p];}});
       D.forEach(function(p){if(have[p])tree.push({path:p,mode:'100644',type:'blob',sha:null});});fn(cur);},message);
     return r.cur;
   };
@@ -2875,6 +2903,45 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       else if(a==='totab'){CM.tab='cmpdata';store('kif_cm_tab','cmpdata');cmRender();}
     });
   }
+  /* ---------- 언더라이팅 인수기준: 관리자 칸 ----------
+     · 원본 자료(회사 양식 PDF·PPT 등) = 게시판 boards.uw [날짜, 제목, 설명, 파일] — 같은 제목으로 다시 올리면 덮어쓰기, 첫 장 그림은 올릴 때 만든다
+     · 프로그램 자료 = 새 「언더라이팅_인수기준.html」 안의 window.UW를 그대로 읽어 uw/data.json + content.json uwdata{month,source,built,title,data,at,ver,n} */
+  var UW_HELP='회사 양식(톤앤매너)으로 만든 언더라이팅 원본 자료(PDF·PPT·엑셀·그림)를 올립니다. FC 화면 「언더라이팅 인수기준」 위쪽 「원본 자료」 칸에 첫 장 그림과 함께 보입니다. 같은 제목으로 다시 올리면 예전 자료를 지우고 새 자료로 바꿉니다(덮어쓰기). 필요 없는 자료는 아래 목록의 「삭제」로 지우세요. ⚠ 이 사이트에 올린 파일은 주소만 알면 누구나 열 수 있으니 외부 유출 금지 자료는 한 번 더 판단하세요.';
+  function uwProg(){
+    var u=cmW().uwdata;
+    var now=u?'<b>'+esc(u.month||'기준월 없음')+'</b> 자료 · 「'+esc(u.title||'')+'」 · 표 '+(u.n||'?')+'개 · 올린 날 '+esc(u.at||'')+(cmLocal(u.data)!==u.data?' <span class="pill warn">저장 전</span>':''):'<b>'+UW_BASE+'</b> 자료 <span class="note">(프로그램에 처음부터 들어 있는 자료)</span>';
+    return '<div class="panel uw-prog"><h3>인수기준 프로그램 자료 <span class="note">FC 화면의 표·비교 내용</span></h3>'+
+      '<p class="note">새 달 「언더라이팅_인수기준.html」(이번에 받은 것과 같은 형식의 프로그램 파일)을 올리면 FC 화면의 표와 비교 내용이 그 파일의 자료로 바뀝니다. AI 없이 파일 안 자료를 그대로 읽습니다. 지우면 처음 들어 있던 '+UW_BASE+' 자료로 돌아갑니다. 바꾼 뒤 위 「저장」을 눌러야 모든 FC에게 반영됩니다.</p>'+
+      '<div class="row" style="gap:8px;flex-wrap:wrap"><span class="note" style="flex:1 1 260px">지금 자료: '+now+'</span><button class="btn sm ghost" type="button" data-go="uw">FC 화면으로 보기</button>'+
+      '<label class="btn sm">'+(u?'새 프로그램으로 바꾸기':'새 프로그램 올리기')+'<input type="file" hidden accept=".html,.htm" data-uwhtml="1"></label>'+(u?(CM.ask==='uwd'?'<button class="btn sm danger" type="button" data-uwdel="go">정말 지우기</button><button class="btn sm ghost" type="button" data-uwdel="no">취소</button>':'<button class="btn sm ghost danger" type="button" data-uwdel="ask">삭제</button>'):'')+'</div>'+
+      (CM.uwMsg?'<p class="note" role="status" style="margin:8px 0 0">'+CM.uwMsg+'</p>':'')+'</div>';
+  }
+  /* HTML 글에서 window.UW={…} 자료만 꺼낸다 */
+  function uwParse(t){
+    var i=t.indexOf('window.UW=');if(i<0)throw new Error('언더라이팅 인수기준 프로그램 파일이 아닙니다(자료 window.UW가 없습니다).');
+    var j=t.indexOf('<\/script>',i),raw=t.slice(i+10,j<0?t.length:j).trim().replace(/;\s*$/,''),d;
+    try{d=JSON.parse(raw);}catch(e){throw new Error('파일 안 자료를 읽지 못했습니다: '+(e.message||e));}
+    if(!d||!Array.isArray(d.sheets)||!Array.isArray(d.views)||!d.pages||!d.sheets.length)throw new Error('표 자료(sheets·views)가 비어 있습니다.');
+    return d;
+  }
+  async function uwTake(f){
+    if(!/\.html?$/i.test(f.name)){CM.uwMsg='⚠ HTML 파일(언더라이팅_인수기준.html)만 올릴 수 있습니다. 원본 PDF·PPT는 아래 「원본 자료」 칸에 올리세요.';cmRender();return;}
+    CM.uwMsg='「'+esc(f.name)+'」 읽는 중… (몇 초 걸립니다)';cmRender();
+    try{
+      var d=uwParse(await f.text()),js=JSON.stringify(d);
+      await cmStage('uwdata',new File([js],'data.json',{type:'application/json'}),'uw/data.json');
+      CM.del=CM.del.filter(function(p){return p!=='uw/data.json';});
+      cmW().uwdata={month:String(d.month||''),source:String(d.source||''),built:String(d.built||''),title:f.name.replace(/\.[^.]+$/,''),data:'uw/data.json',at:today(),ver:Date.now(),n:d.sheets.length};
+      CM.uwMsg='✓ 「'+esc(f.name)+'」을 읽었습니다: '+esc(d.month||'')+' 자료 · 표 '+d.sheets.length+'개 · 화면 '+d.views.length+'개 · 원본 '+(d.pageCount||'?')+'쪽. 위 「저장」을 누르면 모든 FC에게 반영됩니다.';
+      cmTouch('uwdata');
+    }catch(e){CM.uwMsg='⚠ '+esc(e.message||String(e));}
+    cmRender();
+  }
+  function uwDrop(){var W=cmW();W.uwdata=null;CM.add=CM.add.filter(function(a){return a.path!=='uw/data.json';});
+    if(SITE&&SITE.uwdata&&CM.del.indexOf('uw/data.json')<0)CM.del.push('uw/data.json');CM.uwMsg='프로그램 자료를 지웠습니다. 「저장」하면 처음 들어 있던 '+UW_BASE+' 자료로 돌아갑니다.';cmTouch('uwdata');}
+  document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-uwdel]');if(!b||cur!=='cadmin')return;var a=b.getAttribute('data-uwdel');
+    if(a==='ask')CM.ask='uwd';else{CM.ask='';if(a==='go')uwDrop();}cmRender();});
+  document.addEventListener('change',function(e){var t=e.target;if(!t||!t.getAttribute||!t.getAttribute('data-uwhtml')||!t.files||!t.files[0])return;uwTake(t.files[0]);t.value='';});
   function cmHtml(){
     var T=ghTok(),k=CM.tab;
     var h=head('관리자','자료 관리','메뉴별 자료를 올리고, FC에게 보일지 켜고 끄고, 고치고, 지웁니다. 바꾸거나 파일을 붙인 뒤 「저장」을 누르면 모든 FC 화면에 반영됩니다(1~2분).');
@@ -2885,17 +2952,19 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+='<div class="nchips cm-tabs" role="tablist">'+CM_TABS.map(function(t){var n=t[0]==='compare'?cmW().compare.length:t[0]==='cmpdata'?Object.keys(cmW().cmpdata||{}).length+'/'+CD_IDS.length:t[0]==='onepick'?((cmW().onepick||{}).cats||[]).length:t[0]==='concept'?1+cmW().concepts.length:((cmW()[CM_KEY[t[0]]])||[]).length+((cmW().off[t[0]]||[]).length);
       return '<button type="button" role="tab" class="tg'+(t[0]===k?' on':'')+'" aria-selected="'+(t[0]===k)+'" data-cmtab="'+t[0]+'">'+t[1]+' <span class="note">'+n+'</span></button>';}).join('')+'</div>';
     if(k==='cmpdata'){h+='<div class="panel"><h3>비교자료 업로드 <span class="note">도구마다 이번 달 자료를 올리고 AI로 읽어 표를 바꿉니다 · 바꾼 뒤 위 「저장」</span></h3><p class="note">'+CM_HELP.cmpdata+'</p><div id="cmList">'+cmCmpdata()+'</div></div>';return h;}
+    if(k==='uw')h+=uwProg();
     var acc=k==='compare'?'.html,.htm,.pdf,.ppt,.pptx,.xls,.xlsx,.png,.jpg,.jpeg':'.pdf,.ppt,.pptx,.xls,.xlsx,.doc,.docx,.hwp,.hwpx,.png,.jpg,.jpeg';
-    h+='<div class="panel"><h3>'+cmName(k)+' 올리기</h3><p class="note">'+CM_HELP[k]+'</p>'+
-      '<label class="smp-drop" id="cmDrop"><input type="file" id="cmFile" accept="'+acc+'" multiple hidden><b>＋ '+cmName(k)+' 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>'+(k==='compare'?'HTML(비교 프로그램) · PDF · 엑셀 · PPT · 그림':'PDF · PPT · 엑셀 · 워드 · 한글 · 그림')+' · 여러 개 한 번에 · 파일당 50MB 이하</em></label>'+
+    var cnm=k==='uw'?'언더라이팅 원본 자료':cmName(k);
+    h+='<div class="panel"><h3>'+cnm+' 올리기</h3><p class="note">'+CM_HELP[k]+'</p>'+
+      '<label class="smp-drop" id="cmDrop"><input type="file" id="cmFile" accept="'+acc+'" multiple hidden><b>＋ '+cnm+' 추가</b><span>여기를 눌러 파일을 고르거나, 파일을 끌어다 놓으세요</span><em>'+(k==='compare'?'HTML(비교 프로그램) · PDF · 엑셀 · PPT · 그림':'PDF · PPT · 엑셀 · 워드 · 한글 · 그림')+' · 여러 개 한 번에 · 파일당 50MB 이하</em></label>'+
       (k==='compare'||k==='concept'||k==='onepick'?'':'<div class="row"><button class="btn sm ghost" type="button" data-cm="addrow">파일 없이 글로 한 줄 추가</button></div>')+
       (k==='compare'?'':'<div id="nuList"></div><div class="row" style="margin-top:8px;gap:8px"><button class="btn" type="button" id="nuPub" disabled>저장 (모든 FC에게 올리기)</button><button class="btn ghost" type="button" id="nuPrev" disabled>이 기기에서 미리보기</button></div>')+
       '<p class="note" id="nuMsg" role="status"></p></div>';
-    h+='<div class="panel"><h3>'+(k==='concept'?'이달의 컨셉':k==='onepick'?'이번 달의 원픽':'등록된 '+cmName(k))+' <span class="note">고친 뒤 「저장」을 누르면 모든 FC에게 올라갑니다</span></h3><div id="cmList">'+(k==='compare'?cmCompare():k==='concept'?cmConcept():k==='onepick'?cmOnepick():cmRows(k))+'</div></div>';
+    h+='<div class="panel"><h3>'+(k==='concept'?'이달의 컨셉':k==='onepick'?'이번 달의 원픽':'등록된 '+cnm)+' <span class="note">고친 뒤 「저장」을 누르면 모든 FC에게 올라갑니다</span></h3><div id="cmList">'+(k==='compare'?cmCompare():k==='concept'?cmConcept():k==='onepick'?cmOnepick():cmRows(k))+'</div></div>';
     return h;
   }
   /* 자료 관리 밖에서 쓰는 파일(보장분석 샘플 원본·첫 장, 참고자료, 게시판 등)은 지우지 않도록 함께 본다 */
-  function cmUsedElse(){var S=SITE||{};return JSON.stringify([S.aiSamples,S.refs,S.boards,S.onepick,S.concepts,S.concept,S.sched]);}
+  function cmUsedElse(){var S=SITE||{},B=S.boards;if(CM.w){B={};Object.keys(BOARD).forEach(function(b){B[b]=CM.w['board:'+b];});}return JSON.stringify([S.aiSamples,S.refs,B,S.onepick,S.concepts,S.concept,S.sched,CM.w&&CM.w.uwdata]);}
   function cmRender(){var v=document.getElementById('view');if(cur!=='cadmin'||!v)return;var y=window.scrollY;CM.keep=true;v.innerHTML=PAGES.cadmin();bindCm();window.scrollTo(0,y);}
   function cmLoc(id){ /* 'v3' 보이는 줄, 'o1' 꺼 둔 줄, 'p2' 상품 비교 */
     var W=cmW(),t=id[0],i=+id.slice(1),k=CM.tab;
@@ -3049,7 +3118,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var bl=Object.keys(BOARD).map(function(b){return [b,BOARD[b]];});
     KINDS.length=0;base.concat(bl).forEach(function(x){KINDS.push(x);});
     CM_TABS.length=0;[['compare',menuName('compare','상품 비교')],['onepick','이번 달의 원픽'],['cmpdata','비교자료 업로드']].concat(base.filter(function(x){return x[0]==='hypo'||x[0]==='concept';}),base.filter(function(x){return x[0]!=='hypo'&&x[0]!=='concept'&&x[0]!=='onepick';}),bl).forEach(function(x){CM_TABS.push(x);});
-    bl.forEach(function(x){var b=x[0];CM_KEY[b]='board:'+b;CM_COLS[b]=[[0,'날짜','96px'],[1,'제목','w'],[2,'설명','a']];CM_FI[b]=3;CM_LEN[b]=4;CM_HELP[b]='「'+x[1]+'」 메뉴에 보이는 자료입니다.';
+    bl.forEach(function(x){var b=x[0];CM_KEY[b]='board:'+b;CM_COLS[b]=[[0,'날짜','96px'],[1,'제목','w'],[2,'설명','a']];CM_FI[b]=3;CM_LEN[b]=4;CM_HELP[b]=b==='uw'?UW_HELP:'「'+x[1]+'」 메뉴에 보이는 자료입니다.';
       if(!PAGES[b])PAGES[b]=function(){var L=((SITE&&SITE.boards)||{})[b]||[];
         return head(menuGroup(b)||'자료',esc(BOARD[b]||b),'관리자가 올린 자료입니다. 제목을 누르면 열립니다.')+'<div class="panel"><ul class="list">'+(L.length?L.map(function(r){return '<li><span class="dt">'+esc(r[0]||'')+'</span><span class="t">'+fileT(r[3],'<b>'+esc(r[1]||'')+'</b>')+(r[2]?'<br><span class="note">'+esc(r[2])+'</span>':'')+'</span></li>';}).join(''):'<li class="note">아직 올라온 자료가 없습니다.</li>')+'</ul></div>';};});
     if(KINDS.every(function(k){return k[0]!==CM.tab;})&&CM.tab!=='compare'&&CM.tab!=='cmpdata')CM.tab='compare';
@@ -3672,6 +3741,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(id==='cadmin'&&me.role==='admin')bindCm();
     if(id==='compare'){var cf=document.getElementById('cmpFull'),cr=document.querySelector('iframe.cmp-fr'),cx=document.getElementById('cmpClose');
       if(cf&&cr){var setC=function(on){cr.classList.toggle('full',on);cx.hidden=!on;document.body.classList.toggle('adv-full',on);};cf.onclick=function(){setC(true);};cx.onclick=function(){setC(false);};}}
+    if(id==='uw'){var ub=document.getElementById('uwFull'),uf=document.querySelector('iframe.uw-fr'),ux=document.getElementById('uwClose');
+      var setU=function(on){uf.classList.toggle('full',on);ux.hidden=!on;document.body.classList.toggle('adv-full',on);};
+      if(ub)ub.onclick=function(){setU(true);};if(ux)ux.onclick=function(){setU(false);};}
     if(id==='ai2'){var fb=document.getElementById('advFull'),fr=document.querySelector('iframe.ai-adv'),fx=document.getElementById('advClose');
       var setF=function(on){fr.classList.toggle('full',on);fx.hidden=!on;document.body.classList.toggle('adv-full',on);};
       if(fb)fb.onclick=function(){setF(true);};if(fx)fx.onclick=function(){setF(false);};}
