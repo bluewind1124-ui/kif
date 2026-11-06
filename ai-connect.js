@@ -310,7 +310,21 @@ async function read(files){
   return out;
 }
 function b64(b){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){var u=String(r.result);res({mime:b.type||'image/jpeg',data:u.slice(u.indexOf(',')+1)});};r.onerror=rej;r.readAsDataURL(b);});}
+/* 첫 { 부터 짝이 맞는 } 까지(글자 속 괄호는 건너뜀). 짝이 안 맞으면(답이 중간에 끊김) 끝까지와 열린 괄호 목록 */
+function jsonSpan(t,i){var st=[],inS=false,esc1=false;for(var k=i;k<t.length;k++){var c=t[k];
+    if(inS){if(esc1)esc1=false;else if(c==='\\')esc1=true;else if(c==='"')inS=false;continue;}
+    if(c==='"')inS=true;else if(c==='{'||c==='[')st.push(c);else if(c==='}'||c===']'){st.pop();if(!st.length)return {b:t.slice(i,k+1),done:true};}}
+  return {b:t.slice(i),done:false,open:st,inS:inS};}
+/* 끊긴 JSON을 화면에 보여 주기 위해서만 닫아 본다(데이터 반영에는 쓰지 않음 — 줄이 빠진 채 들어가면 안 되므로) */
+function closeCut(t){t=String(t||'').replace(/```(json)?/g,'');var i=t.indexOf('{');if(i<0)return null;var sp=jsonSpan(t,i);if(sp.done)return null;
+  var b=sp.b;if(sp.inS)b+='"';
+  for(var n=0;n<40;n++){var s2=b.replace(/[\s,:]+$/,''),st=jsonSpan(s2,0).open||[],end='';for(var k=st.length-1;k>=0;k--)end+=st[k]==='{'?'}':']';
+    try{return JSON.parse(s2+end);}catch(e){}
+    var cut=Math.max(s2.lastIndexOf(','),s2.lastIndexOf('{'),s2.lastIndexOf('['));if(cut<=0)return null;b=s2.slice(0,s2.charAt(cut)===','?cut:cut+1);}
+  return null;}
 function pickJson(t){t=String(t||'').replace(/```(json)?/g,'');var i=t.indexOf('{'),j=t.lastIndexOf('}');if(i<0||j<i)throw {code:'bad_json'};var b=t.slice(i,j+1);try{return JSON.parse(b);}catch(e){}
+  /* 답 뒤에 설명 글이 붙어 괄호가 더 있는 경우: 짝이 맞는 곳까지만 */
+  var sp=jsonSpan(t,i);if(sp.done&&sp.b!==b){try{return JSON.parse(sp.b);}catch(e){}b=sp.b;}
   /* 화면에서 긁어 복사하면 따옴표가 “ ” 로 바뀌어 오는 경우: 곧은 따옴표로 바꿔 한 번 더 읽는다 */
   try{return JSON.parse(b.replace(/[\u201C\u201D\u201E\u201F\u2033]/g,'"'));}catch(e){}
   /* 따옴표가 모두 “ ”로 바뀌고 글 속에도 “ ”가 섞인 경우: 자리로 보아 구분 따옴표와 글 속 따옴표를 가려 다시 읽는다 */
@@ -457,10 +471,11 @@ async function ask(prompt,mat){
 var PLBL={answer:'요약 답',summary:'요약',conclusion:'결론',points:'상담 핵심',refs:'근거',caution:'주의할 점',warns:'주의사항',cautions:'주의사항',pages:'찾은 관련 쪽',sections:'고른 항목',
   where:'위치',why:'핵심 내용',quote:'인용 원문',p:'쪽',page:'쪽',d:'문서',item:'구분',point:'핵심 내용',comment:'의견',fields:'입력값',products:'상품',product:'상품',name:'이름',
   month:'기준월',upd:'업데이트',text:'내용',reason:'이유',note:'메모',title:'제목',amount:'금액',premium:'보험료',company:'보험사',co:'보험사',prod:'상품명',contracts:'계약',coverages:'담보',
-  ok:'확인',error:'오류',message:'메시지',items:'항목',rows:'줄',cols:'열',value:'값',type:'종류',kind:'종류'};
+  v:'AI가 고친 값',vals:'회사별 값',label:'항목',ok:'확인',error:'오류',message:'메시지',items:'항목',rows:'줄',cols:'열',value:'값',type:'종류',kind:'종류'};
 var PFIRST=['answer','summary','conclusion','comment','points','rows','refs','items','pages','sections','warns','cautions','caution'];
 function plbl(k){return PLBL[k]||k;}
 function prim(v){return v==null||typeof v!=='object';}
+function isObjV(v){return !!v&&typeof v==='object'&&!Array.isArray(v);}
 function pcell(k,v){if(v==null||v==='')return '-';if(prim(v))return (k==='p'||k==='page')&&/^\d+$/.test(String(v))?'p.'+esc(v):mdInline(String(v));return prender(v,2);}
 function mdInline(s){return esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/`([^`]+)`/g,'$1').replace(/\\n/g,'<br>').replace(/\n/g,'<br>');}
 /* 글 답(마크다운 포함)을 단락·목록·표·제목으로 */
@@ -482,6 +497,10 @@ function prender(v,depth){depth=depth||0;
   if(prim(v))return esc(v);
   if(Array.isArray(v)){if(!v.length)return '<span class="kai-note">없음</span>';
     if(v.every(prim))return '<ul>'+v.map(function(x){return '<li>'+mdInline(String(x))+'</li>';}).join('')+'</ul>';
+    /* 줄 이름(label)+회사별 값(vals) 모양 → 줄×회사 표 */
+    if(v.every(function(x){return isObjV(x)&&isObjV(x.vals);})){var cs=[];v.forEach(function(x){Object.keys(x.vals).forEach(function(k){if(cs.indexOf(k)<0)cs.push(k);});});
+      var nm=function(x){return x.label!=null?x.label:x.l!=null?x.l:x.title!=null?x.title:x.name!=null?x.name:'';};
+      return '<div class="kai-pt-tw"><table class="kai-pt-t"><thead><tr><th>항목</th>'+cs.map(function(k){return '<th>'+esc(k||'-')+'</th>';}).join('')+'</tr></thead><tbody>'+v.map(function(x){return '<tr><th style="text-align:left">'+mdInline(String(nm(x)))+'</th>'+cs.map(function(k){return '<td>'+pcell(k,x.vals[k])+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
     if(v.every(function(x){return x&&typeof x==='object'&&!Array.isArray(x);})){var ks=[];v.forEach(function(x){Object.keys(x).forEach(function(k){if(ks.indexOf(k)<0)ks.push(k);});});ks=ks.slice(0,8);
       return '<div class="kai-pt-tw"><table class="kai-pt-t"><thead><tr>'+ks.map(function(k){return '<th>'+esc(plbl(k))+'</th>';}).join('')+'</tr></thead><tbody>'+v.map(function(x){return '<tr>'+ks.map(function(k){return '<td>'+pcell(k,x[k])+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>';}
     return '<ul>'+v.map(function(x){return '<li>'+prender(x,depth+1)+'</li>';}).join('')+'</ul>';}
@@ -489,9 +508,15 @@ function prender(v,depth){depth=depth||0;
   if(!keys.length)return '<span class="kai-note">-</span>';
   return '<div class="kai-pt-o">'+keys.map(function(k){var x=v[k];return '<div class="kai-pt-k'+(/caution|warn/.test(k)?' w':'')+'"><div class="kai-pt-l">'+esc(plbl(k))+'</div><div class="kai-pt-v">'+(prim(x)?(typeof x==='string'&&!depth&&/\n/.test(x)?mdBlock(x):pcell(k,x)):prender(x,depth+1))+'</div></div>';}).join('')+'</div>';}
 /* x: AI 답 원문(글) 또는 읽은 값. raw를 주면 「원문 보기」에 그 글을 그대로 둔다 */
-function pretty(x,raw){addCss();var v=x,r=raw;if(typeof x==='string'){r=r==null?x:r;try{v=pickJson(x);}catch(e){v=x;}}
+function pretty(x,raw){addCss();var v=x,r=raw,top='';if(typeof x==='string'){r=r==null?x:r;try{v=pickJson(x);}catch(e){
+    /* JSON이 깨졌거나 끊긴 답: 날것으로 보이지 않게 — 받은 부분까지 닫아서 표로, 그것도 안 되면 안내 글만 */
+    var cut=closeCut(x),jl=/^\s*(```(json)?\s*)?[\[{]/.test(x);
+    if(cut){v=cut;top='<div class="kai-pt-k w"><div class="kai-pt-l">주의</div><div class="kai-pt-v">AI 답이 <b>너무 길어 중간에 끊겼습니다</b>. 아래 표는 받은 부분까지만 정리한 것이라 끝부분이 빠져 있습니다.</div></div>';}
+    else if(jl){v=null;top='<div class="kai-pt-k w"><div class="kai-pt-l">주의</div><div class="kai-pt-v">AI 답의 형식이 깨져 표로 정리하지 못했습니다. 내용은 아래 「원문 보기」에 있습니다.</div></div>';}
+    else v=x;}}
+  if(isObjV(v)&&Object.keys(v).length<=2&&v.v!==undefined&&(Object.keys(v).length===1||'none' in v))v=v.v===null&&v.none?{answer:'AI가 「새 자료에 이 부분이 없다」고 답했습니다.'}:v.v;
   if(r==null)try{r=JSON.stringify(x,null,1);}catch(e){r=String(x);}
-  return '<div class="kai-pt">'+prender(v,0)+(r&&String(r).trim()?'<details class="kai-pt-raw"><summary>원문 보기 (AI가 보낸 그대로)</summary><pre>'+esc(r)+'</pre></details>':'')+'</div>';}
+  return '<div class="kai-pt">'+top+(v==null&&top?'':prender(v,0))+(r&&String(r).trim()?'<details class="kai-pt-raw"><summary>원문 보기 (AI가 보낸 그대로)</summary><pre>'+esc(r)+'</pre></details>':'')+'</div>';}
 /* 정리한 답을 창으로 보여 준다 (어느 화면에서든) */
 function view(x,title,note){addCss();var w=document.createElement('div');w.className='kai-ov';w.style.zIndex='10001';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label',title||'AI 답 정리');
   w.innerHTML='<div class="kai-box" style="max-width:860px"><div class="kai-hd"><h2>'+esc(title||'AI 답 정리')+'</h2><button type="button" class="kai-btn g kai-x" data-v="x" aria-label="닫기">✕</button></div>'+(note?'<p class="kai-note" style="margin:0 0 10px">'+note+'</p>':'')+pretty(x)+'</div>';
@@ -507,7 +532,7 @@ function err(e){
   var c=e&&e.code,m=M[c]||(e&&e.message)||('AI 읽기 실패'+(c?' ('+c+')':''));
   if(e&&e.tries>1)m='AI에 자동으로 '+e.tries+'번까지 다시 물었지만 끝내지 못했습니다(비용이 커지지 않게 여기서 멈춤). '+m;
   /* 공통 규칙: 쓸 수 없는 모양의 답이 와도 내용은 정리해서 보여 준다 */
-  if(e&&e.raw&&String(e.raw).trim().length>20&&!e.shown){e.shown=true;try{view(e.raw,'AI 답 정리','이 답은 이 화면에 바로 넣을 모양이 아니라 자동 반영은 하지 못했습니다. 대신 AI가 보낸 내용을 읽기 쉽게 정리해 보여 드립니다.');}catch(er){}m+=' (AI가 보낸 내용은 정리해서 창으로 보여 드렸습니다)';}
+  if(e&&e.raw&&String(e.raw).trim().length>20&&!e.shown){e.shown=true;try{view(e.raw,'AI 답 정리','이 답은 화면에 바로 넣을 수 있는 모양이 아니어서 <b>반영하지 않았습니다(기존 값은 그대로)</b>. 따로 할 일은 없습니다 — 확인만 하고 창을 닫으세요. AI가 보낸 내용은 아래에 정리해 두었습니다.');}catch(er){}m+=' (AI가 보낸 내용은 정리해서 창으로 보여 드렸습니다)';}
   return m;
 }
 
