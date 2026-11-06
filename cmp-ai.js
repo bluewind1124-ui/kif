@@ -157,13 +157,43 @@
     var t='',seen={};(nums||[]).forEach(function(n){if(seen[n])return;seen[n]=1;var p=P.filter(function(x){return x.n===n;})[0];if(p)t+='['+n+'쪽]\n'+p.text+'\n\n';});
     return t.slice(0,cap||40000);
   }
-  async function runUnit(o,u,map){
+  /* 단위를 반으로 나눈다(목록은 앞·뒤 줄, 객체는 앞·뒤 키). 나눌 수 없으면 null */
+  function halves(base,u){
+    var p=at(base,u.path),lastOk=!(u.parts>1&&u.part<u.parts),mk=function(x,i,n){x.id=u.id+'_'+i;x.label=u.label+' (나눠 읽기 '+i+'/'+n+')';
+      if(x.from!=null){x.part=lastOk?i:1;x.parts=lastOk?n:2;}return x;};
+    if(Array.isArray(p)&&(u.from!=null||u.whole)){var f=u.from!=null?u.from:0,t=u.from!=null?u.to:p.length;
+      if(t-f===1&&p[f]&&typeof p[f]==='object'){var o1={path:u.path.concat([f]),whole:true,id:u.id+'_1',label:u.label};return {one:true,list:[o1]};}
+      if(t-f<2)return null;var m=f+Math.ceil((t-f)/2);
+      return {arr:true,list:[mk({path:u.path,from:f,to:m},1,2),mk({path:u.path,from:m,to:t},2,2)]};}
+    if(isObj(p)&&(u.keys||u.whole)){var ks=u.keys||Object.keys(p);if(!ks.length)return null;
+      /* 한 키(예: rows)가 대부분이면 그 키만 따로 떼어 안으로 들어가 나눈다 */
+      var sz=ks.map(function(k){return size(p[k]);}),tot=sz.reduce(function(a,b){return a+b;},0),bi=sz.indexOf(Math.max.apply(null,sz)),bk=ks[bi];
+      if(sz[bi]>=tot*0.5&&p[bk]&&typeof p[bk]==='object'){var rest=ks.filter(function(k){return k!==bk;}),inner={path:u.path.concat([bk]),whole:true,as:bk,id:u.id+'_k',label:u.label};
+        return {list:rest.length?[{path:u.path,keys:rest,id:u.id+'_r',label:u.label+' (나눠 읽기 1/2)'},inner]:[inner]};}
+      if(ks.length<2)return null;
+      var acc=0,h=1;for(var j=0;j<ks.length-1;j++){acc+=sz[j];if(acc>=tot/2){h=j+1;break;}h=j+1;}
+      return {list:[mk({path:u.path,keys:ks.slice(0,h)},1,2),mk({path:u.path,keys:ks.slice(h)},2,2)]};}
+    return null;
+  }
+  /* AI 답이 너무 길어 중간에 끊기면(JSON이 닫히지 않음) 단위를 반으로 나눠 다시 읽고 합친다 */
+  async function runSplit(o,u,map,depth){
+    var H=halves(o.base,u);if(!H)return null;
+    var m2={};H.list.forEach(function(x){m2[x.id]=(map&&map[u.id])||[];});
+    var parts=[];for(var i=0;i<H.list.length;i++){var r=await runUnit(o,H.list[i],m2,(depth||0)+(H.list.length>1?1:0));if(!r.ok)return r;parts.push(r);}
+    var v;if(H.one)v=[parts[0].v];else if(H.arr){v=[];parts.forEach(function(x){v=v.concat(x.v);});}else{v={};parts.forEach(function(x,i){if(H.list[i].as!=null)v[H.list[i].as]=x.v;else Object.keys(x.v).forEach(function(k){v[k]=x.v[k];});});}
+    var old=pick(o.base,u),miss=[];parts.forEach(function(x){miss=miss.concat(x.miss||[]);});
+    return {ok:true,v:v,miss:miss,pages:(map&&map[u.id])||[],stat:stat(old,v),split:true};
+  }
+  async function runUnit(o,u,map,depth){
     var old=pick(o.base,u),nums=(map&&map[u.id])||[],text=o.pages.length?pagesText(o.pages,nums):'';
     if(o.pages.length&&!text.trim())return {ok:false,none:true,err:'새 자료에서 이 부분의 쪽을 찾지 못했습니다'};
     var r,tries=0,q=prompt(o,u,old,text),w;
     for(;;){
       try{r=await o.ask(q,text);}
-      catch(e){if(tries++<1&&e&&(e.code==='rate_limited'||e.code==='bad_json'||e.code==='network')){await new Promise(function(s){setTimeout(s,e.code==='rate_limited'?8000:1500);});continue;}
+      catch(e){
+        /* 답이 끊겼거나 JSON이 깨졌으면: 같은 질문을 다시 하기보다 반으로 나눠 짧게 다시 묻는다(최대 4번 나눔) */
+        if(e&&e.code==='bad_json'&&(depth||0)<4&&halves(o.base,u)){var sp=await runSplit(o,u,map,depth);if(sp)return sp;}
+        if(tries++<1&&e&&(e.code==='rate_limited'||e.code==='bad_json'||e.code==='network')){await new Promise(function(s){setTimeout(s,e.code==='rate_limited'?8000:1500);});continue;}
         return {ok:false,err:(o.err?o.err(e):(e&&e.message)||String(e))};}
       w=unwrap(r,old);
       if(w.v==null&&!w.none&&tries++<1){q=prompt(o,u,old,text)+'\n\n[다시 요청] 앞의 답에서 고친 데이터를 찾지 못했다. 반드시 {"v": 고친 데이터} 모양 JSON 하나로만 답하라.';continue;}
@@ -218,6 +248,6 @@
     Object.keys(A).forEach(function(k){if(k!=='__rows'&&!(k in B))rm++;});
     return {changed:ch,added:ad,removed:rm,rowsOld:A.__rows||0,rowsNew:B.__rows||0};
   }
-  root.KIFCMPAI={LIM:LIM,units:units,label:label,pick:pick,mapPages:mapPages,guess:guess,guessUnit:guessUnit,unwrap:unwrap,run:run,runUnit:runUnit,merge:merge,stat:stat,size:size};
+  root.KIFCMPAI={LIM:LIM,halves:halves,units:units,label:label,pick:pick,mapPages:mapPages,guess:guess,guessUnit:guessUnit,unwrap:unwrap,run:run,runUnit:runUnit,merge:merge,stat:stat,size:size};
   if(typeof module!=='undefined')module.exports=root.KIFCMPAI;
 })(typeof window!=='undefined'?window:globalThis);
