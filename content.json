@@ -3042,16 +3042,16 @@
    "title": "상품비교 가이드북 생명보험 11.04",
    "file": "files/cmpdata/2026-11/상품비교_가이드북_생명보험_11.04_n7k2q.pdf",
    "data": "classic/data/life.json",
-   "ver": "1793943193667",
+   "ver": "1793943193668",
    "at": "2026.11.06"
   },
   "wholelife": {
    "file": "files/cmpdata/2026-11/단기납_종신보험환급률_26.11.04_36q1m.pptx",
    "title": "단기납 종신보험환급률 26.11.04",
    "data": "classic/data/wholelife.json",
-   "ver": "1793943517408",
+   "ver": "1793943517409",
    "month": "2026.11",
-   "upd": "2026.11.06",
+   "upd": "2026.11.04",
    "at": "2026.11.06"
   },
   "ceoterm": {

@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-11-06.2">
+<meta name="kif-build" content="2026-11-06.3">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -2802,7 +2802,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   async function cdSrcFile(id){
     var s=cdS(id),R=(cmW().cmpdata||{})[id];if(s.f)return s.f;
-    if(!R||!R.file)return null;var r=await fetch(fileHref(R.file),{cache:'no-store'});if(!r.ok)throw new Error('올려 둔 원본 파일을 열지 못했습니다');
+    if(!R||!R.file)return null;var r=null;try{r=await fetch(fileHref(R.file),{cache:'no-store'});}catch(e){r=null;}
+    /* 방금 저장한 파일은 사이트 반영(1~3분) 전이라 사이트 주소로 안 열린다 → GitHub 원본 주소로 한 번 더 */
+    if(!(r&&r.ok)&&!/^(blob:|data:|https?:)/.test(R.file)){try{r=await fetch(rawUrl(R.file),{cache:'no-store'});}catch(e){r=null;}}
+    if(!(r&&r.ok))throw new Error('올려 둔 원본 파일을 열지 못했습니다. 저장 직후라면 2~3분 뒤 다시 눌러 주세요');
     return new File([await r.blob()],String(R.title||R.file.split('/').pop())+((R.file.match(/\.[a-z0-9]+$/i)||[''])[0]),{type:r.headers.get('content-type')||''});
   }
   function cdMsg(id,t){var s=cdS(id);s.msg=t;var e=document.getElementById('cdMsg_'+id);if(e)e.textContent=t;}
