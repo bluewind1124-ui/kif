@@ -185,7 +185,10 @@
     if(!M){step('새 자료에서 단위별 쪽을 찾는 중…');M=await mapPages({tool:o.tool,units:U,pages:o.pages,base:o.base,ask:o.ask});}
     var res=o.res||{},todo=U.filter(function(u){return !o.only||o.only.indexOf(u.id)>-1;}),done=0,i=0,conc=Math.max(1,o.conc||3);
     step('단위 '+todo.length+'개를 읽는 중… (0/'+todo.length+')');
-    async function worker(){while(i<todo.length){var u=todo[i++];res[u.id]=await runUnit(o,u,M.map);done++;step('단위 '+todo.length+'개를 읽는 중… ('+done+'/'+todo.length+')');if(o.tick)o.tick(u,res[u.id]);}}
+    async function worker(){while(i<todo.length){var u=todo[i++];res[u.id]=await runUnit(o,u,M.map);
+      /* AI가 고른 쪽에서 「없다」고 하면, 표 제목·상품 이름으로 찾은 다른 쪽으로 한 번 더 읽는다 */
+      if(res[u.id].none&&o.pages.length){var g=guessUnit(o.pages,o.base,u),was=(M.map[u.id]||[]).join(',');if(g.length&&g.join(',')!==was){var m2={};m2[u.id]=g;var r2=await runUnit(o,u,m2);if(r2.ok||!r2.none)res[u.id]=r2;}}
+      done++;step('단위 '+todo.length+'개를 읽는 중… ('+done+'/'+todo.length+')');if(o.tick)o.tick(u,res[u.id]);}}
     var W=[];for(var k=0;k<Math.min(conc,todo.length);k++)W.push(worker());await Promise.all(W);
     return {units:U,map:M,res:res};
   }
