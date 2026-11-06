@@ -57,12 +57,39 @@
     else if(isObj(v))Object.keys(v).forEach(function(k){if(/[가-힣]/.test(k))words(k,acc);words(v[k],acc);});
     return acc;
   }
-  function guess(pages,val,max){
-    var W=Object.keys(words(val)).slice(0,400);if(!W.length||!pages.length)return [];
-    var sc=pages.map(function(p,i){var t=p.text,s=0;W.forEach(function(w){if(t.indexOf(w)>-1)s++;});return {i:i,s:s};});
-    var top=sc.slice().sort(function(a,b){return b.s-a.s;}),best=top[0].s;if(!best)return [];
+  /* 단위 안의 제목(title·label) 글자 — 쪽 맨 위 제목 줄과 맞춰 볼 때 쓴다 */
+  function titles(v,acc,d){
+    acc=acc||[];d=d||0;if(d>3||v==null||typeof v!=='object')return acc;
+    if(Array.isArray(v)){if(d<1)v.slice(0,3).forEach(function(x){titles(x,acc,d+1);});return acc;}
+    if(typeof v.title==='string')acc.push(v.title);
+    Object.keys(v).forEach(function(k){if(k!=='rows'&&k!=='vals')titles(v[k],acc,d+1);});
+    return acc;
+  }
+  /* 여러 쪽에 다 나오는 말(회사 이름 등)은 가볍게, 몇 쪽에만 나오는 말은 무겁게 센다.
+     쪽 맨 위 3줄(표 제목)에 단위 제목의 말이 나오면 더 크게 센다 — 예전에는 회사 이름이 많은 쪽을 모든 단위에 골랐다 */
+  function guess(pages,val,max,extra){
+    var W=Object.keys(words(val)).slice(0,600),T=Object.keys(words(titles(val).concat(extra||[])));
+    if(!(W.length||T.length)||!pages.length)return [];
+    var N=pages.length,heads=pages.map(function(p){return head(p.text,3);}),df={};
+    W.concat(T).forEach(function(w){if(df[w]!=null)return;var c=0;pages.forEach(function(p){if(p.text.indexOf(w)>-1)c++;});df[w]=c;});
+    var idf=function(w){return Math.log((N+1)/(df[w]+0.5));};
+    var sc=pages.map(function(p,i){var t=p.text,s=0;
+      W.forEach(function(w){if(df[w]&&df[w]<N*0.7&&t.indexOf(w)>-1)s+=idf(w);});
+      T.forEach(function(w){if(df[w]&&heads[i].indexOf(w)>-1)s+=6*idf(w);});
+      return {i:i,s:s};});
+    var top=sc.slice().sort(function(a,b){return b.s-a.s;}),best=top[0].s;if(!(best>0))return [];
     return top.filter(function(x){return x.s>=best*0.6;}).slice(0,max||4).map(function(x){return x.i;}).sort(function(a,b){return a-b;});
   }
+  /* 단위 위쪽(구분 등)의 제목 — 긴 목록을 나눈 묶음에는 제목이 없어서 */
+  function upTitles(base,u){var v=base,t=[];u.path.forEach(function(k){v=v==null?undefined:v[k];if(isObj(v)&&typeof v.title==='string')t.push(v.title);});return t;}
+  /* 단위에 구분(표)이 여러 개 묶여 있으면 구분마다 따로 찾아 합친다 */
+  function guessUnit(P,base,u){
+    var v=pick(base,u),up=upTitles(base,u),kids=isObj(v)?Object.keys(v).filter(function(k){return isObj(v[k])&&typeof v[k].title==='string';}):[],out=[];
+    if(kids.length>1)kids.forEach(function(k){guess(P,v[k],2,[v[k].title].concat(up)).forEach(function(i){if(out.indexOf(i)<0)out.push(i);});});
+    else out=guess(P,v,4,[u.label].concat(up));
+    return out.sort(function(a,b){return a-b;}).slice(0,6).map(function(i){return P[i].n;});
+  }
+  function unitHint(base,u){var t=upTitles(base,u).concat(titles(pick(base,u))).filter(function(x,i,a){return x&&a.indexOf(x)===i;}).slice(0,4);return t.length?' (표 제목: '+t.join(' / ')+')':'';}
   async function mapPages(o){
     var U=o.units,P=o.pages,res={map:{},month:'',upd:'',by:'guess'};
     if(P.length>1&&o.ask){
@@ -70,14 +97,14 @@
         var q='너는 보험 비교 자료 편집자다. 「'+o.tool+'」 비교 도구에 쓸 새 자료(쪽마다 첫 몇 줄만 보여 줌)와, 도구 데이터의 단위 목록이 있다.\n'+
           '단위마다 그 내용(회사·상품별 보험료·환급률·조건 등)이 실린 쪽 번호를 골라라. 한 단위에 여러 쪽이어도 된다(최대 6쪽). 해당 쪽이 없으면 빈 배열.\n'+
           '답은 JSON 하나: {"month":"자료 기준월 YYYY.MM (모르면 빈 문자열)","upd":"자료에 적힌 기준일·U/W 기준일 YYYY.MM.DD (모르면 빈 문자열)","map":{"u0":[쪽 번호,…],…}}\n\n'+
-          '단위 목록:\n'+U.map(function(u){return u.id+': '+u.label;}).join('\n')+'\n\n쪽 목록:\n'+P.map(function(p){return '['+p.n+'쪽] '+head(p.text);}).join('\n');
+          '단위 목록:\n'+U.map(function(u){return u.id+': '+u.label+unitHint(o.base,u);}).join('\n')+'\n\n쪽 목록:\n'+P.map(function(p){return '['+p.n+'쪽] '+head(p.text);}).join('\n');
         var r=await o.ask(q,'');
         if(r&&isObj(r.map)){Object.keys(r.map).forEach(function(k){var a=[].concat(r.map[k]||[]).map(function(x){return parseInt(x,10);}).filter(function(x){return x>0&&x<=P.length;});if(a.length){res.map[k]=a.slice(0,6);res.by='ai';}});}
         if(r&&/^20\d{2}\.\d{2}$/.test(r.month||''))res.month=r.month;
         if(r&&/^20\d{2}\.\d{2}\.\d{2}$/.test(r.upd||''))res.upd=r.upd;
       }catch(e){res.err=e;}
     }
-    U.forEach(function(u){if(!res.map[u.id]){var g=guess(P,pick(o.base,u),4);res.map[u.id]=g.map(function(i){return P[i].n;});}});
+    U.forEach(function(u){if(!res.map[u.id])res.map[u.id]=guessUnit(P,o.base,u);});
     return res;
   }
 
@@ -98,6 +125,21 @@
   function rowKey(x){if(!isObj(x))return '';return x.id!=null?'id:'+x.id:x.key!=null?'key:'+x.key:(x.co!=null||x.prod!=null)?'cp:'+x.co+'|'+x.prod+'|'+(x.age||''):x.label!=null?'l:'+x.label:x.l!=null?'l:'+x.l:x.title!=null?'t:'+x.title:'';}
   function sameRow(oldA,x){var k=rowKey(x);if(!k)return null;for(var i=0;i<oldA.length;i++)if(rowKey(oldA[i])===k)return oldA[i];return null;}
   function shape(x){return Array.isArray(x)?'arr':isObj(x)?'obj':typeof x;}
+  /* AI가 {"v":…}로 감싸지 않고 데이터만 보내거나 다른 이름으로 감싸 보내도 받아 준다.
+     예전에는 이런 답을 모두 「새 자료에 이 부분이 없다」로 처리해 단위가 하나도 안 바뀌었다 */
+  function unwrap(r,old){
+    if(r==null)return {};
+    if(Array.isArray(r))return Array.isArray(old)?{v:r}:{};
+    if(!isObj(r))return {};
+    if(r.v!=null)return {v:r.v};
+    if(r.none===true||r.none==='true')return {none:true};
+    var alt=['value','data','result','json','answer','fixed','new'];
+    for(var i=0;i<alt.length;i++)if(r[alt[i]]!=null&&shape(r[alt[i]])===shape(old))return {v:r[alt[i]]};
+    if(isObj(old)){var ok=Object.keys(old),hit=ok.filter(function(k){return k in r;}).length;if(ok.length&&hit>=Math.ceil(ok.length/2))return {v:r};}
+    var ks=Object.keys(r).filter(function(k){return k!=='none';});
+    if(ks.length===1&&shape(r[ks[0]])===shape(old))return {v:r[ks[0]]};
+    return {};
+  }
   function prompt(o,u,old,text){
     var many=u.parts>1;
     return '너는 보험 GA(한국보험금융) 상품 비교 자료 편집자다. FC 포털 「'+o.tool+'」 비교 도구 데이터의 한 부분('+u.label+')을 이번 달 새 자료로 고쳐라.\n'+
@@ -118,13 +160,18 @@
   async function runUnit(o,u,map){
     var old=pick(o.base,u),nums=(map&&map[u.id])||[],text=o.pages.length?pagesText(o.pages,nums):'';
     if(o.pages.length&&!text.trim())return {ok:false,none:true,err:'새 자료에서 이 부분의 쪽을 찾지 못했습니다'};
-    var r,tries=0;
+    var r,tries=0,q=prompt(o,u,old,text),w;
     for(;;){
-      try{r=await o.ask(prompt(o,u,old,text),text);break;}
+      try{r=await o.ask(q,text);}
       catch(e){if(tries++<1&&e&&(e.code==='rate_limited'||e.code==='bad_json'||e.code==='network')){await new Promise(function(s){setTimeout(s,e.code==='rate_limited'?8000:1500);});continue;}
         return {ok:false,err:(o.err?o.err(e):(e&&e.message)||String(e))};}
+      w=unwrap(r,old);
+      if(w.v==null&&!w.none&&tries++<1){q=prompt(o,u,old,text)+'\n\n[다시 요청] 앞의 답에서 고친 데이터를 찾지 못했다. 반드시 {"v": 고친 데이터} 모양 JSON 하나로만 답하라.';continue;}
+      break;
     }
-    if(!r||r.none||r.v==null)return {ok:false,none:true,err:'새 자료에 이 부분이 없다고 했습니다 (지난 값 유지)',pages:nums};
+    if(w.none)return {ok:false,none:true,err:'새 자료에 이 부분이 없다고 했습니다 (지난 값 유지)',pages:nums};
+    if(w.v==null)return {ok:false,err:'AI 답에서 고친 데이터를 찾지 못했습니다 (지난 값 유지) — 「다시 읽기」를 눌러 주세요',pages:nums};
+    r={v:w.v};
     var v=r.v;if(shape(v)!==shape(old))return {ok:false,err:'AI 답의 모양이 지난 데이터와 다릅니다',pages:nums};
     v=coerce(old,v);var miss=[];
     if(Array.isArray(v))v=v.map(function(x,i){return fill(sameRow(old,x),x,[String(i)],miss);});else v=fill(old,v,[],miss);
@@ -168,6 +215,6 @@
     Object.keys(A).forEach(function(k){if(k!=='__rows'&&!(k in B))rm++;});
     return {changed:ch,added:ad,removed:rm,rowsOld:A.__rows||0,rowsNew:B.__rows||0};
   }
-  root.KIFCMPAI={LIM:LIM,units:units,label:label,pick:pick,mapPages:mapPages,guess:guess,run:run,runUnit:runUnit,merge:merge,stat:stat,size:size};
+  root.KIFCMPAI={LIM:LIM,units:units,label:label,pick:pick,mapPages:mapPages,guess:guess,guessUnit:guessUnit,unwrap:unwrap,run:run,runUnit:runUnit,merge:merge,stat:stat,size:size};
   if(typeof module!=='undefined')module.exports=root.KIFCMPAI;
 })(typeof window!=='undefined'?window:globalThis);
