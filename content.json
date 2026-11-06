@@ -3028,10 +3028,22 @@
   "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3.pptx": "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3_thumb.jpg",
   "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pptx": "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4_thumb.jpg",
   "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3.pdf": "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3_thumb.jpg",
-  "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pdf": "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4_thumb.jpg"
+  "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pdf": "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4_thumb.jpg",
+  "files/cmpdata/2026-11/상품비교_가이드북_생명보험_11.04_n7k2q.pdf": "files/cmpdata/2026-11/상품비교_가이드북_생명보험_11.04_n7k2q_thumb.jpg"
  },
  "views": {
   "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3.pptx": "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3.pdf",
   "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pptx": "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pdf"
+ },
+ "cmpdata": {
+  "life": {
+   "month": "2026.11",
+   "upd": "2026.11.04",
+   "title": "상품비교 가이드북 생명보험 11.04",
+   "file": "files/cmpdata/2026-11/상품비교_가이드북_생명보험_11.04_n7k2q.pdf",
+   "data": "classic/data/life.json",
+   "ver": "1793925897243",
+   "at": "2026-11-06"
+  }
  }
 }
