@@ -969,6 +969,23 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .hm-vs{max-height:300px;overflow-y:auto;scrollbar-width:thin}.hm-vs.sm{max-height:170px}.hm-vs thead th{position:sticky;top:0;z-index:1}
 @media (max-width:900px){.hm-rail{grid-auto-columns:calc((100% - 16px)/3)}}@media (max-width:600px){.hm-rail{grid-auto-columns:calc((100% - 8px)/2)}.hm-lrail{grid-auto-columns:85%}}
 .hm-two{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;align-items:stretch}
+.hm-go{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.3fr);gap:16px;align-items:stretch}
+.hg-col{display:flex;flex-direction:column;min-width:0}
+.hg-box{border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(15,35,64,.06)}
+.hg-cmp{background:linear-gradient(160deg,#16294a,#0f2240);color:#fff;border:1px solid #0f2240}
+.hg-ai{background:linear-gradient(120deg,#1d3557,#0f2240 70%);color:#fff;border:1px solid #0f2240;border-radius:12px 12px 0 0}
+.hg-top{display:flex;gap:14px;align-items:flex-start}
+.hg-i{flex:none;width:48px;height:48px;border-radius:12px;background:rgba(230,207,151,.16);color:var(--kgold-2,#e6cf97);display:grid;place-items:center}.hg-i svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.hg-k{display:block;font-size:.78rem;color:var(--kgold-2,#e6cf97);letter-spacing:.04em}
+.hg-box h2{margin:2px 0 4px;font-size:1.45rem;color:#fff}.hg-box p{margin:0;font-size:.88rem;color:#cdd6e4;line-height:1.5}
+.hg-chips{display:flex;flex-wrap:wrap;gap:6px}
+.hg-chips button{font:inherit;font-size:.8rem;padding:5px 10px;border-radius:999px;border:1px solid rgba(230,207,151,.45);background:rgba(255,255,255,.06);color:#f3e7c7;cursor:pointer}
+.hg-chips button:hover{background:rgba(230,207,151,.2)}
+.hg-cmp .hg-btn{margin-top:auto;align-self:flex-start}
+.hg-two{display:flex;gap:8px;flex-wrap:wrap}
+.hg-ai .btn:not(.gold){background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.35)}
+.hg-smp{border-top:3px solid var(--kgold,#cd9b34);border-radius:0 0 12px 12px;margin:0;flex:1}
+@media (max-width:860px){.hm-go{grid-template-columns:1fr}}
 .hm-colr{grid-template-rows:auto 1fr}.hm-colr .hm-tools{grid-auto-rows:1fr;align-content:stretch}
 .hm-colr .hm-tool{flex-direction:column;justify-content:center;text-align:center;padding:20px 16px}.hm-colr .hm-tool .tt{flex:none}.hm-colr .hm-tool .ti{width:56px;height:56px}.hm-colr .hm-tool .ti svg{width:28px;height:28px}
 .hm-rail,.hm-lrail{scrollbar-width:none}.hm-rail::-webkit-scrollbar,.hm-lrail::-webkit-scrollbar{display:none}
@@ -1494,6 +1511,15 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         return '<tr><td><b>'+E(m.co)+'</b></td><td>'+(m.title?fileA(n[3],E(t)):E(t))+'</td><td>'+(m.ym?E(m.ym)+' '+(m.wk?m.wk+'주차':'월간'):'')+'</td><td class="r">'+E(String(n[0]||'').slice(5))+'</td></tr>';}).join('');
       var ar=AWARDS.map(function(a){var n=a[3]==='진행 중'?dleft(a[1]):null;
         return '<li data-go="award">'+ic('cup','li-i')+'<span class="t">'+E(a[0])+'</span>'+(a[3]==='진행 중'?'<span class="aw-dd">'+dd(n)+'</span>':'<span class="aw-dd done">'+E(a[3])+'</span>')+'</li>';}).join('');
+      /* 바로 들어가기: 상품 비교 · AI보장분석(기본형·고급형) + 바로 아래 AI 보장분석 샘플 — 보험사 소식지 위 */
+      var CT=cmpOn().slice(0,6);
+      h+='<section class="hm-go" id="hmGo">'+
+        '<div class="hg-box hg-cmp"><div class="hg-top">'+'<span class="hg-i">'+ic('bars')+'</span>'+'<div><span class="hg-k">영업 도구</span><h2>상품 비교</h2><p>보험사 상품을 한눈에 비교하고 1·2·3위를 바로 확인합니다.</p></div></div>'+
+          (CT.length?'<div class="hg-chips">'+CT.map(function(t){return '<button type="button" data-cmpo="'+E(t.id)+'">'+E(t.title)+'</button>';}).join('')+'</div>':'')+
+          '<button class="btn gold hg-btn" type="button" data-go="compare">상품 비교 들어가기 ›</button></div>'+
+        '<div class="hg-col"><div class="hg-box hg-ai"><div class="hg-top">'+'<span class="hg-i">'+ic('scan')+'</span>'+'<div><span class="hg-k">영업 도구</span><h2>AI보장분석</h2><p>증권·가입설계서를 AI가 읽어 보장분석표·리포트·제안서까지 만듭니다.</p></div></div>'+
+          '<div class="hg-two"><button class="btn gold" type="button" data-go="ai">기본형 들어가기 ›</button><button class="btn" type="button" data-go="ai2">고급형 들어가기 ›</button></div></div>'+
+          '<div class="panel smp-home hg-smp">'+smpHome()+'</div></div></section>';
       h+='<section class="hm-two"><div class="panel"><h3>보험사 소식지 <button class="more" data-go="news">전체 '+NEWS.length+'건 보기 ›</button></h3>'+
         '<div class="tbl hm-tbl hm-vs"><table><thead><tr><th>보험사</th><th>자료명</th><th>구분</th><th class="r">등록일</th></tr></thead><tbody>'+nr+'</tbody></table></div></div>'+
         '<div class="panel"><h3>시상 · 공지 <button class="more" data-go="award">전체 보기 ›</button></h3><ul class="hm-aw hm-vs sm">'+ar+'</ul><div class="hm-nt"><b>본사 공지</b><ul class="list noticeList hm-vs sm"></ul></div></div></section>';
@@ -1503,7 +1529,6 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<div class="hm-col hm-colr"><div class="panel"><h3>교육센터 새 강의 '+(LECT_AT?'<span class="note">'+E(LECT_AT)+' 확인</span> ':'')+''+railNav('railLect',LECT.length>4)+'<button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects hm-lrail" id="railLect">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E([l[3],l[2]].filter(Boolean).join(' · '))+'</i></div></a>';}).join('')+'</div>'+sbar('railLect')+'</div></div></section>';
       /* 홈 도구 카드: 교육 자료 아래에 약관 분석(policy.js) · 금융계산기 · 언더라이팅 인수기준을 한 줄씩 가로로 길게 */
       h+='<section class="hm-tools wide" id="hmTools">'+(window.KIFPOL?KIFPOL.card():'')+calcCard()+uwCard()+'</section>';
-      h+='<section class="panel smp-home">'+smpHome()+'</section>';
       h+='<footer class="pfoot">한국보험금융(주) 한보금on 활동지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
       return '<div class="hm">'+h+'</div>';
     },
