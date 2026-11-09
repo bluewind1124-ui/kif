@@ -20,7 +20,7 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-11-09.2">
+<meta name="kif-build" content="2026-11-09.15">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -2107,7 +2107,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       concept:{month:v('kMonth'),title:v('kTitle'),target:v('kTarget'),product:v('kProduct'),desc:v('kDesc'),steps:v('kSteps').split('\n').map(function(x){return x.trim();}).filter(Boolean),mats:rows(v('kMats'),3),file:CONCEPT.file||''},
       banner:{title:v('bTitle'),sub:v('bSub')},
       aiProxy:v('mProxy'),aiProxyFor:(document.getElementById('mProxyFor')||{}).value==='admin'?'admin':'all',aiRules:(v('mRules')&&window.AIMOD&&AIMOD.defRules&&v('mRules')!==AIMOD.defRules())?v('mRules'):((SITE&&SITE.aiRules)&&v('mRules')?v('mRules'):undefined),authApi:(SITE&&SITE.authApi)||'',sangjo:(SITE&&SITE.sangjo)||undefined,car:(SITE&&SITE.car)||undefined,aiModels:{claude:v('mClaude'),openai:v('mOpenai'),gemini:v('mGemini')}};
-    ['compare','off','concepts','aiSamples','boards','onepick','onepicks','cmpdata','uwdata','thumbs'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
+    ['compare','off','concepts','aiSamples','boards','onepick','onepicks','cmpdata','uwdata','thumbs','views','thumbsRedo'].forEach(function(k){if(SITE&&SITE[k]!==undefined&&c[k]===undefined)c[k]=SITE[k];});
     (c.hypo||[]).forEach(function(r){var o=(HYPO||[]).filter(function(x){return x[0]===r[0]&&Array.isArray(x[4]);})[0];if(o){while(r.length<4)r.push('');r[4]=o[4];}});
     var ck=document.getElementById('cOpts');
     if(ck&&ck.checked&&window.AIMOD&&AIMOD.getOpts){c.opts=AIMOD.getOpts();c.optsVer=c.ver;}
@@ -2547,6 +2547,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         nuMerge(cur,list);var gn=cur._gone||[];delete cur._gone;
         gn.forEach(function(f){if(have[f])tree.push({path:f,mode:'100644',type:'blob',sha:null});});
         cur.thumbs=cur.thumbs||{};list.forEach(function(x){if(x.thumb)cur.thumbs[x.path]=x.thumb;});
+        /* PPT·엑셀·워드: 서버가 3~5분 안에 화면용 PDF와 진짜 첫 장 그림을 자동으로 만든다(.github/workflows/ppt-view.yml) */
+        list.forEach(function(x){if(/\.(pptx?|docx?|xlsx?)$/i.test(x.path)){cur.thumbsRedo=cur.thumbsRedo||[];if(cur.thumbsRedo.indexOf(x.path)<0)cur.thumbsRedo.push(x.path);}});
         /* 보관 기간이 지난 소식지·공지 정리 (올린 파일이 있는 줄만) */
         var cutD=keepCut(),dn=0;
         ['news','notices'].forEach(function(k){var fi=k==='news'?3:2;
@@ -2556,7 +2558,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       var cur=land.cur,del=land.out||0;
       NU.items.forEach(function(x){URL.revokeObjectURL(x.url);});NU.items=[];
       applyContent(cur,false);nuRefreshCms();
-      msg.textContent='✓ 저장 완료: '+what+(del?' (보관 기간이 지난 '+del+'건 정리)':'')+' · 아래 목록에 바로 들어갔고, 모든 FC 화면에는 1~2분 뒤 보입니다.';
+      msg.textContent='✓ 저장 완료: '+what+(del?' (보관 기간이 지난 '+del+'건 정리)':'')+' · 아래 목록에 바로 들어갔고, 모든 FC 화면에는 1~2분 뒤 보입니다.'+(list.some(function(x){return /\.(pptx?|docx?|xlsx?)$/i.test(x.path);})?' PPT·엑셀·워드는 3~5분 뒤 화면용 PDF가 자동으로 만들어져 바로 열립니다.':'');
       KS.done(what+(del?' · 지난 자료 '+del+'건 정리':''),cur);okk=true;cmAfterNu();
     }catch(e){msg.textContent='올리기 실패: '+(e.message||e)+' — 사이트는 바뀌지 않았습니다. 다시 시도하세요.';KS.fail(lab,e);}
     NU.busy=false;nuRender();return okk;
@@ -3431,12 +3433,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function matTwin(m,test){return MATS.filter(function(x){return x!==m&&x[4]&&x[1]===m[1]&&test(x[4]);})[0]||null;}
   function matsShown(){return MATS.filter(function(m){return !(isPpt(m[4])&&matTwin(m,isPdf));});}
   function openMat(i,from){
-    var m=Array.isArray(i)?i:MATS[i];if(!m||!m[4])return;var f=m[4],VW=(SITE&&SITE.views)||{},pdfM=isPpt(f)||isDoc(f)?(matTwin(m,isPdf)||(VW[f]?[m[0],m[1],'','',VW[f]]:null)):null,show=pdfM?pdfM[4]:f,orig=isPdf(show)?(matTwin(m,isPpt)||(isPpt(f)||isDoc(f)?m:null)):null;
+    var m=Array.isArray(i)?i:MATS[i];if(!m||!m[4])return;var f=m[4],VW=(SITE&&SITE.views)||{},pdfM=isPpt(f)||isDoc(f)||isXls(f)?((isXls(f)?null:matTwin(m,isPdf))||(VW[f]?[m[0],m[1],'','',VW[f]]:null)):null,show=pdfM?pdfM[4]:f,orig=isPdf(show)?(matTwin(m,isPpt)||(isPpt(f)||isDoc(f)||isXls(f)?m:null)):null;
     var abs=function(x){return new URL(fileHref(x),location.href).href;};
     var w=document.createElement('div');w.className='mview';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label',m[1]);
     w.innerHTML='<div class="mvh"><b>'+esc(m[1])+'</b><span class="note" data-v="pg"></span><span class="sp"></span>'+
       '<a class="btn sm ghost" target="_blank" rel="noopener" href="'+fileHref(show)+'">새 창으로 ↗</a>'+
-      (orig?'<a class="btn sm ghost" download href="'+fileHref(orig[4])+'">원본 '+(isDoc(orig[4])?'Word':'PPT')+' 받기</a>':'')+(from>1&&isPdf(show)?'<button class="btn sm ghost" type="button" data-v="all">처음부터 보기</button>':'')+
+      (orig?'<a class="btn sm ghost" download href="'+fileHref(orig[4])+'">원본 '+(isDoc(orig[4])?'Word':isXls(orig[4])?'엑셀':'PPT')+' 받기</a>':'')+(from>1&&isPdf(show)?'<button class="btn sm ghost" type="button" data-v="all">처음부터 보기</button>':'')+
       '<button class="btn sm" type="button" data-v="x">닫기 ✕</button></div><div class="mvb" data-v="b"></div>';
     document.body.appendChild(w);var prevOv=document.body.style.overflow;document.body.style.overflow='hidden';
     var B=w.querySelector('[data-v="b"]'),pg=w.querySelector('[data-v="pg"]'),alive=true;
@@ -3453,7 +3455,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       return;}
     if(isPpt(show)||isDoc(show)){
       /* Office 보기 화면은 10MB가 넘는 PPT를 열지 못하고 오류를 낸다 → 크기를 먼저 보고, 크면 안내와 내려받기 단추를 보여 준다 */
-      var big=function(){B.innerHTML='<div class="mv-big"><b>파일이 커서 화면에서 바로 열 수 없습니다.</b><p>아래 단추로 내려받아 PowerPoint·Word에서 보세요. 관리자가 같은 제목의 PDF를 함께 올리면 여기서 바로 보입니다.</p><a class="btn gold" download href="'+fileHref(show)+'">원본 내려받기</a></div>';pg.textContent='';};
+      var big=function(){B.innerHTML='<div class="mv-big"><b>화면용 PDF를 자동으로 만드는 중입니다.</b><p>PPT·엑셀·워드를 올리면 3~5분 안에 화면에서 바로 보이는 PDF가 저절로 만들어집니다. 잠시 뒤 다시 열어 주세요. 지금 바로 보려면 아래 단추로 원본을 내려받으세요.</p><a class="btn gold" download href="'+fileHref(show)+'">원본 내려받기</a></div>';pg.textContent='';};
       var office=function(){B.classList.add('full');B.innerHTML='<iframe title="'+esc(m[1])+'" src="https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(abs(show))+'"></iframe>';
         pg.textContent='파일이 안 보이면 「새 창으로」를 눌러 내려받으세요.';};
       pg.textContent='불러오는 중…';
