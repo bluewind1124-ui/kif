@@ -31,7 +31,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<script src="../ai-connect.js?v=20261106a"></script>
+<script src="../ai-connect.js?v=20261109a"></script>
 <script src="../archive.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <!--
@@ -49,7 +49,7 @@
   데이터 모델 (localStorage key: "cov-planner-v1")
     store = {
       clients:[{ id, updated, comment,
-                 customer:{name, age, sex, job, income(만원/년), expense(만원/월), debt(만원), assets(만원), spouse:bool, kids:number, parents:bool, memo},
+                 customer:{name, birth(YYYY-MM-DD), age, sex, sido, sigungu, dong, income(만원/년), expense(만원/월), debt(만원), assets(만원), spouse:bool, kids:number, parents:bool, memo},
                  policies:[{ id, company, product, type, insured, premium(원/월), start, coverEnd(세), renew:bool,
                              covers:[{cat, amt(만원; 입원일당=만원/일; 실손=1)}] }] }],
       currentId, criteria:{...}, requests:[...], consultant:{name, org, phone}
@@ -538,9 +538,12 @@ body.pp-presenting .top{display:none}
           <div class="panel-h"><h2>고객 정보</h2><span class="sub">권장 보장금액 계산에 쓰입니다</span></div>
           <div class="grid g4" id="custForm">
             <label class="f">이름<input type="text" id="c-name" data-k="name"></label>
-            <label class="f">나이<div class="unit"><input type="number" id="c-age" data-k="age" min="0" max="110"><em>세</em></div></label>
+            <label class="f">생년월일<input type="date" id="c-birth" data-k="birth"></label>
+            <label class="f">나이(자동)<div class="unit"><input type="number" id="c-age" data-k="age" min="0" max="110"><em>세</em></div></label>
             <label class="f">성별<select id="c-sex" data-k="sex"><option value="">선택</option><option>남</option><option>여</option></select></label>
-            <label class="f">직업<input type="text" id="c-job" data-k="job"></label>
+            <label class="f">시·도<input type="text" id="c-sido" data-k="sido" placeholder="예: 서울특별시" autocomplete="off"></label>
+            <label class="f">시·군·구<input type="text" id="c-sigungu" data-k="sigungu" placeholder="예: 강남구" autocomplete="off"></label>
+            <label class="f">읍·면·동<input type="text" id="c-dong" data-k="dong" placeholder="예: 역삼동" autocomplete="off"></label>
             <label class="f">연소득<div class="unit"><input type="number" id="c-income" data-k="income" min="0"><em>만원</em></div></label>
             <label class="f">월 생활비<div class="unit"><input type="number" id="c-expense" data-k="expense" min="0"><em>만원</em></div></label>
             <label class="f">대출 잔액<div class="unit"><input type="number" id="c-debt" data-k="debt" min="0"><em>만원</em></div></label>
@@ -551,6 +554,7 @@ body.pp-presenting .top{display:none}
             <label class="chk" style="gap:8px">자녀 <input type="number" id="c-kids" data-k="kids" min="0" max="10" style="width:64px">명</label>
             <label class="chk"><input type="checkbox" id="c-parents" data-k="parents">부모님 부양</label>
           </div>
+          <p class="small muted" style="margin:10px 0 0">🔒 개인정보 보호: 고객 정보는 <b>이름·생년월일·성별·시/구/동</b>까지만 받습니다. 주민번호·연락처·상세주소는 적지 마세요(메모 포함).</p>
           <label class="f" style="margin-top:12px">상담 메모<textarea id="c-memo" data-k="memo" rows="2" placeholder="고객 관심사, 건강 이력, 다음 연락 계획 등"></textarea></label>
         </div>
 
@@ -821,7 +825,7 @@ function sampleClient(){
   return {
     id: uid(), example:true, updated: Date.now(),
     comment: '사망보장이 가족 생활비와 대출을 감당하기에 부족합니다. 1순위로 정기보험 추가를 검토하고, 뇌혈관·심장 진단비는 기존 건강보험 특약 변경으로 맞추는 방안을 비교해 드리겠습니다.',
-    customer: {name:'김민준(예시)', age:42, sex:'남', job:'회사원(제조업 과장)', income:6200, expense:380, debt:21000, assets:4500, spouse:true, kids:2, parents:false, memo:'아내 전업주부, 자녀 초3·중1. 작년 건강검진에서 고지혈증 소견.'},
+    customer: {name:'김민준(예시)', birth:'1984-05-20', age:42, sex:'남', sido:'경기도', sigungu:'수원시 영통구', dong:'매탄동', income:6200, expense:380, debt:21000, assets:4500, spouse:true, kids:2, parents:false, memo:'아내 전업주부, 자녀 초3·중1. 작년 건강검진에서 고지혈증 소견.'},
     policies: [
       {id:uid(), company:'한빛생명', product:'(무)든든종신보험', type:'종신', insured:'본인', premium:125000, start:'2015-03-02', coverEnd:100, renew:false,
         covers:[{cat:'death',amt:10000},{cat:'death_d',amt:10000},{cat:'cancer',amt:1000}]},
@@ -846,10 +850,21 @@ function load(){
   try{ const raw = localStorage.getItem(KEY); if(raw){ const s = JSON.parse(raw); if(s && Array.isArray(s.clients)) return normalize(s); } }catch(e){}
   return freshStore();
 }
+/* 개인정보 줄이기(2026-11-09 사용자 결정): 고객 정보는 이름·생년월일·성별·시/구/동만. 예전 기록의 직업·연락처 등은 지운다 */
+function ageFrom(b){ const m=String(b||'').match(/^(\d{4})-(\d{2})-(\d{2})$/); if(!m) return ''; const t=new Date(); let a=t.getFullYear()-(+m[1]); if(t.getMonth()+1<+m[2]||(t.getMonth()+1===+m[2]&&t.getDate()<+m[3])) a--; return a>=0&&a<120?a:''; }
+function slimClient(c){
+  const cu=c.customer=c.customer||{};
+  ['job','phone','email','addr','rrn','rrn6','rrn7'].forEach(f=>{ delete cu[f]; });
+  ['birth','sido','sigungu','dong'].forEach(f=>{ if(cu[f]==null) cu[f]=''; });
+  if(cu.birth){ const a=ageFrom(cu.birth); if(a!=='') cu.age=a; }
+  if(c.plans) ['coverage','pension','asset'].forEach(k=>{ if(c.plans[k]) delete c.plans[k].job; });
+  return c;
+}
 function normalize(s){
   s.criteria = Object.assign(clone(DEFAULT_CRIT), s.criteria||{});
   s.requests = s.requests||[]; s.consultant = s.consultant||{name:'',org:'',phone:''};
   if(!s.clients.length){ const c=sampleClient(); s.clients=[c]; }
+  s.clients.forEach(slimClient);
   if(!s.clients.find(c=>c.id===s.currentId)) s.currentId = s.clients[0].id;
   return s;
 }
@@ -1021,7 +1036,7 @@ function renderClientSel(){
 $('#clientSel').addEventListener('change',e=>{ store.currentId=e.target.value; save(); go(view==='diag'||view==='inbox'||view==='criteria'?'plan':view); });
 $('#btnNewClient').addEventListener('click',()=>{ newClient({}); go('plan'); });
 function newClient(cu){
-  const c = {id:uid(), updated:Date.now(), comment:'', customer:Object.assign({name:'새 고객', age:'', sex:'', job:'', income:'', expense:'', debt:'', assets:'', spouse:false, kids:0, parents:false, memo:''}, cu), policies:[]};
+  const c = {id:uid(), updated:Date.now(), comment:'', customer:Object.assign({name:'새 고객', birth:'', age:'', sex:'', sido:'', sigungu:'', dong:'', income:'', expense:'', debt:'', assets:'', spouse:false, kids:0, parents:false, memo:''}, cu), policies:[]};
   store.clients.push(c); store.currentId=c.id; save(); renderClientSel(); return c;
 }
 let delArm=0;
@@ -1237,11 +1252,14 @@ function renderCustomer(){
     if(el.type==='checkbox') el.checked=!!cu[k]; else el.value = cu[k]==null?'':cu[k];
   });
 }
+$('#v-analysis').addEventListener('change',e=>{ const el=e.target, k=el.dataset&&el.dataset.k; if(k==='sido'||k==='sigungu'||k==='dong') el.value=cur().customer[k]||''; });
 $('#v-analysis').addEventListener('input',e=>{
   const el=e.target;
   if(el.dataset.k){
     const cu=cur().customer, k=el.dataset.k;
     cu[k] = el.type==='checkbox' ? el.checked : (el.type==='number' ? (el.value===''?'':n(el.value)) : el.value);
+    if(k==='birth'){ const a=ageFrom(cu.birth); if(a!=='') { cu.age=a; const ae=$('#c-age'); if(ae) ae.value=a; } }
+    if(k==='sido'||k==='sigungu'||k==='dong') cu[k]=String(cu[k]||'').replace(/[\d\-]+.*$/,'').slice(0,20);
     touch(); if(k==='name') renderClientSel(); renderAnalysis(); return;
   }
   const pid = el.dataset.p;
@@ -1465,7 +1483,7 @@ function covReportHTML(c){
   // 요약
   h+='<div class="rp-sec"><div class="rp-sum"><div class="ring">'+ringSVG(A.score,g.st)+'<div class="v"><b>'+A.score+'</b><span>보장 점수</span></div></div><div style="min-width:0">';
   h+='<span class="pill '+g.st+'">'+g.t+'</span><p style="margin-top:8px;font-size:15px;font-weight:600">'+esc(summaryLine(A))+'</p>';
-  h+='<p class="small muted" style="margin-top:6px">'+esc([cu.age?cu.age+'세':'', cu.sex, cu.job].filter(Boolean).join(' · '))+(cu.age||cu.sex||cu.job?' · ':'')+esc(fam)+(n(cu.income)?' · 연소득 '+man(cu.income)+'원':'')+(n(cu.debt)?' · 대출 '+man(cu.debt)+'원':'')+'</p>';
+  h+='<p class="small muted" style="margin-top:6px">'+esc([cu.age?cu.age+'세':'', cu.sex].filter(Boolean).join(' · '))+(cu.age||cu.sex?' · ':'')+esc(fam)+(n(cu.income)?' · 연소득 '+man(cu.income)+'원':'')+(n(cu.debt)?' · 대출 '+man(cu.debt)+'원':'')+'</p>';
   h+='<div class="kpis" style="margin-top:14px"><div class="kpi"><span>가입 계약</span><b>'+c.policies.length+'<small>건</small></b></div><div class="kpi"><span>월 보험료</span><b>'+comma(A.premium)+'<small>원</small></b></div><div class="kpi"><span>소득 대비</span><b>'+(A.pRatio!=null?A.pRatio.toFixed(1)+'<small>%</small>':'-')+'</b><small>적정 '+store.criteria.pLow+'~'+store.criteria.pHigh+'%</small></div></div>';
   h+='</div></div></div>';
   // 우선 보완
@@ -1593,8 +1611,8 @@ $('#inboxList').addEventListener('click',e=>{
     const a=r.answers||{}, fam=a.s2||[];
     const ageMap={'20대 이하':28,'30대':35,'40대':45,'50대':55,'60대 이상':65};
     const debtMap={'없다':0,'5천만원 미만':3000,'5천만~2억원':10000,'2억원 이상':20000};
-    newClient({name:r.name, age:ageMap[a.s1]||'', job:a.s3||'', debt: a.s5 in debtMap ? debtMap[a.s5] : '', spouse:fam.includes('배우자'), kids:fam.includes('자녀')?1:0, parents:fam.includes('부모님'),
-      memo:'[자가진단 '+r.score+'점 · '+r.type+']\n'+(r.signals||[]).join(', ')+'\n연락처 '+r.phone+' · '+r.time+(fam.includes('자녀')?'\n※ 자녀 수는 확인 필요':'')+(a.s5&&a.s5!=='없다'?'\n※ 대출 잔액은 응답 구간('+a.s5+') 기준 추정치':'')});
+    newClient({name:r.name, age:ageMap[a.s1]||'', debt: a.s5 in debtMap ? debtMap[a.s5] : '', spouse:fam.includes('배우자'), kids:fam.includes('자녀')?1:0, parents:fam.includes('부모님'),
+      memo:'[자가진단 '+r.score+'점 · '+r.type+']\n'+(r.signals||[]).join(', ')+'\n연락 희망 '+r.time+(fam.includes('자녀')?'\n※ 자녀 수는 확인 필요':'')+(a.s5&&a.s5!=='없다'?'\n※ 대출 잔액은 응답 구간('+a.s5+') 기준 추정치':'')});
     r.read=true; save(); updateInboxCnt(); go('analysis'); toast(r.name+' 고객을 만들었습니다. 계약을 등록하세요'); return;
   }
   save(); updateInboxCnt(); renderInbox();
@@ -1671,7 +1689,7 @@ const AGE_UNIT='세', MAN='만원', MM='만원/월', PCT='%', YR='년';
 const PLAN_FORMS = {
   coverage:{ name:'보장설계', desc:'사망·진단·수술·간병·자녀 보장', sections:[
     {t:'고객 기본', f:[
-      {k:'age',l:'나이',u:AGE_UNIT}, {k:'sex',l:'성별',t:'sel',o:['남','여']}, {k:'job',l:'직업',t:'text',ph:'간호사'}, {k:'smoke',l:'흡연',t:'sel',o:['비흡연','흡연']},
+      {k:'age',l:'나이',u:AGE_UNIT}, {k:'sex',l:'성별',t:'sel',o:['남','여']}, {k:'smoke',l:'흡연',t:'sel',o:['비흡연','흡연']},
       {k:'history',l:'최근 5년 병력',t:'sel',o:['없음','있음']}, {k:'historyMemo',l:'병력 내용',t:'text',s:2,ph:'있음일 때 병명·시기'}, {k:'earner',l:'소득 구조',t:'sel',o:['외벌이','맞벌이']},
       {k:'spouse',l:'배우자',t:'text',ph:'39세, 회사원'}, {k:'kids',l:'자녀 나이',t:'text',ph:'5, 9',hint:'쉼표로 구분'}, {k:'income',l:'연소득',u:MAN}, {k:'incomeM',l:'월소득',u:MM,hint:'비우면 연소득÷12'}]},
     {t:'사망보장 필요자금', sub:'유족이 필요한 돈 − 바로 쓸 수 있는 돈', f:[
@@ -1726,7 +1744,7 @@ const PLAN_FORMS = {
   ]},
   asset:{ name:'자산설계', desc:'자산배분·은퇴자금·절세계좌', sections:[
     {t:'고객 기본', f:[
-      {k:'age',l:'나이',u:AGE_UNIT}, {k:'sex',l:'성별',t:'sel',o:['남','여']}, {k:'job',l:'직업',t:'text',ph:'자영업(카페 운영)'}, {k:'dual',l:'소득 구조',t:'sel',o:['맞벌이','외벌이']},
+      {k:'age',l:'나이',u:AGE_UNIT}, {k:'sex',l:'성별',t:'sel',o:['남','여']}, {k:'dual',l:'소득 구조',t:'sel',o:['맞벌이','외벌이']},
       {k:'salary',l:'본인 총급여',u:MAN}, {k:'spouseIncome',l:'배우자 소득',u:MAN}, {k:'otherIncome',l:'본인 기타 종합소득',u:MAN,hint:'금융소득 외'}, {k:'kids',l:'자녀',t:'text',ph:'2명(중·고등학생)'}]},
     {t:'금융자산', f:[
       {k:'finTotal',l:'금융자산 총액',u:MAN}, {k:'pStock',l:'주식 비중',u:PCT}, {k:'pBond',l:'채권 비중',u:PCT}, {k:'pCash',l:'현금 비중',u:PCT},
@@ -1753,7 +1771,7 @@ const PLAN_FORMS = {
   ]}
 };
 const PLAN_SAMPLES = {
-  coverage:{age:37,sex:'여',job:'간호사',smoke:'비흡연',history:'없음',earner:'맞벌이',spouse:'39세, 회사원',kids:'5',income:5200,incomeM:430,
+  coverage:{age:37,sex:'여',smoke:'비흡연',history:'없음',earner:'맞벌이',spouse:'39세, 회사원',kids:'5',income:5200,incomeM:430,
     survMonthly:250,survYears:25,edu:9000,emergency:2000,mortgage:15000,mortgageYears:25,liquid:3500,exDeath:3000,
     exCancer:2000,exBrain:500,exHeart:500,silson:'3세대',budgetMin:15,budgetMax:35,payYears:20,wlPremium:28,termAge:65,termPremium:6,
     ciCost:3500,lossRate:50,recoverMonths:10,medYear:400,tgCancer:5000,tgBrain:3000,tgHeart:3000,hospDay:3,surgQual:true,hospQual:false,
@@ -1766,7 +1784,7 @@ const PLAN_SAMPLES = {
     products:[
       {type:'공시이율형',insurer:'예시생명',product:'(예시) 행복연금보험',currency:'KRW',monthly:50,payYears:10,sumInsured:50,issueAge:45,startAge:65,payout:'20년',rate:2.9,minRate:1.0,fee:0,gmab:0,expense:7,acq:50,fxIssue:'',fxPayout:'',designMonthly:'',designTotal:'',refund:'',memo:'예시 데이터 — 실제 설계서 값으로 바꾸세요'},
       {type:'달러연금',insurer:'예시생명',product:'(예시) 달러연금보험',currency:'USD',monthly:300,payYears:10,sumInsured:300,issueAge:45,startAge:65,payout:'종신',rate:3.5,minRate:1.0,fee:0,gmab:0,expense:7,acq:50,fxIssue:1380,fxPayout:1380,designMonthly:'',designTotal:'',refund:'',memo:'예시 데이터 — 환율에 따라 원화 연금이 달라집니다'}]},
-  asset:{age:47,sex:'여',job:'자영업(카페 운영)',dual:'외벌이',salary:7000,spouseIncome:0,otherIncome:1200,kids:'2명(중·고등학생)',
+  asset:{age:47,sex:'여',dual:'외벌이',salary:7000,spouseIncome:0,otherIncome:1200,kids:'2명(중·고등학생)',
     finTotal:30000,pStock:30,pBond:20,pCash:45,pAlt:5,goalAmt:6000,goalYears:5,goalIncl:true,emergency:3000,emergSep:true,
     house:70000,mortgage:18000,mortYears:15,mortRate:3.8,mortMonthly:'',npSelf:80,npStart:65,npSpouse:0,npSpouseStart:65,dcBal:0,dcYear:0,psBal:2500,
     retireAge:63,expenseRetire:350,fixedMonthly:380,saveMonthly:150,profile:'안정추구형',lifeAge:92,salaryGrowth:2,saveRatio:40,reGrowth:1.5,npGrowth:'',
@@ -3317,7 +3335,7 @@ function fillPrompt(field){
   const F=PLAN_FORMS[field], cu=cur().customer;
   let t='너는 보험 상담 자료(상담 메모, 가입설계서, 증권, 국민연금 예상액, 퇴직연금·연금저축 내역, 금융자산·대출 내역 등)를 읽어 「'+F.name+'」 입력칸을 채우는 도우미다.\n'
    +'규칙:\n- 자료에 분명히 나온 값만 적는다. 추측하거나 계산해서 만들지 말고, 없는 칸은 빼고 답한다.\n- 금액 단위를 칸에 맞춘다(만원: 5,000,000원→500, 1억→10000 / 만원/월: 월 금액). 비율은 % 숫자(4.5% → 4.5).\n- 선택칸은 주어진 보기 글자 중 하나로만 답한다.\n'
-   +'\n고객 기본 정보(참고): '+[cu.name, cu.age&&cu.age+'세', cu.sex, cu.job, cu.income&&'연소득 '+cu.income+'만원', cu.memo].filter(Boolean).join(', ')+'\n\n입력칸 목록 (코드: 이름 · 형식):\n';
+   +'\n고객 기본 정보(참고): '+[cu.name, cu.age&&cu.age+'세', cu.sex, cu.income&&'연소득 '+cu.income+'만원', cu.memo&&(KAI.scrub?KAI.scrub(cu.memo):cu.memo)].filter(Boolean).join(', ')+'\n\n입력칸 목록 (코드: 이름 · 형식):\n';
   F.sections.forEach(s=>{ t+='['+s.t+']\n'; s.f.forEach(x=>{ t+=x.k+': '+x.l+' · '+fieldSpec(x)+'\n'; }); });
   return t+'\n답은 JSON 하나만: {"fields":{"코드":값}, "missing":"자료에서 찾지 못한 중요한 항목(짧게)"}';
 }
@@ -3326,7 +3344,7 @@ function fillPromptAll(){
   const cu=cur().customer;
   let t='너는 보험 상담 자료(상담 메모, 가입설계서, 증권, 국민연금 예상액, 퇴직연금·연금저축 내역, 금융자산·대출 내역 등)를 읽어 「보장설계」「연금설계」「자산설계」 세 분야의 입력칸을 한 번에 채우는 도우미다.\n'
    +'규칙:\n- 자료에 분명히 나온 값만 적는다. 추측하거나 계산해서 만들지 말고, 없는 칸은 빼고 답한다.\n- 금액 단위를 칸에 맞춘다(만원: 5,000,000원→500, 1억→10000 / 만원/월: 월 금액). 비율은 % 숫자(4.5% → 4.5).\n- 선택칸은 주어진 보기 글자 중 하나로만 답한다.\n- 나이·성별·소득처럼 여러 분야에 같은 칸이 있으면 각 분야에 같은 값을 모두 적는다.\n'
-   +'\n고객 기본 정보(참고): '+[cu.name, cu.age&&cu.age+'세', cu.sex, cu.job, cu.income&&'연소득 '+cu.income+'만원', cu.memo].filter(Boolean).join(', ')+'\n';
+   +'\n고객 기본 정보(참고): '+[cu.name, cu.age&&cu.age+'세', cu.sex, cu.income&&'연소득 '+cu.income+'만원', cu.memo&&(KAI.scrub?KAI.scrub(cu.memo):cu.memo)].filter(Boolean).join(', ')+'\n';
   Object.keys(PLAN_FORMS).forEach(f=>{ const F=PLAN_FORMS[f]; t+='\n==== '+F.name+' (묶음 이름: '+f+') 입력칸 (코드: 이름 · 형식) ====\n';
     F.sections.forEach(s=>{ t+='['+s.t+']\n'; s.f.forEach(x=>{ t+=x.k+': '+x.l+' · '+fieldSpec(x)+'\n'; }); }); });
   return t+'\n답은 JSON 하나만: {"fields":{"coverage":{"코드":값},"pension":{"코드":값},"asset":{"코드":값}}, "missing":"자료에서 찾지 못한 중요한 항목(짧게)"}';
@@ -3411,7 +3429,7 @@ async function draftComment(){
       +'- 리포트에 있는 숫자·판정만 쓴다. 새 숫자를 계산하거나 만들지 않는다. 특정 보험사·상품명은 리포트에 있는 경우만.\n'
       +'- 고객에게 직접 말하는 존댓말(~습니다). 3~5문장, 400자 안팎. 가장 급한 부족 1~2가지 → 우선 보완 방향 → 다음 상담 약속 순서.\n'
       +'- 수익·보장을 확정적으로 약속하는 표현(무조건, 반드시 이득 등)은 쓰지 않는다.\n'
-      +'고객: '+[cu.name,cu.age&&cu.age+'세',cu.sex,cu.job].filter(Boolean).join(', ')+'\n'
+      +'고객: '+[cu.name,cu.age&&cu.age+'세',cu.sex].filter(Boolean).join(', ')+'\n'
       +(c.comment?'FC가 써 둔 메모(반영할 것): '+c.comment+'\n':'')
       +'\n답은 JSON 하나만: {"comment":"의견 문장"}\n\n리포트:\n'+rep;
     const r=await aiAsk(prompt), t=String(r&&r.comment||'').trim();

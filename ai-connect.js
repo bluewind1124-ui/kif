@@ -284,6 +284,21 @@ async function ocrPdf(buf,maxPages,prog){
   }finally{try{await w.terminate();}catch(e){}}
   return {pages:out,numPages:doc.numPages};
 }
+/* 개인정보 가리기(2026-11-09): 증권·가입설계서에서 꺼낸 글을 AI에 보내기 전에
+   주민번호·전화번호·이메일·카드·계좌번호·상세주소(시/구/동 뒤 도로명·번지·동호수)를 가린다. 이름·생년월일·시/구/동은 남긴다 */
+var SIDO='(?:서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충북|충남|전북|전남|경북|경남|제주|충청|전라|경상)[가-힣]{0,6}';
+var ADDR_RE=new RegExp('('+SIDO+'\\s+[가-힣]{1,6}(?:시|군|구)(?:\\s+[가-힣]{1,6}구)?(?:\\s+[가-힣0-9]{1,8}(?:동|읍|면|가))?)((?:\\s*(?:[0-9][0-9\\-]*(?:번지|번길|호|층|동|길)?|[가-힣A-Za-z0-9]{1,15}(?:로|길|번길|아파트|빌라|타워|오피스텔|맨션|단지|마을|빌딩|타운|리)|\\([^)\\n]{1,25}\\)|,)){1,8})','g');
+function scrub(t){
+  t=String(t==null?'':t);
+  t=t.replace(/(^|[^\d])\d{6}\s?[-–]\s?[1-8](?:\d{6}|[*＊●○xX]{6})(?!\d)/g,function(m,a){return a+'******-*******';})
+   .replace(/(^|[^\d])\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])[1-8]\d{6}(?!\d)/g,function(m,a){return a+'*************';})
+   .replace(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}/g,'***@***')
+   .replace(/(^|[^\d\-])0(?:1[016789]|2|[3-6][1-5]|70|50\d)[\-.)\s]{0,2}\d{3,4}[\-.\s]{0,2}\d{4}(?![\d\-])/g,function(m,a){return a+'***-****-****';})
+   .replace(/(^|[^\d])\d{4}[\- ]\d{4}[\- ]\d{4}[\- ]\d{3,4}(?!\d)/g,function(m,a){return a+'****-****-****-****';})
+   .replace(/(^|[^\d\-])(\d{2,6}-\d{2,6}-\d{2,7}(?:-\d{1,3})?)(?![\d\-])/g,function(m,a,b){return /^(19|20)\d{2}-\d{1,2}-\d{1,2}$/.test(b)?m:a+'(계좌번호 가림)';});
+  t=t.replace(ADDR_RE,function(m,a,b){return /\d/.test(b)?a+' (상세주소 가림)':m;});
+  return t;
+}
 async function read(files){
   var out={text:'',images:[],scanned:[]};
   for(var i=0;i<files.length;i++){
@@ -306,7 +321,7 @@ async function read(files){
     var ab=await f.arrayBuffer(),of=await officeText(ab);
     out.text+='\n\n===== '+nm+' =====\n'+(of?of.text:new TextDecoder().decode(ab));
   }
-  out.text=out.text.slice(0,80000);out.images=out.images.slice(0,8);
+  out.text=scrub(out.text).slice(0,80000);out.images=out.images.slice(0,8);
   return out;
 }
 function b64(b){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){var u=String(r.result);res({mime:b.type||'image/jpeg',data:u.slice(u.indexOf(',')+1)});};r.onerror=rej;r.readAsDataURL(b);});}
@@ -444,7 +459,7 @@ function pasteAsk(q,scanned,step,parse,check,want){
 }
 /* prompt + 읽은 자료 → JSON. 어떤 AI를 쓰든 같은 모양의 답 */
 async function ask(prompt,mat){
-  var c=cfg(),p=c.prov;mat=mat||{text:'',images:[],scanned:[]};
+  var c=cfg(),p=c.prov;mat=mat||{text:'',images:[],scanned:[]};if(mat.text)mat.text=scrub(mat.text);
   if(c.mode!=='ai')throw {code:'ai_off'};
   var full=prompt+(mat.text?'\n\n자료:\n'+mat.text:'')+(mat.images.length?'\n\n(첨부한 사진·스캔 '+mat.images.length+'장도 함께 읽으세요)':'');
   var rd=function(t){try{return readAns(t,mat.parse,mat.check,true);}catch(e){if(e.code==='wrong_shape')throw {code:'wrong_shape',raw:t,message:'AI 답의 모양이 이번 단계와 맞지 않습니다'+(mat.want?' (필요: '+mat.want+')':'')+'. 다시 눌러 주세요.'};if(e&&e.code==='bad_json')e.raw=t;throw e;}};
@@ -575,5 +590,5 @@ function fdBox(){
 var folder={name:FD_NAME,ok:fdOk,get:fdGet,label:fdLabel,pick:fdPick,write:fdWrite,clear:fdClear,perm:fdPerm,err:fdErr};
 if(document.readyState!=='loading')addCss();else document.addEventListener('DOMContentLoaded',addCss);
 window.addEventListener('storage',function(e){if(e.key===AIK)fire();});
-window.KIFAI={AIP:AIP,guideDoc:GUIDE_DOC,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,openKey:openKey,keyRowHTML:keyRowHTML,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,ocrPages:ocrPages,err:err,pretty:pretty,view:view,pickJson:function(t){return pickJson(t);},migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
+window.KIFAI={scrub:scrub,AIP:AIP,guideDoc:GUIDE_DOC,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,openKey:openKey,keyRowHTML:keyRowHTML,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,ocrPages:ocrPages,err:err,pretty:pretty,view:view,pickJson:function(t){return pickJson(t);},migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
 })();
