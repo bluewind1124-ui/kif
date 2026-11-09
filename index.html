@@ -981,7 +981,15 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
 .hg-chips{display:flex;flex-wrap:wrap;gap:6px}
 .hg-chips button{font:inherit;font-size:.8rem;padding:5px 10px;border-radius:999px;border:1px solid rgba(230,207,151,.45);background:rgba(255,255,255,.06);color:#f3e7c7;cursor:pointer}
 .hg-chips button:hover{background:rgba(230,207,151,.2)}
-.hg-cmp .hg-btn{margin-top:auto;align-self:flex-start}
+.hg-cmp .hg-btn{align-self:flex-start}
+.hg-col{gap:12px}.hg-col>.hg-ai+.hg-smp{margin-top:-12px}
+.hg-chips{display:grid;grid-template-columns:1fr 1fr}.hg-chips button{border-radius:8px;text-align:left;padding:7px 10px}
+.hg-link2{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1}
+.hg-lk{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;min-height:150px;padding:14px;border-radius:12px;border:1px solid #0f2240;color:#fff;text-align:left;font:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.hg-lk:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(15,35,64,.25)}
+.hg-car{background:linear-gradient(150deg,#2b5a8f,#16294a 70%)}.hg-sj{background:linear-gradient(150deg,#5b4a6e,#24203a 70%)}
+.hg-art{width:100%;max-width:150px;height:auto;align-self:center;margin-bottom:auto}
+.hg-lt small{display:block;font-size:.72rem;color:#e6cf97}.hg-lt b{display:block;font-size:1.05rem}.hg-lt em{display:block;font-style:normal;font-size:.78rem;color:#cdd6e4}
 .hg-two{display:flex;gap:8px;flex-wrap:wrap}
 .hg-ai .btn:not(.gold){background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.35)}
 .hg-smp{border-top:3px solid var(--kgold,#cd9b34);border-radius:0 0 12px 12px;margin:0;flex:1}
@@ -1514,9 +1522,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       /* 바로 들어가기: 상품 비교 · AI보장분석(기본형·고급형) + 바로 아래 AI 보장분석 샘플 — 보험사 소식지 위 */
       var CT=cmpOn().slice(0,6);
       h+='<section class="hm-go" id="hmGo">'+
-        '<div class="hg-box hg-cmp"><div class="hg-top">'+'<span class="hg-i">'+ic('bars')+'</span>'+'<div><span class="hg-k">영업 도구</span><h2>상품 비교</h2><p>보험사 상품을 한눈에 비교하고 1·2·3위를 바로 확인합니다.</p></div></div>'+
+        '<div class="hg-col"><div class="hg-box hg-cmp"><div class="hg-top">'+'<span class="hg-i">'+ic('bars')+'</span>'+'<div><span class="hg-k">영업 도구</span><h2>상품 비교</h2><p>보험사 상품을 한눈에 비교하고 1·2·3위를 바로 확인합니다.</p></div></div>'+
           (CT.length?'<div class="hg-chips">'+CT.map(function(t){return '<button type="button" data-cmpo="'+E(t.id)+'">'+E(t.title)+'</button>';}).join('')+'</div>':'')+
           '<button class="btn gold hg-btn" type="button" data-go="compare">상품 비교 들어가기 ›</button></div>'+
+          /* 자동차 비교견적 · 상조 서비스 바로가기 (그림) — 상품 비교 아래 빈자리를 채운다 */
+          '<div class="hg-link2"><button type="button" class="hg-lk hg-car" data-go="car"><svg class="hg-art" viewBox="0 0 160 90" aria-hidden="true"><ellipse cx="80" cy="80" rx="70" ry="6" fill="rgba(0,0,0,.25)"/><path d="M18 62c0-8 4-12 12-14l14-4 14-14c4-4 9-6 15-6h26c7 0 12 3 16 8l10 12 14 3c7 2 11 6 11 13v8c0 3-2 5-5 5H23c-3 0-5-2-5-5z" fill="#e6cf97"/><path d="M60 32h18v14H48zM84 32h18c4 0 7 2 9 5l7 9H84z" fill="#16294a" opacity=".85"/><circle cx="45" cy="72" r="11" fill="#0f2240"/><circle cx="45" cy="72" r="5" fill="#c9ced6"/><circle cx="118" cy="72" r="11" fill="#0f2240"/><circle cx="118" cy="72" r="5" fill="#c9ced6"/><path d="M138 56h6M20 58h6" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg><span class="hg-lt"><small>외부 연계</small><b>자동차 비교견적</b><em>보험사 견적 한 번에 비교 ›</em></span></button>'+
+          '<button type="button" class="hg-lk hg-sj" data-go="sangjo"><svg class="hg-art" viewBox="0 0 160 90" aria-hidden="true"><ellipse cx="80" cy="82" rx="58" ry="5" fill="rgba(0,0,0,.25)"/><path d="M80 80V44" stroke="#9fb38a" stroke-width="3"/><path d="M80 66c-10-2-16-8-18-15 8 0 15 4 18 15zM80 60c10-2 16-8 18-15-8 0-15 4-18 15z" fill="#9fb38a"/><g fill="#f4f1e8"><ellipse cx="80" cy="26" rx="6" ry="16"/><ellipse cx="80" cy="26" rx="6" ry="16" transform="rotate(30 80 38)"/><ellipse cx="80" cy="26" rx="6" ry="16" transform="rotate(-30 80 38)"/><ellipse cx="80" cy="26" rx="6" ry="16" transform="rotate(60 80 38)"/><ellipse cx="80" cy="26" rx="6" ry="16" transform="rotate(-60 80 38)"/><ellipse cx="80" cy="26" rx="6" ry="16" transform="rotate(90 80 38)"/><ellipse cx="80" cy="26" rx="6" ry="16" transform="rotate(-90 80 38)"/></g><circle cx="80" cy="38" r="7" fill="#e6cf97"/><path d="M36 74c8-10 20-12 30-6M124 74c-8-10-20-12-30-6" stroke="#e6cf97" stroke-width="3" fill="none" stroke-linecap="round"/></svg><span class="hg-lt"><small>제휴 서비스</small><b>상조 서비스</b><em>상품·혜택 안내 보기 ›</em></span></button></div></div>'+
         '<div class="hg-col"><div class="hg-box hg-ai"><div class="hg-top">'+'<span class="hg-i">'+ic('scan')+'</span>'+'<div><span class="hg-k">영업 도구</span><h2>AI보장분석</h2><p>증권·가입설계서를 AI가 읽어 보장분석표·리포트·제안서까지 만듭니다.</p></div></div>'+
           '<div class="hg-two"><button class="btn gold" type="button" data-go="ai">기본형 들어가기 ›</button><button class="btn" type="button" data-go="ai2">고급형 들어가기 ›</button></div></div>'+
           '<div class="panel smp-home hg-smp">'+smpHome()+'</div></div></section>';
