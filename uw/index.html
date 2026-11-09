@@ -716,7 +716,8 @@ function renderSearch(q){
 function render(){
   st=parse();
   markNav();
-  if(st.q){$('q').value=st.q;renderSearch(st.q);return;}
+  /* 입력 중인 칸의 글자를 다시 넣으면 한글 조합이 끊긴다 → 내용이 다를 때만 넣음(2026-11-09) */
+  if(st.q){if($('q').value.trim()!==st.q)$('q').value=st.q;renderSearch(st.q);return;}
   var v=viewById(st.v);
   if(!v){renderHome();window.scrollTo(0,0);return;}
   var ti=+st.t||0;if(!v.tabs[ti])ti=0;var tab=v.tabs[ti];

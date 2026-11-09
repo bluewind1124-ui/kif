@@ -113,17 +113,27 @@ function mountBox(el,toast){
   if(!el) return;
   toast=toast||function(){};
   var q='',src='';
+  /* 검색칸·버튼 줄은 한 번만 그린다. 글자를 칠 때마다 검색칸을 새로 만들면
+     한글 자음·모음 조합(ㄱ+ㅏ→가)이 끊기고 지우기도 꼬이기 때문(v1.1, 2026-11-09). */
+  el.innerHTML='<div class="panel"><div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">'+
+    '<input class="in" id="arcQ" type="search" placeholder="고객 이름 검색" style="max-width:220px" aria-label="고객 이름 검색" autocomplete="off">'+
+    '<button class="btn sm" data-arcsrc="">전체</button><button class="btn sm ghost" data-arcsrc="basic">기본형</button><button class="btn sm ghost" data-arcsrc="adv">고급형</button>'+
+    '<span class="sp" style="flex:1"></span><span class="note" id="arcCnt"></span></div>'+
+    '<p class="note" style="margin:8px 0 0">리포트·제안서를 <b>인쇄·PDF 저장</b>하거나, AI 분석 결과가 나오거나, <b>「자료함에 보관」</b>을 누르면 그때 모습이 여기에 남습니다. 고객·종류마다 최근 '+KEEP+'개까지 보관하고, 이 기기에만 있습니다(다른 PC로 옮기려면 「내 정보 · 자료 보관」의 저장 파일에 함께 들어갑니다).</p></div>'+
+    '<div id="arcList"></div>';
+  var qi=el.querySelector('#arcQ'),cntEl=el.querySelector('#arcCnt'),out=el.querySelector('#arcList');
+  var seq=0;
   function draw(){
+    var my=++seq;
+    el.querySelectorAll('[data-arcsrc]').forEach(function(b){b.classList.toggle('ghost',b.getAttribute('data-arcsrc')!==src);});
     list().then(function(L){
+      if(my!==seq) return; /* 더 늦게 시작한 검색 결과만 화면에 둔다 */
       var F=L.filter(function(x){return (!src||x.src===src)&&(!q||(x.cname||'').indexOf(q)>-1);});
       var G={},order=[];
       F.forEach(function(x){var k=x.src+'|'+x.cid;if(!G[k]){G[k]={src:x.src,cname:x.cname,items:[]};order.push(k);}G[k].items.push(x);});
       var nB=0,nA=0,cs={};L.forEach(function(x){cs[x.src+'|'+x.cid]=x.src;});Object.keys(cs).forEach(function(k){if(cs[k]==='adv')nA++;else nB++;});
-      var h='<div class="panel"><div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">'+
-        '<input class="in" id="arcQ" placeholder="고객 이름 검색" value="'+esc(q)+'" style="max-width:220px" aria-label="고객 이름 검색">'+
-        '<button class="btn sm '+(src===''?'':'ghost')+'" data-arcsrc="">전체</button><button class="btn sm '+(src==='basic'?'':'ghost')+'" data-arcsrc="basic">기본형</button><button class="btn sm '+(src==='adv'?'':'ghost')+'" data-arcsrc="adv">고급형</button>'+
-        '<span class="sp" style="flex:1"></span><span class="note">기본형 고객 '+nB+'명 · 고급형 고객 '+nA+'명 · 보관본 '+L.length+'개</span></div>'+
-        '<p class="note" style="margin:8px 0 0">리포트·제안서를 <b>인쇄·PDF 저장</b>하거나, AI 분석 결과가 나오거나, <b>「자료함에 보관」</b>을 누르면 그때 모습이 여기에 남습니다. 고객·종류마다 최근 '+KEEP+'개까지 보관하고, 이 기기에만 있습니다(다른 PC로 옮기려면 「내 정보 · 자료 보관」의 저장 파일에 함께 들어갑니다).</p></div>';
+      cntEl.textContent='기본형 고객 '+nB+'명 · 고급형 고객 '+nA+'명 · 보관본 '+L.length+'개';
+      var h='';
       if(!order.length){
         h+='<div class="panel"><p class="note">'+(L.length?'찾는 고객의 보관본이 없습니다.':'아직 보관한 자료가 없습니다. AI보장분석 기본형·고급형에서 리포트나 제안서를 만들고 「자료함에 보관」 또는 인쇄를 누르면 여기에 쌓입니다.')+'</p>'+
           '<div class="row" style="gap:6px"><button class="btn sm" data-go="ai">AI보장분석 기본형</button><button class="btn sm ghost" data-go="ai2">AI보장분석 고급형</button></div></div>';
@@ -136,10 +146,10 @@ function mountBox(el,toast){
               '<td class="r" style="white-space:nowrap"><button class="btn sm" data-arcopen="'+esc(x.id)+'">보기·인쇄</button> <button class="btn sm ghost" data-arcdel="'+esc(x.id)+'" title="이 보관본 지우기">삭제</button></td></tr>';}).join('')+
           '</tbody></table></div></div>';
       });
-      el.innerHTML=h;
-      var qi=el.querySelector('#arcQ');if(qi){qi.oninput=function(){q=qi.value.trim();var pos=qi.selectionStart;draw();setTimeout(function(){var n=el.querySelector('#arcQ');if(n){n.focus();try{n.setSelectionRange(pos,pos);}catch(e){}}},0);};}
+      out.innerHTML=h;
     });
   }
+  qi.addEventListener('input',function(){q=qi.value.trim();draw();});
   var armed='';
   el.onclick=function(e){
     var b=e.target.closest&&e.target.closest('[data-arcopen],[data-arcdel],[data-arcsrc]');if(!b)return;
