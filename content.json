@@ -1,6 +1,6 @@
 {
- "ver": 1794214402130,
- "updated": "2026. 11. 9. 오후 5:53:22",
+ "ver": 1794214412688,
+ "updated": "2026. 11. 9. 오후 5:53:32",
  "notices": [
   [
    "2026. 11. 16. ",
@@ -580,6 +580,13 @@
  ],
  "mats": [
   [
+   "PPT",
+   "AIA 달러보험 FC교육 3",
+   "이달의 컨셉",
+   "2026.11 이달의 컨셉 자료",
+   "files/concept/2026-11/달러보험.pptx_4102b.pptx"
+  ],
+  [
    "PDF",
    "AIA 달러보험 FC교육 3",
    "이달의 컨셉",
@@ -678,14 +685,18 @@
   ]
  ],
  "concept": {
-  "month": "",
-  "title": "",
-  "target": "",
-  "product": "",
-  "desc": "",
-  "steps": [],
+  "month": "2026.11",
+  "title": "AIA 달러보험 FC교육 3",
+  "target": "달러 자산·노후 연금에 관심 있는 고객",
+  "product": "AIA 프라임 달러 종신 · 일시납 연금 · 글로벌파워 월납연금",
+  "desc": "왜 지금, 달러인가 — AIA생명 달러보험 상품 완전정복 (거시경제 흐름부터 세일즈 화법까지)",
+  "steps": [
+   "PART 1 왜 지금 달러인가 | 달러의 탄생 · 물가위기 · 금리역전 · 신용등급 · 환율상승 7대 요인 · 시장의 선택 | 4",
+   "PART 2 AIA생명 달러보험 상품 라인업 | 프라임 달러 종신 · 일시납 연금 · 글로벌파워 월납연금 · 타사비교 · 헬스케어 · 절세효과 | 18",
+   "PART 3 실전 세일즈 가이드 | 핵심화법 Cheat Sheet · 고객 Q&A · 완전판매 체크리스트 | 46"
+  ],
   "mats": [],
-  "file": "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pptx"
+  "file": "files/concept/2026-11/달러보험.pptx_4102b.pptx"
  },
  "banner": {
   "title": "",
@@ -3006,7 +3017,6 @@
   "news/2026-10/현대해상_202610_월간_wjz34.pdf": "news/2026-10/현대해상_202610_월간_wjz34_thumb.jpg",
   "news/2026-10/흥국생명_202610_월간_ljzsh.pdf": "news/2026-10/흥국생명_202610_월간_ljzsh_thumb.jpg",
   "news/2026-10/흥국화재_202610_월간_pwxkn.pdf": "news/2026-10/흥국화재_202610_월간_pwxkn_thumb.jpg",
-  "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pptx": "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync_thumb.jpg",
   "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync.pdf": "files/mats/2026-11/AIA_달러보험_FC교육_3_mbync_thumb.jpg",
   "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3.pptx": "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3_thumb.jpg",
   "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pptx": "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4_thumb.jpg",
