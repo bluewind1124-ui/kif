@@ -2037,14 +2037,55 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<ul class="note" style="margin:4px 0 10px;padding-left:1.2em;line-height:1.9"><li><b>① AI가 따라 쓰는 샘플</b> — 제안서·분석 엑셀의 형식과 문장을 AI에게 보여 주는 글입니다. FC 제안서에 직접 붙지 않습니다. 지금 <b>'+((SITE&&Array.isArray(SITE.aiSamples))?SITE.aiSamples.length:0)+'건</b></li>'+
       '<li><b>② 니즈환기 참고자료</b> — 그림·PDF 장표로, FC 제안서에 그대로 한 장씩 붙습니다. 지금 <b>'+((window.AIMOD&&AIMOD.getRefs)?AIMOD.getRefs().refs.length:0)+'건</b></li></ul>'+
       '<div class="row"><button class="btn" type="button" id="cmsRefs">보장분석 샘플 올리기 열기</button></div></div>'+
-      '<div class="panel"><h3>사이트에 반영하는 방법</h3><ol class="note" style="margin:0;padding-left:1.2em;line-height:1.9">'+
-      '<li><b>① 반영할 내용 복사</b>를 누릅니다.</li><li><b>② GitHub 편집 화면 열기</b>를 누르고(GitHub 로그인), 글 상자 안을 클릭해 <b>Ctrl+A</b> 후 <b>Ctrl+V</b>로 붙여넣습니다.</li>'+
-      '<li>오른쪽 위 초록 <b>Commit changes</b> → 다시 <b>Commit changes</b>를 누르면 1~2분 뒤 모든 FC 화면에 나타납니다.</li></ol></div>'+
-      '<div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn" type="button" id="cmsSave" data-ks="save" disabled>저장 (모든 FC에게 올리기)</button><span class="note">위 칸을 고친 뒤 누르면 본사 공지·소식지·배너 등이 1~2분 뒤 모든 FC 화면에 바뀝니다.</span></div>'+
+      cmsConnHtml()+
+      '<div class="row" style="gap:10px;flex-wrap:wrap;align-items:center"><button class="btn" type="button" id="cmsSave" style="font-size:1.05rem;padding:12px 22px">저장 (모든 FC에게 올리기)</button><span class="note">위 칸을 고친 뒤 누르면 본사 공지·소식지·배너·강의·컨셉 등이 1~2분 뒤 모든 FC 화면에 바뀝니다. <span style="opacity:.7">· 바로 저장 v2 (2026-11-09)</span></span></div>'+
       '<details class="note" style="margin-top:8px"><summary>예비 방법: GitHub에 직접 붙여 넣기</summary><div class="row" style="margin-top:6px"><button class="btn sm ghost" type="button" id="cmsCopy">① 반영할 내용 복사</button><a class="btn" style="text-decoration:none" target="_blank" rel="noopener" href="'+GH_EDIT+'">② GitHub 편집 화면 열기 ↗</a>'+
       '<button class="btn ghost" type="button" id="cmsPrev">이 기기에서 미리보기</button><button class="btn ghost" type="button" id="cmsDl">content.json 받기</button></div></details>'+
       '<textarea class="in" id="cmsOut" rows="3" readonly hidden></textarea><p class="note" id="cmsMsg" role="status"></p></div>';
   }
+  /* 바로 저장 연결(v2, 2026-11-09): 관리자가 이 브라우저에 GitHub 토큰을 한 번만 넣으면 이후 「저장」 한 번으로 모든 FC에게 올라간다.
+     토큰은 이 브라우저(localStorage kif_gh_token)에만 두고 코드·저장소에는 절대 넣지 않는다. 「자료 올리기」의 GitHub 연결 설정과 같은 값. */
+  var GH_NEWTOK='https://github.com/settings/personal-access-tokens/new?name='+encodeURIComponent('hanbogeumon-save')+'&description='+encodeURIComponent('한보금on 관리자 저장용')+'&target_name=bluewind1124-ui&expires_in=365&contents=write';
+  function cmsConnHtml(){var T=ghTok();
+    return '<div class="panel" id="cmsConn" style="border:2px solid '+(T?'#2e8b57':'#c9a24a')+'"><h3>바로 저장 연결 '+(T?'<span class="pill ok">연결됨 ✓</span>':'<span class="pill warn">처음 한 번만 필요</span>')+'</h3>'+
+      (T?'<p class="note">이 브라우저는 연결되어 있습니다. 칸을 고친 뒤 아래 <b>「저장 (모든 FC에게 올리기)」</b> 한 번이면 끝납니다. 복사·붙여넣기는 필요 없습니다.</p>'+
+        '<details class="note"><summary>연결 바꾸기 · 지우기 (토큰이 만료됐을 때)</summary>':
+        '<p class="note">이 컴퓨터·이 브라우저에서 <b>딱 한 번</b>만 하면, 다음부터는 「저장」 버튼 하나로 바로 올라갑니다. (다른 컴퓨터나 휴대폰에서는 그 기기에서 한 번 더 합니다.)</p>')+
+      '<ol class="note" style="padding-left:1.3em;line-height:2;margin:8px 0">'+
+      '<li><a class="btn sm" style="text-decoration:none" target="_blank" rel="noopener" href="'+GH_NEWTOK+'">① GitHub 토큰 만들기 화면 열기 ↗</a> (<b>bluewind1124-ui</b> 계정으로 로그인)</li>'+
+      '<li>열린 화면에서 이름·기간은 대부분 채워져 있습니다(비어 있으면 이름은 아무거나, 기간은 1년). <b>Repository access</b>에서 <b>Only select repositories</b>를 누르고 <b>kif</b>를 고릅니다.</li>'+
+      '<li><b>Permissions</b>에서 <b>Contents</b>가 <b>Read and write</b>인지 확인합니다(아니면 바꿉니다).</li>'+
+      '<li>맨 아래 초록 <b>Generate token</b> → 한 번 더 <b>Generate token</b>을 누르고, 나온 <b>github_pat_…</b> 글자 옆 복사 버튼을 누릅니다.</li>'+
+      '<li>아래 칸에 <b>Ctrl+V</b>로 붙여 넣고 <b>② 연결 저장</b>을 누릅니다. 「연결됨 ✓」이 나오면 끝입니다.</li></ol>'+
+      '<div class="row" style="gap:8px;flex-wrap:wrap"><input class="in" id="ccTok" type="password" autocomplete="off" placeholder="github_pat_... 를 여기에 붙여 넣기" value="" style="flex:1;min-width:220px"><button class="btn" type="button" id="ccSave">② 연결 저장</button>'+(T?'<button class="btn sm ghost" type="button" id="ccDel">연결 지우기</button>':'')+'</div>'+
+      '<p class="note" style="color:#8a6d1f">※ 토큰은 비밀번호와 같습니다. 이 브라우저에만 저장되고 사이트·다른 FC에게는 보내지 않습니다. 남에게 보여 주지 마세요.</p>'+
+      '<p class="note" id="ccMsg" role="status"></p>'+(T?'</details>':'')+'</div>';
+  }
+  /* 토큰이 kif 저장소를 읽을 수 있는지 GitHub에 물어 확인한다 */
+  async function ghCheck(tok){
+    var r=await fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo,{cache:'no-store',headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});
+    if(r.status===401)throw new Error('토큰이 맞지 않거나 만료됐습니다. ①부터 새로 만들어 붙여 넣어 주세요.');
+    if(r.status===403||r.status===404)throw new Error('이 토큰으로는 kif 저장소가 보이지 않습니다. ②단계에서 kif를 골랐는지 확인해 주세요.');
+    if(!r.ok)throw new Error('GitHub 확인 실패 ('+r.status+'). 인터넷 연결을 확인하고 다시 눌러 주세요.');
+    return true;
+  }
+  function cmsConnBind(){
+    var sv=document.getElementById('ccSave');if(!sv)return;
+    var cm=function(h){var m=document.getElementById('ccMsg');if(m)m.innerHTML=h;};
+    var redraw=function(){var o=document.getElementById('cmsConn');if(!o)return;var d=document.createElement('div');d.innerHTML=cmsConnHtml();o.parentNode.replaceChild(d.firstChild,o);cmsConnBind();};
+    sv.onclick=async function(){var v=(document.getElementById('ccTok').value||'').trim().replace(/\s+/g,'');
+      if(!v){cm('⚠ 칸이 비어 있습니다. GitHub에서 복사한 github_pat_… 글자를 붙여 넣어 주세요.');return;}
+      if(!/^(github_pat_|ghp_)/.test(v)){cm('⚠ 토큰 모양이 아닙니다. <b>github_pat_</b>로 시작하는 글자를 통째로 복사해 붙여 넣어 주세요.');return;}
+      sv.disabled=true;cm('연결 확인 중…');
+      try{await ghCheck(v);ghTok(v);redraw();
+        var m=document.getElementById('ccMsg'),go=window.KSAVE&&KSAVE.has('cms');
+        var msg=document.getElementById('cmsMsg');if(msg)msg.innerHTML=go?'✓ 연결됐습니다. 바로 저장합니다…':'✓ 연결됐습니다. 이제 칸을 고친 뒤 「저장 (모든 FC에게 올리기)」를 누르면 바로 올라갑니다.';
+        if(go)KSAVE.saveAll();}
+      catch(e){sv.disabled=false;cm('⚠ '+(e.message||e));}};
+    var dl=document.getElementById('ccDel');if(dl)dl.onclick=function(){ghTok('');redraw();var m=document.getElementById('ccMsg');if(m)m.textContent='연결을 지웠습니다. 다시 쓰려면 새 토큰을 붙여 넣으세요.';};
+  }
+  function cmsConnOpen(note){var o=document.getElementById('cmsConn');if(!o)return;var d=o.querySelector('details');if(d)d.open=true;
+    var m=document.getElementById('ccMsg');if(m&&note)m.innerHTML=note;if(o.scrollIntoView)o.scrollIntoView({block:'center',behavior:'smooth'});var t=document.getElementById('ccTok');if(t)setTimeout(function(){t.focus();},300);}
   function cmsCollect(){
     var v=function(id){var e=document.getElementById(id);return e?e.value.trim():'';};
     var c={ver:Date.now(),updated:new Date().toLocaleString('ko-KR'),
@@ -2067,7 +2108,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function cmsLabel(){return '관리자 페이지: '+Object.keys(CMS_D).map(function(k){return CMS_N[k]||k;}).join(', ');}
   async function cmsPublish(){
     var KS=window.KSAVE,keys=Object.keys(CMS_D),lab=cmsLabel(),msg=document.getElementById('cmsMsg')||{};if(!keys.length)return true;
-    if(!ghTok()){KS.fail(lab,new Error('GitHub 연결(토큰)이 아직 없습니다. 관리자 페이지 › 자료 올리기 › GitHub 연결 설정에서 저장하세요.'));msg.textContent='⚠ GitHub 연결(토큰)을 먼저 저장하세요.';return false;}
+    if(!ghTok()){KS.fail(lab,new Error('바로 저장 연결이 아직 없습니다. 저장 버튼 바로 위 「바로 저장 연결」을 한 번만 해 주세요.'));msg.innerHTML='⚠ 처음 한 번만 <b>바로 저장 연결</b>이 필요합니다. 바로 위 칸의 ①~⑤를 따라 해 주세요. 연결되면 고친 내용이 자동으로 이어서 저장됩니다.';cmsConnOpen('👉 여기서 한 번만 연결하면 됩니다. 고친 내용은 그대로 있습니다.');return false;}
     var n=cmsCollect();
     if(CMS_D.lect&&!n.lect.length){msg.textContent='⚠ 교육센터 강의 칸에 저장할 강의가 없습니다. 「② 강의 찾기」로 찾은 목록(분류 | 제목 | 길이 | 날짜)을 확인한 뒤 저장하세요.';return false;}
     KS.start(lab);msg.textContent='저장 중…';
@@ -2078,7 +2119,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
           else if(k==='aiProxy'){c.aiProxy=n.aiProxy;c.aiProxyFor=n.aiProxyFor;}
           else if(n[k]===undefined)delete c[k];else c[k]=n[k];});},[],[],'관리자 페이지: '+keys.map(function(k){return CMS_N[k]||k;}).join(', '));
       CMS_D={};applyContent(cur,false);KS.done(lab,cur);msg.textContent='✓ 저장 완료 · 모든 FC 화면에는 1~2분 뒤 보입니다.';return true;}
-    catch(e){KS.fail(lab,e);msg.textContent='⚠ 저장하지 못했습니다: '+(e.message||e);return false;}
+    catch(e){KS.fail(lab,e);var em=String(e&&e.message||e);msg.textContent='⚠ 저장하지 못했습니다: '+em;if(/GitHub (401|403|404)/.test(em))cmsConnOpen('⚠ 토큰이 만료됐거나 권한이 부족합니다. ①부터 새 토큰을 만들어 붙여 넣어 주세요. 고친 내용은 그대로 있습니다.');return false;}
   }
   function bindCms(){
     var msg=document.getElementById('cmsMsg');if(!msg)return;
@@ -2087,7 +2128,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(box){box.addEventListener('input',mark);box.addEventListener('change',mark);}
     var rb=document.getElementById('cmsRefs');if(rb)rb.onclick=function(){go('refadmin');};
     bindLect(mark);
-    document.getElementById('cmsPrev').onclick=function(){applyContent(cmsCollect(),false);msg.textContent='이 기기에서만 바뀌었습니다. 다른 FC에게 보이려면 ①②로 사이트에 반영하세요.';};
+    cmsConnBind();
+    document.getElementById('cmsSave').onclick=function(){
+      if(!ghTok()){if(window.KSAVE&&KSAVE.has('cms'))KSAVE.saveAll();else{msg.innerHTML='⚠ 처음 한 번만 <b>바로 저장 연결</b>이 필요합니다. 바로 위 칸의 ①~⑤를 따라 해 주세요.';cmsConnOpen('👉 여기서 한 번만 연결하면 됩니다.');}return;}
+      if(window.KSAVE&&KSAVE.has()){KSAVE.saveAll();return;}
+      msg.innerHTML='고친 칸이 없어 올릴 것이 없습니다. 위 칸(공지·강의·컨셉·배너 등)을 고친 뒤 누르세요. 지금 화면 내용이 이미 모든 FC에게 보이는 내용입니다.';};
+    document.getElementById('cmsPrev').onclick=function(){applyContent(cmsCollect(),false);msg.textContent='이 기기에서만 바뀌었습니다. 모든 FC에게 보이려면 「저장 (모든 FC에게 올리기)」를 누르세요.';};
     document.getElementById('cmsDl').onclick=function(){var c=cmsCollect(),b=new Blob([JSON.stringify(c,null,1)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='content.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},4000);};
     document.getElementById('cmsCopy').onclick=function(){
       var txt=JSON.stringify(cmsCollect(),null,1),out=document.getElementById('cmsOut');
