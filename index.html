@@ -543,7 +543,32 @@ a.mat:hover{outline:2px solid var(--gold);outline-offset:1px}
 .logadd{display:grid;grid-template-columns:220px 1fr auto;gap:10px;align-items:end}
 @media (max-width:700px){.logadd{grid-template-columns:1fr}}
 .ai-back{margin:10px 0}.ai-back+.ai-back{display:none}
-.ai-steps{display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--line)}
+.ai-steps{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch;border-bottom:2px solid var(--line);padding-bottom:6px}
+.ai-sg{display:flex;flex-wrap:wrap;align-items:center;gap:0;border:1px solid var(--line);border-radius:10px;padding:0 4px;background:#fff}
+.ai-sg .sgt{font-size:.72rem;font-weight:800;color:#8a6a1f;padding:0 6px;white-space:nowrap}
+.ai-sg.side{border-style:dashed}
+.ai-steps .ai-sg button{padding:8px 10px;margin-bottom:0}
+.ai-steps button i.dn{background:#16a34a;color:#fff}
+.ai-guide{margin:10px 0 12px;border:1px solid #e5d3a6;border-radius:12px;background:#fffbf0}
+.ai-guide>summary{cursor:pointer;list-style:none;padding:12px 16px;font-weight:800;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.ai-guide>summary::-webkit-details-marker{display:none}
+.ai-guide>summary .gv{margin-left:auto;font-size:.78rem;font-weight:600;color:var(--muted)}
+.ai-guide>summary:after{content:'펼치기 ▾';font-size:.8rem;font-weight:700;color:#8a6a1f}
+.ai-guide[open]>summary:after{content:'접기 ▴'}
+.ai-guide .gb{padding:0 16px 16px}
+.ai-guide .gz{background:#14284b;color:#fff;border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.ai-guide .gz b{color:#f3d48a}
+.ai-guide .gg{margin:14px 0 6px;font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:8px}
+.ai-guide .gg span{background:#8a6a1f;color:#fff;border-radius:999px;padding:2px 10px;font-size:.78rem}
+.ai-guide .gc{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.ai-guide .gk{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.ai-guide .gk h5{margin:0;font-size:.92rem;display:flex;gap:6px;align-items:center}
+.ai-guide .gk h5 i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#14284b;color:#fff;font-size:.75rem;flex:none}
+.ai-guide .gk p{margin:0;font-size:.84rem;line-height:1.5}
+.ai-guide .gk .tip{color:#8a6a1f;font-size:.8rem}
+.ai-guide .gk button{align-self:flex-start;margin-top:auto}
+.pick-sum{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#f6f8fc;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+
 .ai-steps button{display:flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--muted);padding:10px 14px;font-weight:700;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
 .ai-steps button i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--line);color:var(--ink);font-size:.78rem}
 .ai-steps button.on{color:var(--ink);border-bottom-color:var(--kgold)}
@@ -4106,7 +4131,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!L.length)P('ok','확인할 부분이 없습니다. 제안서를 만들 수 있습니다.');
     return L;
   }
-  var STEPN={1:'고객정보',2:'기계약 자료',3:'1단계 분석',4:'Before/After 제안서',5:'옵션 관리',8:'2단계 조정·신계약'};
+  var STEPN={1:'① 고객 정보',2:'② 기존 계약 입력',3:'⑤ 기계약 분석',4:'⑨ 제안서',5:'옵션 관리',8:'⑥ 제안안 입력',9:'③④ 옵션·샘플',10:'⑦⑧ 제안서 옵션·샘플'};
   function goAttr(g){var h=' data-s="'+g.s+'"';['el','tk','ti','tg','topt'].forEach(function(k){if(g[k]!=null&&g[k]!==-1)h+=' data-'+k+'="'+esc(g[k])+'"';});return h;}
   /* 화면을 옮긴 뒤 고칠 칸으로 스크롤하고 잠깐 빛나게 한다 */
   function focusTarget(d){
@@ -4306,7 +4331,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
           if(!(navigator.clipboard&&navigator.clipboard.readText)){$('man').open=true;$('amsg').textContent='이 브라우저는 자동 가져오기를 막습니다. 아래 칸에 직접 붙여넣으세요.';return;}
           navigator.clipboard.readText().then(function(t){tryApply(t,true);},function(){$('man').open=true;$('amsg').textContent='붙여넣기 허용이 필요합니다. 브라우저가 물으면 "허용"을 누르거나, 아래 칸에 직접 붙여넣으세요.';});}
         else if(k==='ok')tryApply($('ans').value,false);
-        else if(k==='plan'){fin();rej({code:'paste_cancel'});var pm=o.pkg||{};if(pm.cid)st.cur=pm.cid;st.step=1;render();setTimeout(function(){var e=document.getElementById('pDir');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});},60);}
+        else if(k==='plan'){fin();rej({code:'paste_cancel'});var pm=o.pkg||{};if(pm.cid)st.cur=pm.cid;st.step=9;render();setTimeout(function(){var e=document.getElementById('pDir');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});},60);}
         else if(k==='pkgdl'){dlText('KIF_package_'+(o.pkgId||'')+'.txt',q);$('cmsg').textContent='✓ 패키지 파일을 받았습니다. AI 입력칸에 이 파일을 첨부하고 보내세요(글은 안 써도 됩니다. 필요하면 「진행」만).';sent=true;}
         else if(k==='cancel'){fin();rej({code:'paste_cancel'});}
 
@@ -4381,8 +4406,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     }
   }
   function cust(){return st.customers.filter(function(c){return c.id===st.cur;})[0]||null;}
+  /* 묶음②(⑥ 제안안 입력·⑦⑧ 옵션·샘플·⑨ 제안서)에서는 제안서용 옵션·샘플(c.options2·c.smp2)을 쓴다. 따로 안 고르면 묶음①과 같다 */
+  function stg2(){return st.step===8||st.step===10||st.step===4;}
+  function own2(c){return !!(c&&((Array.isArray(c.options2)&&c.options2.length)||c.smp2));}
   function selIds(c){
-    var ids=(c&&Array.isArray(c.options)&&c.options.length)?c.options:[c&&c.option];
+    var ids=(c&&stg2()&&Array.isArray(c.options2)&&c.options2.length)?c.options2:(c&&Array.isArray(c.options)&&c.options.length)?c.options:[c&&c.option];
     ids=ids.filter(function(id){return st.opts.some(function(o){return o.id===id;});});
     return ids.length?ids:[st.opts[0].id];
   }
@@ -4409,8 +4437,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       return;
     }
     var c=cust();
-    var h='<div class="ph"><div class="kicker">영업 도구</div><h1>AI보장분석 기본형</h1><p><b>1단계</b> 기존 계약 첨부 → 기계약 보장분석(유리한 부분·불리한 부분, 리포트·엑셀) → <b>2단계</b> 기존 담보 유지·정리 + 신계약 첨부 → Before/After 제안서</p></div>';
-    h+=aiBar();
+    var h='<div class="ph"><div class="kicker">영업 도구</div><h1>AI보장분석 기본형</h1><p><b>묶음① 기계약 분석</b> 고객 정보 → 기존 계약 입력 → 옵션 → 샘플 → 분석 출력·저장 &nbsp;·&nbsp; <b>묶음② 제안안</b> 제안안 입력 → 옵션 → 샘플 → Before/After 제안서 출력·저장</p></div>';
+    h+=aiBar()+guideHtml();
     h+='<div class="ai-wrap"><aside class="ai-list"><div class="ai-lh"><b>고객 목록</b><span class="note">'+st.customers.length+'명</span></div>'+
       '<input class="in" id="aiQ" placeholder="이름 검색" value="'+esc(st.q)+'" aria-label="고객 이름 검색">'+
       '<div class="ai-lb"><button class="btn sm" data-a="new">+ 새 고객</button></div><ul>';
@@ -4420,10 +4448,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(st.customers.length)h+='<li class="note ai-nohit"'+(st.customers.some(function(x){return !st.q||(x.name||'').indexOf(st.q)>-1;})?' hidden':'')+'>검색된 고객이 없습니다.</li>';
     if(!st.customers.length)h+='<li class="note ai-empty">저장된 고객이 없습니다. "새 고객"으로 등록하세요.</li>';
     h+='</ul><button class="btn sm ghost" data-a="step" data-s="0">전체 고객 목록 보기</button><p class="note" id="aiSync"></p></aside><section class="ai-main">';
-    var steps=[[0,'고객 목록','☰'],[1,'고객정보','1'],[2,'기계약 자료','2'],[3,'1단계 기계약 분석','3'],[8,'2단계 조정·신계약','4'],[4,'2단계 Before/After','5'],[5,'옵션 관리','⚙'],[6,'참고자료','＋']];
-    h+='<div class="ai-steps" role="tablist">'+steps.map(function(s){return '<button role="tab" aria-selected="'+(st.step===s[0])+'" data-a="step" data-s="'+s[0]+'" class="'+(st.step===s[0]?'on':'')+'"><i>'+s[2]+'</i>'+s[1]+'</button>';}).join('')+'</div>';
+    var DN=stepDone(c),tb=function(s){var d=DN[s[0]]&&st.step!==s[0];return '<button role="tab" aria-selected="'+(st.step===s[0])+'" data-a="step" data-s="'+s[0]+'" class="'+(st.step===s[0]?'on':'')+'"'+(d?' title="입력 완료"':'')+'><i'+(d?' class="dn"':'')+'>'+(d?'✓':s[2])+'</i>'+s[1]+'</button>';};
+    h+='<div class="ai-steps" role="tablist">'+tb([0,'고객 목록','☰'])+
+      '<div class="ai-sg"><span class="sgt">묶음① 기계약 분석</span>'+[[1,'고객 정보','1'],[2,'기존 계약 입력','2'],[9,'옵션·샘플','3·4'],[3,'출력·저장','5']].map(tb).join('')+'</div>'+
+      '<div class="ai-sg"><span class="sgt">묶음② 제안안</span>'+[[8,'제안안 입력','6'],[10,'옵션·샘플','7·8'],[4,'제안서 출력·저장','9']].map(tb).join('')+'</div>'+
+      '<div class="ai-sg side">'+[[5,'옵션 관리','⚙'],[6,'참고자료','＋']].map(tb).join('')+'</div></div>';
     /* 단계마다 이전 단계로 돌아가는 버튼(위·아래) */
-    var SN={0:'고객 목록',1:'고객정보',2:'기계약 자료',3:'1단계 기계약 분석',8:'2단계 조정·신계약',4:'2단계 Before/After',5:'옵션 관리',6:'참고자료'},ORD=[0,1,2,3,8,4],pv=isSide(st.step)?(st.from5==null?3:st.from5):ORD[Math.max(0,ORD.indexOf(st.step)-1)];
+    var SN={0:'고객 목록',1:'① 고객 정보',2:'② 기존 계약 입력',9:'③④ 옵션·샘플',3:'⑤ 기계약 분석 출력',8:'⑥ 제안안 입력',10:'⑦⑧ 제안서 옵션·샘플',4:'⑨ 제안서 출력',5:'옵션 관리',6:'참고자료'},ORD=[0,1,2,9,3,8,10,4],pv=isSide(st.step)?(st.from5==null?3:st.from5):ORD[Math.max(0,ORD.indexOf(st.step)-1)];
     var back=st.step>0?'<div class="ai-back" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn sm ghost" data-a="step" data-s="'+pv+'">◂ 뒤로: '+SN[pv]+'</button>'+(c&&window.KIFARC?'<select class="in" data-arcpick aria-label="이 고객의 지난 분석본" style="max-width:380px;flex:1 1 220px;padding:5px 8px;font-size:13px"><option value="">📂 지난 분석본 찾는 중…</option></select>':'')+'</div>':'';
     h+=back;
     if(st.step===0)h+=viewList();
@@ -4431,11 +4462,44 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     else if(st.step===6)h+=viewRefs();
     else if(!c)h+='<div class="panel ai-none"><h3>고객을 먼저 고르세요</h3><p class="note">왼쪽에서 고객을 고르거나 "새 고객"을 누르세요.</p><div class="row"><button class="btn" data-a="new">+ 새 고객 등록</button></div></div>';
     else if(st.step===8)h+=viewAdjust(c);
+    else if(st.step===9||st.step===10)h+=viewPick(c,st.step===10?2:1);
     else if(st.step===2)h+=viewDocs(c,'기존');
     else h+=[0,viewInfo,0,viewAnalysis1,viewReport][st.step](c);
     h+=back+'</section></div>';
     root.innerHTML=h;syncNote();arcPick(c);
+    var gd=document.getElementById('aiGuide');if(gd)gd.addEventListener('toggle',function(){st.gOpen=gd.open;});
     if(st.arcNext&&c&&(st.step===3||st.step===4)){st.arcNext=0;arcBasic(c,true);}
+  }
+  /* ③④ / ⑦⑧ 옵션·샘플 고르기 화면 */
+  function viewPick(c,S){
+    var two=S===2,h='<div class="aiwho" id="pDir"><b>'+(two?'⑦⑧ 제안서 옵션·샘플':'③④ 옵션·샘플')+'</b> — '+(two?'Before/After 제안서를 어떤 관점(옵션)으로, 어떤 샘플 형식으로 쓸지 고릅니다. 따로 안 고르면 묶음①(기계약 분석)과 같은 옵션·샘플을 그대로 씁니다.':'입력한 기존 계약을 어떤 관점(옵션)으로 볼지, 어떤 샘플 형식으로 리포트를 쓸지 고릅니다. 여기서 고른 내용이 규칙·출력 형식과 함께 AI에게 전달됩니다.')+'</div>';
+    if(two)h+='<div class="pick-sum"><b>지금 상태</b><span class="pill'+(own2(c)?' new':'')+'">'+(own2(c)?'제안서용으로 따로 고름':'묶음①과 같음')+'</span>'+(own2(c)?'<span class="sp"></span><button class="btn sm ghost" data-a="pick2reset">묶음①과 같게 되돌리기</button>':'')+'</div>';
+    h+='<div class="panel"><h3>'+(two?'⑦':'③')+' 분석 관점(옵션) <span class="note">여러 개 선택 가능 · 지금 '+selIds(c).length+'개</span><span class="sp"></span><button class="btn sm ghost" data-a="step" data-s="5">옵션 내용 바꾸기</button></h3><p class="note">고른 옵션의 중심 영역을 더 자세히 봅니다.</p>'+optCards(c)+'</div>';
+    h+=smpPanel(c).replace('<h3>보장분석 샘플 사용','<h3>'+(two?'⑧':'④')+' 보장분석 샘플 사용');
+    return h+'<div class="ai-act"><button class="btn" data-a="pickNext" data-s="'+(two?4:3)+'">'+(two?'다음: ⑨ 제안서 출력·저장 ▸':'다음: ⑤ 기계약 분석 출력·저장 ▸')+'</button></div>';
+  }
+  function pickSum(c,s){return '<div class="pick-sum"><b>'+(s===10?'⑦⑧ 제안서 옵션·샘플':'③④ 옵션·샘플')+'</b><span class="pill">옵션: '+esc(optShort(c))+'</span><span class="pill">샘플: '+smpSum(c)+'</span><span class="sp"></span><button class="btn sm ghost" data-a="step" data-s="'+s+'">바꾸기 ▸</button></div>';}
+  /* 단계 탭의 완료 표시(✓) */
+  function stepDone(c){var D={};if(!c)return D;var K=c.contracts||[],old=K.filter(function(k){return k.kind!=='신규';}),nw=K.filter(function(k){return k.kind==='신규';});
+    D[1]=!!(c.name&&c.birth&&c.sex);D[2]=old.length>0&&old.every(function(k){return k.confirmed;});D[9]=!!c.optSet;D[3]=!!(c.ai1||c.out1);D[8]=nw.length>0&&nw.every(function(k){return k.confirmed;});D[10]=!!c.optSet2;D[4]=!!c.out2;return D;}
+  /* 사용 안내서: 이름만 보이고 누르면 펼쳐진다 */
+  var GUIDE_V='v1.0 · 2026-11-09';
+  function guideHtml(){
+    var card=function(n,t,p,tip,s){return '<div class="gk"><h5><i>'+n+'</i>'+t+'</h5><p>'+p+'</p>'+(tip?'<p class="tip">💡 '+tip+'</p>':'')+(s!=null?'<button class="btn sm ghost" data-a="gGo" data-s="'+s+'">이 단계로 가기 ▸</button>':'')+'</div>';};
+    return '<details class="ai-guide" id="aiGuide"'+(st.gOpen?' open':'')+'><summary>📘 AI 보장분석 사용 안내서 <span class="gv">'+GUIDE_V+'</span></summary><div class="gb">'+
+      '<div class="gz"><b>0. AI 연결 (모든 단계보다 먼저, 처음 한 번)</b><br>위쪽 「내 AI 등록」을 눌러 쓸 AI(Claude·ChatGPT·Gemini)를 고르고 개인 API 키를 넣어 <b>저장</b>합니다. 키를 넣으면 자료 읽기·분석이 자동으로 끝까지 진행되고, 키가 없으면 「복사·붙여넣기」 방식으로 AI 창에 붙여 넣고 답을 다시 가져옵니다. 한 번 등록하면 기본형·고급형 모두 그대로 쓰입니다.</div>'+
+      '<div class="gg"><span>묶음①</span>기계약 분석 — 지금 가입한 보험 점검</div><div class="gc">'+
+      card(1,'고객 정보 입력','왼쪽 「+ 새 고객」 → <b>이름·생년월일·성별</b>(필수)과 시·도/시·군·구/읍·면·동을 적고 「저장하고 다음」.','주민번호·연락처·상세주소는 받지 않습니다. 가족·병력·상담 기록은 필요할 때만.',1)+
+      card(2,'기존 계약 입력','증권·보장분석표·보장 조회 결과(PDF·사진·엑셀)를 올리고 「AI에게 읽히기」. 엑셀 입력 양식은 AI 없이 바로 읽힙니다. 읽힌 계약·담보를 가입설계서와 대조한 뒤 계약마다 <b>「확인 완료」</b>.','여러 장은 모두 올린 뒤 한 번에 읽히세요. 가족 계약은 「이 고객 자료 맞음」을 눌러야 분석에 들어갑니다.',2)+
+      card(3,'옵션 선택','암 주요치료비·순환계·수술비·실손 보완 등 <b>분석 관점</b>을 고릅니다(여러 개 가능). 고른 옵션의 중심 영역을 더 자세히 봅니다.','',9)+
+      card(4,'샘플 선택','리포트 문장을 쓸 형식을 고릅니다. 「맡기기」 = 옵션에 맞는 샘플을 자동으로, 「직접 고르기」 = 🔍 샘플 보기로 확인 후 최대 3개.','',9)+
+      card(5,'기계약 분석 출력·저장','「보장분석 실행」으로 AI가 유리한 부분·불리한 부분을 정리합니다. 그다음 <b>분석 리포트 PDF · PPT 저장 · 분석표 엑셀/PDF</b>, 「자료함에 보관」.','PDF는 카카오톡으로 고객에게 바로 보낼 수 있습니다.',3)+
+      '</div><div class="gg"><span>묶음②</span>제안안 — Before/After 제안서</div><div class="gc">'+
+      card(6,'제안안 입력','기존 계약에서 <b>유지·정리(삭제)·해지</b>할 담보를 체크로 고르고, 제안할 가입설계서(신계약)를 올려 「AI에게 읽히기」 → 「확인 완료」. 아래 Before/After 미리보기로 보험료 변화를 봅니다.','가입설계서 숫자(가입금액·보험료)는 꼭 원본과 대조하세요.',8)+
+      card(7,'옵션 선택','제안서의 관점을 고릅니다. 따로 안 고르면 묶음①과 같은 옵션을 씁니다.','',10)+
+      card(8,'샘플 선택','제안서 문장 형식을 고릅니다. 따로 안 고르면 묶음①과 같은 샘플을 씁니다.','',10)+
+      card(9,'제안서 출력·저장','최근 기사를 고르고 「AI로 문구 다듬기」 → <b>제안서 PDF · PPT 저장 · 분석표 엑셀/PDF</b>, 「자료함에 보관」.','숫자는 포털이 계산하고 AI는 문장만 씁니다. 「⚠ AI 답 점검」이 뜨면 해당 문장을 확인하세요.',4)+
+      '</div></div></details>';
   }
   function viewList(){
     var L=st.customers;
@@ -4459,7 +4523,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       inp('fDong','읍·면·동',c.dong,'placeholder="예: 역삼동" autocomplete="off"')+'</div>'+
       '<p class="note">🔒 개인정보 보호: 고객 정보는 <b>이름·생년월일·성별·시/구/동</b>까지만 받습니다. 주민번호·연락처·이메일·상세주소(도로명·번지·아파트 동호수)는 적지 마세요.</p>'+
       (ageSex(c)?'<p class="note">계산된 나이·성별: <b>'+esc(ageSex(c))+'</b></p>':'')+'</div>';
-    h+='<div id="pDir"><div class="aiwho"><b>먼저 정하기 · 분석 방향</b> — 자료를 첨부하기 전에 이 고객을 어떤 관점으로 볼지(옵션)와 어떤 샘플 형식으로 쓸지 정합니다. 여기서 정한 내용이 규칙·출력 형식과 함께 AI 패키지에 담깁니다. 나중에 1단계 화면에서도 바꿀 수 있습니다.</div>'+
+    h+='<p class="note" style="margin:4px 2px 10px">분석 관점(옵션)과 샘플은 기존 계약을 입력한 다음 <b>③④ 옵션·샘플</b> 단계에서 고릅니다.</p>';
       '<div class="panel"><h3>분석 관점(옵션) <span class="note">여러 개 선택 가능 · 지금 '+selIds(c).length+'개</span></h3>'+optCards(c)+'</div>'+smpPanel(c)+'</div>';
     h+='<div class="panel"><h3>② 가족관계 <button class="btn sm ghost" data-a="addFam">+ 추가</button></h3><div class="tbl"><table class="ed"><thead><tr><th>관계</th><th>이름</th><th>생년월일</th><th>비고</th><th></th></tr></thead><tbody>';
     c.family.forEach(function(f,i){h+='<tr><td><select class="in" data-fam="'+i+'" data-k="rel">'+['배우자','자녀','부','모','형제·자매','기타'].map(function(o){return '<option'+(o===f.rel?' selected':'')+'>'+o+'</option>';}).join('')+'</select></td><td><input class="in" data-fam="'+i+'" data-k="name" value="'+esc(f.name)+'"></td><td><input class="in" type="date" data-fam="'+i+'" data-k="birth" value="'+esc(f.birth)+'"></td><td><input class="in" data-fam="'+i+'" data-k="note" value="'+esc(f.note)+'"></td><td><button class="xb" data-a="delFam" data-i="'+i+'" aria-label="삭제">✕</button></td></tr>';});
@@ -4514,7 +4578,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       });
       h+='</div>';
     });
-    h+='</div>'+(OLD?'<div class="ai-act"><button class="btn" data-a="saveDocs">저장</button><button class="btn ghost" data-a="docsNext">저장하고 1단계 기계약 분석 ▸</button></div>':'');
+    h+='</div>'+(OLD?'<div class="ai-act"><button class="btn" data-a="saveDocs">저장</button><button class="btn ghost" data-a="docsNext">저장하고 다음: ③④ 옵션·샘플 고르기 ▸</button></div>':'');
     return h;
   }
   function upBox(c,kind,title,hint){
@@ -4542,7 +4606,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function smpM(t,title){return window.KIFSMP?KIFSMP.mask(t,title):t;}
   function smpSum(c){var m=smpMode(c),L=smpChosen(c);return m==='none'?'사용 안 함':m==='pick'&&L.length?'직접 고름 · '+esc(L[0].title)+(L.length>1?' 외 '+(L.length-1)+'개':''):'맡기기 (자동)';}
   function smpPanel(c){
-    var m=smpMode(c),rec=smpPick(selIds(c),2).map(function(s){return s.id;}),sel=(c.smpIds||[]);
+    var m=smpMode(c),rec=smpPick(selIds(c),2).map(function(s){return s.id;}),sel=smpIdsOf(c);
     var M=[['auto','맡기기 (자동)','지정하지 않으면 포털이 고른 옵션에 맞는 샘플 후보를 골라 주고, AI가 이 고객에게 가장 맞는 형식을 골라 씁니다.'],
       ['pick','샘플 직접 고르기','아래에서 고른 샘플의 형식·포맷(구성 순서, 장 제목, 문장 길이)을 기준으로 씁니다. 최대 3개, 먼저 고른 것이 기준(샘플 1)입니다.'],
       ['none','샘플 사용 안 함','샘플 없이 포털 기본 규칙만으로 씁니다.']];
@@ -4611,8 +4675,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     sc.sort(function(a,b){return b.v-a.v||a.i-b.i;});return sc.slice(0,3).map(function(x){return x.s;});
   }
   /* 고객별 샘플 사용 방식: auto(기본, 맡기기) / pick(FC가 직접 고름) / none(샘플 안 씀) */
-  function smpMode(c){var m=c&&c.smpMode;return m==='pick'||m==='none'?m:'auto';}
-  function smpChosen(c){var ids=(c&&c.smpIds)||[];return ids.map(function(id){return SMP.filter(function(s){return s.id===id&&s.on!==false&&smpOk(s);})[0];}).filter(Boolean).slice(0,3);}
+  function smpMode(c){var m=c&&(stg2()&&c.smp2?c.smp2.mode:c.smpMode);return m==='pick'||m==='none'?m:'auto';}
+  function smpIdsOf(c){return (c&&(stg2()&&c.smp2?c.smp2.ids:c.smpIds))||[];}
+  function smpSet(c,mode,ids){if(stg2()){var o=c.smp2||{mode:smpMode(c),ids:smpIdsOf(c).slice()};if(mode!=null)o.mode=mode;if(ids)o.ids=ids;c.smp2=o;}else{if(mode!=null)c.smpMode=mode;if(ids)c.smpIds=ids;}c.optSet=1;}
+  function smpChosen(c){var ids=smpIdsOf(c);return ids.map(function(id){return SMP.filter(function(s){return s.id===id&&s.on!==false&&smpOk(s);})[0];}).filter(Boolean).slice(0,3);}
   function smpFor(c,stage){var m=smpMode(c);if(m==='none')return [];if(m==='pick'){var L=smpChosen(c);if(L.length)return L;}return smpPick(selIds(c),stage);}
   function smpText(ids,stage,c){
     if(c&&smpMode(c)==='none')return '[보장분석 샘플 없음 — FC가 이 고객은 샘플 없이 쓰기로 했다. 위 규칙만 따라 쉬운 말로 쓴다]';
@@ -4732,13 +4798,12 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function bars1(R,focus){return bars(R,focus).replace('<span><i class="mo"></i>기존</span><span><i class="mt"></i>신규 가입 후(합산)</span>','<span><i class="mt"></i>기존 계약 보장</span>');}
   function rptBar(c,title,pill){return '<div class="panel rtool"><div class="row"><b>'+title+'</b><span class="pill new">'+esc(pill)+'</span><span class="sp"></span>'+
       (st.step===4?'<button class="btn sm ghost" data-a="aiText" id="aiTextBtn">AI로 문구 다듬기</button>'+pkgBtns():'')+'<button class="btn sm ghost" data-a="print">인쇄</button><button class="btn sm ghost" data-a="saveHtml">HTML 저장</button><button class="btn sm ghost" data-a="arcSave" title="이 화면을 「내 자료함」에 날짜별로 남깁니다">자료함에 보관</button></div>'+
-      '<div class="row outs"><b>카카오톡으로 보낼 파일</b><button class="btn sm" data-a="pdfRpt">'+(st.step===3?'분석 리포트':'제안서')+' PDF 저장</button><button class="btn sm" data-a="pdfSheet">분석표 PDF 저장</button><button class="btn sm ghost" data-a="saveXlsx">분석표 엑셀 저장</button><span class="note" id="pdfNote">PDF를 저장한 뒤 카카오톡 대화방에서 파일로 첨부하면 됩니다.</span></div>'+
+      '<div class="row outs"><b>카카오톡으로 보낼 파일</b><button class="btn sm" data-a="pdfRpt">'+(st.step===3?'분석 리포트':'제안서')+' PDF 저장</button><button class="btn sm" data-a="pptRpt" title="장표마다 그림으로 넣은 PowerPoint 파일(발표용)">'+(st.step===3?'분석 리포트':'제안서')+' PPT 저장</button><button class="btn sm" data-a="pdfSheet">분석표 PDF 저장</button><button class="btn sm ghost" data-a="saveXlsx">분석표 엑셀 저장</button><span class="note" id="pdfNote">PDF를 저장한 뒤 카카오톡 대화방에서 파일로 첨부하면 됩니다.</span></div>'+
       needsPick(c,opt(c));}
   /* 화면 3: 1단계 기계약 보장분석 */
   function viewAnalysis1(c){
     var o=opt(c),v=vOld(c),R=analyze(v,o),PC=prosCons(v,o,R),K=useK(v);
-    var h='<div class="aiwho"><b>1단계 · 기계약 보장분석</b> — 지금 가입한 보험만으로 무엇이 든든하고 무엇이 비어 있는지 정리합니다. 신계약은 2단계에서 붙입니다.</div>';
-    h+='<div class="panel"><h3>분석 관점(옵션) 선택 <span class="note">여러 개 선택 가능 · 지금 '+selIds(c).length+'개</span><span class="sp"></span><button class="btn sm ghost" data-a="step" data-s="5">옵션 내용 바꾸기</button></h3><p class="note">고른 옵션의 중심 영역을 더 자세히 봅니다. 2단계 제안서도 같은 옵션으로 만듭니다.</p>'+optCards(c)+'</div>'+smpPanel(c);
+    var h='<div class="aiwho"><b>⑤ 기계약 분석 출력·저장</b> — 지금 가입한 보험만으로 무엇이 든든하고 무엇이 비어 있는지 정리하고, 리포트를 PDF·PPT·엑셀로 저장합니다. 제안안은 묶음②에서 붙입니다.</div>'+pickSum(c,9);
     if(!K.length)return h+'<div class="panel"><h3>기존 계약이 없습니다</h3><p class="note">먼저 "기계약 자료"에 증권·보장분석표를 첨부하세요.</p><div class="row"><button class="btn" data-a="step" data-s="2">기계약 자료 첨부하기 ▸</button></div></div>';
     h+='<div class="kpis"><div><span>기존 월보험료</span><b>'+fmt(R.prem.old)+'<small>원</small></b><em>계약 '+K.length+'건</em></div><div><span>담보</span><b>'+R.cnt.old+'<small>개</small></b><em>'+AREAS.filter(function(a){return R.A[a].old;}).length+'개 영역</em></div><div class="t"><span>점검 결과</span><b>유리 '+PC.P.length+' · 불리 '+PC.C.length+'</b><em>아래 정리 참고</em></div></div>';
     h+='<div class="panel ai1"><div class="row"><b>내 AI로 보장분석</b><span class="note">'+(PC.ai?'✓ '+esc(PC.ai.by)+'가 포털 규칙으로 정리 ('+esc(PC.ai.at)+')'+aiWarn(PC.ai.warn):'지금은 포털 규칙으로 자동 정리한 결과입니다. 버튼을 누르면 내 AI('+esc(provName())+')가 같은 규칙으로 다시 정리합니다.')+'</span><span class="sp"></span><button class="btn sm" data-a="ai1" id="ai1Btn">'+(PC.ai?'다시 분석':'보장분석 실행')+'</button>'+(PC.ai?'<button class="btn sm ghost" data-a="ai1off">규칙 기본 결과로</button>':'')+pkgBtns()+'</div><p class="note" id="ai1Note">어떤 AI를 쓰든 숫자·표·출력물 모양은 포털이 정하고, AI는 유리·불리·결론 <b>문장</b>만 씁니다. 문장은 관리자가 정한 <b>보장분석 규칙</b>과 샘플을 함께 보내 맞추고, 받은 답은 포털이 다시 점검합니다(자료에 없는 숫자·금지 표현·개수).</p></div>';
@@ -4752,13 +4817,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+='</tbody></table></div></div>'+itemsPanel(v);
     h+=rptBar(c,'1단계 기계약 보장분석 리포트',o.title)+'<p class="note" id="rptNote">숫자는 분석표에서 계산한 값입니다. 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.</p></div>';
     h+='<div class="rpt" id="rpt">'+report1Html(v,o,R,PC)+'</div>';
-    return h+'<div class="ai-act"><button class="btn" data-a="step" data-s="8">2단계: 기존 계약 조정·신계약 첨부 ▸</button></div>';
+    return h+'<div class="ai-act"><button class="btn" data-a="step" data-s="8">묶음②로: ⑥ 제안안 입력 ▸</button></div>';
   }
   /* 화면 4: 2단계 조정(유지·삭제·해지) + 신계약 첨부 */
   function baRows(c,o){var v=vAfter(c),R=analyze(v,o),R0=v._B.R0,out=[];AREAS.forEach(function(a){var b=R0.A[a].old,f=R.A[a].old+R.A[a].neu;if(!b&&!f&&o.areas.indexOf(a)<0)return;out.push({a:a,b:b,f:f,d:f-b,fx:o.areas.indexOf(a)>-1});});return {rows:out,R:R,R0:R0,v:v};}
   function viewAdjust(c){
     var o=opt(c),X=baRows(c,o),B=X.v._B,bp=X.R0.prem.old,ap=X.R.prem.old+X.R.prem.neu;
-    var h=(dupNew(c)?'<div class="panel" style="border:1px solid #f59e0b;background:#fffbeb"><b>⚠ 신계약 중복 의심 '+dupNew(c)+'건</b> <span class="note">같은 보험사·상품·보험료의 신계약이 두 번 이상 들어 있어 After가 부풀려질 수 있습니다. 아래 신계약 목록에서 하나를 지우세요.</span></div>':'')+'<div class="aiwho"><b>2단계 · 조정과 신계약</b> — ① 기존 계약에서 유지할 담보와 정리할 담보를 고르고 ② 신계약·추천 계약을 첨부하면, 컨설팅 전(Before)과 후(After)를 비교한 제안서가 만들어집니다.</div>';
+    var h=(dupNew(c)?'<div class="panel" style="border:1px solid #f59e0b;background:#fffbeb"><b>⚠ 신계약 중복 의심 '+dupNew(c)+'건</b> <span class="note">같은 보험사·상품·보험료의 신계약이 두 번 이상 들어 있어 After가 부풀려질 수 있습니다. 아래 신계약 목록에서 하나를 지우세요.</span></div>':'')+'<div class="aiwho"><b>⑥ 제안안 입력</b> — ① 기존 계약에서 유지할 담보와 정리할 담보를 고르고 ② 신계약·추천 계약을 첨부하면, 컨설팅 전(Before)과 후(After)를 비교한 제안서가 만들어집니다.</div>';
     h+='<div class="panel"><h3>① 기존 계약 조정 <span class="note">체크 = 유지 · 체크를 끄면 정리(삭제)</span></h3><p class="note">계약을 통째로 해지하려면 계약 줄의 "계약 유지" 체크를 끄세요. 담보별 보험료가 적혀 있으면 After 보험료에 바로 반영됩니다.</p>';
     var any=false;
     c.contracts.forEach(function(k,ki){if(k.kind==='신규'||(k.nameWarn&&!k.nameOk))return;any=true;
@@ -4772,7 +4837,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+='</div>'+viewDocs(c,'신규');
     h+='<div class="panel"><h3>③ Before / After 미리보기 <span class="note">단위: 만원 · 보험료 원</span></h3><div class="kpis"><div><span>Before 월보험료</span><b>'+fmt(bp)+'<small>원</small></b><em>기존 계약 그대로</em></div><div><span>정리·신규</span><b>−'+fmt(B.saved)+' / +'+fmt(X.R.prem.neu)+'</b><em>담보 '+B.drop.length+'개 정리 · 신규 '+X.R.cnt.neu+'개</em></div><div class="t"><span>After 월보험료</span><b>'+fmt(ap)+'<small>원</small></b><em>'+(ap>bp?'+'+fmt(ap-bp)+'원':ap<bp?'−'+fmt(bp-ap)+'원':'변동 없음')+'</em></div></div>'+
       '<div class="tbl"><table><thead><tr><th>보장영역</th><th class="r">Before</th><th class="r">After</th><th class="r">변화</th></tr></thead><tbody>'+X.rows.map(function(r){return '<tr class="'+(r.fx?'fx':'')+'"><td>'+r.a+'</td><td class="r">'+fmt(r.b)+'</td><td class="r"><b>'+fmt(r.f)+'</b></td><td class="r '+(r.d>0?'up':r.d<0?'dn':'')+'">'+(r.d>0?'+'+fmt(r.d):r.d<0?'−'+fmt(-r.d):'—')+'</td></tr>';}).join('')+'</tbody></table></div></div>';
-    return h+'<div class="ai-act"><button class="btn" data-a="saveDocs">저장</button><button class="btn ghost" data-a="adjNext">저장하고 Before/After 제안서 ▸</button></div>';
+    return h+'<div class="ai-act"><button class="btn" data-a="saveDocs">저장</button><button class="btn ghost" data-a="adjNext">저장하고 다음: ⑦⑧ 제안서 옵션·샘플 ▸</button></div>';
   }
   /* 옵션 하나의 부각 내용: 공백(0원)·부족·보강 영역과 한 줄 메시지 */
   function spotInfo(q,R){
@@ -4849,8 +4914,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function newsHost(u){try{var h=new URL(u).hostname.replace(/^(www|m|n|news|biz)\./,'');for(var k in NEWS_HOST)if(h===k||h.slice(-k.length-1)==='.'+k)return NEWS_HOST[k];return h;}catch(e){return '';}}
   function viewReport(c){
     var o=opt(c),v=vAfter(c),R=analyze(v,o),T=(c.ai&&c.ai.opt===o.id&&c.ai.s2)?c.ai:defText(v,o,R);
-    var h='<div class="aiwho"><b>2단계 · Before / After 제안서</b> — 기존 계약은 이랬는데(Before), 컨설팅 후 조정 계약은 이렇게 됩니다(After).</div>'+rptBar(c,'Before/After 제안서',o.title)+
-      '<p class="note" id="rptNote">'+(c.ai&&c.ai.opt===o.id&&c.ai.s2?(c.ai.by?esc(c.ai.by)+'가 ':'AI가 ')+'다듬은 문구입니다. 숫자는 분석표에서 계산한 값입니다.'+aiWarn(c.ai.warn):'기본 문구입니다. 숫자는 분석표에서 계산한 값입니다.')+' 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.<br>샘플: <b>'+smpSum(c)+'</b> <button class="chkgo" data-a="step" data-s="3">바꾸기 ▸</button></p></div>';
+    var h='<div class="aiwho"><b>⑨ 제안서 출력·저장</b> — 기존 계약은 이랬는데(Before), 컨설팅 후 조정 계약은 이렇게 됩니다(After). PDF·PPT·엑셀로 저장합니다.</div>'+pickSum(c,10)+rptBar(c,'Before/After 제안서',o.title)+
+      '<p class="note" id="rptNote">'+(c.ai&&c.ai.opt===o.id&&c.ai.s2?(c.ai.by?esc(c.ai.by)+'가 ':'AI가 ')+'다듬은 문구입니다. 숫자는 분석표에서 계산한 값입니다.'+aiWarn(c.ai.warn):'기본 문구입니다. 숫자는 분석표에서 계산한 값입니다.')+' 인쇄는 저장한 PDF를 열어서 하면 가장 깔끔합니다.<br>샘플: <b>'+smpSum(c)+'</b> <button class="chkgo" data-a="step" data-s="10">바꾸기 ▸</button></p></div>';
     h+=newsPanel(c,o);
     h+='<div class="rpt" id="rpt">'+reportHtml(v,o,R,T)+'</div>';
     return h;
@@ -5611,7 +5676,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       PASTE_FILE=imgNames.join(', ');
       if(prog)prog.textContent='자료 '+recs.length+'건을 한 번에 AI에게 보내는 중…';
       var head='여러 파일을 한 번에 보낸다(파일 '+recs.length+'개). 모든 파일의 계약·담보를 빠짐없이 적고, 각 계약 객체에 "file":파일번호(숫자)를 꼭 넣어라.\n\n';
-      var anaC=(kind!=='신규'&&isPaste())?c:null,got=await aiCall(head+texts.join('\n\n'),imgs,kind,'',anaC);
+      var anaC=(kind!=='신규'&&isPaste()&&c.optSet)?c:null,got=await aiCall(head+texts.join('\n\n'),imgs,kind,'',anaC);
       recs.forEach(function(rec,i){var no=i+1,L=got.filter(function(k){return k.file===no||(recs.length===1)||(i===0&&!(k.file>=1&&k.file<=recs.length));});
         L=mergeK(L);L.forEach(function(k){delete k.file;});delete rec.pend;
         if(L.length)addParsed(c,L,rec,'AI 판독(확인 필요) · '+recs.length+'건 한 번에 읽음',kind,true);
@@ -5842,6 +5907,24 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   function pdfReport(c,btn){var el=document.getElementById('rpt');if(!el)return;
     pdfRun(btn,'제안서 PDF',async function(prog){var data=await makePdf(el.innerHTML,{orient:'l',fmt:[338.67,190.5],m:0,w:1280,cls:'rpt',sel:'.sl',prog:prog});await dl(fileBase(c)+(c._stage===1?'_기계약보장분석_':'_BeforeAfter제안서_')+ymd()+'.pdf',data);});}
+  /* 리포트·제안서 장표(.sl)를 한 장씩 그림으로 떠서 16:9 PowerPoint로 저장 */
+  function pptReport(c,btn){var el=document.getElementById('rpt');if(!el)return;
+    var note=document.getElementById('pdfNote'),old=note?note.textContent:'';if(btn)btn.disabled=true;
+    (async function(){
+      await Promise.all([loadJs('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'),loadJs('https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.bundle.js')]);
+      if(!window.html2canvas||!window.PptxGenJS)throw {code:'lib'};
+      var host=document.createElement('div');host.className='pdfhost rpt';host.style.width='1280px';host.innerHTML=el.innerHTML;document.body.appendChild(host);
+      try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+        var pp=new window.PptxGenJS();pp.layout='LAYOUT_WIDE';pp.title=(c._stage===1?'기계약 보장분석':'Before/After 제안서');
+        var secs=host.querySelectorAll('.sl');
+        for(var i=0;i<secs.length;i++){if(note)note.textContent='PPT 만드는 중… '+(i+1)+'/'+secs.length+'장';
+          var cv=await window.html2canvas(secs[i],{scale:2,backgroundColor:'#ffffff',logging:false,useCORS:true,windowWidth:1320});
+          var s=pp.addSlide(),W=13.333,H=7.5,r=Math.min(W/cv.width,H/cv.height),w=cv.width*r,hh=cv.height*r;
+          s.addImage({data:cv.toDataURL('image/jpeg',0.92),x:(W-w)/2,y:(H-hh)/2,w:w,h:hh});}
+        var buf=await pp.write({outputType:'uint8array'});
+        await dl(fileBase(c)+(c._stage===1?'_기계약보장분석_':'_BeforeAfter제안서_')+ymd()+'.pptx',buf);
+      }finally{host.remove();}
+    })().then(function(){if(note)note.textContent=old;},function(e){if(note)note.textContent=e&&e.code==='lib'?'PPT 도구를 불러오지 못했습니다(인터넷 연결 확인).':'PPT를 만들지 못했습니다. 다시 눌러 보세요.';}).then(function(){if(btn)btn.disabled=false;});}
   function pdfSheet(c,btn){
     pdfRun(btn,'분석표 PDF',async function(prog){var data=await makePdf(sheetHtml(c),{orient:'p',w:1000,cls:'xbook',sel:'.xsh',prog:prog});await dl(fileBase(c)+(c._stage===1?'_기계약분석표_':'_BeforeAfter분석표_')+ymd()+'.pdf',data);});}
   function saveTpl(){
@@ -5876,6 +5959,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(a==='smpBadX'){SMPST.bad=[];SMPST.ocr=[];render();return;}
     if(a==='smpDel'){if(!isAdm())return;var sd=SMP.filter(function(s){return s.id===b.dataset.id;})[0];if(!sd||!confirm('"'+sd.title+'" 샘플을 지울까요?'))return;SMP=SMP.filter(function(s){return s!==sd;});smpSave('"'+sd.title+'" 삭제');return;}
     if(a==='smpReset'){if(!isAdm()||!confirm('등록된 샘플을 지우고 기본 샘플 3건으로 되돌릴까요?'))return;SMP=JSON.parse(JSON.stringify(SMP_DEF));smpSave('기본 샘플로 되돌림');return;}
+    if(a==='gGo'){var gs=+b.dataset.s;if(!c&&gs>0){toast('먼저 왼쪽에서 고객을 고르거나 「+ 새 고객」을 누르세요.');return;}gather();if(c)touch(c);st.step=gs;render();window.scrollTo(0,root.offsetTop-80);return;}
+    if(a==='pickNext'){if(st.step===9)c.optSet=1;else c.optSet2=1;touch(c);st.step=+b.dataset.s;render();window.scrollTo(0,root.offsetTop-80);return;}
+    if(a==='pick2reset'){delete c.options2;delete c.smp2;touch(c);render();return;}
     if(a==='step'){st.refAdm=false;gather();if(c)touch(c);var ns=+b.dataset.s;if(isSide(ns)&&!isSide(st.step))st.from5=st.step;st.step=ns;render();window.scrollTo(0,root.offsetTop-80);return;}
     if(a==='new'){gather();var x=blank();st.customers.unshift(x);st.cur=x.id;st.step=1;persist();render();document.getElementById('fName').focus();return;}
     if(a==='example_off'){gather();var ex=exampleCustomer();st.customers.unshift(ex);st.cur=ex.id;st.step=3;persist();pushC(ex);render();toast('예시 고객을 불러왔습니다. 옵션을 바꿔 보세요.');return;}
@@ -5915,8 +6001,10 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(a==='nameOk'){gatherDocs(c);c.contracts[+b.dataset.k].nameOk=true;touch(c);render();toast('이 고객 자료로 확인했습니다. 분석에 넣습니다.');return;}
     if(a==='dupOk'){gatherDocs(c);c.contracts[+b.dataset.k].dupOk=true;touch(c);render();toast('중복 가입으로 확인했습니다. 합산에 그대로 들어갑니다.');return;}
     if(a==='okK'){gatherDocs(c);c.contracts[+b.dataset.k].confirmed=true;touch(c);render();toast('확인 완료로 표시했습니다.');return;}
-    if(a==='saveDocs'||a==='docsNext'||a==='adjNext'){gatherDocs(c);c.contracts.forEach(function(k){k.items.forEach(function(it){if(it.area==='기타')it.area=classify(it.name);});});touch(c);if(a==='docsNext')st.step=3;if(a==='adjNext')st.step=4;render();toast('저장했습니다.');return;}
+    if(a==='saveDocs'||a==='docsNext'||a==='adjNext'){gatherDocs(c);c.contracts.forEach(function(k){k.items.forEach(function(it){if(it.area==='기타')it.area=classify(it.name);});});touch(c);if(a==='docsNext')st.step=9;if(a==='adjNext')st.step=10;render();toast('저장했습니다.');return;}
     if(a==='tpl'){saveTpl();return;}
+    if(/^(pdfRpt|pdfSheet|pptRpt|saveXlsx)$/.test(a)&&c&&(st.step===3||st.step===4)){c[st.step===3?'out1':'out2']=1;touch(c);}
+    if(a==='pptRpt'){arcBasic(c);pptReport(dataC(c),b);return;}
     if(a==='pdfRpt'){arcBasic(c);pdfReport(dataC(c),b);return;}
     if(a==='pdfSheet'){arcBasic(c);pdfSheet(dataC(c),b);return;}
     if(a==='arcSave'){arcBasic(c,true);return;}
@@ -5950,13 +6038,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       if(t.dataset.kc!=null){ca.contracts[+t.dataset.kc].cancel=!t.checked;}else{var pr=t.dataset.kd.split(':');ca.contracts[+pr[0]].items[+pr[1]].drop=!t.checked;}
       touch(ca);var yy=window.scrollY;render();window.scrollTo(0,yy);return;}
     if(st.step===1&&/^(smpMode|smpSel|aiOpt)$/.test(t.name||'')){var c1=cust(),lg=document.getElementById('fLog'),lv=lg?lg.value:'';if(lg)lg.value='';if(c1)gatherInfo(c1);setTimeout(function(){var l2=document.getElementById('fLog');if(l2&&lv)l2.value=lv;},0);}
-    if(t.name==='smpMode'){var c3=cust();if(!c3)return;c3.smpMode=t.value;if(t.value==='pick'&&!(c3.smpIds&&c3.smpIds.length))c3.smpIds=smpPick(selIds(c3),2).slice(0,1).map(function(s){return s.id;});touch(c3);var y3=window.scrollY;render();window.scrollTo(0,y3);return;}
-    if(t.name==='smpSel'){var c4=cust();if(!c4)return;var si=(c4.smpIds||[]).filter(function(id){return SMP.some(function(s){return s.id===id;});}),j=si.indexOf(t.value);
+    if(t.name==='smpMode'){var c3=cust();if(!c3)return;smpSet(c3,t.value);if(t.value==='pick'&&!smpIdsOf(c3).length)smpSet(c3,null,smpPick(selIds(c3),2).slice(0,1).map(function(s){return s.id;}));touch(c3);var y3=window.scrollY;render();window.scrollTo(0,y3);return;}
+    if(t.name==='smpSel'){var c4=cust();if(!c4)return;var si=smpIdsOf(c4).filter(function(id){return SMP.some(function(s){return s.id===id;});}),j=si.indexOf(t.value);
       if(t.checked&&j<0){if(si.length>=3){t.checked=false;toast('샘플은 3개까지 고를 수 있습니다.');return;}si.push(t.value);}else if(!t.checked&&j>-1)si.splice(j,1);
-      c4.smpIds=si;touch(c4);var y4=window.scrollY;render();window.scrollTo(0,y4);return;}
+      smpSet(c4,null,si);touch(c4);var y4=window.scrollY;render();window.scrollTo(0,y4);return;}
     if(t.name==='aiOpt'){var c=cust(),ids=selIds(c).slice(),i=ids.indexOf(t.value);
       if(t.checked&&i<0)ids.push(t.value);else if(!t.checked&&i>-1){if(ids.length===1){t.checked=true;toast('옵션은 최소 1개를 골라야 합니다.');return;}ids.splice(i,1);}
-      c.options=ids;c.option=ids[0];touch(c);render();return;}
+      if(stg2())c.options2=ids;else{c.options=ids;c.option=ids[0];}c.optSet=1;touch(c);var y5=window.scrollY;render();window.scrollTo(0,y5);return;}
     if(t.dataset&&t.dataset.upkind&&t.files&&t.files.length){onFiles([].slice.call(t.files),t.dataset.upkind);return;}
     if(t.dataset&&t.dataset.g==='name'){var tr=t.closest('tr'),sel=tr.querySelector('[data-g="area"]');if(sel&&sel.value==='기타')sel.value=classify(t.value);var ts=tr.querySelector('[data-g="ty"]');if(ts){ts.options[0].text='자동: '+injType(t.value);if(!ts.value)ts.className='in tysel '+tyCls(injType(t.value));}}
     if(t.dataset&&t.dataset.g==='ty'){t.className='in tysel '+tyCls(t.value||injType((t.closest('tr').querySelector('[data-g="name"]')||{}).value));}
