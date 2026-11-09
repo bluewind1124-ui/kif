@@ -4,7 +4,8 @@
    - 약관이 한 번에 안 들어가면 기본은 「빠짐없이 전체 읽기」: 전체를 묶음으로 나눠 AI가 모든 쪽을 읽고 관련 쪽을 고른 뒤, 그 쪽 원문으로 답한다.
      「빠른 찾기」는 낱말로 관련 쪽만 골라 한 번에 보낸다. 어느 쪽이든 답마다 읽힌 범위·못 읽은 쪽을 표시한다.
    - 글자 없는 쪽(표·별표 그림, 스캔)은 문자 인식(KIFAI.ocrPages)으로 읽을 수 있게 하고, 읽기 전까지 화면에 계속 알린다.
-   window.KIFPOL = { html(), bind(root), card() } */
+   window.KIFPOL = { html(), bind(root), card() }
+   v1.1 (2026-11-09): 보고서 표가 화면 오른쪽으로 잘리던 문제 수정(PC 줄바꿈 · 폰 카드 모양) */
 (function(){
 'use strict';
 if(window.KIFPOL)return;
@@ -78,7 +79,7 @@ var CSS='.pol{max-width:880px;margin:0 auto}'+
 '.pol-a .rf{margin-top:10px;font-size:.88rem;background:var(--surface-2);border-radius:5px;padding:8px 12px}.pol-a .rf li{margin:3px 0}.pol-a .rf q{color:var(--muted)}'+
 '.pol-a .cv{margin-top:8px;font-size:.85rem;color:var(--warn)}.pol-a .ft{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}.pol-a .ft .note{flex:1}'+
 '.pol-blk{margin-top:10px}.pol-blk>.lb{font-weight:700;font-size:.86rem;color:var(--navy-ink);margin-bottom:4px}.pol-wn{background:var(--warn-soft);border-radius:6px;padding:8px 12px}.pol-wn>.lb{color:var(--warn)}.pol-wn ul{margin:4px 0 0}'+
-'.pol-tw{overflow-x:auto}.pol-t{border-collapse:collapse;width:100%;min-width:560px;font-size:.85rem}.pol-t th,.pol-t td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}.pol-t th{background:var(--surface-2);white-space:nowrap}.pol-t td.c{font-weight:700;white-space:nowrap}.pol-t tr.w td.c{color:var(--warn)}.pol-t td.q{color:var(--muted)}.pol-t .pg{white-space:nowrap;color:var(--navy-ink);font-weight:700}'+
+'.pol-tw{overflow-x:auto}.pol-t{border-collapse:collapse;width:100%;min-width:560px;font-size:.85rem}.pol-t th,.pol-t td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}.pol-t th{background:var(--surface-2);color:var(--navy-ink);font-weight:700;white-space:nowrap}.pol-t td.c{font-weight:700;white-space:nowrap}.pol-t tr.w td.c{color:var(--warn)}.pol-t td.q{color:var(--muted)}.pol-t .pg{white-space:nowrap;color:var(--navy-ink);font-weight:700}'+
 '.pol-raw{margin-top:10px;font-size:.8rem}.pol-raw summary,.pol-paste summary{cursor:pointer;color:var(--muted)}.pol-raw pre{white-space:pre-wrap;word-break:break-all;background:var(--surface-2);border-radius:6px;padding:8px;max-height:280px;overflow:auto}.pol-paste{font-size:.88rem}.pol-paste textarea{width:100%;box-sizing:border-box}'+
 '.pol-rh{border-bottom:2px solid var(--navy-ink);padding-bottom:8px;margin-bottom:6px}.pol-rh .k{font-size:.78rem;font-weight:700;letter-spacing:.08em;color:var(--kgold)}.pol-rh .qq{margin:2px 0 2px;font-size:1.02rem}'+
 '.pol-rs{margin-top:12px}.pol-rs h4{margin:0 0 6px;font-size:.92rem;color:var(--navy-ink);display:flex;align-items:center;gap:6px}.pol-rs h4 span{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--navy-ink);color:var(--surface);font-size:.72rem}.pol-rs ul{margin:2px 0 0}.pol-rs.concl .tx{font-size:1rem}.pol-rs.pol-wn h4{color:var(--warn)}.pol-rs.pol-wn h4 span{background:var(--warn)}'+
@@ -93,6 +94,8 @@ var CSS='.pol{max-width:880px;margin:0 auto}'+
 '.pol-kw{margin:8px 0 0;font-size:.9rem;display:grid;gap:4px}.pol-kw:empty{display:none}.pol-kwin{width:100%;box-sizing:border-box;border:1px solid var(--line-strong);border-radius:6px;padding:6px 10px;background:var(--surface);color:var(--ink);font-size:.92rem}'+
 '.pol-a .pol-cov{margin-top:10px;font-size:.85rem;border-radius:5px;padding:8px 12px;background:var(--good-soft);color:var(--ink)}.pol-a .pol-cov.w{background:var(--warn-soft)}.pol-a .pol-cov b{color:var(--navy-ink)}.pol-a .pol-cov details{margin-top:4px}.pol-a .pol-cov .btn{margin-top:6px}'+
 '.pol-rec{border-color:var(--kgold);background:var(--gold-soft)}.pol-alt{flex-basis:100%;font-size:.85rem;color:var(--muted);border-top:1px dashed var(--line-strong);padding-top:8px}'+
+'.pol,.pol-st,.pol-sb,#polAns>*,.pol-rs,.pol-blk{min-width:0;max-width:100%}.pol-t td{white-space:normal;overflow-wrap:anywhere;word-break:keep-all}.pol-t td.c{min-width:5em}.pol-tw{-webkit-overflow-scrolling:touch;max-width:100%}'+ /* v5.7.1 약관 보고서 표가 화면 밖으로 잘리던 문제(그리드 칸 폭) 수정 */
+'@media (max-width:640px){.pol-t{min-width:0}.pol-t thead{display:none}.pol-t,.pol-t tbody,.pol-t tr,.pol-t td{display:block;width:auto}.pol-t tr{border:1px solid var(--line);border-radius:6px;margin-bottom:8px;padding:4px 0}.pol-t td{border:0;padding:3px 10px}.pol-t td.c{white-space:normal}.pol-t td.c:empty{display:none}}'+
 '@media (max-width:640px){.pol-sh .note{margin-left:0;flex-basis:100%}.pol-sb{padding:14px}.pol-top .bt{margin-left:0}}';
 function addCss(){if(document.getElementById('polCss'))return;var s=document.createElement('style');s.id='polCss';s.textContent=CSS;document.head.appendChild(s);}
 
