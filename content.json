@@ -1,12 +1,7 @@
 {
- "ver": 1794214412688,
- "updated": "2026. 11. 9. 오후 5:53:32",
+ "ver": 1794214489392,
+ "updated": "2026. 11. 9. 오후 5:54:49",
  "notices": [
-  [
-   "2026. 11. 16. ",
-   "신인 교육과정 진행 11월 16일 ~ 20일 (무경력 5일, 경력 4일차, 5일차 이틀간)  장소 본사 교육장. 원거리 - 온라인 교육",
-   "files/notice/2026-11/신규도입_교육과정_시간표_강사입력_f6f1o.pptx"
-  ],
   [
    "2026.11.02",
    "KakaoTalk 20261031 095608915 02",
@@ -581,6 +576,13 @@
  "mats": [
   [
    "PPT",
+   "달러보험을 팔아야 하는 백만가지 이유",
+   "이달의 컨셉",
+   "2026.11 이달의 컨셉 자료",
+   "files/concept/2026-11/달러보험을_팔아야_하는_백만가지_이유_r7x5x.pptx"
+  ],
+  [
+   "PPT",
    "AIA 달러보험 FC교육 3",
    "이달의 컨셉",
    "2026.11 이달의 컨셉 자료",
@@ -686,7 +688,7 @@
  ],
  "concept": {
   "month": "2026.11",
-  "title": "AIA 달러보험 FC교육 3",
+  "title": "달러보험을 팔아야 하는 백만가지 이유",
   "target": "달러 자산·노후 연금에 관심 있는 고객",
   "product": "AIA 프라임 달러 종신 · 일시납 연금 · 글로벌파워 월납연금",
   "desc": "왜 지금, 달러인가 — AIA생명 달러보험 상품 완전정복 (거시경제 흐름부터 세일즈 화법까지)",
@@ -695,8 +697,14 @@
    "PART 2 AIA생명 달러보험 상품 라인업 | 프라임 달러 종신 · 일시납 연금 · 글로벌파워 월납연금 · 타사비교 · 헬스케어 · 절세효과 | 18",
    "PART 3 실전 세일즈 가이드 | 핵심화법 Cheat Sheet · 고객 Q&A · 완전판매 체크리스트 | 46"
   ],
-  "mats": [],
-  "file": "files/concept/2026-11/달러보험.pptx_4102b.pptx"
+  "mats": [
+   [
+    "PPT",
+    "달러보험을 팔아야 하는 백만가지 이유",
+    "files/concept/2026-11/달러보험을_팔아야_하는_백만가지_이유_r7x5x.pptx"
+   ]
+  ],
+  "file": "files/concept/2026-11/달러보험을_팔아야_하는_백만가지_이유_r7x5x.pptx"
  },
  "banner": {
   "title": "",
@@ -893,6 +901,20 @@
   "mats": []
  },
  "concepts": [
+  {
+   "month": "2026.11",
+   "title": "AIA 달러보험 FC교육 3",
+   "target": "달러 자산·노후 연금에 관심 있는 고객",
+   "product": "AIA 프라임 달러 종신 · 일시납 연금 · 글로벌파워 월납연금",
+   "desc": "왜 지금, 달러인가 — AIA생명 달러보험 상품 완전정복 (거시경제 흐름부터 세일즈 화법까지)",
+   "steps": [
+    "PART 1 왜 지금 달러인가 | 달러의 탄생 · 물가위기 · 금리역전 · 신용등급 · 환율상승 7대 요인 · 시장의 선택 | 4",
+    "PART 2 AIA생명 달러보험 상품 라인업 | 프라임 달러 종신 · 일시납 연금 · 글로벌파워 월납연금 · 타사비교 · 헬스케어 · 절세효과 | 18",
+    "PART 3 실전 세일즈 가이드 | 핵심화법 Cheat Sheet · 고객 Q&A · 완전판매 체크리스트 | 46"
+   ],
+   "mats": [],
+   "file": "files/concept/2026-11/달러보험.pptx_4102b.pptx"
+  },
   {
    "month": "2026.10",
    "title": "2026년 2월 Issue & Concept",
@@ -2844,13 +2866,6 @@
    "src": "news/2026-10/흥국생명_202610_월간_ljzsh.pdf"
   },
   {
-   "d": "2026.10.07",
-   "co": "삼성생명",
-   "k": "개정",
-   "t": "신계약 청약서·계약체결동의서 개정 (기존 양식 10/7까지 병행 사용)",
-   "src": "news/2026-10/삼성생명_202610_월간_i2yld.pdf"
-  },
-  {
    "d": "2026.10.11",
    "co": "삼성화재",
    "k": "판매종료",
@@ -2946,6 +2961,44 @@
  "aiProxyFor": "admin",
  "aiProxyOff": "https://fc-ai.bluewind1124.workers.dev",
  "lectAt": "2026.11.09 17:17",
+ "cmpdata": {
+  "life": {
+   "month": "2026.11",
+   "upd": "2026.11.04",
+   "title": "상품비교 가이드북 생명보험 11.04",
+   "file": "files/cmpdata/2026-11/상품비교_가이드북_생명보험_11.04_n7k2q.pdf",
+   "data": "classic/data/life.json",
+   "ver": "1793943193667",
+   "at": "2026.11.06"
+  },
+  "wholelife": {
+   "file": "files/cmpdata/2026-11/단기납_종신보험환급률_26.11.04_36q1m.pptx",
+   "title": "단기납 종신보험환급률 26.11.04",
+   "data": "classic/data/wholelife.json",
+   "ver": "1793944232474",
+   "month": "2026.11",
+   "upd": "2026.11.06",
+   "at": "2026.11.06"
+  },
+  "ceoterm": {
+   "file": "files/cmpdata/2026-11/경영인정기보험(환급률)_26.11.04_kwck6.pptx",
+   "title": "경영인정기보험(환급률) 26.11.04",
+   "data": "classic/data/ceoterm.json",
+   "ver": "1793943571596",
+   "month": "2025.12",
+   "upd": "2026.11.06",
+   "at": "2026.11.06"
+  },
+  "critical3": {
+   "file": "files/cmpdata/2026-11/3대질병진단비_보험료(26.11.04)_3f9y2.pptx",
+   "title": "3대질병진단비 보험료(26.11.04)",
+   "data": "classic/data/critical3.json",
+   "ver": "1793943703436",
+   "month": "2026.11",
+   "upd": "2026.11.04",
+   "at": "2026.11.06"
+  }
+ },
  "thumbs": {
   "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm.pdf": "files/concept/2026-02/2026년_2월_Issue_Concept_dg8bm_thumb.jpg",
   "files/samples/2026-10/김OO님_보험비교분석_발표자료_s1k7m.pdf": "files/samples/2026-10/김OO님_보험비교분석_발표자료_s1k7m_thumb.jpg",
@@ -3022,48 +3075,11 @@
   "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pptx": "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4_thumb.jpg",
   "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3.pdf": "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3_thumb.jpg",
   "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pdf": "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4_thumb.jpg",
-  "files/cmpdata/2026-11/상품비교_가이드북_생명보험_11.04_n7k2q.pdf": "files/cmpdata/2026-11/상품비교_가이드북_생명보험_11.04_n7k2q_thumb.jpg"
+  "files/cmpdata/2026-11/상품비교_가이드북_생명보험_11.04_n7k2q.pdf": "files/cmpdata/2026-11/상품비교_가이드북_생명보험_11.04_n7k2q_thumb.jpg",
+  "files/concept/2026-11/달러보험을_팔아야_하는_백만가지_이유_r7x5x.pptx": "files/concept/2026-11/달러보험을_팔아야_하는_백만가지_이유_r7x5x_thumb.jpg"
  },
  "views": {
   "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3.pptx": "files/award/2026-11/11월_1주차_손보_직영채널시상모음_3v6m3.pdf",
   "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pptx": "files/award/2026-11/11월_생보_직영채널시상_모음_ftkk4.pdf"
- },
- "cmpdata": {
-  "life": {
-   "month": "2026.11",
-   "upd": "2026.11.04",
-   "title": "상품비교 가이드북 생명보험 11.04",
-   "file": "files/cmpdata/2026-11/상품비교_가이드북_생명보험_11.04_n7k2q.pdf",
-   "data": "classic/data/life.json",
-   "ver": "1793943193667",
-   "at": "2026.11.06"
-  },
-  "wholelife": {
-   "file": "files/cmpdata/2026-11/단기납_종신보험환급률_26.11.04_36q1m.pptx",
-   "title": "단기납 종신보험환급률 26.11.04",
-   "data": "classic/data/wholelife.json",
-   "ver": "1793944232474",
-   "month": "2026.11",
-   "upd": "2026.11.06",
-   "at": "2026.11.06"
-  },
-  "ceoterm": {
-   "file": "files/cmpdata/2026-11/경영인정기보험(환급률)_26.11.04_kwck6.pptx",
-   "title": "경영인정기보험(환급률) 26.11.04",
-   "data": "classic/data/ceoterm.json",
-   "ver": "1793943571596",
-   "month": "2025.12",
-   "upd": "2026.11.06",
-   "at": "2026.11.06"
-  },
-  "critical3": {
-   "file": "files/cmpdata/2026-11/3대질병진단비_보험료(26.11.04)_3f9y2.pptx",
-   "title": "3대질병진단비 보험료(26.11.04)",
-   "data": "classic/data/critical3.json",
-   "ver": "1793943703436",
-   "month": "2026.11",
-   "upd": "2026.11.04",
-   "at": "2026.11.06"
-  }
  }
 }
