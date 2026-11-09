@@ -1531,6 +1531,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<div class="hg-col"><div class="hg-box hg-ai"><div class="hg-top">'+'<span class="hg-i">'+ic('scan')+'</span>'+'<div><span class="hg-k">영업 도구</span><h2>AI보장분석</h2><p>증권·가입설계서를 AI가 읽어 보장분석표·리포트·제안서까지 만듭니다.</p></div></div>'+
           '<div class="hg-two"><button class="btn gold" type="button" data-go="ai">기본형 들어가기 ›</button><button class="btn" type="button" data-go="ai2">고급형 들어가기 ›</button></div></div>'+
           '<div class="panel smp-home hg-smp">'+smpHome()+'</div></div></section>';
+      /* 약관 분석 · 금융계산기 · 언더라이팅 인수기준: 보험사 소식지 바로 위에 한 줄씩 */
+      h+='<section class="hm-tools wide" id="hmTools">'+(window.KIFPOL?KIFPOL.card():'')+calcCard()+uwCard()+'</section>';
       h+='<section class="hm-two"><div class="panel"><h3>보험사 소식지 <button class="more" data-go="news">전체 '+NEWS.length+'건 보기 ›</button></h3>'+
         '<div class="tbl hm-tbl hm-vs"><table><thead><tr><th>보험사</th><th>자료명</th><th>구분</th><th class="r">등록일</th></tr></thead><tbody>'+nr+'</tbody></table></div></div>'+
         '<div class="panel"><h3>시상 · 공지 <button class="more" data-go="award">전체 보기 ›</button></h3><ul class="hm-aw hm-vs sm">'+ar+'</ul><div class="hm-nt"><b>본사 공지</b><ul class="list noticeList hm-vs sm"></ul></div></div></section>';
@@ -1539,7 +1541,6 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<div class="panel"><h3>대표 상품 가설 <span class="note">고객 유형별 대표 상품과 첫 화법 '+HYPO.length+'건</span>'+railNav('railHypo',HYPO.length>0)+' <button class="more" data-go="hypo">전체 보기 ›</button></h3>'+(HYPO.length?'<div class="hm-rail" id="railHypo">'+HYPO.map(hypoCard).join('')+'</div>'+sbar('railHypo'):'<p class="note">아직 등록된 가설이 없습니다.</p>')+'</div></div>'+
         '<div class="hm-col hm-colr"><div class="panel"><h3>교육센터 새 강의 '+(LECT_AT?'<span class="note">'+E(LECT_AT)+' 확인</span> ':'')+''+railNav('railLect',LECT.length>4)+'<button class="more" data-go="edu">교육센터 ›</button></h3><div class="lects hm-lrail" id="railLect">'+LECT.map(function(l){return '<a class="lect" target="_blank" rel="noopener" href="'+EDU+'"><div class="lt"><span>'+E(l[0])+'</span><b>'+E(l[1])+'</b><i>'+E([l[3],l[2]].filter(Boolean).join(' · '))+'</i></div></a>';}).join('')+'</div>'+sbar('railLect')+'</div></div></section>';
       /* 홈 도구 카드: 교육 자료 아래에 약관 분석(policy.js) · 금융계산기 · 언더라이팅 인수기준을 한 줄씩 가로로 길게 */
-      h+='<section class="hm-tools wide" id="hmTools">'+(window.KIFPOL?KIFPOL.card():'')+calcCard()+uwCard()+'</section>';
       h+='<footer class="pfoot">한국보험금융(주) 한보금on 활동지원 · 상품 비교 자료는 「생명·손해보험 비교 가이드북(26.09)」 기준 참고자료이며, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다.</footer>';
       return '<div class="hm">'+h+'</div>';
     },
