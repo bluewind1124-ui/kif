@@ -8,9 +8,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="한보금on 활동지원">
-<link rel="apple-touch-icon" href="icon-180.png?v=10">
+<link rel="apple-touch-icon" href="icon-180.png?v=11">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" href="icon-192.png?v=10">
+<link rel="icon" type="image/png" href="icon-192.png?v=11">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="한보금on 활동지원">
 <meta property="og:title" content="한보금on 활동지원 · 앱 아이콘 설치 (PC·폰)">
@@ -57,7 +57,7 @@ b{color:#0f2240}
 <body>
 <div class="wrap">
   <div class="top">
-    <img src="icon-192.png?v=10" alt="">
+    <img src="icon-192.png?v=11" alt="">
     <h1>한보금on <em>활동지원</em></h1>
     <p class="sub">아이콘을 한 번 만들어 두면 누를 때마다 앱처럼 바로 열립니다.</p>
   </div>
@@ -117,7 +117,7 @@ b{color:#0f2240}
     <div class="tip">아이폰은 애플 규칙상 버튼 하나로 설치할 수 없어서 위 순서로 직접 추가해야 합니다. 목록에 <b>홈 화면에 추가</b>가 없으면 맨 아래 <b>동작 편집</b>에서 켤 수 있습니다.</div>
     <div class="tip ok">끝나면 폰 바탕화면에 <b>한보금on</b> 아이콘이 생깁니다.</div>
     <div class="tip"><b>📎 설치 파일로 하기 (위 방법이 어려우면)</b><br>① 아래 버튼을 누르고 <b>허용</b> → ② <b>설정</b> 앱 맨 위 <b>프로필이 다운로드됨</b> → ③ 오른쪽 위 <b>설치</b> → 암호 입력 → <b>설치</b>. (사파리에서만 됩니다. 「서명되지 않음」 표시는 정상입니다)</div>
-    <a class="btn" id="iosFile" href="hanbogeumon-iphone.mobileconfig?v=1.1">📎 모바일 설치 파일 받기 (v1.1)</a>
+    <a class="btn" id="iosFile" href="hanbogeumon-iphone.mobileconfig?v=1.2">📎 모바일 설치 파일 받기 (v1.2)</a>
   </div>
 
   <!-- PC -->
@@ -198,7 +198,7 @@ b{color:#0f2240}
   if(isIOS&&/[?&]ios=file/.test(location.search)&&!/CriOS|FxiOS|EdgiOS/.test(ua)){
     $('iosArrow').style.display='none';
     var f=$('iosFile');if(f){f.scrollIntoView({block:'center'});f.style.outline='4px solid #e6cf97';}
-    setTimeout(function(){location.href='hanbogeumon-iphone.mobileconfig?v=1.1';},900);
+    setTimeout(function(){location.href='hanbogeumon-iphone.mobileconfig?v=1.2';},900);
   }
 })();
 </script>
