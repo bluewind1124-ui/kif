@@ -117,7 +117,7 @@ b{color:#0f2240}
     <div class="tip">아이폰은 애플 규칙상 버튼 하나로 설치할 수 없어서 위 순서로 직접 추가해야 합니다. 목록에 <b>홈 화면에 추가</b>가 없으면 맨 아래 <b>동작 편집</b>에서 켤 수 있습니다.</div>
     <div class="tip ok">끝나면 폰 바탕화면에 <b>한보금on</b> 아이콘이 생깁니다.</div>
     <div class="tip"><b>📎 설치 파일로 하기 (위 방법이 어려우면)</b><br>① 아래 버튼을 누르고 <b>허용</b> → ② <b>설정</b> 앱 맨 위 <b>프로필이 다운로드됨</b> → ③ 오른쪽 위 <b>설치</b> → 암호 입력 → <b>설치</b>. (사파리에서만 됩니다. 「서명되지 않음」 표시는 정상입니다)</div>
-    <a class="btn line" href="hanbogeumon-iphone.mobileconfig?v=1">아이폰 설치 파일 받기 (v1.0)</a>
+    <a class="btn" id="iosFile" href="hanbogeumon-iphone.mobileconfig?v=1">📎 아이폰 설치 파일 받기 (v1.0)</a>
   </div>
 
   <!-- PC -->
@@ -195,6 +195,12 @@ b{color:#0f2240}
 
   /* 아이폰 사파리: 아래 공유 버튼을 가리키는 표시 */
   if(isIOS&&/Safari/.test(ua)&&!/CriOS|FxiOS|EdgiOS/.test(ua))$('iosArrow').style.display='block';
+  /* 아이폰 설치 파일 링크(phone.html?ios=file): 사파리에서 열리면 설치 파일을 바로 받게 함 */
+  if(isIOS&&/[?&]ios=file/.test(location.search)&&!/CriOS|FxiOS|EdgiOS/.test(ua)){
+    $('iosArrow').style.display='none';
+    var f=$('iosFile');if(f){f.scrollIntoView({block:'center'});f.style.outline='4px solid #e6cf97';}
+    setTimeout(function(){location.href='hanbogeumon-iphone.mobileconfig?v=1';},900);
+  }
 })();
 </script>
 <!-- 포털로 돌아가기: 모든 화면 왼쪽 아래 '← 이전' '⌂ 포털 홈' -->
