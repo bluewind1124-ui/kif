@@ -20,7 +20,12 @@
 <meta property="og:image:width" content="800">
 <meta property="og:image:height" content="400">
 <meta name="description" content="한국보험금융(주) FC 활동지원 — 상품 비교 · AI보장분석 · 소식지 · 시상 · 교육">
-<meta name="kif-build" content="2026-11-09.15">
+<script>/* 글자 색 대비 v1.0 (2026-11-10): 휴대폰·PC가 「어두운 화면」이면 처음부터 data-theme="dark"를 붙여,
+   어두운 화면용 색 규칙이 빠짐없이 적용되게 한다(직접 ☾ 버튼을 누르면 그 선택을 따름). */
+(function(){try{var r=document.documentElement,mq=matchMedia('(prefers-color-scheme: dark)');
+  function ap(){if(r.getAttribute('data-theme-user'))return;r.setAttribute('data-theme',mq.matches?'dark':'light');}
+  ap();if(mq.addEventListener)mq.addEventListener('change',ap);else if(mq.addListener)mq.addListener(ap);}catch(e){}})();</script>
+<meta name="kif-build" content="2026-11-10.1">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1170,6 +1175,34 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   .hh-card span{display:none}
   .hh-card button{margin-top:8px}
 }
+
+/* ===== 글자 색 대비 v1.0 (2026-11-10) =====
+   어두운 화면에서 바탕이 흰색으로 고정된 칸에 밝은 글자가 겹쳐 안 보이던 곳을 고침.
+   ① 보고서·슬라이드처럼 늘 흰 종이인 곳은 안쪽 글자색을 밝은 화면 기준으로 고정
+   ② 화면 칸(홈 카드·빠른 실행·안내 상자 등)은 어두운 화면에서 어두운 바탕으로 바꿈 */
+.rpg,.sl,.xv,.xbook .xsh,.pdfhost,.smp-txt,.smp-rail .th.paper{--bg:#f3f5f8;--surface:#ffffff;--surface-2:#f8f9fb;--ink:#18202e;--muted:#667185;--line:#e1e6ed;--line-strong:#c5cedb;
+  --gold:#7c5916;--gold-soft:#fbf4e3;--accent-soft:#eef1f6;--good:#0f7a48;--good-soft:#e2f2e9;--warn:#a4520b;--warn-soft:#fbeadb;--btn:#0f2240;--btn-ink:#fff;--navy-ink:#0f2240;color-scheme:light}
+:root[data-theme="dark"] .hm .panel,:root[data-theme="dark"] .hm-kpi button,:root[data-theme="dark"] .hq{background:rgba(17,33,64,.92)}
+:root[data-theme="dark"] .hq:hover{background:var(--gold-soft)}
+:root[data-theme="dark"] .scr button{background:rgba(17,33,64,.95);color:var(--kgold-2)}
+:root[data-theme="dark"] .top{background:rgba(17,33,64,.86);border-color:var(--line)}
+:root[data-theme="dark"] .nchips .tg.on{background:var(--kgold);border-color:var(--kgold);color:#0f2240}
+:root[data-theme="dark"] .aifirst,:root[data-theme="dark"] .ai1,:root[data-theme="dark"] .nu-sch,:root[data-theme="dark"] .pendbar,:root[data-theme="dark"] .smp-ocr{background:var(--gold-soft)}
+:root[data-theme="dark"] .ai-guide{background:var(--gold-soft);border-color:#6b5520}
+:root[data-theme="dark"] .ai-guide>summary:after,:root[data-theme="dark"] .ai-guide .gk .tip,:root[data-theme="dark"] .ai-sg .sgt,:root[data-theme="dark"] .smp-drop b{color:var(--gold)}
+:root[data-theme="dark"] .ai-guide .gk,:root[data-theme="dark"] .ai-sg,:root[data-theme="dark"] .smp-c,:root[data-theme="dark"] .cm-bulk,:root[data-theme="dark"] .pick-sum{background:var(--surface-2);border-color:var(--line-strong)}
+:root[data-theme="dark"] .smp-drop{background:var(--gold-soft)}
+:root[data-theme="dark"] .smp-drop.over,:root[data-theme="dark"] .smp-drop:hover{background:#4a3b1c}
+:root[data-theme="dark"] .smp-bad,:root[data-theme="dark"] .adjk.off{background:#3a1f1c}
+:root[data-theme="dark"] .sj-vals b{color:var(--navy-ink)}
+:root[data-theme="dark"] .hm-ai .s small,:root[data-theme="dark"] .kai-keyrow .kai-note{color:var(--muted)}
+:root[data-theme="dark"] .kai-keyrow .kai-note b[style]{color:var(--warn)!important}
+.smp-txt{background:#fff;color:#18202e}
+.sch-t tr.past{opacity:.72}
+:root:not([data-theme="dark"]) .hh-w em,:root:not([data-theme="dark"]) .hh-s em{color:#b07f1c}
+:root{--card:#fff;--ink-3:#6b7380}
+:root[data-theme="dark"]{--card:#112140;--ink-3:#9fb0c8}
+:root[data-theme="dark"] [style*="color:#8a6d1f"],:root[data-theme="dark"] [style*="color:#8a6a1f"]{color:var(--gold)!important}
 </style>
 
 <div class="demo">시제품(데모)입니다. 화면 구성 확인용이며 실제 고객·상품 데이터가 아닌 예시가 들어 있습니다.</div>
@@ -3962,7 +3995,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   setZ(z);
   document.getElementById('theme').onclick=function(){
     var r=document.documentElement,now=r.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
-    r.setAttribute('data-theme',now==='dark'?'light':'dark');
+    r.setAttribute('data-theme',now==='dark'?'light':'dark');r.setAttribute('data-theme-user','1');
   };
 })();
 </script>
