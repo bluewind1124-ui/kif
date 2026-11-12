@@ -25,7 +25,7 @@
 (function(){try{var r=document.documentElement,mq=matchMedia('(prefers-color-scheme: dark)');
   function ap(){if(r.getAttribute('data-theme-user'))return;r.setAttribute('data-theme',mq.matches?'dark':'light');}
   ap();if(mq.addEventListener)mq.addEventListener('change',ap);else if(mq.addListener)mq.addListener(ap);}catch(e){}})();</script>
-<meta name="kif-build" content="2026-11-12.4">
+<meta name="kif-build" content="2026-11-12.5">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -593,6 +593,7 @@ textarea.in{resize:vertical;font-family:inherit;line-height:1.5}
 .xb:hover{color:var(--warn)}
 .ai-act{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .btn.danger{color:var(--warn);border-color:var(--warn)}
+.btn.danger-fill{background:#b42318;border-color:#b42318;color:#fff}.clist td.c,.clist th.c{text-align:center;position:sticky;right:0;z-index:1}.clist td.c{background:var(--surface);box-shadow:-6px 0 8px -6px rgba(0,0,0,.25)}.clist .cdel{padding:3px 9px;font-size:.8rem}.cdelbox .cdl{padding-left:1.2em;display:grid;gap:6px;margin:8px 0 10px}.cdelbox .warn{color:var(--warn)}
 .consent{display:grid;gap:8px;margin:8px 0;padding:10px;border:1px dashed var(--line-strong);border-radius:4px;background:var(--surface-2)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .flist li{align-items:center}
@@ -4620,12 +4621,49 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var L=st.customers;
     var h='<div class="panel"><h3>전체 고객 목록 <span class="note">'+L.length+'명 · 상담 시작이 최근인 순</span><span class="sp"></span><button class="btn sm" data-a="new">+ 새 고객</button></h3>';
     if(!L.length)return h+'<p class="note">아직 등록된 고객이 없습니다. "새 고객"으로 등록하세요.</p></div>';
-    h+='<div class="tbl"><table class="clist"><thead><tr><th>이름</th><th>나이·성별</th><th>지역</th><th>상담 시작</th><th>최근 상담</th><th class="r">상담 기록</th><th>분석 옵션</th><th>동의</th></tr></thead><tbody>';
+    h+='<div class="tbl"><table class="clist"><thead><tr><th>이름</th><th>나이·성별</th><th>지역</th><th>상담 시작</th><th>최근 상담</th><th class="r">상담 기록</th><th>분석 옵션</th><th>동의</th><th class="c">삭제</th></tr></thead><tbody>';
     L.slice().sort(function(a,b){return String(b.createdAt).localeCompare(String(a.createdAt));}).forEach(function(x){
-      h+='<tr data-nm="'+esc(x.name||'')+'"'+(st.q&&(x.name||'').indexOf(st.q)<0?' hidden':'')+'><td><button class="lnk" data-a="pick" data-id="'+x.id+'" data-to="1"><b>'+esc(x.name||'(이름 없음)')+'</b></button></td><td>'+esc(ageSex(x)||'—')+'</td><td>'+esc(region(x)||'—')+'</td><td>'+esc(x.createdAt||'—')+'</td><td>'+esc(lastLog(x)||'—')+'</td><td class="r">'+(x.logs||[]).length+'건</td><td>'+esc(optShort(x))+'</td><td>'+esc(x.consent||'')+'</td></tr>';
+      h+='<tr data-nm="'+esc(x.name||'')+'"'+(st.q&&(x.name||'').indexOf(st.q)<0?' hidden':'')+'><td><button class="lnk" data-a="pick" data-id="'+x.id+'" data-to="1"><b>'+esc(x.name||'(이름 없음)')+'</b></button></td><td>'+esc(ageSex(x)||'—')+'</td><td>'+esc(region(x)||'—')+'</td><td>'+esc(x.createdAt||'—')+'</td><td>'+esc(lastLog(x)||'—')+'</td><td class="r">'+(x.logs||[]).length+'건</td><td>'+esc(optShort(x))+'</td><td>'+esc(x.consent||'')+'</td><td class="c"><button class="btn sm ghost danger cdel" data-a="delRow" data-id="'+x.id+'" title="이 고객 삭제" aria-label="'+esc(x.name||'이름 없는 고객')+' 삭제">🗑 삭제</button></td></tr>';
     });
-    h+='<tr class="ai-nohit"'+(L.some(function(x){return !st.q||(x.name||'').indexOf(st.q)>-1;})?' hidden':'')+'><td colspan="8" class="note">검색된 고객이 없습니다.</td></tr>';
-    return h+'</tbody></table></div><p class="note">이름을 누르면 그 고객의 정보 화면으로 갑니다. 왼쪽 "이름 검색"으로 이 표도 함께 걸러집니다.</p></div>';
+    h+='<tr class="ai-nohit"'+(L.some(function(x){return !st.q||(x.name||'').indexOf(st.q)>-1;})?' hidden':'')+'><td colspan="9" class="note">검색된 고객이 없습니다.</td></tr>';
+    return h+'</tbody></table></div><p class="note">이름을 누르면 그 고객의 정보 화면으로 갑니다. 왼쪽 "이름 검색"으로 이 표도 함께 걸러집니다. 필요 없는 고객은 줄 끝 <b>「🗑 삭제」</b>를 누르면 확인 창이 뜹니다.</p></div>';
+  }
+  /* 고객 삭제 확인 창 — 목록 줄 끝 「🗑 삭제」와 ① 고객 정보 「고객 삭제」가 함께 씀 (v6.5, 2026-11-12)
+     지워지는 것: 고객 정보·기존 계약·제안안·상담 기록(고객 안에 들어 있음). 내 자료함 보관본은 고르면 함께 지움.
+     PC 저장 폴더·다운로드 폴더에 저장된 파일(PDF·PPT·엑셀)은 건드리지 않음. */
+  function delAsk(id){
+    var x=st.customers.filter(function(k){return k.id===id;})[0];if(!x)return;
+    var nm=x.name||'(이름 없음)',logs=(x.logs||[]).length,ks=(x.contracts||[]),kOld=ks.filter(function(k){return k.kind!=='신규';}).length,kNew=ks.length-kOld;
+    var w=document.createElement('div');w.className='pmodal';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label','고객 삭제');
+    w.innerHTML='<div class="pbox cdelbox"><h3>🗑 고객 삭제</h3>'+
+      '<p><b>'+esc(nm)+'</b>'+(ageSex(x)?' <span class="note">'+esc(ageSex(x))+'</span>':'')+' 고객을 지울까요? <span class="note">상담 시작 '+esc(x.createdAt||'—')+'</span></p>'+
+      '<ul class="cdl"><li><b>함께 지워지는 것</b> — 고객 정보, 기존 계약 '+kOld+'건, 제안안 '+kNew+'건, 상담 기록 '+logs+'건</li>'+
+      '<li data-p="arc"><b>내 자료함 보관본</b> — 확인하는 중…</li>'+
+      '<li><b>그대로 남는 것</b> — PC 저장 폴더·다운로드 폴더에 이미 저장한 PDF·PPT·엑셀 파일 (필요 없으면 직접 지우세요)</li></ul>'+
+      '<p class="note warn">지운 고객은 되돌릴 수 없습니다. 혹시 몰라 남겨 두려면 먼저 <b>「내 정보 · 자료 보관」 → 「고객 자료 보관」</b>으로 파일을 저장해 두세요.</p>'+
+      '<div class="row"><button class="btn danger-fill" type="button" data-p="ok">삭제</button><button class="btn ghost" type="button" data-p="no">취소</button></div></div>';
+    document.body.appendChild(w);
+    var arcIds=[],li=w.querySelector('[data-p="arc"]');
+    function close(){document.removeEventListener('keydown',onKey);w.remove();}
+    function onKey(e){if(e.key==='Escape')close();}
+    document.addEventListener('keydown',onKey);
+    if(window.KIFARC){KIFARC.list().then(function(L){arcIds=(L||[]).filter(function(a){return a.cid===id;}).map(function(a){return a.id;});
+      li.innerHTML=arcIds.length?'<label><input type="checkbox" data-p="arcOn" checked> <b>내 자료함 보관본 '+arcIds.length+'개도 함께 지우기</b> <span class="note">(체크를 끄면 자료함에는 남음)</span></label>':'<b>내 자료함 보관본</b> — 없음';
+    },function(){li.innerHTML='<b>내 자료함 보관본</b> — 확인하지 못해 그대로 둡니다';});}else li.innerHTML='<b>내 자료함 보관본</b> — 이 화면에서는 확인할 수 없어 그대로 둡니다';
+    w.addEventListener('click',function(e){
+      if(e.target===w){close();return;}
+      var t=e.target.closest('[data-p]');if(!t)return;var p=t.dataset.p;
+      if(p==='no'){close();return;}
+      if(p==='ok'){
+        var cb=w.querySelector('[data-p="arcOn"]'),rmArc=cb&&cb.checked?arcIds:[];
+        st.customers=st.customers.filter(function(k){return k.id!==id;});delC(id);
+        if(st.cur===id){st.cur=null;st.step=0;}
+        persist();close();render();
+        Promise.all(rmArc.map(function(a){return KIFARC.del(a).catch(function(){});})).then(function(){
+          toast('「'+nm+'」 고객을 삭제했습니다'+(rmArc.length?' (자료함 보관본 '+rmArc.length+'개 포함)':'')+'.');});
+      }
+    });
+    var ok=w.querySelector('[data-p="no"]');if(ok)ok.focus();
   }
   function inp(id,label,val,attr){return '<label class="f">'+label+'<input class="in" id="'+id+'" value="'+esc(val)+'" '+(attr||'')+'></label>';}
   function viewInfo(c){
@@ -6132,6 +6170,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(/^ai(mode|cfg|prov|save|test|del)$/.test(a)){aiCfgClick(a,b);return;}
     if(a==='delRef'){var fr=findRef(b.dataset.id);if(!fr)return;if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='한 번 더 누르면 삭제';return;}var L=refList(fr.by);L.splice(L.indexOf(fr.r),1);saveRefs(fr.by,fr.r,true);render();toast('참고자료를 삭제했습니다.');return;}
     if(a==='pickRpt'){gather();st.cur=b.dataset.id;st.step=4;render();return;}
+    if(a==='delRow'){gather();delAsk(b.dataset.id);return;}
     if(!c&&a!=='saveOpt'&&a!=='resetOpt')return;
     if(a==='newsEdit'){st.newsOpen=st.newsOpen===b.dataset.q?'':b.dataset.q;var y=window.scrollY;render();window.scrollTo(0,y);return;}
     if(a==='newsDel'){if(c.news)delete c.news[b.dataset.q];touch(c);st.newsOpen='';var y=window.scrollY;render();window.scrollTo(0,y);toast('기본 기사로 되돌렸습니다.');return;}
@@ -6155,7 +6194,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(a==='addHx'){gatherInfo(c);c.history.push({date:'',type:'통원',dx:'',days:'',visits:'',surg:'',note:''});render();return;}
     if(a==='delHx'){gatherInfo(c);c.history.splice(+b.dataset.i,1);render();return;}
     if(a==='saveInfo'||a==='saveNext'){gatherInfo(c);if(!c.name){toast('이름을 입력하세요.');document.getElementById('fName').focus();return;}touch(c);if(a==='saveNext')st.step=2;render();toast('저장했습니다.');return;}
-    if(a==='delCust'){if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='한 번 더 누르면 삭제';return;}st.customers=st.customers.filter(function(x){return x.id!==c.id;});delC(c.id);st.cur=null;st.step=0;persist();render();toast('고객을 삭제했습니다.');return;}
+    if(a==='delCust'){if(c){gather();delAsk(c.id);}return;}
     if(a==='addK'){gatherDocs(c);var nkid=uid();st.openK=st.openK||{};st.openK[nkid]=true;c.contracts.push({id:nkid,kind:b.dataset.kind||'기존',insurer:'',product:'',period:'',term:'',premium:0,nature:'',items:[{area:'기타',name:'',amt:null,prem:null,term:'',cycle:''}],confirmed:true});render();return;}
     if(a==='delK'){gatherDocs(c);if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='한 번 더 누르면 삭제';return;}c.contracts.splice(+b.dataset.k,1);touch(c);render();return;}
     if(a==='addI'){gatherDocs(c);c.contracts[+b.dataset.k].items.push({area:'기타',name:'',amt:null,prem:null,term:'',cycle:''});render();return;}
