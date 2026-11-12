@@ -1,6 +1,7 @@
 /* 한보금on 「내 자료함」 — AI보장분석 기본형·고급형에서 만든 리포트·제안서를 이 기기에 날짜별로 보관한다.
    고객 자료는 회사 서버에 올리지 않는다. 이 기기 브라우저(IndexedDB, 안 되면 localStorage)에만 둔다.
-   보관 단위: {id, src:'basic'|'adv', cid, cname, kind, title, at, html, wrap, css, sig}
+   보관 단위: {id, src:'basic'|'adv', cid, cname, kind, title, at, html, wrap, css, sig, data?}
+   - data(2026-11-12~): 기본형 보관 때의 고객 자료 사본 — 「지난 분석본」 창에서 분석표 PDF·엑셀을 그때 내용으로 다시 만든다.
    - css는 크기를 줄이려고 따로 한 번만 저장하고(css 저장소, 키 = 내용 서명) 항목에는 그 키만 둔다.
    - 같은 고객·같은 종류는 최근 KEEP개만 남긴다. 내용이 직전과 같으면 새로 만들지 않는다.
    window.KIFARC = { add, list, get, del, dump, load, open, mountBox, KEEP } */
@@ -49,8 +50,8 @@ function add(o){
   return B.all().then(function(L){
     L=L||[];
     var same=L.filter(function(x){return x.src===o.src&&x.cid===o.cid&&x.kind===o.kind;}).sort(function(a,b){return b.at-a.at;});
-    if(same[0]&&same[0].sig===s){var u=Object.assign({},same[0],{at:Date.now(),cname:o.cname||same[0].cname});return B.put(u).then(function(){return {item:u,dup:true};});}
-    var it={id:uid(),src:o.src,cid:String(o.cid),cname:o.cname||'',kind:o.kind||'자료',title:o.title||o.kind||'자료',at:Date.now(),html:o.html,wrap:o.wrap||'',css:ck,sig:s,bg:o.bg||''};
+    if(same[0]&&same[0].sig===s){var u=Object.assign({},same[0],{at:Date.now(),cname:o.cname||same[0].cname});if(o.data)u.data=o.data;return B.put(u).then(function(){return {item:u,dup:true};});}
+    var it={id:uid(),src:o.src,cid:String(o.cid),cname:o.cname||'',kind:o.kind||'자료',title:o.title||o.kind||'자료',at:Date.now(),html:o.html,wrap:o.wrap||'',css:ck,sig:s,bg:o.bg||''};if(o.data)it.data=o.data;   /* 다시 출력용 그때 자료(기본형, v6.0~) */
     var p=css?B.cssPut(ck,css):Promise.resolve();
     return p.then(function(){return B.put(it);}).then(function(){
       var old=same.slice(KEEP-1);

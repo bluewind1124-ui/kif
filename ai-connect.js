@@ -172,7 +172,7 @@ function render(){
     var man=c.mode!=='ai';
     h='<h2>4. 고객 자료 저장 폴더 정하기</h2>'+(man?'<div class="kai-done"><b>✓ AI 없이 쓰기로 저장했습니다</b><span>값은 직접 입력합니다. 나중에 왼쪽 메뉴 아래 「AI 연결」에서 언제든 AI를 연결할 수 있습니다.</span></div>':
       '<div class="kai-done"><b>✓ '+esc(AIP[p].name)+' 연결됨</b><span>이제 AI보장분석(기본형·고급형), 약관 분석, 상품 비교 등 포털의 모든 AI 기능이 이 AI를 씁니다.'+(AIP[p].key?' 여러 단계도 끝까지 자동으로 진행합니다.':'')+'</span></div>')+
-      '<p class="kai-note">상담한 고객 자료는 회사 서버에 올라가지 않고 <b>이 기기</b>에만 있습니다. 내 PC나 내 클라우드(OneDrive·Google Drive) 안에 <b>보관 폴더</b>를 한 번 정해 두면, 「내 정보 · 자료 보관」에서 저장할 때마다 그 폴더에 날짜별 파일로 바로 저장됩니다.</p>'+fdBox()+
+      '<p class="kai-note">상담한 고객 자료는 회사 서버에 올라가지 않고 <b>이 기기</b>에만 있습니다. 내 PC나 내 클라우드(OneDrive·Google Drive) 안에 <b>보관 폴더</b>를 한 번 정해 두면, 「내 정보 · 자료 보관」의 백업 파일은 그 폴더에, AI보장분석에서 만든 <b>PDF·PPT·엑셀</b>은 그 안의 <b>고객 이름 폴더</b>에 바로 저장됩니다. 정하지 않으면 지금처럼 <b>다운로드 폴더</b>에 저장됩니다.</p>'+fdBox()+
       (man?'':'<ul class="kai-ul"><li>기본형: 증권·가입설계서를 올리면 등록된 기준·샘플대로 분석합니다.</li><li>고급형: 「증권·설계서 AI 판독」, 「자료로 채우기 (AI)」, 「AI 의견 초안 받기」에서 씁니다.</li><li>약관 분석: 약관 PDF를 올리고 물으면 이 AI가 읽고 보고서를 만듭니다.</li><li>바꾸고 싶으면 왼쪽 메뉴 아래 「AI 연결」(폰은 「내 정보」)에서 언제든 다시 엽니다.</li></ul>')+
       '<div class="kai-row"><button type="button" class="kai-btn p" data-kai="x">닫기</button></div>';
   }
@@ -553,7 +553,7 @@ function err(e){
 
 /* ---------- 고객 자료 저장 폴더 (PC 크롬·엣지) ----------
    처음 한 번 폴더를 고르면 그 안에 「한보금on_고객자료」 폴더를 만들고, 폴더 위치(핸들)를 이 기기 브라우저(IndexedDB)에 기억한다.
-   이후 저장은 그 폴더에 날짜별 파일로 바로 쓴다. 폰·사파리·파이어폭스는 폴더 지정이 안 되므로 예전처럼 공유 창·다운로드로 저장한다. */
+   이후 저장은 그 폴더에 날짜별 파일로 바로 쓴다. 기본형의 PDF·PPT·엑셀·HTML 출력물은 그 안의 「고객 이름」 폴더에 쓴다(v1.0, 2026-11-12). 폰·사파리·파이어폭스는 폴더 지정이 안 되므로 예전처럼 공유 창·다운로드로 저장한다. */
 var FD_NAME='한보금on_고객자료',FD_LS='kif_bk_dir',fdH=null,fdLoaded=false;
 function fdOk(){try{return !!window.showDirectoryPicker&&window.isSecureContext&&window.self===window.top&&!/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);}catch(e){return false;}}
 function idbDo(mode,f){return new Promise(function(res,rej){var r=indexedDB.open('kif_fs',1);r.onupgradeneeded=function(){r.result.createObjectStore('h');};r.onerror=function(){rej(r.error);};
@@ -576,6 +576,20 @@ async function fdWrite(name,blob){
   var fh;try{fh=await h.getFileHandle(name,{create:true});}catch(e){if(e&&e.name==='NotFoundError'){await fdClear();throw {code:'fd_gone'};}throw e;}
   var w=await fh.createWritable();await w.write(blob);await w.close();return fdLabel()+' › '+name;
 }
+/* 출력물(PDF·PPT·엑셀·HTML) 저장 v1.0 (2026-11-12): 저장 폴더 안 「고객 이름」 폴더에 바로 쓴다.
+   sub: 고객 이름(폴더 이름으로 못 쓰는 글자는 뺀다). 폴더를 아직 안 정했으면 null을 돌려주고, 부르는 쪽이 다운로드로 저장한다. */
+function fdSafe(t){return String(t||'').replace(/[\\/:*?"<>|]/g,'').replace(/[\s.]+$/,'').trim().slice(0,60);}
+async function fdWriteIn(sub,name,blob){
+  var h=await fdGet();if(!h)return null;
+  if(!(await fdPerm(h)))throw {code:'fd_denied'};
+  var d=h,s=fdSafe(sub);
+  try{if(s)d=await h.getDirectoryHandle(s,{create:true});}catch(e){if(e&&e.name==='NotFoundError'){await fdClear();throw {code:'fd_gone'};}throw e;}
+  var fh=await d.getFileHandle(name,{create:true}),w=await fh.createWritable();await w.write(blob);await w.close();
+  return fdLabel()+(s?' › '+s:'')+' › '+name;
+}
+/* 버튼을 누른 바로 그 순간에 부른다: 브라우저의 「파일 수정 허용」 질문은 클릭 직후에만 띄울 수 있어서,
+   PDF를 다 만든 뒤(몇 초 뒤)에 물으면 막힌다. 미리 허용을 받아 둔다. */
+function fdReady(){return fdGet().then(function(h){return h?fdPerm(h).catch(function(){return false;}):false;},function(){return false;});}
 function fdErr(e){var M={fd_unsupported:'이 기기(브라우저)는 저장 폴더를 정할 수 없습니다. PC의 크롬이나 엣지에서 해 주세요.',fd_denied:'폴더에 저장하려면 브라우저 창에서 「허용」(파일 수정 허용)을 눌러야 합니다. 다시 눌러 주세요.',
   fd_gone:'정해 둔 저장 폴더를 찾을 수 없습니다(옮기거나 지웠을 수 있습니다). 저장 폴더를 다시 골라 주세요.'};
   if(e&&e.name==='SecurityError')return '이 폴더는 브라우저가 막는 곳입니다(바탕 화면·문서 자체 등). 그 안의 폴더를 고르거나 「새 폴더」로 만들어 고르세요.';
@@ -587,7 +601,7 @@ function fdBox(){
     '<div class="kai-row"><button type="button" class="kai-btn'+(l?'':' p')+'" data-kai="fd">'+(l?'폴더 바꾸기':'저장 폴더 고르기')+'</button><span class="kai-note" id="kaiFdMsg" role="status"></span></div>'+
     '<p class="kai-note" style="margin:8px 0 0">창이 뜨면 <b>OneDrive</b>·<b>Google Drive</b>·<b>문서</b> 안에서 보관할 곳을 고르고 「폴더 선택」 → 「파일 수정 허용」을 누르세요. 고른 곳 안에 <b>'+FD_NAME+'</b> 폴더를 자동으로 만들어 줍니다. (바탕 화면·문서 자체는 크롬이 막으니, 그 안의 폴더를 고르거나 「새 폴더」를 만들어 고르세요.)</p></div>';
 }
-var folder={name:FD_NAME,ok:fdOk,get:fdGet,label:fdLabel,pick:fdPick,write:fdWrite,clear:fdClear,perm:fdPerm,err:fdErr};
+var folder={name:FD_NAME,ok:fdOk,get:fdGet,label:fdLabel,pick:fdPick,write:fdWrite,writeIn:fdWriteIn,ready:fdReady,safe:fdSafe,clear:fdClear,perm:fdPerm,err:fdErr};
 if(document.readyState!=='loading')addCss();else document.addEventListener('DOMContentLoaded',addCss);
 window.addEventListener('storage',function(e){if(e.key===AIK)fire();});
 window.KIFAI={scrub:scrub,AIP:AIP,guideDoc:GUIDE_DOC,cfg:cfg,chosen:chosen,adminDefault:adminDefault,companyOk:companyOk,model:model,statusHTML:statusHTML,open:open,openKey:openKey,keyRowHTML:keyRowHTML,ask:ask,read:read,officeText:officeText,ocrPdf:ocrPdf,ocrPages:ocrPages,err:err,pretty:pretty,view:view,pickJson:function(t){return pickJson(t);},migrateClaudeKey:migrateClaudeKey,folder:folder,onChange:function(f){subs.push(f);}};
