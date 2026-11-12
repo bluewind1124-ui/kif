@@ -25,7 +25,7 @@
 (function(){try{var r=document.documentElement,mq=matchMedia('(prefers-color-scheme: dark)');
   function ap(){if(r.getAttribute('data-theme-user'))return;r.setAttribute('data-theme',mq.matches?'dark':'light');}
   ap();if(mq.addEventListener)mq.addEventListener('change',ap);else if(mq.addListener)mq.addListener(ap);}catch(e){}})();</script>
-<meta name="kif-build" content="2026-11-12.3">
+<meta name="kif-build" content="2026-11-12.6">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -896,6 +896,11 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   .rpt{position:absolute;left:0;top:0;width:100%;display:block}
   .rpg{box-shadow:none;border:0;page-break-after:always;break-after:page;margin:0}
   .rvsheet .xsh{break-after:page;page-break-after:always}.rvsheet{overflow:visible}
+  html,body{background:#fff!important;background-image:none!important}body::before,body::after{display:none!important}
+  html,body,.rpt,.rpt *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  .rpt .slw{break-inside:avoid;page-break-inside:avoid;break-after:page;page-break-after:always;margin:0 0 0}
+  .rpt .slw:last-child{break-after:auto;page-break-after:auto}
+  .rpt .sl{border:0;box-shadow:none}
   .demo,.top,.gnb,.side{display:none}
 }
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:90;background:var(--navy);color:#fff;padding:10px 18px;border-radius:30px;font-size:.9rem;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
@@ -4923,6 +4928,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function bars1(R,focus){return bars(R,focus).replace('<span><i class="mo"></i>기존</span><span><i class="mt"></i>신규 가입 후(합산)</span>','<span><i class="mt"></i>기존 계약 보장</span>');}
   /* 결과 화면 보기: 제안서(1단계는 분석 리포트) / 분석표 탭 — 탭마다 출력(인쇄)·PDF 저장 (v6.1, 2026-11-12) */
   function rvSheet(){return st.rview==='sheet';}
+  /* 인쇄 방향을 화면 모양대로: 16:9 장표(리포트·제안서)는 A4 가로, 분석표는 A4 세로 (v6.2) — Ctrl+P로 인쇄해도 같게 */
+  function printPage(){var el=document.getElementById('rpt');if(!el)return;var land=!!el.querySelector('.sl')&&!el.querySelector('.xsh');
+    var t=document.getElementById('kifPrintPage');if(!t){t=document.createElement('style');t.id='kifPrintPage';document.head.appendChild(t);}
+    t.textContent='@media print{@page{size:A4 '+(land?'landscape':'portrait')+';margin:'+(land?'6mm':'10mm')+'}}';}
+  window.addEventListener('beforeprint',printPage);
   function rptName(){return st.step===3?'분석 리포트':'제안서';}
   function rptBar(c,title,pill){var sh=rvSheet(),nm=sh?'분석표':rptName();
     return '<div class="panel rtool"><div class="rvtabs" role="tablist" aria-label="결과물 고르기">'+
@@ -5891,7 +5901,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     }).catch(function(){});
   }
   /* 지난 분석본 창 v1.0 (2026-11-12): 고른 보관본을 다시 보기 · 그때 내용 그대로 PDF·PPT·엑셀 다시 저장 ·
-     저장 폴더(고객 이름 폴더)에 있는 파일 목록 열기. 엑셀·분석표 PDF는 그때 자료(data)를 함께 보관한 v6.2 이후 보관본만 된다. */
+     저장 폴더(고객 이름 폴더)에 있는 파일 목록 열기. 엑셀·분석표 PDF는 그때 자료(data)를 함께 보관한 v6.6 이후 보관본만 된다. */
   function arcDlg(id,c){
     KIFARC.get(id).then(function(it){
       if(!it){toast('보관본을 찾지 못했습니다.');return;}
@@ -5907,7 +5917,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<div class="grp"><b class="t">② 파일로 다시 저장 '+(fd?'<span style="font-weight:500;color:#1d7f47">→ 저장 폴더 › '+esc(fileBase(cc))+'</span>':'<span style="font-weight:500;color:#5b6573">→ 다운로드 폴더</span>')+'</b><div class="bt">'+
           (isSh?'':'<button type="button" class="btn sm" data-ad="pdf">'+nm+' PDF</button><button type="button" class="btn sm" data-ad="ppt">'+nm+' PPT</button>')+
           '<button type="button" class="btn sm'+(isSh?'':' ghost')+'" data-ad="sheet"'+(dc||isSh?'':' disabled')+'>분석표 PDF</button><button type="button" class="btn sm ghost" data-ad="xlsx"'+(dc?'':' disabled')+'>분석표 엑셀</button></div>'+
-          (dc?'':'<p class="nt">이 보관본은 예전(v6.2 이전)에 보관되어 화면 모습만 있습니다. 분석표 PDF·엑셀은 고객 화면에서 다시 출력하거나, 다음부터 보관되는 분석본에서 쓸 수 있습니다.</p>')+
+          (dc?'':'<p class="nt">이 보관본은 예전(v6.6 이전)에 보관되어 화면 모습만 있습니다. 분석표 PDF·엑셀은 고객 화면에서 다시 출력하거나, 다음부터 보관되는 분석본에서 쓸 수 있습니다.</p>')+
           '<p class="nt" style="background:#eef4fb;color:#24456e">파일 이름 날짜는 보관한 날('+ymd(it.at)+')로 붙습니다.</p></div>'+
         '<div class="grp"><b class="t">③ 저장 폴더에 있는 이 고객 파일</b><div id="arcFiles">'+(fd?'<span class="note">찾는 중…</span>':'<p class="nt" style="margin:0">저장 폴더를 아직 정하지 않았거나 이 기기(휴대폰·사파리)에서는 쓸 수 없습니다. PC 크롬·엣지의 「내 정보 · 자료 보관」에서 저장 폴더를 정하면 여기에 고객 파일이 보입니다.</p>')+'</div></div>'+
         '<p class="msg" id="arcMsg" role="status"></p><div class="bt" style="justify-content:flex-end;margin-top:6px"><button type="button" class="btn sm ghost" data-ad="x">닫기</button></div></div>';
@@ -6252,7 +6262,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(a==='aiText'){aiText(c);return;}
     if(a==='ai1'){aiAnalyze1(c);return;}
     if(a==='ai1off'){c.ai1=null;touch(c);render();toast('포털 규칙으로 정리한 기본 결과로 돌렸습니다.');return;}
-    if(a==='print'){arcBasic(c);window.print();return;}
+    if(a==='print'){arcBasic(c);printPage();window.print();return;}
     if(a==='rview'){st.rview=b.dataset.v==='sheet'?'sheet':'rpt';render();return;}
     if(a==='saveHtml'){arcBasic(c);saveHtml(dataC(c));return;}
     if(a==='saveXlsx'){saveXlsx(dataC(c),b);return;}
