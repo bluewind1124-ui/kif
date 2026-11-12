@@ -25,7 +25,7 @@
 (function(){try{var r=document.documentElement,mq=matchMedia('(prefers-color-scheme: dark)');
   function ap(){if(r.getAttribute('data-theme-user'))return;r.setAttribute('data-theme',mq.matches?'dark':'light');}
   ap();if(mq.addEventListener)mq.addEventListener('change',ap);else if(mq.addListener)mq.addListener(ap);}catch(e){}})();</script>
-<meta name="kif-build" content="2026-11-12.4">
+<meta name="kif-build" content="2026-11-12.5">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -885,6 +885,11 @@ tr.grp td{background:var(--gold-soft);font-weight:700;font-size:.82rem}
   .rpt{position:absolute;left:0;top:0;width:100%;display:block}
   .rpg{box-shadow:none;border:0;page-break-after:always;break-after:page;margin:0}
   .rvsheet .xsh{break-after:page;page-break-after:always}.rvsheet{overflow:visible}
+  html,body{background:#fff!important;background-image:none!important}body::before,body::after{display:none!important}
+  html,body,.rpt,.rpt *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  .rpt .slw{break-inside:avoid;page-break-inside:avoid;break-after:page;page-break-after:always;margin:0 0 0}
+  .rpt .slw:last-child{break-after:auto;page-break-after:auto}
+  .rpt .sl{border:0;box-shadow:none}
   .demo,.top,.gnb,.side{display:none}
 }
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:90;background:var(--navy);color:#fff;padding:10px 18px;border-radius:30px;font-size:.9rem;box-shadow:var(--shadow);max-width:calc(100% - 32px)}
@@ -4623,7 +4628,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     h+='<tr class="ai-nohit"'+(L.some(function(x){return !st.q||(x.name||'').indexOf(st.q)>-1;})?' hidden':'')+'><td colspan="9" class="note">검색된 고객이 없습니다.</td></tr>';
     return h+'</tbody></table></div><p class="note">이름을 누르면 그 고객의 정보 화면으로 갑니다. 왼쪽 "이름 검색"으로 이 표도 함께 걸러집니다. 필요 없는 고객은 줄 끝 <b>「🗑 삭제」</b>를 누르면 확인 창이 뜹니다.</p></div>';
   }
-  /* 고객 삭제 확인 창 — 목록 줄 끝 「🗑 삭제」와 ① 고객 정보 「고객 삭제」가 함께 씀 (v6.3, 2026-11-12)
+  /* 고객 삭제 확인 창 — 목록 줄 끝 「🗑 삭제」와 ① 고객 정보 「고객 삭제」가 함께 씀 (v6.5, 2026-11-12)
      지워지는 것: 고객 정보·기존 계약·제안안·상담 기록(고객 안에 들어 있음). 내 자료함 보관본은 고르면 함께 지움.
      PC 저장 폴더·다운로드 폴더에 저장된 파일(PDF·PPT·엑셀)은 건드리지 않음. */
   function delAsk(id){
@@ -4949,6 +4954,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function bars1(R,focus){return bars(R,focus).replace('<span><i class="mo"></i>기존</span><span><i class="mt"></i>신규 가입 후(합산)</span>','<span><i class="mt"></i>기존 계약 보장</span>');}
   /* 결과 화면 보기: 제안서(1단계는 분석 리포트) / 분석표 탭 — 탭마다 출력(인쇄)·PDF 저장 (v6.1, 2026-11-12) */
   function rvSheet(){return st.rview==='sheet';}
+  /* 인쇄 방향을 화면 모양대로: 16:9 장표(리포트·제안서)는 A4 가로, 분석표는 A4 세로 (v6.2) — Ctrl+P로 인쇄해도 같게 */
+  function printPage(){var el=document.getElementById('rpt');if(!el)return;var land=!!el.querySelector('.sl')&&!el.querySelector('.xsh');
+    var t=document.getElementById('kifPrintPage');if(!t){t=document.createElement('style');t.id='kifPrintPage';document.head.appendChild(t);}
+    t.textContent='@media print{@page{size:A4 '+(land?'landscape':'portrait')+';margin:'+(land?'6mm':'10mm')+'}}';}
+  window.addEventListener('beforeprint',printPage);
   function rptName(){return st.step===3?'분석 리포트':'제안서';}
   function rptBar(c,title,pill){var sh=rvSheet(),nm=sh?'분석표':rptName();
     return '<div class="panel rtool"><div class="rvtabs" role="tablist" aria-label="결과물 고르기">'+
@@ -6202,7 +6212,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(a==='aiText'){aiText(c);return;}
     if(a==='ai1'){aiAnalyze1(c);return;}
     if(a==='ai1off'){c.ai1=null;touch(c);render();toast('포털 규칙으로 정리한 기본 결과로 돌렸습니다.');return;}
-    if(a==='print'){arcBasic(c);window.print();return;}
+    if(a==='print'){arcBasic(c);printPage();window.print();return;}
     if(a==='rview'){st.rview=b.dataset.v==='sheet'?'sheet':'rpt';render();return;}
     if(a==='saveHtml'){arcBasic(c);saveHtml(dataC(c));return;}
     if(a==='saveXlsx'){saveXlsx(dataC(c),b);return;}
