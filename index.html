@@ -25,7 +25,7 @@
 (function(){try{var r=document.documentElement,mq=matchMedia('(prefers-color-scheme: dark)');
   function ap(){if(r.getAttribute('data-theme-user'))return;r.setAttribute('data-theme',mq.matches?'dark':'light');}
   ap();if(mq.addEventListener)mq.addEventListener('change',ap);else if(mq.addListener)mq.addListener(ap);}catch(e){}})();</script>
-<meta name="kif-build" content="2026-11-12.4">
+<meta name="kif-build" content="2026-11-12.6">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -548,6 +548,18 @@ a.mat:hover{outline:2px solid var(--gold);outline-offset:1px}
 .logadd{display:grid;grid-template-columns:220px 1fr auto;gap:10px;align-items:end}
 @media (max-width:700px){.logadd{grid-template-columns:1fr}}
 .ai-back{margin:10px 0}.ai-back+.ai-back{display:none}
+/* 「지난 분석본」 칸 v1.0 (2026-11-12): 눈에 잘 띄게 — 금색 테두리·연노랑 바탕·굵은 글자 (밝은/어두운 화면 모두 진한 글자) */
+.arcpick{flex:1 1 260px;max-width:460px;font-size:14.5px!important;font-weight:700;padding:9px 12px!important;border:2px solid #c8961e!important;background:#fff6dc!important;color:#4a3300!important;border-radius:10px!important;box-shadow:0 2px 8px rgba(200,150,30,.25);cursor:pointer}
+.arcpick:disabled{border-style:dashed!important;background:#fbf7ec!important;color:#7a6a45!important;box-shadow:none;cursor:default;font-weight:600}
+.arcpick:not(:disabled):hover,.arcpick:focus{border-color:#a8770a!important;box-shadow:0 0 0 3px rgba(200,150,30,.3)}
+.arcdlg{position:fixed;inset:0;z-index:9998;background:rgba(15,25,40,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.arcdlg .bx{background:#fff;color:#1b2533;border-radius:14px;max-width:620px;width:100%;max-height:90vh;overflow:auto;padding:18px 20px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.arcdlg h3{margin:0 0 4px;font-size:17px;color:#0f2240}.arcdlg .sub{font-size:13px;color:#5b6573;margin:0 0 12px}
+.arcdlg .grp{border:1px solid #e3e7ec;border-radius:10px;padding:10px 12px;margin:10px 0}.arcdlg .grp b.t{display:block;font-size:13.5px;margin-bottom:8px;color:#0f2240}
+.arcdlg .bt{display:flex;gap:6px;flex-wrap:wrap}.arcdlg .bt button{font-size:13.5px}
+.arcdlg .fl{list-style:none;margin:0;padding:0;max-height:220px;overflow:auto}.arcdlg .fl li{display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px dashed #e3e7ec;font-size:13px}.arcdlg .fl li span{flex:1;word-break:break-all}
+.arcdlg .nt{font-size:12.5px;color:#6b5a2e;background:#fbf3e3;border-radius:8px;padding:7px 10px;margin:8px 0 0}
+.arcdlg .msg{font-size:13px;color:#1d7f47;min-height:1em;margin:8px 0 0}
 .ai-steps{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch;border-bottom:2px solid var(--line);padding-bottom:6px}
 .ai-sg{display:flex;flex-wrap:wrap;align-items:center;gap:0;border:1px solid var(--line);border-radius:10px;padding:0 4px;background:#fff}
 .ai-sg .sgt{font-size:.72rem;font-weight:800;color:#8a6a1f;padding:0 6px;white-space:nowrap}
@@ -1352,8 +1364,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   window.addEventListener('beforeunload',function(e){if(names().length||KS.busy){e.preventDefault();e.returnValue='';return '';}});
 })();
 </script>
-<script src="archive.js?v=20261109a"></script>
-<script src="ai-connect.js?v=20261109a"></script>
+<script src="archive.js?v=20261112a"></script>
+<script src="ai-connect.js?v=20261112a"></script>
 <script src="policy.js?v=20261109a"></script>
 <script src="cmp-ai.js?v=20261106a"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -3603,7 +3615,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var K=window.KIFAI;if(!K)return '';var on=K.chosen()&&K.cfg().mode==='ai';
     return '<div class="panel form" id="meAi"><h3>AI 연결 <span class="pill new">기본형·고급형 공통</span></h3>'+
       '<p>'+(K.chosen()?K.statusHTML():'<b>아직 AI를 연결하지 않았습니다.</b>')+'</p>'+
-      '<p class="note">AI 연결 창의 마지막 단계에서 <b>고객 자료 저장 폴더</b>도 함께 정합니다.</p>'+
+      '<p class="note">AI 연결 창의 마지막 단계에서 <b>고객 자료 저장 폴더</b>도 함께 정합니다. 정해 두면 백업 파일과 AI보장분석 출력물(고객 이름 폴더)이 그 폴더에 저장됩니다.</p>'+
       '<div class="row"><button type="button" class="btn'+(on?'':' gold')+'" data-kai-open>'+(on?'AI 연결 바꾸기':'AI 연결하기')+'</button></div></div>';
   }
   function bindMe(){
@@ -3734,7 +3746,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       bkDirHtml()+
       '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn" type="button" id="bkSave">'+(fd?'저장 폴더에 저장':'내 PC·클라우드에 저장')+'</button><button class="btn ghost" type="button" id="bkLoad">저장한 파일 불러오기</button><input type="file" id="bkFile" accept=".json,application/json" hidden></div>'+
       '<ol class="note" style="padding-left:1.2em;line-height:1.8;margin:10px 0 0">'+
-      (fd?'<li><b>PC</b>: 처음 한 번 <b>저장 폴더</b>를 고르면(OneDrive·Google Drive 안을 고르면 클라우드 보관) 그 안에 <b>한보금on_고객자료</b> 폴더가 생기고, 이후엔 누를 때마다 그 폴더에 <b>날짜별 파일</b>로 바로 저장됩니다. 같은 날 다시 저장하면 그날 파일을 새 내용으로 바꿉니다.</li><li>브라우저가 「파일 수정 허용」을 물으면 <b>허용</b>(가능하면 「항상 허용」)을 누르세요.</li>':
+      (fd?'<li><b>PC</b>: 처음 한 번 <b>저장 폴더</b>를 고르면(OneDrive·Google Drive 안을 고르면 클라우드 보관) 그 안에 <b>한보금on_고객자료</b> 폴더가 생기고, 이후엔 누를 때마다 그 폴더에 <b>날짜별 파일</b>로 바로 저장됩니다. 같은 날 다시 저장하면 그날 파일을 새 내용으로 바꿉니다.</li><li>AI보장분석의 <b>PDF·PPT·엑셀</b>도 이 저장 폴더 안 <b>고객 이름 폴더</b>에 바로 저장됩니다(예: 한보금on_고객자료 › 홍길동 › 홍길동_기계약보장분석_20261112.pdf).</li><li>브라우저가 「파일 수정 허용」을 물으면 <b>허용</b>(가능하면 「항상 허용」)을 누르세요.</li>':
        '<li><b>폰</b>: 저장을 누르면 나오는 창에서 <b>드라이브</b>(안드로이드)나 <b>파일에 저장 → iCloud Drive</b>(아이폰)를 고르세요. 처음 한 번 그 안에 <b>한보금on_고객자료</b> 폴더를 만들어 두면 찾기 쉽습니다.</li>')+
       '<li>다른 기기에서는 <b>저장한 파일 불러오기</b>로 같은 파일을 고르면 고객 자료가 그대로 옮겨집니다.</li></ol>'+
       '<p class="note" id="bkMsg" role="status"></p></div>';
@@ -4564,7 +4576,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<div class="ai-sg side">'+[[5,'옵션 관리','⚙'],[6,'참고자료','＋']].map(tb).join('')+'</div></div>';
     /* 단계마다 이전 단계로 돌아가는 버튼(위·아래) */
     var SN={0:'고객 목록',1:'① 고객 정보',2:'② 기존 계약 입력',9:'③④ 옵션·샘플',3:'⑤ 기계약 분석 출력',8:'⑥ 제안안 입력',10:'⑦⑧ 제안서 옵션·샘플',4:'⑨ 제안서 출력',5:'옵션 관리',6:'참고자료'},ORD=[0,1,2,9,3,8,10,4],pv=isSide(st.step)?(st.from5==null?3:st.from5):ORD[Math.max(0,ORD.indexOf(st.step)-1)];
-    var back=st.step>0?'<div class="ai-back" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn sm ghost" data-a="step" data-s="'+pv+'">◂ 뒤로: '+SN[pv]+'</button>'+(c&&window.KIFARC?'<select class="in" data-arcpick aria-label="이 고객의 지난 분석본" style="max-width:380px;flex:1 1 220px;padding:5px 8px;font-size:13px"><option value="">📂 지난 분석본 찾는 중…</option></select>':'')+'</div>':'';
+    var back=st.step>0?'<div class="ai-back" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn sm ghost" data-a="step" data-s="'+pv+'">◂ 뒤로: '+SN[pv]+'</button>'+(c&&window.KIFARC?'<select class="in arcpick" data-arcpick aria-label="이 고객의 지난 분석본 — 골라서 보기·다시 저장"><option value="">📂 지난 분석본 찾는 중…</option></select>':'')+'</div>':'';
     h+=back;
     if(st.step===0)h+=viewList();
     else if(st.step===5)h+=viewOpts();
@@ -4592,7 +4604,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function stepDone(c){var D={};if(!c)return D;var K=c.contracts||[],old=K.filter(function(k){return k.kind!=='신규';}),nw=K.filter(function(k){return k.kind==='신규';});
     D[1]=!!(c.name&&c.birth&&c.sex);D[2]=old.length>0&&old.every(function(k){return k.confirmed;});D[9]=!!c.optSet;D[3]=!!(c.ai1||c.out1);D[8]=nw.length>0&&nw.every(function(k){return k.confirmed;});D[10]=!!c.optSet2;D[4]=!!c.out2;return D;}
   /* 사용 안내서: 이름만 보이고 누르면 펼쳐진다 */
-  var GUIDE_V='v1.1 · 2026-11-09';
+  var GUIDE_V='v1.2 · 2026-11-12';
   function guideHtml(){
     var card=function(n,t,p,tip,s){return '<div class="gk"><h5><i>'+n+'</i>'+t+'</h5><p>'+p+'</p>'+(tip?'<p class="tip">💡 '+tip+'</p>':'')+(s==null?'':typeof s==='string'?'<button class="btn sm ghost" type="button" data-go="'+s+'">'+(s==='arcbox'?'내 자료함 열기':'내 정보 열기')+' ▸</button>':'<button class="btn sm ghost" data-a="gGo" data-s="'+s+'">이 단계로 가기 ▸</button>')+'</div>';};
     return '<details class="ai-guide" id="aiGuide"'+(st.gOpen?' open':'')+'><summary>📘 AI 보장분석 사용 안내서 <span class="gv">'+GUIDE_V+'</span></summary><div class="gb">'+
@@ -4611,8 +4623,8 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '</div><div class="gg"><span>저장·관리</span>상담 기록과 고객별 분석·제안서 찾기</div><div class="gc">'+
       card('📝','상담 기록 확인','왼쪽 고객 이름을 누르면 <b>① 고객 정보</b> 화면 맨 아래 <b>「⑤ 상담 기록」</b>에 최초 상담·2차·3차… 순서로 쌓입니다. 「전체 고객 목록」 표에서 고객마다 <b>상담 기록 건수·최근 상담일</b>을 한눈에 봅니다.','상담 일시와 내용을 적고 「기록 추가」. 「저장」만 눌러도 적어 둔 내용이 기록으로 남습니다.',1)+
       card('↻','작업 이어서 하기','입력한 고객 정보·계약·옵션·분석 결과는 고객 목록에 자동 저장됩니다. 다음에 고객 이름만 누르면 하던 단계부터 이어서 할 수 있고, 위 단계 탭의 ✓가 끝낸 단계를 보여 줍니다.','이름 검색 칸으로 고객을 빨리 찾을 수 있습니다.',0)+
-      card('📂','지난 분석본·제안서 (내 자료함)','PDF·PPT·인쇄를 하거나 「자료함에 보관」을 누르면 그때 화면이 <b>「내 자료함」</b>에 날짜별로 남습니다(고객별·종류별 최근 5개). 각 단계 위쪽 「📂 지난 분석본」 목록에서도 바로 열 수 있습니다.','','arcbox')+
-      card('⬇','저장한 파일','PDF·PPT·엑셀은 PC·휴대폰의 <b>다운로드 폴더</b>에 저장됩니다. 카카오톡 대화방에서 파일로 첨부해 고객에게 보내면 됩니다.','파일 이름에 고객 이름과 날짜가 붙습니다.',null)+
+      card('📂','지난 분석본·제안서 (내 자료함)','PDF·PPT·인쇄를 하거나 「자료함에 보관」을 누르면 그때 화면이 <b>「내 자료함」</b>에 날짜별로 남습니다(고객별·종류별 최근 5개). 각 단계 위쪽 금색 <b>「📂 지난 분석본」</b> 칸에서 골라 그때 내용 그대로 다시 보고 <b>PDF·PPT·엑셀로 다시 저장</b>할 수 있고, 저장 폴더에 있는 이 고객 파일도 바로 엽니다.','','arcbox')+
+      card('⬇','저장한 파일','PC(크롬·엣지)에서 <b>저장 폴더</b>를 정해 두면 PDF·PPT·엑셀이 <b>저장 폴더 › 고객 이름 폴더</b>에 바로 저장됩니다. 정하지 않았거나 휴대폰이면 <b>다운로드 폴더</b>에 저장됩니다. 카카오톡 대화방에서 파일로 첨부해 고객에게 보내면 됩니다.','저장 폴더는 「내 정보 · 자료 보관」에서 정합니다. 파일 이름에 고객 이름과 날짜가 붙습니다.','me')+
       card('💾','백업·다른 기기로 옮기기','고객 자료와 자료함은 <b>지금 쓰는 기기의 브라우저</b>에만 저장됩니다. <b>「내 정보 · 자료 보관」 → 「고객 자료 보관」</b>에서 파일 한 개로 저장해 두고, 다른 기기에서 그 파일을 불러오면 그대로 옮겨집니다.','브라우저 기록(쿠키·사이트 데이터)을 지우면 자료가 사라지니, 자주 파일로 보관하세요.','me')+
       '</div></div></details>';
   }
@@ -5850,7 +5862,19 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
 
   /* ---------------- 저장·출력 ---------------- */
-  async function dl(name,data){
+  /* 출력물 저장 v1.0 (2026-11-12): c(고객)를 주면, PC 크롬·엣지에서 저장 폴더를 정해 둔 경우
+     「저장 폴더 › 고객 이름 › 파일」로 바로 저장한다. 폴더가 없거나 폰이거나 실패하면 예전처럼 다운로드 폴더로. */
+  function outFD(){var F=window.KIFAI&&KIFAI.folder;return F&&F.ok()&&F.label()?F:null;}
+  var outP=null;function outPrep(){var F=outFD();outP=F?F.ready():null;}
+  async function dl(name,data,c){
+    var F=!cap.dl&&c?outFD():null;
+    if(F){
+      try{var fb=data instanceof Blob?data:new Blob([data],{type:typeof data==='string'?'text/html;charset=utf-8':'application/octet-stream'});
+        if(outP){await outP;outP=null;}   /* 클릭 때 띄운 「허용」 질문의 답을 기다린다 */
+        var where=await F.writeIn(fileBase(c),name,fb);
+        if(where){toast('저장했습니다: '+where);var pn=document.getElementById('pdfNote');if(pn)pn.textContent='저장 위치: '+where;return;}}
+      catch(e){toast('저장 폴더에 쓰지 못해 다운로드 폴더에 저장합니다. ('+F.err(e)+')');}
+    }
     if(!cap.dl){
       /* Claude 밖(회사 사이트)에서 열었을 때: 브라우저 기본 내려받기 */
       try{var b=data instanceof Blob?data:new Blob([data],{type:typeof data==='string'?'text/html;charset=utf-8':'application/octet-stream'});
@@ -5868,24 +5892,88 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     KIFARC.list().then(function(L){
       L=L.filter(function(x){return x.src==='basic'&&x.cid===String(c.id);});
       var d=function(t){var x=new Date(t);return (x.getMonth()+1)+'/'+x.getDate()+' '+String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0');};
-      var o=L.length?'<option value="">📂 지난 분석본 '+L.length+'개 — 골라서 보기</option>'+L.map(function(x){return '<option value="'+esc(x.id)+'">'+esc(d(x.at)+' · '+x.title)+'</option>';}).join('')+'<option value="__box">→ 내 자료함 전체 보기</option>'
+      var o=L.length?'<option value="">📂 지난 분석본 '+L.length+'개 — 골라서 다시 보기·PDF·PPT·엑셀</option>'+L.map(function(x){return '<option value="'+esc(x.id)+'">'+esc(d(x.at)+' · '+x.title)+'</option>';}).join('')+'<option value="__box">→ 내 자료함 전체 보기</option>'
         :'<option value="">📂 이 고객의 지난 분석본 없음 (인쇄·PDF·「자료함에 보관」 때 남습니다)</option>';
       Array.prototype.forEach.call(S,function(sel){sel.innerHTML=o;sel.disabled=!L.length;
         sel.onchange=function(){var v=sel.value;sel.value='';if(!v)return;
           if(v==='__box'){var g=document.querySelector('[data-go="arcbox"]');if(g)g.click();return;}
-          KIFARC.open(v).catch(function(e){toast(e.message||'열지 못했습니다');});};});
+          arcDlg(v,c);};});
     }).catch(function(){});
+  }
+  /* 지난 분석본 창 v1.0 (2026-11-12): 고른 보관본을 다시 보기 · 그때 내용 그대로 PDF·PPT·엑셀 다시 저장 ·
+     저장 폴더(고객 이름 폴더)에 있는 파일 목록 열기. 엑셀·분석표 PDF는 그때 자료(data)를 함께 보관한 v6.6 이후 보관본만 된다. */
+  function arcDlg(id,c){
+    KIFARC.get(id).then(function(it){
+      if(!it){toast('보관본을 찾지 못했습니다.');return;}
+      var old=document.getElementById('arcDlg');if(old)old.remove();
+      var d0=new Date(it.at),dt=d0.getFullYear()+'.'+(d0.getMonth()+1)+'.'+d0.getDate()+' '+String(d0.getHours()).padStart(2,'0')+':'+String(d0.getMinutes()).padStart(2,'0');
+      var stage=/^1단계/.test(it.kind)?1:2,dc=it.data||null;
+      if(dc){dc.name=dc.name||it.cname;if(!dc._stage)dc._stage=stage;}
+      var cc=dc||{name:it.cname||(c&&c.name)||'고객',_stage:stage};
+      var F=outFD(),fd=!!F,isSh=/분석표/.test(it.kind||''),nm=stage===1?'분석 리포트':'제안서';   /* isSh: 분석표 탭을 보관한 것(화면이 분석표) */
+      var w=document.createElement('div');w.id='arcDlg';w.className='arcdlg';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label','지난 분석본');
+      w.innerHTML='<div class="bx"><h3>📂 '+esc((it.cname||cc.name)+'님 · '+it.title)+'</h3><p class="sub">보관한 때: <b>'+esc(dt)+'</b> · 그때 내용 그대로 다시 보고 저장합니다(지금 입력한 내용은 바뀌지 않습니다).</p>'+
+        '<div class="grp"><b class="t">① 화면으로 보기</b><div class="bt"><button type="button" class="btn sm" data-ad="view">그때 화면 열기 (인쇄 가능)</button></div></div>'+
+        '<div class="grp"><b class="t">② 파일로 다시 저장 '+(fd?'<span style="font-weight:500;color:#1d7f47">→ 저장 폴더 › '+esc(fileBase(cc))+'</span>':'<span style="font-weight:500;color:#5b6573">→ 다운로드 폴더</span>')+'</b><div class="bt">'+
+          (isSh?'':'<button type="button" class="btn sm" data-ad="pdf">'+nm+' PDF</button><button type="button" class="btn sm" data-ad="ppt">'+nm+' PPT</button>')+
+          '<button type="button" class="btn sm'+(isSh?'':' ghost')+'" data-ad="sheet"'+(dc||isSh?'':' disabled')+'>분석표 PDF</button><button type="button" class="btn sm ghost" data-ad="xlsx"'+(dc?'':' disabled')+'>분석표 엑셀</button></div>'+
+          (dc?'':'<p class="nt">이 보관본은 예전(v6.6 이전)에 보관되어 화면 모습만 있습니다. 분석표 PDF·엑셀은 고객 화면에서 다시 출력하거나, 다음부터 보관되는 분석본에서 쓸 수 있습니다.</p>')+
+          '<p class="nt" style="background:#eef4fb;color:#24456e">파일 이름 날짜는 보관한 날('+ymd(it.at)+')로 붙습니다.</p></div>'+
+        '<div class="grp"><b class="t">③ 저장 폴더에 있는 이 고객 파일</b><div id="arcFiles">'+(fd?'<span class="note">찾는 중…</span>':'<p class="nt" style="margin:0">저장 폴더를 아직 정하지 않았거나 이 기기(휴대폰·사파리)에서는 쓸 수 없습니다. PC 크롬·엣지의 「내 정보 · 자료 보관」에서 저장 폴더를 정하면 여기에 고객 파일이 보입니다.</p>')+'</div></div>'+
+        '<p class="msg" id="arcMsg" role="status"></p><div class="bt" style="justify-content:flex-end;margin-top:6px"><button type="button" class="btn sm ghost" data-ad="x">닫기</button></div></div>';
+      document.body.appendChild(w);
+      var msg=w.querySelector('#arcMsg'),close=function(){w.remove();document.removeEventListener('keydown',kk,true);},kk=function(e){if(e.key==='Escape'){e.stopPropagation();close();}};
+      document.addEventListener('keydown',kk,true);
+      if(fd)arcFiles(F,cc,w.querySelector('#arcFiles'));
+      w.addEventListener('click',function(e){
+        if(e.target===w){close();return;}
+        var b=e.target.closest('[data-ad]');if(!b)return;var a=b.getAttribute('data-ad');
+        if(a==='x'){close();return;}
+        if(a==='view'){close();KIFARC.open(id).catch(function(er){toast(er.message||'열지 못했습니다');});return;}
+        if(a==='fopen'){arcOpenFile(F,cc,b.getAttribute('data-f'));return;}
+        if(a==='frefresh'){arcFiles(F,cc,w.querySelector('#arcFiles'));return;}
+        outPrep();msg.textContent='만드는 중… (몇 초 걸립니다)';b.disabled=true;
+        var fin=function(r){b.disabled=false;if(r===false){msg.textContent='✕ 만들지 못했습니다(인터넷 연결 확인 후 다시 눌러 보세요).';return;}msg.textContent='✓ 저장했습니다. '+(fd?'저장 폴더 › '+fileBase(cc)+' 폴더를 확인하세요.':'다운로드 폴더를 확인하세요.');if(fd)setTimeout(function(){arcFiles(F,cc,w.querySelector('#arcFiles'));},600);};
+        var p=a==='pdf'?pdfRun(null,nm+' PDF',async function(prog){var data=await makePdf(it.html,{orient:'l',fmt:[338.67,190.5],m:0,w:1280,cls:'rpt',sel:'.sl',prog:prog});await dl(fileBase(cc)+(stage===1?'_기계약보장분석_':'_BeforeAfter제안서_')+ymd(it.at)+'.pdf',data,cc);})
+          :a==='ppt'?pptReport(cc,null,it.html,it.at)
+          :a==='sheet'?pdfRun(null,'분석표 PDF',async function(prog){var data=await makePdf(dc?sheetHtml(dc):it.html,{orient:'p',w:1000,cls:'xbook',sel:'.xsh',prog:prog});await dl(fileBase(cc)+(stage===1?'_기계약분석표_':'_BeforeAfter분석표_')+ymd(it.at)+'.pdf',data,cc);})
+          :saveXlsx(dc,null,it.at);
+        Promise.resolve(p).then(fin,function(er){b.disabled=false;msg.textContent='✕ 만들지 못했습니다: '+(er&&er.message||er&&er.code||'다시 눌러 보세요');});
+      });
+    }).catch(function(e){toast(e&&e.message||'열지 못했습니다');});
+  }
+  /* 저장 폴더 › 고객 이름 폴더의 파일 목록 (새 것부터) */
+  async function arcFiles(F,cc,box){
+    if(!box)return;
+    try{var h=await F.get();if(!h){box.innerHTML='<p class="nt" style="margin:0">저장 폴더를 찾지 못했습니다. 「내 정보 · 자료 보관」에서 다시 골라 주세요.</p>';return;}
+      if(!(await F.perm(h,false))){box.innerHTML='<p class="nt" style="margin:0">폴더를 보려면 허용이 필요합니다. <button type="button" class="btn sm" data-ad="frefresh">허용하고 목록 보기</button></p>';
+        box.querySelector('[data-ad="frefresh"]').onclick=async function(ev){ev.stopPropagation();try{await F.perm(h,true);}catch(e){}arcFiles(F,cc,box);};return;}
+      var d;try{d=await h.getDirectoryHandle(F.safe(fileBase(cc)));}catch(e){box.innerHTML='<p class="nt" style="margin:0">아직 이 고객 폴더(<b>'+esc(fileBase(cc))+'</b>)에 저장한 파일이 없습니다.</p>';return;}
+      var L=[];for await(var en of d.values()){if(en.kind==='file'){var f=await en.getFile();L.push({n:en.name,t:f.lastModified,s:f.size});}}
+      L.sort(function(a,b){return b.t-a.t;});
+      box.innerHTML=L.length?'<ul class="fl">'+L.map(function(x){var t=new Date(x.t);return '<li><span>'+esc(x.n)+'<br><small class="note">'+(t.getMonth()+1)+'/'+t.getDate()+' '+String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0')+' · '+Math.max(1,Math.round(x.s/1024))+'KB</small></span><button type="button" class="btn sm ghost" data-ad="fopen" data-f="'+esc(x.n)+'">열기</button></li>';}).join('')+'</ul><p class="note" style="margin:6px 0 0">위치: '+esc(F.label()+' › '+fileBase(cc))+'</p>'
+        :'<p class="nt" style="margin:0">이 고객 폴더에 아직 파일이 없습니다.</p>';
+    }catch(e){box.innerHTML='<p class="nt" style="margin:0">목록을 읽지 못했습니다: '+esc(F.err(e))+'</p>';}
+  }
+  async function arcOpenFile(F,cc,name){
+    try{var h=await F.get(),d=await h.getDirectoryHandle(F.safe(fileBase(cc))),f=await (await d.getFileHandle(name)).getFile();
+      var u=URL.createObjectURL(f);
+      if(/\.(pdf|html?)$/i.test(name)){window.open(u,'_blank');}
+      else{var a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();toast('PPT·엑셀은 브라우저에서 바로 열 수 없어 다운로드 폴더로 한 부 받았습니다. 원본은 저장 폴더에 있습니다.');}
+      setTimeout(function(){URL.revokeObjectURL(u);},60000);
+    }catch(e){toast('파일을 열지 못했습니다: '+F.err(e));}
   }
   function arcBasic(c,say){
     var el=document.getElementById('rpt');if(!el||!c||!window.KIFARC||(st.step!==3&&st.step!==4))return;
     var o=opt(c),kind=(st.step===3?'1단계 기계약 ':'2단계 Before/After ')+(rvSheet()?'분석표':st.step===3?'분석 리포트':'제안서');
-    KIFARC.add({src:'basic',cid:c.id,cname:c.name,kind:kind,title:kind+(o&&o.title?' · '+o.title:''),html:el.innerHTML,wrap:'rpt',css:rptCss()})
+    var snap=null;try{snap=JSON.parse(JSON.stringify(dataC(c)));}catch(e){}   /* 다시 출력(엑셀·분석표 PDF)용 그때 자료 — v1.0 2026-11-12 */
+    KIFARC.add({src:'basic',cid:c.id,cname:c.name,kind:kind,title:kind+(o&&o.title?' · '+o.title:''),html:el.innerHTML,wrap:'rpt',css:rptCss(),data:snap})
       .then(function(r){arcPick(c);if(say&&r)toast(r.dup?'자료함의 최신 보관본과 같아 시간만 고쳤습니다.':'내 자료함에 보관했습니다.');})
       .catch(function(e){if(say)toast('보관하지 못했습니다: '+(e&&e.message||'저장 공간 부족'));});
   }
   function saveHtml(c){
     var html='<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(c.name)+'님 보장분석 제안서</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap"><style>'+rptCss()+'body{background:#eef1f6;padding:20px}.pbtn{position:fixed;right:16px;top:16px;z-index:9}@media print{.pbtn{display:none}body{padding:0;background:#fff}}</style></head><body><button class="btn pbtn" onclick="window.print()">인쇄</button><div class="rpt">'+document.getElementById('rpt').innerHTML+'</div></body></html>';
-    dl(c.name.replace(/[\\/:*?"<>|()\s]/g,'')+'_보장분석제안서.html',html);
+    dl(c.name.replace(/[\\/:*?"<>|()\s]/g,'')+'_보장분석제안서.html',html,c);
   }
   /* 분석표(김덕중님 엑셀 형식): 시트 모델 하나로 엑셀과 PDF를 같이 만든다.
      칸 = {v:값, s:모양, f:엑셀 수식, l:링크}, 행.span = B열부터 합칠 칸 수. 표는 B2에서 시작 */
@@ -6016,13 +6104,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     return window.XLSXS||window.XLSX;
   }
   function fileBase(c){return String(c.name||'고객').replace(/[\\/:*?"<>|()\s]/g,'');}
-  function ymd(){return today().replace(/-/g,'');}
-  async function saveXlsx(c,btn){
+  function ymd(t){if(t){var d=new Date(t);return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');}return today().replace(/-/g,'');}
+  async function saveXlsx(c,btn,when){
     if(btn)btn.disabled=true;
     try{
-      var X=await xlsxLib();if(!X){toast('엑셀 도구를 불러오지 못했습니다(인터넷 연결 확인).');return;}
+      var X=await xlsxLib();if(!X){toast('엑셀 도구를 불러오지 못했습니다(인터넷 연결 확인).');return false;}
       var wb=X.utils.book_new();sheets(c).forEach(function(x){X.utils.book_append_sheet(wb,toWs(X,x),x.name);});
-      await dl(fileBase(c)+(c._stage===1?'_기계약분석표_':'_BeforeAfter분석표_')+ymd()+'.xlsx',new Uint8Array(X.write(wb,{bookType:'xlsx',type:'array'})));
+      await dl(fileBase(c)+(c._stage===1?'_기계약분석표_':'_BeforeAfter분석표_')+ymd(when)+'.xlsx',new Uint8Array(X.write(wb,{bookType:'xlsx',type:'array'})),c);
     }finally{if(btn)btn.disabled=false;}
   }
   /* 분석표를 엑셀 모양 HTML로 (PDF용) */
@@ -6062,19 +6150,19 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   async function pdfRun(btn,label,fn){
     var note=document.getElementById('pdfNote'),old=note?note.textContent:'';
     root.querySelectorAll('[data-a="pdfRpt"],[data-a="pdfSheet"]').forEach(function(x){x.disabled=true;});
-    try{await fn(function(i,t){if(note)note.textContent=label+' 만드는 중… '+i+'/'+t+'쪽';});if(note)note.textContent=old;}
-    catch(e){if(note)note.textContent=e&&e.code==='lib'?'PDF 도구를 불러오지 못했습니다(인터넷 연결 확인).':'PDF를 만들지 못했습니다. 다시 눌러 보세요.';}
+    try{await fn(function(i,t){if(note)note.textContent=label+' 만드는 중… '+i+'/'+t+'쪽';});if(note)note.textContent=old;return true;}
+    catch(e){if(note)note.textContent=e&&e.code==='lib'?'PDF 도구를 불러오지 못했습니다(인터넷 연결 확인).':'PDF를 만들지 못했습니다. 다시 눌러 보세요.';return false;}
     finally{root.querySelectorAll('[data-a="pdfRpt"],[data-a="pdfSheet"]').forEach(function(x){x.disabled=false;});}
   }
-  function pdfReport(c,btn){var el=document.getElementById('rpt');if(!el)return;
-    pdfRun(btn,'제안서 PDF',async function(prog){var data=await makePdf(el.innerHTML,{orient:'l',fmt:[338.67,190.5],m:0,w:1280,cls:'rpt',sel:'.sl',prog:prog});await dl(fileBase(c)+(c._stage===1?'_기계약보장분석_':'_BeforeAfter제안서_')+ymd()+'.pdf',data);});}
+  function pdfReport(c,btn,html,when){var el=document.getElementById('rpt');if(!el&&!html)return;
+    pdfRun(btn,'제안서 PDF',async function(prog){var data=await makePdf(html||el.innerHTML,{orient:'l',fmt:[338.67,190.5],m:0,w:1280,cls:'rpt',sel:'.sl',prog:prog});await dl(fileBase(c)+(c._stage===1?'_기계약보장분석_':'_BeforeAfter제안서_')+ymd(when)+'.pdf',data,c);});}
   /* 리포트·제안서 장표(.sl)를 한 장씩 그림으로 떠서 16:9 PowerPoint로 저장 */
-  function pptReport(c,btn){var el=document.getElementById('rpt');if(!el)return;
+  function pptReport(c,btn,html,when){var el=document.getElementById('rpt');if(!el&&!html)return;
     var note=document.getElementById('pdfNote'),old=note?note.textContent:'';if(btn)btn.disabled=true;
-    (async function(){
+    return (async function(){
       await Promise.all([loadJs('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'),loadJs('https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.bundle.js')]);
       if(!window.html2canvas||!window.PptxGenJS)throw {code:'lib'};
-      var host=document.createElement('div');host.className='pdfhost rpt';host.style.width='1280px';host.innerHTML=el.innerHTML;document.body.appendChild(host);
+      var host=document.createElement('div');host.className='pdfhost rpt';host.style.width='1280px';host.innerHTML=html||el.innerHTML;document.body.appendChild(host);
       try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;
         var pp=new window.PptxGenJS();pp.layout='LAYOUT_WIDE';pp.title=(c._stage===1?'기계약 보장분석':'Before/After 제안서');
         var secs=host.querySelectorAll('.sl');
@@ -6083,11 +6171,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
           var s=pp.addSlide(),W=13.333,H=7.5,r=Math.min(W/cv.width,H/cv.height),w=cv.width*r,hh=cv.height*r;
           s.addImage({data:cv.toDataURL('image/jpeg',0.92),x:(W-w)/2,y:(H-hh)/2,w:w,h:hh});}
         var buf=await pp.write({outputType:'uint8array'});
-        await dl(fileBase(c)+(c._stage===1?'_기계약보장분석_':'_BeforeAfter제안서_')+ymd()+'.pptx',buf);
+        await dl(fileBase(c)+(c._stage===1?'_기계약보장분석_':'_BeforeAfter제안서_')+ymd(when)+'.pptx',buf,c);
       }finally{host.remove();}
-    })().then(function(){if(note)note.textContent=old;},function(e){if(note)note.textContent=e&&e.code==='lib'?'PPT 도구를 불러오지 못했습니다(인터넷 연결 확인).':'PPT를 만들지 못했습니다. 다시 눌러 보세요.';}).then(function(){if(btn)btn.disabled=false;});}
-  function pdfSheet(c,btn){
-    pdfRun(btn,'분석표 PDF',async function(prog){var data=await makePdf(sheetHtml(c),{orient:'p',w:1000,cls:'xbook',sel:'.xsh',prog:prog});await dl(fileBase(c)+(c._stage===1?'_기계약분석표_':'_BeforeAfter분석표_')+ymd()+'.pdf',data);});}
+    })().then(function(){if(note)note.textContent=old;return true;},function(e){if(note)note.textContent=e&&e.code==='lib'?'PPT 도구를 불러오지 못했습니다(인터넷 연결 확인).':'PPT를 만들지 못했습니다. 다시 눌러 보세요.';return false;}).then(function(r){if(btn)btn.disabled=false;return r;});}
+  function pdfSheet(c,btn,when){
+    pdfRun(btn,'분석표 PDF',async function(prog){var data=await makePdf(sheetHtml(c),{orient:'p',w:1000,cls:'xbook',sel:'.xsh',prog:prog});await dl(fileBase(c)+(c._stage===1?'_기계약분석표_':'_BeforeAfter분석표_')+ymd(when)+'.pdf',data,c);});}
   function saveTpl(){
     if(!window.XLSX){toast('엑셀 도구를 불러오지 못했습니다.');return;}
     var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['계약구분','보험사','상품명','계약 월보험료','담보명','가입금액(만원)','보험료(원)','보장기간','지급주기'],['기존','OO손해보험','(예시) 종합보험',85000,'암진단비(유사암제외)',3000,12000,'90세','최초1회'],['신규','OO손해보험','(예시) 간편건강보험',47000,'암주요치료비(항암약물치료시)(연간1회한)',1000,8800,'90세','연간1회']]),'입력양식');
@@ -6166,6 +6254,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(a==='saveDocs'||a==='docsNext'||a==='adjNext'){gatherDocs(c);c.contracts.forEach(function(k){k.items.forEach(function(it){if(it.area==='기타')it.area=classify(it.name);});});touch(c);if(a==='docsNext')st.step=9;if(a==='adjNext')st.step=10;render();toast('저장했습니다.');return;}
     if(a==='tpl'){saveTpl();return;}
     if(/^(pdfRpt|pdfSheet|pptRpt|saveXlsx)$/.test(a)&&c&&(st.step===3||st.step===4)){c[st.step===3?'out1':'out2']=1;touch(c);}
+    if(/^(pptRpt|pdfRpt|pdfSheet|saveHtml|saveXlsx)$/.test(a))outPrep();   /* 저장 폴더 「허용」은 클릭 직후에만 물을 수 있다 */
     if(a==='pptRpt'){arcBasic(c);pptReport(dataC(c),b);return;}
     if(a==='pdfRpt'){arcBasic(c);pdfReport(dataC(c),b);return;}
     if(a==='pdfSheet'){arcBasic(c);pdfSheet(dataC(c),b);return;}
