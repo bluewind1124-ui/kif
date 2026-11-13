@@ -14,6 +14,15 @@
     Object.keys(base).forEach(function(k){if(d[k]===undefined)d[k]=base[k];});
     return d;
   }
+  /* 처음 들어 있던 비교 데이터: 공개 사이트에서 빼고 잠긴 저장소(classic/base/도구.json)에 둔다. 로그인한 FC만 받는다 */
+  window.KIFCMP_BASE=function(id){
+    var d=window.KIFD?KIFD.json('classic/base/'+id+'.json'):get('../classic/base/'+id+'.json');
+    if(d&&typeof d==='object')return d;
+    var show=function(){if(!document.body)return;var m=document.createElement('div');m.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(15,34,64,.92);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font:16px/1.8 sans-serif;padding:24px';
+      m.innerHTML='상품 비교 자료는 <b>로그인한 FC만</b> 볼 수 있습니다.<br>한보금on 활동지원에 로그인한 뒤 다시 열어 주세요.';document.body.appendChild(m);};
+    if(document.body)show();else document.addEventListener('DOMContentLoaded',show);
+    return {};
+  };
   window.KIFCMP_LOAD=function(id,base){
     try{
       var pk='kif_cmpprev_'+id,pv=null;

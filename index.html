@@ -25,7 +25,8 @@
 (function(){try{var r=document.documentElement,mq=matchMedia('(prefers-color-scheme: dark)');
   function ap(){if(r.getAttribute('data-theme-user'))return;r.setAttribute('data-theme',mq.matches?'dark':'light');}
   ap();if(mq.addEventListener)mq.addEventListener('change',ap);else if(mq.addListener)mq.addListener(ap);}catch(e){}})();</script>
-<meta name="kif-build" content="2026-11-12.4">
+<script src="kif-data.js?v=1"></script>
+<meta name="kif-build" content="2026-11-13.1">
 <script>
 /* 자동 새 버전: 브라우저가 예전 화면을 기억해 두어도(최대 10분), 열 때마다 version.json의 build를 확인해
    이 화면보다 새 버전이 있으면 한 번만 새 주소로 다시 불러온다. 창을 오래 켜 두어도 30분마다·다시 볼 때 확인한다. */
@@ -1929,9 +1930,9 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* ---------- 관리자 콘텐츠: content.json 불러오기 · 편집 · 사이트 반영 ----------
      FC 화면은 열릴 때마다 사이트의 content.json을 읽어 공지·소식지·시상·컨셉 등을 바꿔 보여준다.
      관리자는 여기서 고친 내용을 복사해 GitHub의 content.json 편집 화면에 붙여넣고 저장(Commit)하면 반영된다. */
-  var GH={owner:'bluewind1124-ui',repo:'kif',path:'content.json',branch:'main'};
+  var GH={owner:'bluewind1124-ui',repo:'kif-data',path:'content.json',branch:'main'}; /* 자료 잠금 v1.0: 자료·content.json은 비공개 저장소 kif-data에 올린다 */
   var GH_EDIT='https://github.com/'+GH.owner+'/'+GH.repo+'/edit/'+GH.branch+'/'+GH.path;
-  var CONTENT_URLS=['content.json','https://'+GH.owner+'.github.io/'+GH.repo+'/content.json'];
+  var CONTENT_URLS=['content.json'];
   function applyContent(c,redraw){
     if(!c||typeof c!=='object')return;SITE=c;
     if(Array.isArray(c.news))NEWS=c.news;if(Array.isArray(c.awards))AWARDS=c.awards;if(Array.isArray(c.mats))MATS=c.mats;
@@ -1942,10 +1943,13 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(!me)gateMode();
     if(redraw!==false&&me&&cur!=='ai'&&cur!=='admin'&&cur!=='cadmin'&&!(cur==='compare'&&CMP.open))go(cur);
   }
-  (function loadContent(i){
+  function loadContent(i){
     if(i>=CONTENT_URLS.length)return;
     fetch(CONTENT_URLS[i]+'?t='+Date.now(),{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(c){applyContent((window.KSAVE&&KSAVE.fresher(c))||c);}).catch(function(){loadContent(i+1);});
-  })(0);
+  }
+  /* 자료 잠금 v1.0: content.json은 로그인한 사람만 받는다. 로그인 증표가 있으면 바로, 없으면 로그인한 뒤에 받는다 */
+  window.KIF_LOAD_CONTENT=function(){loadContent(0);};
+  if(window.KIFD&&KIFD.tok())loadContent(0);
   function lines(a){return (a||[]).map(function(r){return Array.isArray(r)?r.join(' | '):String(r);}).join('\n');}
   function rows(t,n){return String(t||'').split('\n').map(function(x){return x.trim();}).filter(Boolean).map(function(x){var p=x.split('|').map(function(y){return y.trim();});while(p.length<n)p.push('');return p.slice(0,n);});}
   function nowTxt(){var d=new Date(),z=function(n){return (n<10?'0':'')+n;};return d.getFullYear()+'.'+z(d.getMonth()+1)+'.'+z(d.getDate())+' '+z(d.getHours())+':'+z(d.getMinutes());}
@@ -2095,7 +2099,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
         '<p class="note">이 컴퓨터·이 브라우저에서 <b>딱 한 번</b>만 하면, 다음부터는 「저장」 버튼 하나로 바로 올라갑니다. (다른 컴퓨터나 휴대폰에서는 그 기기에서 한 번 더 합니다.)</p>')+
       '<ol class="note" style="padding-left:1.3em;line-height:2;margin:8px 0">'+
       '<li><a class="btn sm" style="text-decoration:none" target="_blank" rel="noopener" href="'+GH_NEWTOK+'">① GitHub 토큰 만들기 화면 열기 ↗</a> (<b>bluewind1124-ui</b> 계정으로 로그인)</li>'+
-      '<li>열린 화면에서 이름·기간은 대부분 채워져 있습니다(비어 있으면 이름은 아무거나, 기간은 1년). <b>Repository access</b>에서 <b>Only select repositories</b>를 누르고 <b>kif</b>를 고릅니다.</li>'+
+      '<li>열린 화면에서 이름·기간은 대부분 채워져 있습니다(비어 있으면 이름은 아무거나, 기간은 1년). <b>Repository access</b>에서 <b>Only select repositories</b>를 누르고 <b>kif-data</b>(자료 저장소)를 고릅니다.</li>'+
       '<li><b>Permissions</b>에서 <b>Contents</b>가 <b>Read and write</b>인지 확인합니다(아니면 바꿉니다).</li>'+
       '<li>맨 아래 초록 <b>Generate token</b> → 한 번 더 <b>Generate token</b>을 누르고, 나온 <b>github_pat_…</b> 글자 옆 복사 버튼을 누릅니다.</li>'+
       '<li>아래 칸에 <b>Ctrl+V</b>로 붙여 넣고 <b>② 연결 저장</b>을 누릅니다. 「연결됨 ✓」이 나오면 끝입니다.</li></ol>'+
@@ -2103,11 +2107,11 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<p class="note" style="color:#8a6d1f">※ 토큰은 비밀번호와 같습니다. 이 브라우저에만 저장되고 사이트·다른 FC에게는 보내지 않습니다. 남에게 보여 주지 마세요.</p>'+
       '<p class="note" id="ccMsg" role="status"></p>'+(T?'</details>':'')+'</div>';
   }
-  /* 토큰이 kif 저장소를 읽을 수 있는지 GitHub에 물어 확인한다 */
+  /* 토큰이 kif-data 저장소를 읽을 수 있는지 GitHub에 물어 확인한다 */
   async function ghCheck(tok){
     var r=await fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo,{cache:'no-store',headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});
     if(r.status===401)throw new Error('토큰이 맞지 않거나 만료됐습니다. ①부터 새로 만들어 붙여 넣어 주세요.');
-    if(r.status===403||r.status===404)throw new Error('이 토큰으로는 kif 저장소가 보이지 않습니다. ②단계에서 kif를 골랐는지 확인해 주세요.');
+    if(r.status===403||r.status===404)throw new Error('이 토큰으로는 kif-data 저장소가 보이지 않습니다. ②단계에서 kif-data를 골랐는지 확인해 주세요.');
     if(!r.ok)throw new Error('GitHub 확인 실패 ('+r.status+'). 인터넷 연결을 확인하고 다시 눌러 주세요.');
     return true;
   }
@@ -2221,7 +2225,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function today(){var d=new Date();return d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());}
   function cut(x){return x.length>42?x.slice(0,41)+'…':x;}
   /* 화면에서 파일 열기: 저장소 안 경로(news/… files/…)·미리보기(blob:)·외부 주소 모두 새 창으로 */
-  function fileHref(f){return !f?'':/^(blob:|https?:)/.test(f)?f:encodeURI(f);}
+  function fileHref(f){var r=!f?'':/^(blob:|https?:)/.test(f)?f:encodeURI(f);return r&&window.KIFD?KIFD.url(r):r;} /* 자료 잠금 v1.0: 잠긴 자료는 계정 서버 주소로 */
   /* 첫 장 그림이 붙은 자료 링크(FC 화면 목록용). 그림은 ntThumb·ntMake가 채운다 */
   function thBox(f,cls){var ty=(String(f).split('.').pop()||'').toUpperCase(),th=ntThumb(f);
     return '<span class="nt-th'+(cls?' '+cls:'')+(th?'':' wait')+'"'+(th?'':' data-ntmk="'+esc(f)+'"')+'>'+(th?'<img loading="lazy" alt="" src="'+(/^blob:/.test(th)?th:fileHref(th))+'">':'')+'<em>'+esc(ty)+'</em></span>';}
@@ -2300,7 +2304,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<details class="nu-set"'+(T?'':' open')+'><summary>GitHub 연결 설정 '+(T?'<span class="pill ok">연결됨</span>':'<span class="pill warn">처음 한 번 필요</span>')+'</summary>'+
       '<ol class="note" style="padding-left:1.2em;line-height:1.9;margin:8px 0">'+
       '<li><a target="_blank" rel="noopener" href="https://github.com/settings/personal-access-tokens/new">GitHub 토큰 만들기 화면 ↗</a>을 엽니다 (bluewind1124-ui 계정으로 로그인).</li>'+
-      '<li>Token name은 아무거나(예: 자료올리기), Expiration은 원하는 기간, <b>Repository access → Only select repositories → kif</b>을 고릅니다.</li>'+
+      '<li>Token name은 아무거나(예: 자료올리기), Expiration은 원하는 기간, <b>Repository access → Only select repositories → kif-data</b>(자료 저장소)를 고릅니다.</li>'+
       '<li><b>Permissions → Repository permissions → Contents</b>를 <b>Read and write</b>로 바꾼 뒤 <b>Generate token</b>을 누릅니다.</li>'+
       '<li>나온 토큰(github_pat_…)을 복사해 아래에 붙여넣고 저장합니다. 이 컴퓨터의 이 브라우저에만 저장됩니다.</li></ol>'+
       '<div class="row" style="gap:8px"><input class="in" id="nuTok" type="password" autocomplete="off" placeholder="github_pat_..." value="'+esc(T)+'" style="flex:1;min-width:200px"><button class="btn sm" type="button" id="nuTokSave">저장</button><button class="btn sm ghost" type="button" id="nuTokDel">지우기</button></div></details></div>';
@@ -2497,7 +2501,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     /* cache:'no-store' — GitHub API는 읽기 결과를 브라우저에 60초 기억시킨다. 그러면 방금 저장한 뒤 예전 main을 읽어
        다음 저장이 「Update is not a fast forward」(422)로 계속 실패하므로, 항상 최신을 읽는다 */
     var r=await fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+path,{method:method,cache:'no-store',headers:{'Authorization':'Bearer '+ghTok(),'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},body:body?JSON.stringify(body):undefined});
-    if(!r.ok){var t='';try{t=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(t?' · '+t:'')+(r.status===401?' (토큰을 확인하세요)':r.status===403||r.status===404?' (토큰 권한: kif · Contents Read and write)':''));}
+    if(!r.ok){var t='';try{t=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(t?' · '+t:'')+(r.status===401?' (토큰을 확인하세요)':r.status===403||r.status===404?' (토큰 권한: kif-data · Contents Read and write)':''));}
     return r.json();
   }
   /* 최신 main 위에 커밋한다. 그 사이 다른 저장·배포로 main이 바뀌어 「not a fast forward」(422)가 나면
@@ -2956,6 +2960,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     var R=(cmW().cmpdata||{})[id];
     if(R&&R.data){var a=CM.add.filter(function(x){return x.path===R.data;})[0];
       try{var r=await fetch(a?a.url:fileHref(R.data)+'?v='+encodeURIComponent(R.ver||Date.now()),{cache:'no-store'});if(r.ok)return await r.json();}catch(e){}}
+    try{var rb=await fetch('classic/base/'+id+'.json',{cache:'no-store'});if(rb.ok){var jb=await rb.json();if(jb&&typeof jb==='object'&&Object.keys(jb).length)return jb;}}catch(e){} /* 자료 잠금 v1.0: 처음 데이터는 잠긴 저장소 */
     var h=await (await fetch('classic/'+id+'.html',{cache:'no-store'})).text(),i=h.indexOf('let DATA'),j=h.indexOf('{',i);if(i<0||j<0)throw new Error('도구 파일에서 데이터를 찾지 못했습니다');
     var d=0,q=null,k=j;for(;k<h.length;k++){var c=h[k];if(q){if(c==='\\'){k++;continue;}if(c===q)q=null;continue;}if(c==='"'||c==="'"||c==='`'){q=c;continue;}if(c==='{'||c==='[')d++;else if(c==='}'||c===']'){d--;if(!d)break;}}
     var src=h.slice(j,k+1);try{return JSON.parse(src);}catch(e){return (new Function('return ('+src+');'))();}
@@ -3476,7 +3481,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function matsShown(){return MATS.filter(function(m){return !(isPpt(m[4])&&matTwin(m,isPdf));});}
   function openMat(i,from){
     var m=Array.isArray(i)?i:MATS[i];if(!m||!m[4])return;var f=m[4],VW=(SITE&&SITE.views)||{},pdfM=isPpt(f)||isDoc(f)||isXls(f)?((isXls(f)?null:matTwin(m,isPdf))||(VW[f]?[m[0],m[1],'','',VW[f]]:null)):null,show=pdfM?pdfM[4]:f,orig=isPdf(show)?(matTwin(m,isPpt)||(isPpt(f)||isDoc(f)||isXls(f)?m:null)):null;
-    var abs=function(x){return new URL(fileHref(x),location.href).href;};
+    var abs=function(x){var u=new URL(fileHref(x),location.href).href;return window.KIFD?KIFD.url(u):u;}; /* 오피스 보기 창은 잠긴 자료 주소(로그인 증표 포함)로 */
     var w=document.createElement('div');w.className='mview';w.setAttribute('role','dialog');w.setAttribute('aria-modal','true');w.setAttribute('aria-label',m[1]);
     w.innerHTML='<div class="mvh"><b>'+esc(m[1])+'</b><span class="note" data-v="pg"></span><span class="sp"></span>'+
       '<a class="btn sm ghost" target="_blank" rel="noopener" href="'+fileHref(show)+'">새 창으로 ↗</a>'+
@@ -3529,7 +3534,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   var ACC={list:null, issued:null, busy:false, note:''};
   var SSO_KEY='kif_sso', TOK_KEY='kif_tok', PH_ITER=150000;
   var TE=new TextEncoder();
-  function authApi(){return (SITE&&SITE.authApi)||'';}
+  function authApi(){return (window.KIFD&&KIFD.api)||(SITE&&SITE.authApi)||'';} /* 자료 잠금 v1.0: 계정 서버 주소는 화면 파일에 고정(로그인 전에는 content.json을 받을 수 없음) */
   function b2a(u){var s='';u=new Uint8Array(u);for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);return btoa(s);}
   async function phOf(id,pw){
     var b=await crypto.subtle.importKey('raw',TE.encode(pw),'PBKDF2',false,['deriveBits']);
@@ -3545,7 +3550,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   }
   function tok(){try{var t=JSON.parse(localStorage.getItem(TOK_KEY)||'null');return t&&t.exp>Date.now()?t.token:'';}catch(e){return '';}}
   /* content.json을 먼저 읽어야 계정 서버 주소를 안다 */
-  var siteReady=new Promise(function(res){var n=0,t=setInterval(function(){if(SITE||++n>40){clearInterval(t);res();}},100);});
+  var siteReady=new Promise(function(res){var n=0,t=setInterval(function(){if(SITE||authApi()||++n>40){clearInterval(t);res();}},100);});
   async function accLogin(id,pw){
     await siteReady;
     if(!authApi()){var d=USERS[id];if(d&&d.pw===pw)return {id:id,name:d.name,org:d.org,no:d.no,role:d.role,demo:true};throw '아이디 또는 비밀번호가 맞지 않습니다. 위 체험용 계정을 확인하세요.';}
@@ -3862,7 +3867,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function ntMake(){Array.prototype.forEach.call(document.querySelectorAll('[data-ntmk]'),function(el){var f=el.getAttribute('data-ntmk');
     if(typeof NT_TH[f]==='string'){ntDone(f,NT_TH[f]);return;}if(NT_TH[f]===-1){el.classList.remove('wait');return;}if(NT_TH[f]===0)return;NT_TH[f]=0;NT_Q.push(f);});ntPump();}
   /* 방금 올린 파일은 사이트 반영(1~3분)이 끝나기 전엔 사이트 주소로 안 열린다 → GitHub 원본 주소로 한 번 더 시도 */
-  function rawUrl(f){return 'https://raw.githubusercontent.com/'+GH.owner+'/'+GH.repo+'/'+GH.branch+'/'+String(f).split('/').map(encodeURIComponent).join('/');}
+  function rawUrl(f){return window.KIFD?KIFD.url(new URL(String(f),KIFD.root).href):String(f);}
   document.addEventListener('error',function(e){var im=e.target;if(!im||im.tagName!=='IMG'||im.getAttribute('data-raw'))return;
     var a=im.getAttribute('src')||'',d=a;try{d=decodeURI(a);}catch(x){}if(!/^(files|news|refs)\//.test(d))return;im.setAttribute('data-raw','1');im.src=rawUrl(d);},true);
   /* 어느 화면이든 첫 장 그림이 없는 자료 칸(data-ntmk)이 생기면 바로 만든다 */
@@ -3961,6 +3966,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   /* ---------- 로그인 ---------- */
   function enter(p){
     me=p;ssoSet(p);
+    if(!SITE&&window.KIF_LOAD_CONTENT)KIF_LOAD_CONTENT(); /* 로그인한 뒤 사내 자료(content.json) 받기 */
     try{sessionStorage.setItem('fc_portal_ok','1');}catch(e){}   /* 고급형(advanced/)이 포털 로그인 여부를 확인 */
     document.getElementById('gate').hidden=true;document.getElementById('app').hidden=false;
     document.getElementById('who').innerHTML=me.org+' · <b>'+me.name+'</b>';
