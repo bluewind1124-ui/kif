@@ -88,3 +88,28 @@
 - 관리자 비밀번호를 잊으면: 다른 관리자 계정이 있으면 그 계정으로 초기화합니다. 관리자가 한 명뿐이면 클라우드플레어 **KV → kif-accounts** 에서 내 아이디 줄을 지우고 다시 신청하면 됩니다. 그래서 **관리자 계정을 2개** 만들어 두는 것을 권장합니다.
 - 비밀번호는 서버에 원래 글자로 저장되지 않습니다. 관리자도 FC의 비밀번호를 볼 수 없고, 초기화만 할 수 있습니다.
 - 서버 코드를 고치면 2단계 5~6번처럼 다시 붙여넣고 배포합니다. 계정 목록(KV)은 그대로 남습니다.
+
+---
+
+## 자료 잠금 설정 (v2, 2026-11-13)
+
+사내 자료(content.json · 교육자료 · 소식지 · 상품 비교 데이터 · 원픽 · 언더라이팅 자료)는 공개 저장소(kif)에 두지 않고
+**비공개 저장소 `kif-data`** 에 둡니다. 로그인한 FC가 자료를 열면 이 계정 서버가 로그인 증표를 확인한 뒤
+`kif-data`에서 파일을 꺼내 줍니다. 로그인하지 않은 사람에게는 「로그인이 필요합니다」만 돌려줍니다.
+
+1. GitHub에서 비공개 저장소 **`kif-data`** 를 만듭니다(Private 선택, 빈 저장소).
+2. GitHub 토큰 만들기 화면(Settings → Developer settings → Fine-grained tokens → Generate new token)
+   - Repository access: **Only select repositories → kif-data**
+   - Permissions → Contents: **Read-only** (읽기만)
+   - 만들어진 `github_pat_…` 를 복사합니다.
+3. 클라우드플레어 **kif-auth → 설정 → 변수 및 비밀** 에 두 개를 추가하고 배포합니다.
+
+| 종류 | 이름 | 값 |
+|---|---|---|
+| 텍스트 (Text) | `DATA_REPO` | `bluewind1124-ui/kif-data` |
+| 비밀 (Secret) | `DATA_TOKEN` | 2단계에서 복사한 `github_pat_…` |
+
+4. **kif-auth → 코드 편집** 에서 이 폴더의 `worker.js` 전체를 다시 붙여넣고 배포합니다.
+5. 계정 서버 주소를 열었을 때 `"data":true,"ver":2` 가 보이면 끝입니다.
+
+관리자의 「저장」(자료 올리기)용 GitHub 토큰은 **kif-data** 저장소에 **Read and write** 권한이 있어야 합니다.
