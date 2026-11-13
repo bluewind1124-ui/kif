@@ -2107,7 +2107,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<p class="note" style="color:#8a6d1f">※ 토큰은 비밀번호와 같습니다. 이 브라우저에만 저장되고 사이트·다른 FC에게는 보내지 않습니다. 남에게 보여 주지 마세요.</p>'+
       '<p class="note" id="ccMsg" role="status"></p>'+(T?'</details>':'')+'</div>';
   }
-  /* 토큰이 kif 저장소를 읽을 수 있는지 GitHub에 물어 확인한다 */
+  /* 토큰이 kif-data 저장소를 읽을 수 있는지 GitHub에 물어 확인한다 */
   async function ghCheck(tok){
     var r=await fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo,{cache:'no-store',headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});
     if(r.status===401)throw new Error('토큰이 맞지 않거나 만료됐습니다. ①부터 새로 만들어 붙여 넣어 주세요.');
@@ -2304,7 +2304,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
       '<details class="nu-set"'+(T?'':' open')+'><summary>GitHub 연결 설정 '+(T?'<span class="pill ok">연결됨</span>':'<span class="pill warn">처음 한 번 필요</span>')+'</summary>'+
       '<ol class="note" style="padding-left:1.2em;line-height:1.9;margin:8px 0">'+
       '<li><a target="_blank" rel="noopener" href="https://github.com/settings/personal-access-tokens/new">GitHub 토큰 만들기 화면 ↗</a>을 엽니다 (bluewind1124-ui 계정으로 로그인).</li>'+
-      '<li>Token name은 아무거나(예: 자료올리기), Expiration은 원하는 기간, <b>Repository access → Only select repositories → kif</b>을 고릅니다.</li>'+
+      '<li>Token name은 아무거나(예: 자료올리기), Expiration은 원하는 기간, <b>Repository access → Only select repositories → kif-data</b>(자료 저장소)를 고릅니다.</li>'+
       '<li><b>Permissions → Repository permissions → Contents</b>를 <b>Read and write</b>로 바꾼 뒤 <b>Generate token</b>을 누릅니다.</li>'+
       '<li>나온 토큰(github_pat_…)을 복사해 아래에 붙여넣고 저장합니다. 이 컴퓨터의 이 브라우저에만 저장됩니다.</li></ol>'+
       '<div class="row" style="gap:8px"><input class="in" id="nuTok" type="password" autocomplete="off" placeholder="github_pat_..." value="'+esc(T)+'" style="flex:1;min-width:200px"><button class="btn sm" type="button" id="nuTokSave">저장</button><button class="btn sm ghost" type="button" id="nuTokDel">지우기</button></div></details></div>';
@@ -2501,7 +2501,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     /* cache:'no-store' — GitHub API는 읽기 결과를 브라우저에 60초 기억시킨다. 그러면 방금 저장한 뒤 예전 main을 읽어
        다음 저장이 「Update is not a fast forward」(422)로 계속 실패하므로, 항상 최신을 읽는다 */
     var r=await fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+path,{method:method,cache:'no-store',headers:{'Authorization':'Bearer '+ghTok(),'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},body:body?JSON.stringify(body):undefined});
-    if(!r.ok){var t='';try{t=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(t?' · '+t:'')+(r.status===401?' (토큰을 확인하세요)':r.status===403||r.status===404?' (토큰 권한: kif · Contents Read and write)':''));}
+    if(!r.ok){var t='';try{t=(await r.json()).message;}catch(e){}throw new Error('GitHub '+r.status+(t?' · '+t:'')+(r.status===401?' (토큰을 확인하세요)':r.status===403||r.status===404?' (토큰 권한: kif-data · Contents Read and write)':''));}
     return r.json();
   }
   /* 최신 main 위에 커밋한다. 그 사이 다른 저장·배포로 main이 바뀌어 「not a fast forward」(422)가 나면
