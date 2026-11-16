@@ -1,0 +1,456 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><script>try{var s=JSON.parse(localStorage.getItem("kif_sso")||"null");if(!(s&&s.exp>Date.now()))location.replace("../index.html");}catch(e){location.replace("../index.html");}</script></head><body>
+<title>단기납 종신보험 비교</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --surface-2:#f6f8fa; --ink:#182231; --muted:#5c6a7c;
+  --line:#d6dce3; --line-strong:#b9c3ce;
+  --accent:#1f5c9e; --accent-ink:#173f6b; --accent-soft:#e6eff8;
+  --good:#0f7a48; --good-soft:#e2f2e9;
+  --gold:#9a6b12; --gold-soft:#f6ecd6;
+  --rank1:#1a7a4c; --rank2:#3f7cc0; --rank3:#7a8595;
+  --shadow:0 1px 2px rgba(20,32,48,.06), 0 6px 20px -12px rgba(20,32,48,.28);
+  --radius:12px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f151d; --surface:#171f2a; --surface-2:#1e2733; --ink:#e7ecf2; --muted:#9aa7b6;
+    --line:#2b3543; --line-strong:#3a4655;
+    --accent:#5aa0e0; --accent-ink:#a9cdf0; --accent-soft:#1b2c3e;
+    --good:#48c78e; --good-soft:#16302a;
+    --gold:#d9ab5c; --gold-soft:#33291a;
+    --rank1:#48c78e; --rank2:#5aa0e0; --rank3:#8b97a6;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f151d; --surface:#171f2a; --surface-2:#1e2733; --ink:#e7ecf2; --muted:#9aa7b6;
+  --line:#2b3543; --line-strong:#3a4655;
+  --accent:#5aa0e0; --accent-ink:#a9cdf0; --accent-soft:#1b2c3e;
+  --good:#48c78e; --good-soft:#16302a;
+  --gold:#d9ab5c; --gold-soft:#33291a;
+  --rank1:#48c78e; --rank2:#5aa0e0; --rank3:#8b97a6;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,-apple-system,sans-serif;
+  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:900;letter-spacing:-.01em}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--accent)}
+
+header.app{padding:22px 24px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+header.app .kicker{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+header.app h1{font-size:21px}
+header.app p{margin:6px 0 0;color:var(--muted);font-size:12.5px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:22px 24px 80px;
+  display:grid;grid-template-columns:1fr 380px;gap:26px;align-items:start}
+@media (max-width:940px){.wrap{grid-template-columns:1fr;padding:18px 16px 64px}}
+
+.step{margin-bottom:26px}
+.step-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;
+  font-size:12px;font-weight:700;display:grid;place-items:center;flex:none}
+.step-head h2{font-size:15px}
+.step-head .hint{color:var(--muted);font-size:12px;font-weight:400}
+
+/* category cards */
+.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (max-width:520px){.cats{grid-template-columns:1fr}}
+.cat{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);
+  padding:14px 15px;text-align:left;transition:border-color .15s,background .15s}
+.cat:hover{border-color:var(--line-strong)}
+.cat[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.cat[disabled]{opacity:.5;cursor:not-allowed}
+.cat b{display:block;font-size:14px}
+.cat span{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
+.cats-collapsed{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  border:1px solid var(--accent);background:var(--accent-soft);border-radius:var(--radius);padding:10px 14px}
+.cats-collapsed .cur-cat b{font-size:14px}
+.cats-collapsed .cur-cat span{color:var(--accent-ink);font-size:11.5px;margin-left:8px}
+
+/* segmented */
+.seg-group{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:4px}
+.seg{display:flex;flex-direction:column;gap:6px}
+.seg .lab{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.seg .opts{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface)}
+.seg .opts button{border:0;background:transparent;padding:7px 13px;font-size:13px;color:var(--muted);
+  border-right:1px solid var(--line)}
+.seg .opts button:last-child{border-right:0}
+.seg .opts button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+.seg .opts button[disabled]{opacity:.35;cursor:not-allowed}
+
+/* cover list */
+.cov-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.cov-toolbar .count{font-size:12px;color:var(--muted)}
+.linkbtn{border:0;background:transparent;color:var(--accent);font-size:12px;font-weight:700;padding:4px 2px}
+.cov-list{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+.cov{border-bottom:1px solid var(--line)}
+.cov:last-child{border-bottom:0}
+.cov-main{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:10px 13px}
+.cov-main:hover{background:var(--surface-2)}
+.cov input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent);margin:0}
+.cov .name{font-size:13px;font-weight:500}
+.cov .name .basis{color:var(--muted);font-weight:400;font-size:11.5px;margin-left:6px}
+.cov .rng{font-size:11px;color:var(--muted);text-align:right;white-space:nowrap}
+.cov .rng b{color:var(--ink);font-weight:600}
+.cov .info{grid-column:2/4;font-size:12px;color:var(--muted);background:var(--surface-2);
+  border-left:2px solid var(--accent);padding:8px 11px;margin:0 13px 11px;border-radius:0 6px 6px 0;display:none}
+.cov.open .info{display:block}
+.cov .toggle{border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:700;padding:2px 6px}
+.selected-only .cov:not(.is-checked){display:none}
+
+.notice{border:1px dashed var(--line-strong);border-radius:10px;padding:18px;color:var(--muted);font-size:13px;background:var(--surface)}
+
+/* result panel */
+.result{position:sticky;top:16px}
+.result .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.result .p-head{padding:14px 16px;border-bottom:1px solid var(--line)}
+.result .p-head h2{font-size:14px}
+.result .p-head p{margin:4px 0 0;font-size:11.5px;color:var(--muted)}
+.result .body{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.rank{border:1px solid var(--line);border-radius:10px;padding:11px 12px;position:relative}
+.rank[data-r="1"]{border-color:var(--rank1);background:var(--good-soft)}
+.rank .rtop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.rank .badge{font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:2px 7px;border-radius:20px;color:#fff}
+.rank[data-r="1"] .badge{background:var(--rank1)}
+.rank[data-r="2"] .badge{background:var(--rank2)}
+.rank[data-r="3"] .badge{background:var(--rank3)}
+.rank .co{font-size:14px;font-weight:700}
+.rank .prod{font-size:11px;color:var(--muted);margin-top:2px}
+.rank .figs{display:flex;justify-content:space-between;gap:8px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
+.rank .fig .k{font-size:10.5px;color:var(--muted)}
+.rank .fig .v{font-size:15px;font-weight:700}
+.rank .fig .v.total{color:var(--accent-ink)}
+.rank .miss{margin-top:7px;font-size:10.5px;color:var(--gold);background:var(--gold-soft);padding:4px 7px;border-radius:6px}
+.result .foot{padding:12px 16px;border-top:1px solid var(--line);font-size:10.5px;color:var(--muted)}
+
+.detail{margin-top:14px}
+.detail h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table.cmp{border-collapse:collapse;width:100%;font-size:11.5px}
+table.cmp th,table.cmp td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+table.cmp thead th{background:var(--surface-2);font-weight:700;position:sticky;left:0}
+table.cmp tbody th{font-weight:500;color:var(--muted);background:var(--surface)}
+table.cmp td{font-variant-numeric:tabular-nums}
+table.cmp td.hl{background:var(--accent-soft);font-weight:700}
+
+.pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--accent-soft);color:var(--accent-ink)}
+
+.terms{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 2px}
+.chip2{font-size:11px;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:5px 10px;color:var(--muted);line-height:1.35}
+.chip2 .k{font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;display:block}
+.chip2 b{color:var(--ink);font-weight:600}
+.chip2 .n{display:block;font-size:10px;opacity:.75;margin-top:1px}
+.cov-grp-h{display:flex;align-items:center;gap:8px;padding:8px 13px;background:var(--surface-2);border-bottom:1px solid var(--line);font-size:11.5px;font-weight:700;color:var(--accent-ink)}
+.cov-grp-h .cnt{color:var(--muted);font-weight:400}
+.cov-grp-h button{margin-left:auto;border:0;background:transparent;color:var(--accent);font-size:11px;font-weight:700;padding:2px 4px}
+.cdetail{margin-top:12px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.cdetail>summary{padding:10px 13px;background:var(--surface-2);font-size:12px;font-weight:700;cursor:pointer;list-style:none}
+.cdetail>summary::-webkit-details-marker{display:none}
+.cdetail>summary::before{content:"▸  ";color:var(--accent)}
+.cdetail[open]>summary::before{content:"▾  "}
+.cdetail .cd-body{padding:6px 13px 12px}
+.cd-sub{font-size:11px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.footnotes{margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:8px 11px;background:var(--surface-2)}
+.footnotes .fn-h{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.footnotes .fn-i{font-size:11px;color:var(--muted);line-height:1.5}
+.rk-note{margin-top:6px;font-size:10.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:5px;white-space:normal}
+.foot-note{max-width:1180px;margin:0 auto;padding:0 24px;color:var(--muted);font-size:11px}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<style>
+.sortbtns{display:flex;flex-wrap:wrap;gap:8px}
+.sortbtn{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 13px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:1px;align-items:flex-start;min-width:118px}
+.sortbtn[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff}
+.sortbtn b{font-size:13px;font-weight:700}
+.sortbtn span{font-size:10.5px;opacity:.85}
+.rank .metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 10px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
+.rank .metrics .k{font-size:10px;color:var(--muted)}
+.rank .metrics .v{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.rank .metrics .v.hot{color:var(--accent-ink)}
+.usd-tag{display:inline-block;font-size:10px;font-weight:700;background:var(--gold-soft);color:var(--gold);padding:1px 6px;border-radius:10px;margin-left:5px}
+table.cmp td.hot{background:var(--accent-soft);font-weight:700}
+.wrap{display:block;min-width:0;max-width:1180px;margin:0 auto;padding:22px 24px 80px}
+@media (max-width:940px){.wrap{padding:18px 16px 64px}}
+.col-main{min-width:0;max-width:100%}
+#s3{min-width:0;max-width:100%}
+#s3body{min-width:0;max-width:100%}
+#s3body .tbl-scroll{max-width:100%}
+table.cmp{width:100%}
+table.cmp thead th{position:static}
+/* 유리한 상품 TOP3 — 가로 배치 (STEP2 아래) */
+#result{position:static;margin:0 0 26px}
+#result .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+#result .body{display:flex;flex-direction:row;flex-wrap:wrap;gap:12px;align-items:stretch}
+#result .rank{flex:1 1 220px;min-width:200px}
+@media (max-width:620px){#result .body{flex-direction:column}}
+.fbar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.fchip{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:5px 11px;font-size:11.5px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.fchip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff;font-weight:700}
+.fchip.all{font-weight:700;color:var(--ink)}
+.fchip.all[aria-pressed="true"]{color:#fff}
+</style>
+<header class="app">
+  <div class="kicker">한국보험금융 · 단기납 종신보험 환급률 비교</div>
+  <h1>단기납 종신보험 비교</h1>
+  <p>가입금액·납입기간·심사방식을 고르고, <b>정렬 기준(보험료·환급률·보장금액·환급금)</b>을 누르면 가장 유리한 상품 3가지를 보여줍니다. · 40세 남자 · U/W 기준일 2026.09.04</p>
+  <p id="fxline" style="margin-top:4px;font-size:11.5px;color:var(--accent-ink)"></p>
+</header>
+
+<div class="wrap">
+  <div class="step" id="s1">
+    <div class="step-head"><span class="step-num">1</span><h2>조건</h2><span class="hint">가입금액 · 납입기간 · 심사방식</span></div>
+    <div class="seg-group" id="conds"></div>
+  </div>
+  <div class="step" id="s2">
+    <div class="step-head"><span class="step-num">2</span><h2>정렬 기준</h2><span class="hint" id="s2hint">기준을 누르면 유리한 순으로 정렬</span></div>
+    <div id="sortbox"></div>
+  </div>
+  <div class="result" id="result"></div>
+  <div class="step" id="s3">
+    <div class="step-head"><span class="step-num">3</span><h2>전체 상품 비교</h2><span class="hint" id="s3hint"></span></div>
+    <div class="fbar" id="s3filter"></div>
+    <div id="s3body"></div>
+  </div>
+</div>
+<p class="foot-note">한국보험금융 「단기납 종신보험 환급률」 자료를 옮긴 것입니다. 각 보험사 대표 상품으로 설계했으며, 환급금(률)은 연령·성별·보험료·가입금액에 따라 달라지므로 상품 비교 이해용 참고자료입니다. 종신보험은 보장이 주목적인 보장성 보험으로 초기 해지 시 환급금이 적거나 없을 수 있습니다.</p>
+
+<script src="../kif-data.js?v=1"></script>
+<script src="cmpdata.js?v=20261113a"></script>
+<script>
+let DATA = (window.KIFCMP_BASE ? KIFCMP_BASE('wholelife') : {}); /* 자료는 잠긴 저장소(classic/base/wholelife.json)에서 로그인한 FC만 받음 */
+if(window.KIFCMP_LOAD)DATA=KIFCMP_LOAD('wholelife',DATA);
+const won = n => n==null ? "—" : Math.round(n).toLocaleString("ko-KR")+"원";
+const pct = n => n==null ? "—" : n.toFixed(1)+"%";
+const man = n => n==null ? "—" : Math.round(n).toLocaleString("ko-KR")+"만원";
+
+const state = { amount:"3천만원", pay:"5년납", review:"일반심사", sort:"보험료", year:10, show:[] };
+function keepScroll(fn){ var y=window.pageYOffset||0; fn(); var r=function(){window.scrollTo(0,y);}; r(); if(window.requestAnimationFrame) requestAnimationFrame(r); }
+
+function el(tag, attrs={}, ...kids){
+  const e=document.createElement(tag);
+  for(const[k,v]of Object.entries(attrs)){
+    if(k==="class")e.className=v; else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);
+    else if(v!=null)e.setAttribute(k,v);
+  }
+  for(const k of kids) if(k!=null) e.append(k.nodeType?k:document.createTextNode(k));
+  return e;
+}
+function seg(label, opts, cur, cb){
+  const s=el("div",{class:"seg"}, el("span",{class:"lab"},label));
+  const o=el("div",{class:"opts"});
+  opts.forEach(v=>{
+    const b=el("button",{"aria-pressed":String(v===cur)}, String(v));
+    b.addEventListener("click",()=>cb(v)); o.append(b);
+  });
+  s.append(o); return s;
+}
+function setKey(){
+  return state.amount==="3천만원"
+    ? `3천만원|${state.pay}|${state.review}`
+    : `5천만원|${state.pay}`;
+}
+function curSet(){ return DATA.sets[setKey()]; }
+
+/* ---------- STEP 1 ---------- */
+function renderConds(){
+  const box=document.getElementById("conds"); box.innerHTML="";
+  box.append(seg("가입금액(사망보험금)", ["3천만원","5천만원"], state.amount, v=>{
+    state.amount=v; state.show=[];
+    if(v==="5천만원" && state.sort==="—") state.sort="보험료";
+    fixYear(); refresh();
+  }));
+  box.append(seg("납입기간", ["5년납","7년납","10년납"], state.pay, v=>{state.pay=v; state.show=[]; fixYear(); refresh();}));
+  if(state.amount==="3천만원")
+    box.append(seg("심사방식", ["일반심사","간편심사"], state.review, v=>{state.review=v; state.show=[]; refresh();}));
+}
+function fixYear(){
+  const yrs=curSet() ? curSet().years : [10];
+  if(!yrs.includes(state.year)) state.year = yrs.includes(10)?10:yrs[0];
+}
+
+/* ---------- STEP 2 : sort criteria ---------- */
+function sortOptions(){
+  const base=[
+    {k:"보험료", label:"월 보험료", sub:"낮은 순", dir:1},
+    {k:"환급률", label:"환급률", sub:"높은 순", dir:-1},
+  ];
+  if(state.amount==="5천만원"){
+    base.push({k:"사망보장", label:"사망보장금", sub:"높은 순", dir:-1});
+    base.push({k:"환급금", label:"해약환급금", sub:"높은 순", dir:-1});
+  }
+  return base;
+}
+function renderSort(){
+  const box=document.getElementById("sortbox"); box.innerHTML="";
+  const st=el("div",{class:"sortbtns"});
+  sortOptions().forEach(o=>{
+    const b=el("button",{class:"sortbtn","aria-pressed":String(state.sort===o.k)},
+      el("b",{},o.label), el("span",{},o.sub));
+    b.addEventListener("click",()=>{state.sort=o.k; refresh();});
+    st.append(b);
+  });
+  box.append(st);
+  const s=curSet();
+  if(s && state.sort!=="보험료"){
+    const yb=el("div",{style:"margin-top:10px"});
+    yb.append(seg("기준 연차 ("+state.sort+")", s.years.map(y=>y+"년"), state.year+"년",
+      v=>{state.year=parseInt(v); refresh();}));
+    box.append(yb);
+  }
+  document.getElementById("s2hint").textContent =
+    state.sort==="보험료" ? "월 보험료가 가장 낮은 순" :
+    `${state.year}년 시점 ${state.sort}이(가) 가장 높은 순`;
+}
+
+/* ---------- compute ranking ---------- */
+function ranked(){
+  const s=curSet(); if(!s) return [];
+  const y=state.year;
+  const val=r=>{
+    if(state.sort==="보험료") return r.monthly;
+    if(state.sort==="환급률") return r.rr ? r.rr[y] : null;
+    if(state.sort==="사망보장") return r.death ? r.death[y] : null;
+    if(state.sort==="환급금") return r.refund ? r.refund[y] : null;
+  };
+  const dir = state.sort==="보험료" ? 1 : -1;
+  let src = s.rows;
+  if(state.show.length) src = src.filter(r=>state.show.includes(r.co));
+  const withV = src.map(r=>({...r, _v:val(r)}));
+  const has = withV.filter(r=>r._v!=null);
+  const no  = withV.filter(r=>r._v==null);
+  has.sort((a,b)=> dir*(a._v-b._v));
+  return has.concat(no);
+}
+function setCompanies(){
+  const s=curSet(); if(!s) return [];
+  const seen=new Set(), out=[];
+  s.rows.forEach(r=>{ if(r.co && !seen.has(r.co)){ seen.add(r.co); out.push(r.co); } });
+  return out;
+}
+function renderFilter(){
+  const box=document.getElementById("s3filter"); box.innerHTML="";
+  const cos=setCompanies();
+  const all=el("button",{class:"fchip all","aria-pressed":String(state.show.length===0)}, `전체 (${cos.length})`);
+  all.addEventListener("click",()=>{ state.show=[]; keepScroll(refresh); });
+  box.append(all);
+  cos.forEach(c=>{
+    const on=state.show.includes(c);
+    const b=el("button",{class:"fchip","aria-pressed":String(on),title:c}, c.length>22?c.slice(0,22)+"…":c);
+    b.addEventListener("click",()=>{ state.show = on ? state.show.filter(x=>x!==c) : state.show.concat([c]); keepScroll(refresh); });
+    box.append(b);
+  });
+}
+
+/* ---------- STEP 3 : full table ---------- */
+function renderTable(){
+  const s=curSet(), body=document.getElementById("s3body"); body.innerHTML="";
+  if(!s){ body.append(el("div",{class:"notice"},"자료가 없습니다.")); return; }
+  const rows=ranked();
+  document.getElementById("s3hint").textContent =
+    `${state.amount} · ${state.pay}` + (state.amount==="3천만원"?` · ${state.review}`:"")
+    + ` · ${rows.length}개` + (state.show.length?` 표시 (전체 ${s.rows.length}개 중)`:` 상품 (납입기간별 취급 회사 상이)`);
+  const sc=el("div",{class:"tbl-scroll"}); const t=el("table",{class:"cmp"});
+  const y=state.year;
+  const htr=el("tr");
+  htr.append(el("th",{},"순위"), el("th",{},"회사 · 상품"), el("th",{},"월 보험료"));
+  s.years.forEach(yr=>htr.append(el("th",{}, "환급률 "+yr+"년")));
+  if(state.amount==="5천만원"){
+    s.years.forEach(yr=>htr.append(el("th",{}, "사망보장 "+yr+"년")));
+    s.years.forEach(yr=>htr.append(el("th",{}, "환급금 "+yr+"년")));
+  }
+  t.append(el("thead",{},htr));
+  const tb=el("tbody");
+  rows.forEach((r,i)=>{
+    const tr=el("tr");
+    tr.append(el("th",{}, String(i+1)));
+    tr.append(el("td",{style:"white-space:normal;min-width:150px"},
+      el("b",{},r.co), r.prod? el("span",{style:"display:block;color:var(--muted);font-size:10.5px"},r.prod):null));
+    tr.append(el("td",{class:state.sort==="보험료"?"hot":""},
+      r.usd? el("span",{}, won(r.monthly), el("span",{class:"usd-tag"},r.monthlyRaw)) : won(r.monthly)));
+    s.years.forEach(yr=>tr.append(el("td",{class:(state.sort==="환급률"&&yr===y)?"hot":""}, pct(r.rr?r.rr[yr]:null))));
+    if(state.amount==="5천만원"){
+      s.years.forEach(yr=>tr.append(el("td",{class:(state.sort==="사망보장"&&yr===y)?"hot":""}, man(r.death?r.death[yr]:null))));
+      s.years.forEach(yr=>tr.append(el("td",{class:(state.sort==="환급금"&&yr===y)?"hot":""}, man(r.refund?r.refund[yr]:null))));
+    }
+    tb.append(tr);
+  });
+  t.append(tb); sc.append(t); body.append(sc);
+
+  // 개요(예정이율·추가납입 등) 참고
+  if(DATA.overview && DATA.overview.length){
+    const d=el("details",{class:"cdetail",style:"margin-top:12px"});
+    d.append(el("summary",{},"상품 개요 참고 (예정이율 · 중도인출 · 추가납입 조건)"));
+    const bd=el("div",{class:"cd-body"});
+    const s2=el("div",{class:"tbl-scroll"}); const t2=el("table",{class:"cmp"});
+    const h2=el("tr"); h2.append(el("th",{},"항목")); DATA.overviewCompanies.forEach(c=>h2.append(el("th",{},c)));
+    t2.append(el("thead",{},h2));
+    const b2=el("tbody");
+    DATA.overview.forEach(row=>{
+      const tr=el("tr"); tr.append(el("th",{},row.label));
+      DATA.overviewCompanies.forEach(c=>tr.append(el("td",{style:"white-space:normal"}, row.vals[c]||"—")));
+      b2.append(tr);
+    });
+    t2.append(b2); s2.append(t2); bd.append(s2); d.append(bd); body.append(d);
+  }
+}
+
+/* ---------- RESULT PANEL ---------- */
+function renderResult(){
+  const R=document.getElementById("result"); R.innerHTML="";
+  const s=curSet(); const rows=ranked(); const y=state.year;
+  const panel=el("div",{class:"panel"});
+  const critLabel = state.sort==="보험료" ? "월 보험료 낮은 순" : `${y}년 ${state.sort} 높은 순`;
+  panel.append(el("div",{class:"p-head"}, el("h2",{}, "유리한 상품 TOP 3"),
+    el("p",{}, `${state.amount} · ${state.pay}` + (state.amount==="3천만원"?` · ${state.review}`:"") + ` · ${critLabel}`)));
+  const body=el("div",{class:"body"});
+  rows.slice(0,3).forEach((r,i)=>{
+    const card=el("div",{class:"rank","data-r":String(i+1)});
+    card.append(el("div",{class:"rtop"},
+      el("span",{class:"badge"}, i===0?"1위":(i+1)+"위"),
+      el("div",{}, el("div",{class:"co"}, r.co), el("div",{class:"prod"}, r.prod||r.rate||""))));
+    const m=el("div",{class:"metrics"});
+    const cell=(k,v,hot)=>{ m.append(el("div",{}, el("div",{class:"k"},k), el("div",{class:"v"+(hot?" hot":"")}, v))); };
+    cell("월 보험료", won(r.monthly) + (r.usd? " ("+r.monthlyRaw+")" : ""), state.sort==="보험료");
+    cell(y+"년 환급률", pct(r.rr?r.rr[y]:null), state.sort==="환급률");
+    if(state.amount==="5천만원"){
+      cell(y+"년 사망보장", man(r.death?r.death[y]:null), state.sort==="사망보장");
+      cell(y+"년 환급금", man(r.refund?r.refund[y]:null), state.sort==="환급금");
+    } else {
+      cell("적용이율", r.rate||"—", false);
+    }
+    card.append(m);
+    body.append(card);
+  });
+  panel.append(body);
+  panel.append(el("div",{class:"foot"},
+    `달러(메트라이프) 상품은 1 USD = ${DATA.meta.fxRate.toLocaleString("ko-KR")}원(${DATA.meta.fxDate} 기준)으로 환산해 함께 비교합니다. 실제 계약 시 환율·공시이율 변동으로 달라집니다. 모든 수치는 40세 남자 기준 예시값입니다.`));
+  R.append(panel);
+}
+
+function refresh(){ renderConds(); renderSort(); renderFilter(); renderTable(); renderResult(); }
+document.getElementById("fxline").textContent =
+  `※ 달러(메트라이프) 상품 환율 적용: 1 USD = ${DATA.meta.fxRate.toLocaleString("ko-KR")}원 (${DATA.meta.fxDate} 기준)`;
+fixYear(); refresh();
+</script>
+
+<link rel="stylesheet" href="kif.css?v=20261023">
+<script src="kif.js?v=20261023bb"></script>
+<!-- 포털로 돌아가기: 모든 화면 왼쪽 아래 '← 이전' '⌂ 포털 홈' -->
+<style>#kifNav{position:fixed;left:14px;bottom:14px;z-index:2147483000;display:flex;gap:6px;font-family:"Noto Sans KR","Malgun Gothic",sans-serif}#kifNav button{border:0;border-radius:999px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(15,34,64,.28);background:#0f2240;color:#fff}#kifNav button.h{background:#cb9c3a;color:#0f2240}#kifNav button:hover{filter:brightness(1.12)}body{padding-bottom:64px}@media print{#kifNav{display:none}}</style>
+<div id="kifNav" role="navigation" aria-label="포털 이동"><button type="button" id="kifBack">← 이전</button><button type="button" class="h" id="kifHome">⌂ 포털 홈</button></div>
+<script>(function(){var HOME=new URL('../index.html',location.href).href;
+if(window.top!==window){var n=document.getElementById('kifNav');if(n)n.remove();return;}
+function same(u){try{return new URL(u).origin===location.origin;}catch(e){return false;}}
+document.getElementById('kifHome').onclick=function(){location.href=HOME;};
+document.getElementById('kifBack').onclick=function(){if(history.length>1&&same(document.referrer))history.back();else location.href=HOME;};})();</script>
+</body></html>

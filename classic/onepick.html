@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><script>try{var s=JSON.parse(localStorage.getItem("kif_sso")||"null");if(!(s&&s.exp>Date.now()))location.replace("../index.html");}catch(e){location.replace("../index.html");}</script></head><body>
+<title>이번 달의 원픽</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+<style>
+
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,-apple-system,sans-serif;
+  font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2{margin:0;font-weight:900;letter-spacing:-.01em}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+/* ===== 로그인 (좌: 브랜드 / 우: 접속코드) ===== */
+#gate{position:fixed;inset:0;z-index:100;display:grid;grid-template-columns:1fr 1fr;background:#eef1f6}
+html[data-theme="dark"] #gate{background:#0a1429}
+#gate .l{background:#0f2240;color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:60px 62px 48px}
+#gate .l::after{content:"";position:absolute;right:-220px;bottom:-200px;width:620px;height:620px;border-radius:50%;
+  border:42px solid rgba(255,255,255,.035);pointer-events:none}
+#gate .eyebrow{font-size:12px;font-weight:700;letter-spacing:.28em;color:#cb9c3a;display:flex;align-items:center;gap:12px}
+#gate .eyebrow::before{content:"";width:26px;border-top:1px solid #cb9c3a}
+#gate .logo{width:min(430px,100%);display:block;margin-bottom:34px}
+#gate .l h2{font-size:25px;font-weight:700;margin-bottom:14px}
+#gate .l p{margin:0;color:#b8c4d8;font-size:14px;line-height:1.85}
+#gate .tools{font-size:11.5px;color:#8c9bb3;display:flex;flex-wrap:wrap;gap:8px 18px}
+#gate .r{display:grid;place-items:center;padding:30px}
+#gate .box{width:100%;max-width:390px}
+#gate .box h1{font-size:24px;margin-bottom:6px}
+#gate .box .sub{color:var(--muted);font-size:13.5px;margin:0 0 26px}
+#gate label.f{display:block;font-size:12.5px;font-weight:700;margin-bottom:7px}
+#gate input[type=password]{width:100%;padding:14px;border:1px solid var(--line-strong);border-radius:3px;background:var(--surface);
+  color:var(--ink);font-size:17px;text-align:center;letter-spacing:.3em;font-family:inherit}
+#gate input[type=password]:focus{outline:2px solid #cb9c3a;outline-offset:0}
+#gate .keep{display:flex;align-items:center;gap:8px;margin:14px 0;font-size:13px;color:var(--ink)}
+#gate .keep input{width:16px;height:16px;accent-color:#0f2240}
+#gate .go{width:100%;padding:14px;border:0;border-radius:3px;background:#0f2240;color:#fff;font-size:14.5px;font-weight:700}
+#gate .go:hover{background:#1d3557}
+html[data-theme="dark"] #gate .go{background:#cb9c3a;color:#0f2240}
+#gate .err{color:#b3261e;font-size:12.5px;margin-top:10px;min-height:18px}
+html[data-theme="dark"] #gate .err{color:#ff8a7a}
+#gate .guide{border:1px solid var(--line);background:var(--surface);padding:15px 17px;margin-top:20px;font-size:12.5px}
+#gate .guide b{display:block;margin-bottom:6px}
+#gate .guide span{display:block;color:var(--muted);margin-top:3px}
+#gate .legal{margin-top:20px;color:var(--muted);font-size:11.5px;line-height:1.7}
+.shake{animation:sh .35s}
+@keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (max-width:860px){
+  #gate{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  #gate .l{padding:26px 24px}
+  #gate .logo{width:230px;margin-bottom:0}
+  #gate .l h2,#gate .l p,#gate .tools,#gate .eyebrow{display:none}
+}
+
+/* ===== 홈 ===== */
+#home{display:none;max-width:1000px;margin:0 auto;padding:30px 24px 70px}
+.ph{margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--line-strong)}
+.ph .kicker{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--gold);margin-bottom:6px}
+.ph h1{font-size:23px;border-left:4px solid #cb9c3a;padding-left:12px}
+.ph p{color:var(--muted);font-size:13px;margin:10px 0 0}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media (max-width:700px){.grid{grid-template-columns:1fr}#home{padding:22px 16px 60px}}
+.tool{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-top:3px solid #0f2240;
+  border-radius:4px;box-shadow:var(--shadow);padding:18px 20px 16px;transition:transform .12s,border-color .12s}
+html[data-theme="dark"] .tool{border-top-color:#cb9c3a}
+.tool:hover{transform:translateY(-2px);border-color:#cb9c3a;border-top-color:#cb9c3a}
+.tool .no{font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--gold);margin-bottom:6px}
+.tool h2{font-size:15.5px;margin-bottom:6px}
+.tool .desc{color:var(--muted);font-size:12.5px;flex:1;line-height:1.6}
+.tool .go{margin-top:14px;align-self:flex-start;font-size:12.5px;font-weight:700;color:var(--ink);
+  background:var(--surface);border:1px solid var(--line-strong);border-radius:3px;padding:6px 14px}
+.tool:hover .go{background:#0f2240;color:#fff;border-color:#0f2240}
+.foot{margin-top:26px;color:var(--muted);font-size:11.5px;line-height:1.75;border-top:1px solid var(--line);padding-top:14px}
+
+
+</style>
+<style>
+
+/* ===== 이번 달의 원픽 ===== */
+#main{display:none;max-width:1180px;margin:0 auto;padding:26px 24px 70px}
+.ph{margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--line-strong)}
+.ph .kicker{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--gold);margin-bottom:6px}
+.ph h1{font-size:23px;border-left:4px solid var(--kgold);padding-left:12px}
+.ph p{color:var(--muted);font-size:13px;margin:10px 0 0}
+.ph .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.badge{display:inline-block;font-size:11.5px;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--gold-soft);color:var(--gold);white-space:nowrap}
+.badge.g{background:var(--accent-soft);color:var(--accent-ink)}
+.sec-t{display:flex;align-items:center;gap:10px;margin:26px 0 12px;font-size:16px;font-weight:900}
+.sec-t i{font-style:normal;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em}
+.sec-t::before{content:"";width:4px;height:18px;background:var(--kgold);border-radius:2px}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media (max-width:760px){.cards{grid-template-columns:1fr}#main{padding:20px 16px 60px}}
+.cd{display:flex;flex-direction:column;text-align:left;background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--navy);
+  border-radius:4px;box-shadow:var(--shadow);padding:16px 18px 14px;color:var(--ink);cursor:pointer;font-family:inherit;transition:transform .12s,border-color .12s}
+html[data-theme="dark"] .cd{border-top-color:var(--kgold)}
+.cd:hover{transform:translateY(-2px);border-color:var(--kgold);border-top-color:var(--kgold)}
+.cd .tg{font-size:10.5px;font-weight:700;letter-spacing:.14em;color:var(--gold);margin-bottom:5px}
+.cd h3{font-size:16.5px;margin-bottom:10px}
+.cd ul{margin:0;padding:0;list-style:none;flex:1;font-size:12.5px;color:var(--muted)}
+.cd li{padding:3px 0;border-top:1px dashed var(--line)}
+.cd li:first-child{border-top:0}
+.cd li b{color:var(--ink);font-weight:700;margin-right:6px}
+.cd .go{margin-top:12px;align-self:flex-start;font-size:12.5px;font-weight:700;border:1px solid var(--line-strong);border-radius:3px;padding:5px 13px;background:var(--surface)}
+.cd:hover .go{background:var(--navy);color:#fff;border-color:var(--navy)}
+.lead{margin-top:6px;color:var(--muted);font-size:12.5px}
+
+/* 상세 */
+.back{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:3px;padding:6px 12px;font-size:12.5px;font-family:inherit;cursor:pointer;margin-bottom:14px}
+.back:hover{background:var(--accent-soft)}
+.picks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:760px){.picks{grid-template-columns:1fr}}
+.pk{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:13px 15px;position:relative}
+.pk.best{border:2px solid var(--kgold);background:var(--gold-soft)}
+.pk .rk{font-size:11px;font-weight:900;letter-spacing:.1em;color:var(--muted)}
+.pk.best .rk{color:var(--gold)}
+.pk b{display:block;font-size:15px;margin-top:2px}
+.pk span{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.cond{font-size:11.5px;color:var(--muted);text-align:right;margin:0 0 6px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--surface);box-shadow:var(--shadow)}
+table.op{border-collapse:collapse;width:100%;min-width:720px;font-size:13px}
+table.op th,table.op td{border:1px solid var(--line);padding:9px 10px;text-align:center;vertical-align:middle;line-height:1.45}
+table.op thead th{background:var(--navy-2);color:#fff;font-size:14px;font-weight:700;border-color:rgba(255,255,255,.18);padding:12px 8px}
+table.op thead th.best{background:var(--navy);box-shadow:inset 0 -3px 0 var(--kgold)}
+table.op thead th svg{width:18px;height:18px;vertical-align:-3px;margin-right:5px}
+table.op td.lab{background:var(--surface-2);font-weight:700;width:120px;color:var(--ink)}
+table.op td.sub{background:var(--surface-2);font-weight:600;color:var(--ink);width:110px}
+table.op td.best{background:var(--gold-soft);font-weight:700;color:var(--ink)}
+table.op td.hd{background:var(--surface-2);color:var(--muted);font-size:12px;font-weight:700}
+table.op td.best.hd{background:var(--gold-soft);color:var(--gold)}
+table.op td.lo{color:#c0392b;font-weight:900}
+html[data-theme="dark"] table.op td.lo{color:#ff9a8a}
+table.op td small{display:block;font-size:10.5px;font-weight:400;color:var(--muted);margin-top:1px}
+table.op td.best small{color:var(--gold)}
+table.op td.kv{padding:0}
+table.op td.kv div{display:flex;justify-content:space-between;gap:10px;padding:9px 12px}
+table.op td.kv div span{color:var(--muted)}
+table.op td.kv div b{font-weight:700}
+table.op td.sum{font-size:12.5px;line-height:1.55}
+table.op tr.feat td{background:var(--surface-2)}
+table.op tr.feat td.best{background:var(--gold-soft)}
+table.op tr.feat td.lab{color:var(--gold)}
+@media (max-width:760px){table.op td.lab:first-child,table.op td.sub:first-child{position:sticky;left:0;z-index:1}}
+.rs{display:grid;grid-template-columns:150px 1fr;gap:10px;margin-bottom:10px}
+@media (max-width:620px){.rs{grid-template-columns:1fr}}
+.rs .k{display:flex;align-items:center;justify-content:center;background:var(--gold-soft);color:var(--gold);font-weight:900;border-radius:6px;padding:14px 10px;text-align:center}
+.rs.why .k{background:var(--navy);color:#fff}
+html[data-theme="dark"] .rs.why .k{background:var(--kgold);color:#0f2240}
+.rs .v{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 18px;font-size:13.5px;line-height:1.75}
+.rs.why .v{background:var(--gold-soft);border-color:var(--kgold)}
+.rs .v ul{margin:0;padding-left:18px}
+.rs .v li{margin:3px 0}
+.rs.why .v li{font-weight:700;color:var(--ink)}
+.pager{display:flex;justify-content:space-between;gap:10px;margin-top:26px}
+.pager button{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:3px;padding:9px 14px;font-size:13px;font-family:inherit;cursor:pointer;max-width:48%}
+.pager button:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.disc{margin-top:22px;border-top:1px solid var(--line);padding-top:12px;color:var(--muted);font-size:11.5px;line-height:1.75}
+.src{font-size:11px;color:var(--muted);margin-top:6px}
+.kif-side .grp{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--gold);padding:12px 12px 4px}
+
+</style>
+<div id="main"></div>
+<script src="../kif-data.js?v=1"></script>
+<script>
+var CATS = (window.KIFD && KIFD.json('classic/base/onepick.json')) || []; /* 원픽 표는 잠긴 저장소에서 로그인한 FC만 받음 */
+
+
+(function(){
+  /* 원픽 데이터: 관리자가 「자료 관리 › 이번 달의 원픽」에서 고친 내용(content.json의 onepick)을 먼저 쓰고, 없으면 위 기본값을 쓴다 */
+  var OP={month:'2026.10',title:'26년 10월 베스트 픽업 상품 비교 분석 가이드',upd:'2026.10.12',guide:''};
+  function lowIdx(c,row,s){var b=-1,bv=Infinity;row.mf.forEach(function(x,i){var n=parseFloat(String(x[s]).replace(/,/g,''));if(!isNaN(n)&&n<bv){bv=n;b=i;}});return b;}
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  var TYPES={life:'생명보험',nonlife:'손해보험'};
+  var main=document.getElementById('main');
+/* ── 표 렌더링 ── */
+  var MEDAL='<svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="6.5" fill="#cb9c3a"/><path d="M8.6 9.2l2.4 2.4 4.2-4.6" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 14.5L6.5 21l5.5-2.6 5.5 2.6L16 14.5" fill="#e0b862"/></svg>';
+  function txt(s){
+    var p=String(s).split('\n'), o=esc(p[0]);
+    for(var i=1;i<p.length;i++){ o+= /^\(/.test(p[i]) ? '<small>'+esc(p[i])+'</small>' : '<br>'+esc(p[i]); }
+    return o;
+  }
+  function table(c){
+    var n=c.cols.length, anyG=c.rows.some(function(r){return r.g;}), cs=c.rows.some(function(r){return r.mf||r.hd;})?' colspan="2"':'';
+    var o='<div class="tw"><table class="op"><thead><tr><th'+(anyG?' colspan="2"':'')+'>구분</th>';
+    c.cols.forEach(function(k,i){o+='<th'+cs+' class="'+(i===c.best?'best':'')+'">'+(i===c.best?MEDAL:'')+esc(k.co)+'</th>';});
+    o+='</tr></thead><tbody>';
+    o+='<tr><td class="lab"'+(anyG?' colspan="2"':'')+'>상품명</td>';
+    c.cols.forEach(function(k,i){o+='<td'+cs+' class="'+(i===c.best?'best':'')+'">'+esc(k.prod)+'</td>';});
+    o+='</tr>';
+    var rows=c.rows, curHasL=false;
+    for(var r=0;r<rows.length;r++){
+      var row=rows[r], tr='<tr'+(row.feat?' class="feat"':'')+'>';
+      if(row.g){
+        if(r===0||rows[r-1].g!==row.g){
+          var span=1;while(r+span<rows.length&&rows[r+span].g===row.g)span++;
+          var hasL=false;for(var q=r;q<r+span;q++)if(rows[q].l)hasL=true;
+          curHasL=hasL;
+          tr+='<td class="lab" rowspan="'+span+'"'+(hasL?'':' colspan="2"')+'>'+txt(row.g)+'</td>';
+        }
+        if(curHasL)tr+='<td class="sub">'+txt(row.l||'')+'</td>';
+      }else{
+        tr+='<td class="lab"'+(anyG?' colspan="2"':'')+'>'+txt(row.l)+'</td>';
+      }
+      for(var i=0;i<n;i++){
+        var b=(i===c.best?' best':'');
+        if(row.hd){tr+='<td class="hd'+b+'" colspan="1">'+esc(row.hd[0])+'</td><td class="hd'+b+'">'+esc(row.hd[1])+'</td>';}
+        else if(row.mf){
+          if(!row.lo&&c.kind==='value')row.lo=[lowIdx(c,row,0),lowIdx(c,row,1)]; /* 가성비 표: 남·여 각각 가장 싼 보험료 표시 */
+          for(var s=0;s<2;s++){var lo=row.lo&&row.lo[s]===i?' lo':'';tr+='<td class="'+(b+lo).trim()+'">'+txt(row.mf[i][s])+'</td>';}
+        }else{
+          var v=row.v[i], cls=b.trim();
+          if(String(v).indexOf('|')>-1){var kv=String(v).split('|');tr+='<td'+cs+' class="kv'+b+'"><div><span>'+esc(kv[0])+'</span><b>'+esc(kv[1])+'</b></div></td>';continue;}
+          if(row.sum)cls+=' sum';
+          tr+='<td'+cs+' class="'+cls.trim()+'">'+txt(v)+'</td>';
+        }
+      }
+      o+=tr+'</tr>';
+    }
+    return o+'</tbody></table></div>';
+  }
+  /* hd 행/mf 행은 colspan 처리를 위해 v 행만 colspan=2 — 표 안에 남/여 구분이 없으면 colspan 제거 */
+  function fixSpans(html,c){
+    var hasMf=c.rows.some(function(r){return r.mf||r.hd;});
+    return hasMf?html:html.replace(/<td colspan="2" class="/g,'<td class="').replace(/<td colspan="2">/g,'<td>');
+  }
+
+  /* ── 화면 ── */
+  function byId(id){for(var i=0;i<CATS.length;i++)if(CATS[i].id===id)return CATS[i];return null;}
+  function home(){
+    var o='<div class="ph"><div class="kicker">'+esc(OP.month)+' · 베스트 픽업</div><h1>이번 달의 원픽</h1>'+
+      '<p>이번 달에 뭐 팔지? 상품군을 선택하면 선정 상품의 타사 비교표와 선정 이유를 보여줍니다. '+esc(OP.title)+' 기준 · 최종 업데이트 <b>'+esc(OP.upd||'')+'</b>'+
+      (OP.guide?' · <a class="op-guide" href="'+esc(guideHref())+'" target="_blank" rel="noopener" data-pg="1">원본 가이드 PDF 보기</a>':'')+'</p></div>';
+    ['life','nonlife'].forEach(function(t){
+      var best=CATS.filter(function(c){return c.type===t&&c.kind==='best';}), val=CATS.filter(function(c){return c.type===t&&c.kind==='value';});
+      o+='<div class="sec-t">'+TYPES[t]+' <i>베스트 초이스</i></div><div class="cards">';
+      best.forEach(function(c){o+=card(c);});
+      o+='</div>';
+      o+='<div class="sec-t">'+TYPES[t]+' 가성비 상품 <i>'+(t==='nonlife'?'유병자 ':'')+'3사 비교</i></div><div class="cards">';
+      val.forEach(function(c){o+=card(c);});
+      o+='</div>';
+    });
+    o+=disc();
+    return o;
+  }
+  function card(c){
+    var li='';c.cols.forEach(function(k){li+='<li><b>'+esc(k.co)+'</b>'+esc(k.prod)+'</li>';});
+    return '<button class="cd" data-id="'+c.id+'"><div class="tg">'+(c.kind==='best'?'베스트 초이스':'가성비 상품')+'</div><h3>'+esc(c.name)+'</h3><ul>'+li+'</ul><span class="go">상세 보기 →</span></button>';
+  }
+  function disc(){
+    return '<div class="disc">더 자세한 상품내용은 GA 소식지와 지점장님 상품조회 자료를 참고해 주세요.<br>본 자료는 설계사 교육을 위해 만든 자료입니다. 고객에게 배포할 수 없으며 이 자료를 광고나 다른 용도로 사용 시 생기는 문제에 법적 책임을 지지 않습니다.</div>';
+  }
+  function detail(c){
+    var idx=CATS.indexOf(c), prev=CATS[idx-1], next=CATS[idx+1];
+    var o='<button class="back" data-id="">← 원픽 전체</button>'+
+      '<div class="ph"><div class="row"><div><div class="kicker">'+(c.kind==='best'?'베스트 초이스':'가성비 상품')+' · '+esc(OP.month)+'</div><h1>'+esc(c.name)+'</h1></div>'+
+      '<span class="badge'+(c.type==='life'?'':' g')+'">'+TYPES[c.type]+'</span></div>'+
+      (c.lead?'<p>'+esc(c.lead)+'</p>':'')+'</div>';
+    var hasBest=c.best>=0;
+    o+='<div class="sec-t">'+(hasBest?'이번 달 선정 상품':'가성비 추천 상품')+' <i>'+c.cols.length+'개</i></div><div class="picks">';
+    c.cols.forEach(function(k,i){o+='<div class="pk'+(i===c.best?' best':'')+'"><div class="rk">'+(i===c.best?'이번 달 원픽':(hasBest?'비교 상품 '+i:'추천 '+(i+1)))+'</div><b>'+esc(k.co)+'</b><span>'+esc(k.prod)+'</span></div>';});
+    o+='</div>';
+    o+='<div class="sec-t">타사 비교표'+(hasBest?' <i>'+esc(c.cols[c.best].co)+' – '+esc(c.cols[c.best].prod)+'</i>':'')+'</div>';
+    if(c.cond)o+='<div class="cond">'+esc(c.cond)+'</div>';
+    o+=table(c);
+    if(c.reason&&c.cols[c.best]){
+      var r=c.reason;
+      o+='<div class="sec-t">선정 이유 <i>'+esc(c.cols[c.best].co)+' – '+esc(c.cols[c.best].prod)+'</i></div>';
+      o+=rs('상품 특징',r.feat,'')+rs('선정 이유',r.why,' why')+rs('세일즈 포인트',r.sales,'');
+    }
+    o+='<div class="src">원본: '+esc(OP.title)+(c.src?' '+esc(c.src)+'쪽':'')+
+      (OP.guide?' · <a class="op-guide" href="'+esc(guideHref(c.pg))+'" target="_blank" rel="noopener" data-pg="'+(+c.pg||1)+'">원본 PDF에서 보기'+(c.pg?' (PDF '+(+c.pg)+'쪽)':'')+' ↗</a>':'')+'</div>';
+    o+='<div class="pager"><button data-id="'+(prev?prev.id:'')+'"'+(prev?'':' style="visibility:hidden"')+'>← '+(prev?esc(prev.name):'')+'</button><button data-id="'+(next?next.id:'')+'"'+(next?'':' style="visibility:hidden"')+'>'+(next?esc(next.name):'')+' →</button></div>';
+    o+=disc();
+    return o;
+  }
+  function guideHref(pg){return '../'+encodeURI(OP.guide)+(pg?'#page='+(+pg):'');}
+  function rs(k,list,cls){
+    list=list||[];var l='<ul>';list.forEach(function(t){l+='<li>'+esc(t)+'</li>';});l+='</ul>';
+    return '<div class="rs'+cls+'"><div class="k">'+k+'</div><div class="v">'+l+'</div></div>';
+  }
+
+
+  function show(){
+    var id=(location.hash||'').replace('#','');
+    var c=byId(id);
+    main.style.display='block';
+    main.innerHTML=c?detail(c):home();
+    document.title=(c?c.name+' · ':'')+'이번 달의 원픽 · 한국보험금융';
+    fillUpd();
+    window.scrollTo(0,0);
+  }
+  function fillUpd(){var v=window.KIF_VER;if(!v)return;var u=main.querySelectorAll('.kif-upd');for(var i=0;i<u.length;i++)u[i].textContent=String(v.updated).replace(/-/g,'.');}
+  document.addEventListener('kifver',fillUpd);
+  main.addEventListener('click',function(e){
+    /* 포털 안에서 열려 있으면 원본 PDF를 포털의 자료 보기 창으로 (해당 쪽부터) */
+    var g=e.target.closest&&e.target.closest('a.op-guide');
+    if(g){try{if(window.parent!==window&&window.parent.location.origin===location.origin){e.preventDefault();window.parent.postMessage({kif:'pdf',file:OP.guide,page:+g.getAttribute('data-pg')||1,title:OP.title},location.origin);}}catch(err){}return;}
+    var b=e.target.closest&&e.target.closest('[data-id]');
+    if(!b)return;
+    var id=b.getAttribute('data-id');
+    try{location.hash=id?'#'+id:'';}catch(err){}
+    show();
+  });
+  window.addEventListener('hashchange',show);
+  fetch('../content.json?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){
+    var o=j&&j.onepick;if(o&&Array.isArray(o.cats)&&o.cats.length){CATS=o.cats;['month','title','upd','guide'].forEach(function(k){if(o[k]!=null)OP[k]=o[k];});}
+  }).catch(function(){}).then(show);
+})();
+</script>
+<link rel="stylesheet" href="kif.css?v=20261023">
+<script src="kif.js?v=20261023bb"></script>
+<!-- 포털로 돌아가기: 모든 화면 왼쪽 아래 '← 이전' '⌂ 포털 홈' -->
+<style>#kifNav{position:fixed;left:14px;bottom:14px;z-index:2147483000;display:flex;gap:6px;font-family:"Noto Sans KR","Malgun Gothic",sans-serif}#kifNav button{border:0;border-radius:999px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(15,34,64,.28);background:#0f2240;color:#fff}#kifNav button.h{background:#cb9c3a;color:#0f2240}#kifNav button:hover{filter:brightness(1.12)}body{padding-bottom:64px}@media print{#kifNav{display:none}}</style>
+<div id="kifNav" role="navigation" aria-label="포털 이동"><button type="button" id="kifBack">← 이전</button><button type="button" class="h" id="kifHome">⌂ 포털 홈</button></div>
+<script>(function(){var HOME=new URL('../index.html',location.href).href;
+if(window.top!==window){var n=document.getElementById('kifNav');if(n)n.remove();return;}
+function same(u){try{return new URL(u).origin===location.origin;}catch(e){return false;}}
+document.getElementById('kifHome').onclick=function(){location.href=HOME;};
+document.getElementById('kifBack').onclick=function(){if(history.length>1&&same(document.referrer))history.back();else location.href=HOME;};})();</script>
+</body></html>

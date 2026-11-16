@@ -1,0 +1,752 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><script>try{var s=JSON.parse(localStorage.getItem("kif_sso")||"null");if(!(s&&s.exp>Date.now()))location.replace("../index.html");}catch(e){location.replace("../index.html");}</script></head><body>
+<title>생명보험 상품 비교</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --surface-2:#f6f8fa; --ink:#182231; --muted:#5c6a7c;
+  --line:#d6dce3; --line-strong:#b9c3ce;
+  --accent:#1f5c9e; --accent-ink:#173f6b; --accent-soft:#e6eff8;
+  --good:#0f7a48; --good-soft:#e2f2e9;
+  --gold:#9a6b12; --gold-soft:#f6ecd6;
+  --rank1:#1a7a4c; --rank2:#3f7cc0; --rank3:#7a8595;
+  --shadow:0 1px 2px rgba(20,32,48,.06), 0 6px 20px -12px rgba(20,32,48,.28);
+  --radius:12px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f151d; --surface:#171f2a; --surface-2:#1e2733; --ink:#e7ecf2; --muted:#9aa7b6;
+    --line:#2b3543; --line-strong:#3a4655;
+    --accent:#5aa0e0; --accent-ink:#a9cdf0; --accent-soft:#1b2c3e;
+    --good:#48c78e; --good-soft:#16302a;
+    --gold:#d9ab5c; --gold-soft:#33291a;
+    --rank1:#48c78e; --rank2:#5aa0e0; --rank3:#8b97a6;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f151d; --surface:#171f2a; --surface-2:#1e2733; --ink:#e7ecf2; --muted:#9aa7b6;
+  --line:#2b3543; --line-strong:#3a4655;
+  --accent:#5aa0e0; --accent-ink:#a9cdf0; --accent-soft:#1b2c3e;
+  --good:#48c78e; --good-soft:#16302a;
+  --gold:#d9ab5c; --gold-soft:#33291a;
+  --rank1:#48c78e; --rank2:#5aa0e0; --rank3:#8b97a6;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,-apple-system,sans-serif;
+  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:900;letter-spacing:-.01em}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--accent)}
+
+header.app{padding:22px 24px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+header.app .kicker{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+header.app h1{font-size:21px}
+header.app p{margin:6px 0 0;color:var(--muted);font-size:12.5px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:22px 24px 80px;
+  display:grid;grid-template-columns:1fr 380px;gap:26px;align-items:start}
+@media (max-width:940px){.wrap{grid-template-columns:1fr;padding:18px 16px 64px}}
+
+.step{margin-bottom:26px}
+.step-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;
+  font-size:12px;font-weight:700;display:grid;place-items:center;flex:none}
+.step-head h2{font-size:15px}
+.step-head .hint{color:var(--muted);font-size:12px;font-weight:400}
+
+/* category cards */
+.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (max-width:520px){.cats{grid-template-columns:1fr}}
+.cat{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);
+  padding:14px 15px;text-align:left;transition:border-color .15s,background .15s}
+.cat:hover{border-color:var(--line-strong)}
+.cat[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.cat[disabled]{opacity:.5;cursor:not-allowed}
+.cat b{display:block;font-size:14px}
+.cat span{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
+.cats-collapsed{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  border:1px solid var(--accent);background:var(--accent-soft);border-radius:var(--radius);padding:10px 14px}
+.cats-collapsed .cur-cat b{font-size:14px}
+.cats-collapsed .cur-cat span{color:var(--accent-ink);font-size:11.5px;margin-left:8px}
+
+/* segmented */
+.seg-group{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:4px}
+.seg{display:flex;flex-direction:column;gap:6px}
+.seg .lab{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.seg .opts{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface)}
+.seg .opts button{border:0;background:transparent;padding:7px 13px;font-size:13px;color:var(--muted);
+  border-right:1px solid var(--line)}
+.seg .opts button:last-child{border-right:0}
+.seg .opts button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+.seg .opts button[disabled]{opacity:.35;cursor:not-allowed}
+
+/* cover list */
+.cov-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.cov-toolbar .count{font-size:12px;color:var(--muted)}
+.linkbtn{border:0;background:transparent;color:var(--accent);font-size:12px;font-weight:700;padding:4px 2px}
+.cov-list{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--surface)}
+.cov{border-bottom:1px solid var(--line)}
+.cov:last-child{border-bottom:0}
+.cov-main{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:10px 13px}
+.cov-main:hover{background:var(--surface-2)}
+.cov input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent);margin:0}
+.cov .name{font-size:13px;font-weight:500}
+.cov .name .basis{color:var(--muted);font-weight:400;font-size:11.5px;margin-left:6px}
+.cov .rng{font-size:11px;color:var(--muted);text-align:right;white-space:nowrap}
+.cov .rng b{color:var(--ink);font-weight:600}
+.cov .info{grid-column:2/4;font-size:12px;color:var(--muted);background:var(--surface-2);
+  border-left:2px solid var(--accent);padding:8px 11px;margin:0 13px 11px;border-radius:0 6px 6px 0;display:none}
+.cov.open .info{display:block}
+.cov .toggle{border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:700;padding:2px 6px}
+.selected-only .cov:not(.is-checked){display:none}
+
+.notice{border:1px dashed var(--line-strong);border-radius:10px;padding:18px;color:var(--muted);font-size:13px;background:var(--surface)}
+
+/* result panel */
+.result{position:sticky;top:16px}
+.result .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.result .p-head{padding:14px 16px;border-bottom:1px solid var(--line)}
+.result .p-head h2{font-size:14px}
+.result .p-head p{margin:4px 0 0;font-size:11.5px;color:var(--muted)}
+.result .body{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.rank{border:1px solid var(--line);border-radius:10px;padding:11px 12px;position:relative}
+.rank[data-r="1"]{border-color:var(--rank1);background:var(--good-soft)}
+.rank .rtop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.rank .badge{font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:2px 7px;border-radius:20px;color:#fff}
+.rank[data-r="1"] .badge{background:var(--rank1)}
+.rank[data-r="2"] .badge{background:var(--rank2)}
+.rank[data-r="3"] .badge{background:var(--rank3)}
+.rank .co{font-size:14px;font-weight:700}
+.rank .prod{font-size:11px;color:var(--muted);margin-top:2px}
+.rank .figs{display:flex;justify-content:space-between;gap:8px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
+.rank .fig .k{font-size:10.5px;color:var(--muted)}
+.rank .fig .v{font-size:15px;font-weight:700}
+.rank .fig .v.total{color:var(--accent-ink)}
+.rank .miss{margin-top:7px;font-size:10.5px;color:var(--gold);background:var(--gold-soft);padding:4px 7px;border-radius:6px}
+.result .foot{padding:12px 16px;border-top:1px solid var(--line);font-size:10.5px;color:var(--muted)}
+
+.detail{margin-top:14px}
+.detail h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table.cmp{border-collapse:collapse;width:100%;font-size:11.5px}
+table.cmp th,table.cmp td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+table.cmp thead th{background:var(--surface-2);font-weight:700;position:sticky;left:0}
+table.cmp tbody th{font-weight:500;color:var(--muted);background:var(--surface)}
+table.cmp td{font-variant-numeric:tabular-nums}
+table.cmp td.hl{background:var(--accent-soft);font-weight:700}
+
+.pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--accent-soft);color:var(--accent-ink)}
+
+.terms{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 2px}
+.chip2{font-size:11px;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:5px 10px;color:var(--muted);line-height:1.35}
+.chip2 .k{font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;display:block}
+.chip2 b{color:var(--ink);font-weight:600}
+.chip2 .n{display:block;font-size:10px;opacity:.75;margin-top:1px}
+.cov-grp-h{display:flex;align-items:center;gap:8px;padding:8px 13px;background:var(--surface-2);border-bottom:1px solid var(--line);font-size:11.5px;font-weight:700;color:var(--accent-ink)}
+.cov-grp-h .cnt{color:var(--muted);font-weight:400}
+.cov-grp-h button{margin-left:auto;border:0;background:transparent;color:var(--accent);font-size:11px;font-weight:700;padding:2px 4px}
+.cdetail{margin-top:12px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.cdetail>summary{padding:10px 13px;background:var(--surface-2);font-size:12px;font-weight:700;cursor:pointer;list-style:none}
+.cdetail>summary::-webkit-details-marker{display:none}
+.cdetail>summary::before{content:"▸  ";color:var(--accent)}
+.cdetail[open]>summary::before{content:"▾  "}
+.cdetail .cd-body{padding:6px 13px 12px}
+.cd-sub{font-size:11px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.footnotes{margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:8px 11px;background:var(--surface-2)}
+.footnotes .fn-h{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.footnotes .fn-i{font-size:11px;color:var(--muted);line-height:1.5}
+.rk-note{margin-top:6px;font-size:10.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:5px;white-space:normal}
+.foot-note{max-width:1180px;margin:0 auto;padding:0 24px;color:var(--muted);font-size:11px}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<style>
+.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (max-width:520px){.cats{grid-template-columns:1fr}}
+.cat{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);padding:13px 14px;text-align:left}
+.cat[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.cat b{display:block;font-size:13.5px}.cat span{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.sortbtns{display:flex;flex-wrap:wrap;gap:8px}
+.sortbtn{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 13px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:1px;align-items:flex-start;min-width:104px}
+.sortbtn[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff}
+.sortbtn b{font-size:12.5px;font-weight:700}.sortbtn span{font-size:10px;opacity:.85}
+.rank .metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 10px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
+.rank .metrics .k{font-size:10px;color:var(--muted)}.rank .metrics .v{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.rank .metrics .v.hot{color:var(--accent-ink)}
+.usd-tag{display:inline-block;font-size:10px;font-weight:700;background:var(--gold-soft);color:var(--gold);padding:1px 6px;border-radius:10px;margin-left:5px}
+table.cmp td.hot{background:var(--accent-soft);font-weight:700}
+.pickcell input{width:15px;height:15px;accent-color:var(--accent);margin:0}
+.detail-cmp{margin-top:14px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.detail-cmp .dh{padding:9px 13px;background:var(--surface-2);font-size:12px;font-weight:700}
+.detail-cmp .db{padding:0}
+.detail-cmp table{border-collapse:collapse;width:100%;font-size:11.5px}
+.detail-cmp th,.detail-cmp td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:normal}
+.detail-cmp thead th{background:var(--surface);position:sticky;top:0}
+.detail-cmp tbody th{background:var(--surface-2);color:var(--muted);font-weight:600;width:120px}
+.hint-pick{font-size:11px;color:var(--muted);margin:6px 0}
+/* 연금 환급률 — 상세 스펙 슬라이드 */
+.slide-cmp{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.slide-cmp .sc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 13px;background:var(--surface-2);font-size:12px}
+.slide-cmp .sc-nav{display:flex;align-items:center;gap:8px}
+.slide-cmp .sc-count{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:44px;text-align:center}
+.slide-cmp .sc-btn{width:26px;height:26px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--accent);font-size:15px;line-height:1;cursor:pointer}
+.slide-cmp .sc-btn:disabled{opacity:.35;cursor:default}
+.slide-cmp .sc-track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:12px;-webkit-overflow-scrolling:touch}
+.slide-cmp .sc-card{flex:0 0 clamp(260px,86%,360px);scroll-snap-align:start;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--surface)}
+.slide-cmp .sc-title{margin-bottom:8px}
+.slide-cmp .sc-title b{display:block;font-size:13px}
+.slide-cmp .sc-title span{display:block;font-size:10.5px;color:var(--muted);margin-top:1px}
+.slide-cmp .sc-typ{display:inline-block;margin-top:4px!important;font-size:10px;font-weight:700;background:var(--accent-soft);color:var(--accent-ink);padding:2px 7px;border-radius:10px}
+.slide-cmp .sc-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:9px}
+.slide-cmp .sc-mini>div{background:var(--surface-2);border-radius:6px;padding:5px 4px;text-align:center}
+.slide-cmp .sc-mini>div.on{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.slide-cmp .sc-mini .k{display:block;font-size:8.5px;color:var(--muted)}
+.slide-cmp .sc-mini .v{display:block;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.slide-cmp .sc-mini .g{display:block;font-size:8.5px;color:var(--muted)}
+.slide-cmp .sc-scroll{max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:7px}
+.slide-cmp table.sc-spec{border-collapse:collapse;width:100%;font-size:11px}
+.slide-cmp table.sc-spec th,.slide-cmp table.sc-spec td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top;white-space:normal}
+.slide-cmp table.sc-spec th{background:var(--surface-2);color:var(--muted);font-weight:600;width:38%}
+.slide-cmp .sc-kv{font-size:10.5px;margin-top:6px;color:var(--ink)}
+.slide-cmp .sc-kv b{color:var(--muted);font-weight:600}
+.slide-cmp .sc-src{font-size:9.5px;color:var(--muted);margin-top:8px}
+.unmatched-box{margin-top:12px;border:1px dashed var(--line-strong);border-radius:10px;padding:12px;background:var(--surface)}
+.unmatched-box .um-head{font-size:12px;font-weight:700;color:var(--gold)}
+.unmatched-box .um-note{font-size:10.5px;color:var(--muted);margin:4px 0 8px}
+.unmatched-box .um-card{border-top:1px solid var(--line);padding-top:8px;margin-top:8px}
+.unmatched-box .um-card:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.unmatched-box .um-t{font-size:12px;margin-bottom:4px}
+.unmatched-box .um-kv{display:flex;flex-wrap:wrap;gap:5px 10px}
+.unmatched-box .um-kv>div{font-size:10.5px}
+.unmatched-box .um-kv .k{color:var(--muted);margin-right:4px}
+.linkbtn{border:0;background:transparent;color:var(--accent);font-size:11px;font-weight:700;padding:0 2px;cursor:pointer;text-decoration:underline}
+.wrap{display:block;min-width:0;max-width:1180px;margin:0 auto;padding:22px 24px 80px}
+@media (max-width:940px){.wrap{padding:18px 16px 64px}}
+.col-main{min-width:0;max-width:100%}
+#s3{min-width:0;max-width:100%}
+#s3body{min-width:0;max-width:100%}
+#s3body .tbl-scroll{max-width:100%}
+/* 유리한 상품 TOP3 — 가로 배치 (STEP2 아래) */
+#result{position:static;margin:0 0 26px}
+#result:empty{display:none}
+#result .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+#result .body{display:flex;flex-direction:row;flex-wrap:wrap;gap:12px;align-items:stretch}
+#result .rank{flex:1 1 220px;min-width:200px}
+@media (max-width:620px){#result .body{flex-direction:column}}
+/* 표는 공간이 남으면 채우고, 부족할 때만 가로 스크롤 */
+table.cmp{width:100%}
+table.cmp thead th{position:static}
+table.cmp-info{width:100%}
+table.cmp-info thead th{background:var(--surface-2);vertical-align:top;white-space:normal}
+table.cmp-info thead th.info-corner{position:sticky;left:0;z-index:3;min-width:88px}
+table.cmp-info thead th.co-th{min-width:124px;padding:7px 9px;font-size:11px;line-height:1.35}
+table.cmp-info tbody th{position:sticky;left:0;z-index:1;background:var(--surface);min-width:108px;white-space:normal;font-weight:600;color:var(--ink)}
+table.cmp-info td{white-space:normal;vertical-align:top}
+.fbar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.fchip{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:5px 11px;font-size:11.5px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.fchip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff;font-weight:700}
+.fchip.all{font-weight:700;color:var(--ink)}
+.fchip.all[aria-pressed="true"]{color:#fff}
+</style>
+<header class="app">
+  <div class="kicker">한국보험금융 · 생명보험 비교 가이드북 (26.09)</div>
+  <h1>생명보험 상품 비교</h1>
+  <p>상품 구분을 고르고 세부 조건·정렬 기준을 누르면 가장 유리한 상품 3가지를 보여줍니다. · 40세 남/여 · 주계약 1억원(별도 표기 제외) · 20년납 · U/W 2026.09.04</p>
+  <p id="fxline" style="margin-top:4px;font-size:11.5px;color:var(--accent-ink)"></p>
+</header>
+<div class="wrap">
+  <div class="step" id="s1"><div class="step-head"><span class="step-num">1</span><h2>상품 구분</h2><span class="hint">비교할 항목을 고르세요</span></div><div class="cats" id="cats"></div></div>
+  <div class="step" id="s2" hidden><div class="step-head"><span class="step-num">2</span><h2>세부 조건 &amp; 정렬</h2><span class="hint" id="s2hint"></span></div><div class="seg-group" id="conds"></div><div id="sortbox" style="margin-top:8px"></div></div>
+  <div class="result" id="result"></div>
+  <div class="step" id="s3" hidden><div class="step-head"><span class="step-num">3</span><h2>전체 상품 비교</h2><span class="hint" id="s3hint"></span></div><div class="fbar" id="s3filter"></div><div id="s3body"></div></div>
+</div>
+<p class="foot-note">한국보험금융 「생명보험 비교 가이드북 09.04」 자료. 각 보험사 대표 상품·기본형/보증형 기준으로 설계했으며, 환급금(률)은 조건에 따라 달라지므로 상품 비교 이해용 참고자료입니다. 가이드북의 종신보험(공시이율·저해약 환급형·중장기납·상속·납면강화·간편심사·변액유니버셜·CI(GI)) · 정기보험 · 연금(즉시연금·환급률(공시이율형·변액형)·공시이율 금리·주요특징·변액연금 특징) · 참고 가입나이표를 모두 반영했습니다. 「(상세)」 표시 구분은 회사·항목 비교표입니다. 각 표 위의 「전체 / 회사명」 필터로 볼 상품을 좁힐 수 있고, 필요한 상품만 화면에 맞춰 표시됩니다. 달러 상품은 현재 환율로 환산해 함께 비교합니다.</p>
+<script src="../kif-data.js?v=1"></script>
+<script src="cmpdata.js?v=20261113a"></script>
+<script>
+let DATA = (window.KIFCMP_BASE ? KIFCMP_BASE('life') : {}); /* 자료는 잠긴 저장소(classic/base/life.json)에서 로그인한 FC만 받음 */
+if(window.KIFCMP_LOAD)DATA=KIFCMP_LOAD('life',DATA);
+const won = n => n==null ? "—" : Math.round(n).toLocaleString("ko-KR")+"원";
+const pct = n => n==null ? "—" : n.toFixed(1)+"%";
+const state = { sec:null, sub:{}, sort:null, picks:[], show:[], catsOpen:false };
+const MAXPICK = 3;
+function keepScroll(fn){ var y=window.pageYOffset||0; fn(); var r=function(){window.scrollTo(0,y);}; r(); if(window.requestAnimationFrame) requestAnimationFrame(r); }
+function hasDetails(sid){ const d=DATA.details||{}; return Object.keys(d).some(k=>k.slice(0,sid.length+1)===sid+"|"); }
+function sectionCompanies(s){
+  if(s.kind==="info"||s.kind==="jeonggi") return (s.companies||[]).slice();
+  const seen=new Set(), out=[];
+  (s.rows||[]).forEach(r=>{ if(r.co && !seen.has(r.co)){ seen.add(r.co); out.push(r.co); } });
+  return out;
+}
+function renderFilter(){
+  const box=document.getElementById("s3filter"); box.innerHTML="";
+  const s=cur(); const cos=sectionCompanies(s);
+  const all=el("button",{class:"fchip all","aria-pressed":String(state.show.length===0)}, `전체 (${cos.length})`);
+  all.addEventListener("click",()=>{ state.show=[]; keepScroll(refresh); });
+  box.append(all);
+  cos.forEach(c=>{
+    const on=state.show.includes(c);
+    const b=el("button",{class:"fchip","aria-pressed":String(on),title:c}, c.length>24?c.slice(0,24)+"…":c);
+    b.addEventListener("click",()=>{
+      state.show = on ? state.show.filter(x=>x!==c) : state.show.concat([c]);
+      keepScroll(refresh);
+    });
+    box.append(b);
+  });
+}
+const SECS = [
+  {g:"종신보험", id:"공시이율종신_보험료", label:"공시이율 종신 · 보험료", sub:"보증형/미보증형 · 30·40·50세"},
+  {g:"종신보험", id:"공시이율종신_환급률", label:"공시이율 종신 · 환급률", sub:"1억원/추가납입 · 5~50년"},
+  {g:"종신보험", id:"저해약종신_보험료", label:"저해약 환급형 종신 · 보험료", sub:"유형별 · 30·40·50세 · 20개사"},
+  {g:"종신보험", id:"저해약종신_환급률", label:"저해약 환급형 종신 · 환급률", sub:"40세남 3천만원 10년납 · 달러환산"},
+  {g:"종신보험", id:"저해약_중장기납", label:"저해약 종신 주요 상품 (상세)", sub:"보험료·가입한도·연금선지급 20개"},
+  {g:"종신보험", id:"저해약_상속종신", label:"저해약 상속종신 (상세)", sub:"상속목적 · 30·40·50세 보험료"},
+  {g:"종신보험", id:"저해약_납면강화", label:"저해약 납면강화·중도인출강화 (상세)", sub:"납입면제 강화·리턴형·중도인출"},
+  {g:"종신보험", id:"간편심사_종신", label:"간편심사형 종신 (상세)", sub:"40세 1억원 20년납"},
+  {g:"종신보험", id:"변액유니버셜_종신", label:"변액유니버셜 종신 (상세)", sub:"30·40·50세 보험료"},
+  {g:"종신보험", id:"CI_GI_종신", label:"CI(GI) 종신 (상세)", sub:"40세 최대보장 · 중대질병"},
+  {g:"정기보험", id:"정기보험_일반형", label:"정기보험 (일반형)", sub:"70세만기 순수보장 · 일반/간편"},
+  {g:"연금", id:"즉시연금", label:"즉시연금", sub:"65세남 1억원 · 월 연금액 순"},
+  {g:"연금", id:"연금_환급률", label:"연금보험 · 환급률", sub:"공시이율형·변액형 · 40세남 100만 10년납"},
+  {g:"연금", id:"연금_공시이율금리", label:"연금·저축 공시이율 금리", sub:"당월 공시이율 높은 순"},
+  {g:"연금", id:"연금_주요특징", label:"연금보험 주요 특징 (상세)", sub:"월납 · 수령형태·중도인출 등"},
+  {g:"연금", id:"변액연금_특징", label:"변액연금 상품 특징 (상세)", sub:"연금개시·최저연금기준액 등"},
+  {g:"참고", id:"참고_가입나이_일반", label:"[참고] 최고 가입나이 (일반)", sub:"10년납 이하 · 남/여"},
+  {g:"참고", id:"참고_가입나이_간편", label:"[참고] 최고 가입나이 (간편)", sub:"10년납 이하 · 남/여"},
+];
+function el(tag,a={},...k){const e=document.createElement(tag);for(const[x,v]of Object.entries(a)){if(x==="class")e.className=v;else if(x==="html")e.innerHTML=v;else if(x.startsWith("on"))e.addEventListener(x.slice(2),v);else if(v!=null)e.setAttribute(x,v);}for(const c of k)if(c!=null)e.append(c.nodeType?c:document.createTextNode(c));return e;}
+function seg(label,opts,cur,cb){const s=el("div",{class:"seg"},el("span",{class:"lab"},label));const o=el("div",{class:"opts"});opts.forEach(v=>{const b=el("button",{"aria-pressed":String(v===cur)},String(v));b.addEventListener("click",()=>cb(v));o.append(b);});s.append(o);return s;}
+function cur(){ return DATA.sections[state.sec]; }
+
+function renderCats(){
+  const box=document.getElementById("cats"); box.innerHTML=""; box.className="";
+  if(state.sec && !state.catsOpen){
+    const c=SECS.find(x=>x.id===state.sec);
+    const bar=el("div",{class:"cats-collapsed"});
+    bar.append(el("div",{class:"cur-cat"}, el("b",{}, c.label), el("span",{}, c.sub)));
+    const chg=el("button",{class:"linkbtn",style:"margin-left:auto"},"구분 변경 ▾");
+    chg.addEventListener("click",()=>{ state.catsOpen=true; renderCats(); });
+    bar.append(chg);
+    box.append(bar);
+    return;
+  }
+  const groups=[...new Set(SECS.map(s=>s.g))];
+  groups.forEach(g=>{
+    box.append(el("div",{style:"grid-column:1/-1;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin:6px 0 2px"}, g));
+    const grid=el("div",{class:"cats"});
+    SECS.filter(s=>s.g===g).forEach(c=>{
+      const b=el("button",{class:"cat","aria-pressed":String(state.sec===c.id)}, el("b",{},c.label), el("span",{},c.sub));
+      b.addEventListener("click",()=>pickSec(c.id)); grid.append(b);
+    });
+    box.append(grid);
+  });
+  if(state.sec){
+    const cl=el("button",{class:"linkbtn",style:"margin-top:8px"},"▴ 접기");
+    cl.addEventListener("click",()=>{ state.catsOpen=false; renderCats(); });
+    box.append(cl);
+  }
+}
+function pickSec(id){
+  state.sec=id; const s=DATA.sections[id]; state.sub={}; state.picks=[]; state.show=[]; state.catsOpen=false;
+  const ax=s.axes||{};
+  Object.entries(ax).forEach(([k,vs])=>{ state.sub[k]=vs[0]; });
+  state.year = (s.years&&s.years.includes("10년")) ? "10년" : (s.years?s.years[0]:null);
+  state.sort = (s.kind==="refund"||s.kind==="vrefund") ? "환급률"
+             : s.kind==="yeonggeum" ? "월연금액"
+             : s.kind==="rate" ? s.sortDefault
+             : s.kind==="info" ? null : "보험료";
+  renderCats();
+  document.getElementById("s2").hidden=false; document.getElementById("s3").hidden=false;
+  refresh();
+}
+
+function renderConds(){
+  const box=document.getElementById("conds"); box.innerHTML="";
+  const s=cur(); const ax=s.axes||{};
+  Object.entries(ax).forEach(([k,vs])=>{
+    box.append(seg(k, vs, state.sub[k], v=>{ state.sub[k]=v; refresh(); }));
+  });
+  document.getElementById("s2hint").textContent = s.note||"";
+}
+function renderSort(){
+  const box=document.getElementById("sortbox"); box.innerHTML="";
+  const s=cur();
+  if(s.kind==="info"){ box.append(el("div",{class:"hint-pick"},"이 구분은 회사·항목 비교표로 제공됩니다. 표 위의 「전체 / 회사명」 필터로 볼 상품을 좁힐 수 있습니다.")); return; }
+  let opts=[];
+  if(s.kind==="refund"||s.kind==="vrefund") opts=[{k:"환급률",l:"환급률",d:"높은 순"}].concat(s.kind==="refund"?[{k:"보험료",l:"월 보험료",d:"낮은 순"}]:[]);
+  else if(s.kind==="yeonggeum") opts=[{k:"월연금액",l:"월 연금액",d:"많은 순"}];
+  else if(s.kind==="rate") opts=(s.metricCols||[]).map(c=>({k:c,l:c.replace("(당월)","").replace("연금 ",""),d:"높은 순"}));
+  else opts=[{k:"보험료",l:"월 보험료",d:"낮은 순"}];
+  const st=el("div",{class:"sortbtns"});
+  opts.forEach(o=>{ const b=el("button",{class:"sortbtn","aria-pressed":String(state.sort===o.k)},el("b",{},o.l),el("span",{},o.d));
+    b.addEventListener("click",()=>{state.sort=o.k;keepScroll(refresh);}); st.append(b); });
+  box.append(st);
+  if(s.years && state.sort==="환급률"){
+    const yb=el("div",{style:"margin-top:10px"});
+    yb.append(seg("기준 연차 (환급률)", s.years, state.year, v=>{state.year=v;refresh();}));
+    box.append(yb);
+  }
+}
+
+/* value extraction per kind */
+function val(r){
+  const s=cur();
+  if(s.kind==="premium"){ const t=state.sub["유형"]==="보증형"?"보증":"미보증"; return (r[t]||{})[state.sub["연령"]] ? r[t][state.sub["연령"]][state.sub["성별"]] : null; }
+  if(s.kind==="premium_gubun"){ const g=state.sub["성별"], a=state.sub["연령"];
+    const v1=(r[g]||{})[a], v2=(r[g+"2"]||{})[a]; return [v1,v2].filter(x=>x!=null).sort((x,y)=>x-y)[0] ?? null; }
+  if(s.kind==="refund"){ if(state.sort==="보험료") return r.monthly; return r.rr ? r.rr[state.year] : null; }
+  if(s.kind==="vrefund"){ return r.rr ? r.rr[state.year] : null; }
+  if(s.kind==="yeonggeum"){ return r.월연금액; }
+  if(s.kind==="rate"){ return r[state.sort]; }
+  if(s.kind==="jeonggi"){ return null; }
+  return null;
+}
+function rows(){
+  const s=cur();
+  let base;
+  if(s.kind==="jeonggi"){
+    const g=state.sub["성별"], rv=state.sub["심사"]==="일반"?"일반":"간편";
+    base = s.companies.map(co=>({co, prod:s.products[co], 구조:s["구조"][co],
+      m:(s["보험료"][g][co]||{})[rv]})).map(r=>({...r,v:r.m}));
+  } else if(s.kind==="refund" && s.axes && s.axes["블록"]){
+    const bl=state.sub["블록"];
+    base = s.rows.filter(r=>r.blk && r.blk.includes(bl.slice(0,2))||r.blk===bl||(!r.blk)).map(r=>({...r,v:val(r)}));
+  } else {
+    base = s.rows.map(r=>({...r, v:val(r)}));
+  }
+  if(state.show.length) base = base.filter(r=>state.show.includes(r.co));
+  return base;
+}
+function ranked(){
+  const s=cur();
+  if(s.kind==="info") return s.rows ? [] : [];
+  const dir = ((s.kind==="refund"||s.kind==="vrefund")&&state.sort==="환급률")||s.kind==="yeonggeum"||s.kind==="rate" ? -1 : 1;
+  const rs=rows();
+  const has=rs.filter(r=>r.v!=null), no=rs.filter(r=>r.v==null);
+  has.sort((a,b)=>dir*(a.v-b.v));
+  return has.concat(no);
+}
+function dedupe(rs){ const seen=new Set(),o=[]; rs.forEach(r=>{if(!seen.has(r.co)){seen.add(r.co);o.push(r);}}); return o; }
+
+function renderInfoTable(){
+  const s=cur(), body=document.getElementById("s3body"); body.innerHTML="";
+  const allCos=s.companies;
+  const cos = state.show.length ? allCos.filter(c=>state.show.includes(c)) : allCos.slice();
+  document.getElementById("s3hint").textContent =
+    s.title+" · "+s.source+" · 총 "+allCos.length+"개 상품"+(state.show.length?` · ${cos.length}개 표시`:"");
+  if(!cos.length){ body.append(el("div",{class:"hint-pick"},"위의 「전체」를 누르거나 상품을 선택하세요.")); return; }
+  const sc=el("div",{class:"tbl-scroll"}); const t=el("table",{class:"cmp cmp-info"});
+  const h=el("tr"); h.append(el("th",{class:"info-corner"},"항목"));
+  cos.forEach(c=>h.append(el("th",{class:"co-th"}, c)));
+  t.append(el("thead",{},h));
+  const tb=el("tbody");
+  s.rows.forEach(row=>{
+    if(!cos.some(c=>row.vals[c])) return;
+    const tr=el("tr"); tr.append(el("th",{}, row.label));
+    cos.forEach(c=>tr.append(el("td",{}, row.vals[c]||"—")));
+    tb.append(tr);
+  });
+  t.append(tb); sc.append(t); body.append(sc);
+}
+
+function renderTable(){
+  const s=cur(), body=document.getElementById("s3body"); body.innerHTML="";
+  if(s.kind==="info") return renderInfoTable();
+  const rs=ranked();
+  const det=hasDetails(state.sec) || s.kind==="vrefund";
+  const totCo=sectionCompanies(s).length;
+  document.getElementById("s3hint").textContent = s.title+" · "+s.source+" · "+rs.length+"개"+(state.show.length?` 표시 (전체 ${totCo}개사 중)`:"");
+  const sc=el("div",{class:"tbl-scroll"}); const t=el("table",{class:"cmp"});
+  const head=el("tr");
+  if(det) head.append(el("th",{},"비교"));
+  head.append(el("th",{},"순위"),el("th",{},"회사 · 상품"));
+  if(s.kind==="premium"||s.kind==="premium_gubun"){
+    if(s.kind==="premium_gubun") head.append(el("th",{},"유형"));
+    ["30세","40세","50세"].forEach(a=>head.append(el("th",{}, a+" "+state.sub["성별"])));
+  } else if(s.kind==="refund"){
+    head.append(el("th",{},"유형"),el("th",{},"적용이율"),el("th",{},"가입금액"),el("th",{},"월 보험료"));
+    s.years.forEach(y=>head.append(el("th",{},"환급률 "+y)));
+  } else if(s.kind==="jeonggi"){
+    head.append(el("th",{},"구조"),el("th",{},"일반심사"),el("th",{},"간편심사"));
+  } else if(s.kind==="yeonggeum"){
+    head.append(el("th",{},"월 연금액"),el("th",{},"가입형태"),el("th",{},"공시이율"),el("th",{},"최저보험료"));
+  } else if(s.kind==="rate"){
+    s.metricCols.forEach(c=>head.append(el("th",{class:c===state.sort?"hot":""}, c)));
+  } else if(s.kind==="vrefund"){
+    head.append(el("th",{},"유형"),el("th",{},"펀드 / 연금전환이율"),el("th",{},"연금액"));
+    s.years.forEach(y=>head.append(el("th",{class:y===state.year?"hot":""},"환급률 "+y)));
+  }
+  t.append(el("thead",{},head));
+  const tb=el("tbody");
+  rs.forEach((r,i)=>{
+    const tr=el("tr");
+    if(det){
+      const pk = s.kind==="vrefund" ? r.k : r.co;
+      const pc=el("td",{class:"pickcell"});
+      const cb=el("input",{type:"checkbox"}); cb.checked=state.picks.includes(pk);
+      cb.addEventListener("change",()=>{
+        if(cb.checked){ if(state.picks.length>=MAXPICK){ cb.checked=false; return; } state.picks.push(pk); }
+        else state.picks=state.picks.filter(x=>x!==pk);
+        keepScroll(()=>{ renderPicksArea(); renderTable(); });
+      });
+      pc.append(cb); tr.append(pc);
+    }
+    tr.append(el("th",{},String(i+1)));
+    tr.append(el("td",{style:"white-space:normal;min-width:150px"},el("b",{},r.co), r.prod?el("span",{style:"display:block;color:var(--muted);font-size:10.5px"},r.prod):null));
+    if(s.kind==="premium"){
+      const tp=state.sub["유형"]==="보증형"?"보증":"미보증", g=state.sub["성별"];
+      ["30세","40세","50세"].forEach(a=>tr.append(el("td",{class:a===state.sub["연령"]?"hot":""}, won((r[tp]||{})[a]?r[tp][a][g]:null))));
+    } else if(s.kind==="premium_gubun"){
+      const g=state.sub["성별"];
+      tr.append(el("td",{style:"white-space:normal;font-size:10.5px"}, r.gubun + (r.gubun2?(" / "+r.gubun2):"")));
+      ["30세","40세","50세"].forEach(a=>{
+        const v1=(r[g]||{})[a], v2=(r[g+"2"]||{})[a];
+        tr.append(el("td",{class:a===state.sub["연령"]?"hot":""}, v2!=null?(won(v1)+" / "+won(v2)):won(v1)));
+      });
+    } else if(s.kind==="refund"){
+      tr.append(el("td",{style:"white-space:normal;font-size:10.5px"}, r.type||r.blk||"—"));
+      tr.append(el("td",{style:"font-size:10.5px"}, r.rate||"—"));
+      tr.append(el("td",{}, r.ga||"—"));
+      tr.append(el("td",{class:state.sort==="보험료"?"hot":""}, r.usd? el("span",{},won(r.monthly),el("span",{class:"usd-tag"},r.monthlyRaw||"달러")) : won(r.monthly)));
+      s.years.forEach(y=>tr.append(el("td",{class:(state.sort==="환급률"&&y===state.year)?"hot":""}, pct(r.rr?r.rr[y]:null))));
+    } else if(s.kind==="jeonggi"){
+      tr.append(el("td",{style:"white-space:normal;font-size:10.5px"}, r.구조||"—"));
+      const g=state.sub["성별"], d=(cur()["보험료"][g][r.co]||{});
+      tr.append(el("td",{class:state.sub["심사"]==="일반"?"hot":""}, won(d["일반"])));
+      tr.append(el("td",{class:state.sub["심사"]==="간편"?"hot":""}, won(d["간편"])));
+    } else if(s.kind==="yeonggeum"){
+      tr.append(el("td",{class:"hot"}, won(r.월연금액)));
+      tr.append(el("td",{style:"white-space:normal;font-size:10.5px"}, r.형태||"—"));
+      tr.append(el("td",{}, r.공시이율||"—"));
+      tr.append(el("td",{}, r.최저보험료_usd? (won(r.최저보험료_원)+" ("+r.최저보험료+")") : (r.최저보험료||"—")));
+    } else if(s.kind==="rate"){
+      s.metricCols.forEach(c=>tr.append(el("td",{class:c===state.sort?"hot":""}, r[c]==null?"—":r[c].toFixed(2)+"%")));
+    } else if(s.kind==="vrefund"){
+      tr.append(el("td",{style:"white-space:normal;font-size:10.5px;font-weight:700"}, r.유형||"—"));
+      tr.append(el("td",{style:"white-space:normal;font-size:10.5px"}, (r.펀드||"—")+(r.연금전환이율?(" · "+r.연금전환이율):"")));
+      tr.append(el("td",{style:"white-space:normal;font-size:10.5px"}, r.연금액표기||"—"));
+      s.years.forEach(y=>{
+        const p=r.rr?r.rr[y]:null, g=r.환급금?r.환급금[y]:null;
+        tr.append(el("td",{class:y===state.year?"hot":"",style:"white-space:nowrap"},
+          pct(p), g!=null?el("span",{style:"display:block;color:var(--muted);font-size:9.5px"}, Math.round(g).toLocaleString("ko-KR")+"만"):null));
+      });
+    }
+    tb.append(tr);
+  });
+  t.append(tb); sc.append(t); body.append(sc);
+  if(det){
+    body.append(el("div",{class:"hint-pick"}, s.kind==="vrefund"
+      ? `환급률 높은 상품을 왼쪽 「비교」 칸에서 체크하면(최대 ${MAXPICK}개), 아래에서 해당 상품의 상세 스펙을 슬라이드로 볼 수 있습니다.`
+      : `왼쪽 「비교」 칸을 체크하면 선택한 상품(최대 ${MAXPICK}개)의 담보·상품 특징을 아래에서 나란히 볼 수 있습니다.`));
+    body.append(el("div",{id:"picksArea"}));
+    renderPicksArea();
+  }
+}
+
+function renderPicksArea(){
+  return cur().kind==="vrefund" ? renderPicksSlide() : renderPicks();
+}
+
+function renderPicksSlide(){
+  const area=document.getElementById("picksArea"); if(!area) return; area.innerHTML="";
+  if(!state.picks.length) return;
+  const s=cur();
+  const rows=s.rows.filter(r=>state.picks.includes(r.k));
+  const matched=rows.filter(r=>r.detail && r.detail.length);
+  const unmatched=rows.filter(r=>!(r.detail && r.detail.length));
+
+  if(matched.length){
+    const box=el("div",{class:"slide-cmp"});
+    const counter=el("span",{class:"sc-count"});
+    const prev=el("button",{class:"sc-btn","aria-label":"이전"},"‹");
+    const next=el("button",{class:"sc-btn","aria-label":"다음"},"›");
+    box.append(el("div",{class:"sc-head"},
+      el("b",{}, `선택 상품 상세 스펙 (${matched.length}개)`),
+      el("span",{class:"sc-nav"}, prev, counter, next)));
+    const track=el("div",{class:"sc-track"});
+    matched.forEach(r=>{
+      const card=el("div",{class:"sc-card"});
+      card.append(el("div",{class:"sc-title"}, el("b",{}, r.co),
+        el("span",{}, r.prod), el("span",{class:"sc-typ"}, r.유형)));
+      const mini=el("div",{class:"sc-mini"});
+      s.years.forEach(y=>{
+        const p=r.rr?r.rr[y]:null, g=r.환급금?r.환급금[y]:null;
+        mini.append(el("div",{class:y===state.year?"on":""},
+          el("span",{class:"k"}, "환급률 "+y), el("span",{class:"v"}, pct(p)),
+          g!=null?el("span",{class:"g"}, Math.round(g).toLocaleString("ko-KR")+"만"):null));
+      });
+      card.append(mini);
+      const tw=el("div",{class:"sc-scroll"}); const tb=el("table",{class:"sc-spec"});
+      r.detail.forEach(([l,v])=>{ const tr=el("tr"); tr.append(el("th",{}, l), el("td",{}, v)); tb.append(tr); });
+      tw.append(tb); card.append(tw);
+      if(r.연금액표기) card.append(el("div",{class:"sc-kv"}, el("b",{},"연금액 "), r.연금액표기));
+      if(r.최저연금기준액) card.append(el("div",{class:"sc-kv"}, el("b",{},"최저연금기준액 "), r.최저연금기준액));
+      card.append(el("div",{class:"sc-src"}, r.detailSrc||""));
+      track.append(card);
+    });
+    box.append(track);
+    let curIdx=0;
+    const setNav=()=>{
+      counter.textContent=(curIdx+1)+" / "+matched.length;
+      prev.disabled=curIdx<=0; next.disabled=curIdx>=matched.length-1;
+    };
+    const go=d=>{
+      curIdx=Math.max(0, Math.min(matched.length-1, curIdx+d));
+      const cs=track.children;
+      if(cs[curIdx]) track.scrollTo({left: cs[curIdx].offsetLeft - cs[0].offsetLeft, behavior:"smooth"});
+      setNav();
+    };
+    prev.addEventListener("click",()=>go(-1));
+    next.addEventListener("click",()=>go(1));
+    track.addEventListener("scroll",()=>{
+      const cs=track.children; if(!cs.length) return;
+      const base=cs[0].offsetLeft;
+      let best=0, bd=1e9;
+      for(let i=0;i<cs.length;i++){ const d=Math.abs((cs[i].offsetLeft-base)-track.scrollLeft); if(d<bd){bd=d;best=i;} }
+      if(best!==curIdx){ curIdx=best; setNav(); }
+    });
+    area.append(box); setNav();
+  }
+
+  if(unmatched.length){
+    const box=el("div",{class:"unmatched-box"});
+    box.append(el("div",{class:"um-head"}, `상세 매칭 자료 없는 선택 상품 (${unmatched.length}개)`));
+    box.append(el("div",{class:"um-note"}, "아래 상품은 가이드북 상세 특징표(p.35·36)에 대응 항목이 없어 환급률 표의 기본 정보만 제공됩니다."));
+    unmatched.forEach(r=>{
+      const c=el("div",{class:"um-card"});
+      c.append(el("div",{class:"um-t"}, el("b",{}, r.co+" · "+r.prod)));
+      const kv=(k,v)=> v ? el("div",{}, el("span",{class:"k"},k), el("span",{},v)) : null;
+      c.append(el("div",{class:"um-kv"},
+        kv("유형", r.유형), kv("펀드", r.펀드), kv("연금전환이율", r.연금전환이율),
+        kv("연금액", r.연금액표기), kv("최저연금기준액", r.최저연금기준액),
+        kv(state.year+" 환급률", pct(r.rr?r.rr[state.year]:null))));
+      box.append(c);
+    });
+    area.append(box);
+  }
+}
+
+function renderPicks(){
+  const area=document.getElementById("picksArea"); if(!area) return; area.innerHTML="";
+  if(!state.picks.length) return;
+  const dets=(DATA.details)||{};
+  const cols=state.picks.map(co=>({co, d:dets[`${state.sec}|${co}`]}));
+  const box=el("div",{class:"detail-cmp"});
+  box.append(el("div",{class:"dh"}, `선택 상품 담보·특징 비교 (${state.picks.join(" · ")})`));
+  const bd=el("div",{class:"db"}); const sc=el("div",{style:"overflow-x:auto"}); const t=el("table",{});
+  const htr=el("tr"); htr.append(el("th",{},"항목"));
+  cols.forEach(c=>htr.append(el("th",{}, c.co + (c.d&&c.d.prod?(" · "+c.d.prod):""))));
+  t.append(el("thead",{},htr));
+  const tb=el("tbody");
+  // union of labels across selected products (in first product's order, then extras)
+  const labels=[]; const seen=new Set();
+  cols.forEach(c=>{ (c.d?c.d.rows:[]).forEach(([l])=>{ if(!seen.has(l)){ seen.add(l); labels.push(l); } }); });
+  if(!labels.length){
+    const tr=el("tr"); tr.append(el("th",{},"안내"));
+    cols.forEach(()=>tr.append(el("td",{},"이 구분의 상세(담보·특징) 자료는 다음 버전에서 추가됩니다.")));
+    tb.append(tr);
+  } else {
+    labels.forEach(l=>{
+      const tr=el("tr"); tr.append(el("th",{}, l.replace(/\s*\/\s*/g," ")));
+      cols.forEach(c=>{
+        const row=(c.d?c.d.rows:[]).find(([ll])=>ll===l);
+        tr.append(el("td",{}, row? row[1] : "—"));
+      });
+      tb.append(tr);
+    });
+  }
+  t.append(tb); sc.append(t); bd.append(sc); box.append(bd); area.append(box);
+}
+
+function renderResult(){
+  const R=document.getElementById("result"); R.innerHTML="";
+  const s=cur();
+  if(s.kind==="info"){
+    const p=el("div",{class:"panel"});
+    p.append(el("div",{class:"p-head"}, el("h2",{},"상품 특징 비교"),
+      el("p",{}, s.title+" · 총 "+s.companies.length+"개 상품")));
+    const picked=state.show.filter(c=>s.companies.includes(c));
+    p.append(el("div",{class:"body"}, el("div",{class:"hint-pick",style:"padding:14px"},
+      picked.length
+        ? `표시 중인 ${picked.length}개 상품: ${picked.join(" · ")}`
+        : "이 구분은 회사·상품별 담보·특징 비교표입니다. 표 위의 「전체 / 회사명」 필터로 볼 상품을 좁힐 수 있습니다.")));
+    if(s.note) p.append(el("div",{class:"foot"}, s.note));
+    R.append(p); return;
+  }
+  const rs = s.kind==="jeonggi" ? ranked().filter(r=>r.v!=null).sort((a,b)=>a.v-b.v)
+           : s.kind==="vrefund" ? ranked().filter(r=>r.v!=null) : dedupe(ranked());
+  const panel=el("div",{class:"panel"});
+  const critMap={"환급률":`${state.year} 환급률 높은 순`,"보험료":"월 보험료 낮은 순","월연금액":"월 연금액 많은 순"};
+  if(s.kind==="rate") critMap[state.sort]=state.sort+" 높은 순";
+  if(s.kind==="vrefund") critMap["환급률"]=`${state.year} 환급률 높은 순`;
+  panel.append(el("div",{class:"p-head"}, el("h2",{},"유리한 상품 TOP 3"),
+    el("p",{}, s.title + " · " + (critMap[state.sort]||"") + (s.kind==="premium"||s.kind==="premium_gubun"||s.kind==="jeonggi" ? (" · "+Object.values(state.sub).join(" · ")) : ""))));
+  const body=el("div",{class:"body"});
+  rs.slice(0,3).forEach((r,i)=>{
+    const card=el("div",{class:"rank","data-r":String(i+1)});
+    card.append(el("div",{class:"rtop"}, el("span",{class:"badge"}, i===0?"1위":(i+1)+"위"),
+      el("div",{}, el("div",{class:"co"},r.co), el("div",{class:"prod"}, r.prod||r.rate||""))));
+    const m=el("div",{class:"metrics"});
+    const cell=(k,v,hot)=>m.append(el("div",{},el("div",{class:"k"},k),el("div",{class:"v"+(hot?" hot":"")},v)));
+    if(s.kind==="premium"){
+      const tp=state.sub["유형"]==="보증형"?"보증":"미보증", g=state.sub["성별"];
+      cell(state.sub["연령"]+" 월보험료", won((r[tp]||{})[state.sub["연령"]]?r[tp][state.sub["연령"]][g]:null), true);
+      cell("예정이율", (state.sub["유형"]==="보증형"?r.보증_이율:r.미보증_이율)||"—", false);
+    } else if(s.kind==="premium_gubun"){
+      cell(state.sub["연령"]+" "+state.sub["성별"]+" 최저", won(r.v), true);
+      cell("유형", r.gubun+(r.gubun2?(" / "+r.gubun2):""), false);
+      cell("예정이율", r.rate||"—", false);
+    } else if(s.kind==="refund"){
+      cell(state.year+" 환급률", pct(r.rr?r.rr[state.year]:null), state.sort==="환급률");
+      cell("월 보험료", won(r.monthly)+(r.usd?" ("+r.monthlyRaw+")":""), state.sort==="보험료");
+      cell("유형 / 이율", (r.type||"")+" / "+(r.rate||""), false);
+    } else if(s.kind==="jeonggi"){
+      const g=state.sub["성별"], d=(s["보험료"][g][r.co]||{});
+      cell(state.sub["심사"]+"심사 "+g+" 월보험료", won(state.sub["심사"]==="일반"?d["일반"]:d["간편"]), true);
+      cell("일반 / 간편", won(d["일반"])+" / "+won(d["간편"]), false);
+      cell("구조", r.구조||"—", false);
+    } else if(s.kind==="yeonggeum"){
+      cell("월 연금액", won(r.월연금액), true);
+      cell("가입형태", r.형태||"—", false);
+      cell("공시이율", r.공시이율||"—", false);
+      cell("최저보험료", r.최저보험료_usd?(won(r.최저보험료_원)+" ("+r.최저보험료+")"):(r.최저보험료||"—"), false);
+    } else if(s.kind==="rate"){
+      cell(state.sort, r[state.sort]==null?"—":r[state.sort].toFixed(2)+"%", true);
+      const other=s.metricCols.filter(c=>c!==state.sort && r[c]!=null)[0];
+      if(other) cell(other, r[other].toFixed(2)+"%", false);
+    } else if(s.kind==="vrefund"){
+      cell(state.year+" 환급률", pct(r.rr?r.rr[state.year]:null), true);
+      cell("유형", r.유형||"—", false);
+      cell(state.year+" 환급금", (r.환급금&&r.환급금[state.year]!=null)? Math.round(r.환급금[state.year]).toLocaleString("ko-KR")+"만원":"—", false);
+      cell("연금액", r.연금액표기||"—", false);
+    }
+    card.append(m); body.append(card);
+  });
+  panel.append(body);
+  panel.append(el("div",{class:"foot"}, `달러 상품은 1 USD = ${DATA.meta.fxRate.toLocaleString("ko-KR")}원(${DATA.meta.fxDate} 기준)으로 환산해 함께 비교합니다.`));
+  R.append(panel);
+}
+
+function refresh(){ renderConds(); renderSort(); renderFilter(); renderTable(); renderResult(); }
+document.getElementById("fxline").textContent = `※ 달러 상품 환율 적용: 1 USD = ${DATA.meta.fxRate.toLocaleString("ko-KR")}원 (${DATA.meta.fxDate} 기준)`;
+renderCats();
+</script>
+
+<link rel="stylesheet" href="kif.css?v=20261023">
+<script src="kif.js?v=20261023bb"></script>
+<!-- 포털로 돌아가기: 모든 화면 왼쪽 아래 '← 이전' '⌂ 포털 홈' -->
+<style>#kifNav{position:fixed;left:14px;bottom:14px;z-index:2147483000;display:flex;gap:6px;font-family:"Noto Sans KR","Malgun Gothic",sans-serif}#kifNav button{border:0;border-radius:999px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(15,34,64,.28);background:#0f2240;color:#fff}#kifNav button.h{background:#cb9c3a;color:#0f2240}#kifNav button:hover{filter:brightness(1.12)}body{padding-bottom:64px}@media print{#kifNav{display:none}}</style>
+<div id="kifNav" role="navigation" aria-label="포털 이동"><button type="button" id="kifBack">← 이전</button><button type="button" class="h" id="kifHome">⌂ 포털 홈</button></div>
+<script>(function(){var HOME=new URL('../index.html',location.href).href;
+if(window.top!==window){var n=document.getElementById('kifNav');if(n)n.remove();return;}
+function same(u){try{return new URL(u).origin===location.origin;}catch(e){return false;}}
+document.getElementById('kifHome').onclick=function(){location.href=HOME;};
+document.getElementById('kifBack').onclick=function(){if(history.length>1&&same(document.referrer))history.back();else location.href=HOME;};})();</script>
+</body></html>

@@ -1,0 +1,879 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><script>try{var s=JSON.parse(localStorage.getItem("kif_sso")||"null");if(!(s&&s.exp>Date.now()))location.replace("../index.html");}catch(e){location.replace("../index.html");}</script></head><body>
+<title>생명·손해보험 담보별 비교견적</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --surface-2:#f6f8fa; --ink:#182231; --muted:#5c6a7c;
+  --line:#d6dce3; --line-strong:#b9c3ce;
+  --accent:#1f5c9e; --accent-ink:#173f6b; --accent-soft:#e6eff8;
+  --good:#0f7a48; --good-soft:#e2f2e9;
+  --gold:#9a6b12; --gold-soft:#f6ecd6;
+  --rank1:#1a7a4c; --rank2:#3f7cc0; --rank3:#7a8595;
+  --shadow:0 1px 2px rgba(20,32,48,.06), 0 6px 20px -12px rgba(20,32,48,.28);
+  --radius:12px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f151d; --surface:#171f2a; --surface-2:#1e2733; --ink:#e7ecf2; --muted:#9aa7b6;
+    --line:#2b3543; --line-strong:#3a4655;
+    --accent:#5aa0e0; --accent-ink:#a9cdf0; --accent-soft:#1b2c3e;
+    --good:#48c78e; --good-soft:#16302a;
+    --gold:#d9ab5c; --gold-soft:#33291a;
+    --rank1:#48c78e; --rank2:#5aa0e0; --rank3:#8b97a6;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f151d; --surface:#171f2a; --surface-2:#1e2733; --ink:#e7ecf2; --muted:#9aa7b6;
+  --line:#2b3543; --line-strong:#3a4655;
+  --accent:#5aa0e0; --accent-ink:#a9cdf0; --accent-soft:#1b2c3e;
+  --good:#48c78e; --good-soft:#16302a;
+  --gold:#d9ab5c; --gold-soft:#33291a;
+  --rank1:#48c78e; --rank2:#5aa0e0; --rank3:#8b97a6;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,-apple-system,sans-serif;
+  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:900;letter-spacing:-.01em}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--accent)}
+
+header.app{padding:22px 24px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+header.app .kicker{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+header.app h1{font-size:21px}
+header.app p{margin:6px 0 0;color:var(--muted);font-size:12.5px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:22px 24px 80px;
+  display:grid;grid-template-columns:1fr 380px;gap:26px;align-items:start}
+@media (max-width:940px){.wrap{grid-template-columns:1fr;padding:18px 16px 64px}}
+
+.step{margin-bottom:26px}
+.step-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;
+  font-size:12px;font-weight:700;display:grid;place-items:center;flex:none}
+.step-head h2{font-size:15px}
+.step-head .hint{color:var(--muted);font-size:12px;font-weight:400}
+
+/* category cards */
+.cats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (max-width:520px){.cats{grid-template-columns:1fr}}
+.cat{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);
+  padding:14px 15px;text-align:left;transition:border-color .15s,background .15s}
+.cat:hover{border-color:var(--line-strong)}
+.cat[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.cat[disabled]{opacity:.5;cursor:not-allowed}
+.cat b{display:block;font-size:14px}
+.cat span{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
+.cats-collapsed{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  border:1px solid var(--accent);background:var(--accent-soft);border-radius:var(--radius);padding:10px 14px}
+.cats-collapsed .cur-cat b{font-size:14px}
+.cats-collapsed .cur-cat span{color:var(--accent-ink);font-size:11.5px;margin-left:8px}
+
+/* segmented */
+.seg-group{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:4px}
+.seg{display:flex;flex-direction:column;gap:6px}
+.seg .lab{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.seg .opts{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface)}
+.seg .opts button{border:0;background:transparent;padding:7px 13px;font-size:13px;color:var(--muted);
+  border-right:1px solid var(--line)}
+.seg .opts button:last-child{border-right:0}
+.seg .opts button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:700}
+.seg .opts button[disabled]{opacity:.35;cursor:not-allowed}
+
+/* cover list */
+.cov-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.cov-toolbar .count{font-size:12px;color:var(--muted)}
+.linkbtn{border:0;background:transparent;color:var(--accent);font-size:12px;font-weight:700;padding:4px 2px}
+.cov-list{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden auto;background:var(--surface);max-height:720px}
+@media (max-width:640px){.cov-list{max-height:none;overflow:visible}}
+.cov{border-bottom:1px solid var(--line)}
+.cov:last-child{border-bottom:0}
+.cov-main{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:10px 13px}
+.cov-main:hover{background:var(--surface-2)}
+.cov input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent);margin:0}
+.cov .name{font-size:13px;font-weight:500}
+.cov .name .basis{color:var(--muted);font-weight:400;font-size:11.5px;margin-left:6px}
+.cov .rng{font-size:11px;color:var(--muted);text-align:right;white-space:nowrap}
+.cov .rng b{color:var(--ink);font-weight:600}
+.cov .info{grid-column:2/4;font-size:12px;color:var(--muted);background:var(--surface-2);
+  border-left:2px solid var(--accent);padding:8px 11px;margin:0 13px 11px;border-radius:0 6px 6px 0;display:none}
+.cov.open .info{display:block}
+.cov .toggle{border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:700;padding:2px 6px}
+.selected-only .cov:not(.is-checked){display:none}
+
+.notice{border:1px dashed var(--line-strong);border-radius:10px;padding:18px;color:var(--muted);font-size:13px;background:var(--surface)}
+
+/* result panel */
+.result{position:sticky;top:16px}
+.col-side{align-self:stretch}
+@media (max-width:940px){.col-side{align-self:auto}}
+.result .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.result .p-head{padding:14px 16px;border-bottom:1px solid var(--line)}
+.result .p-head h2{font-size:14px}
+.result .p-head p{margin:4px 0 0;font-size:11.5px;color:var(--muted)}
+.result .body{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.rank{border:1px solid var(--line);border-radius:10px;padding:11px 12px;position:relative}
+.rank[data-r="1"]{border-color:var(--rank1);background:var(--good-soft)}
+.rank .rtop{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.rank .badge{font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:2px 7px;border-radius:20px;color:#fff}
+.rank[data-r="1"] .badge{background:var(--rank1)}
+.rank[data-r="2"] .badge{background:var(--rank2)}
+.rank[data-r="3"] .badge{background:var(--rank3)}
+.rank .co{font-size:14px;font-weight:700}
+.rank .prod{font-size:11px;color:var(--muted);margin-top:2px}
+.rank .figs{display:flex;justify-content:space-between;gap:8px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
+.rank .fig .k{font-size:10.5px;color:var(--muted)}
+.rank .fig .v{font-size:15px;font-weight:700}
+.rank .fig .v.total{color:var(--accent-ink)}
+.rank .miss{margin-top:7px;font-size:10.5px;color:var(--gold);background:var(--gold-soft);padding:4px 7px;border-radius:6px}
+.result .foot{padding:12px 16px;border-top:1px solid var(--line);font-size:10.5px;color:var(--muted)}
+
+.detail{margin-top:14px}
+.detail h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table.cmp{border-collapse:collapse;width:100%;font-size:11.5px}
+table.cmp th,table.cmp td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+table.cmp thead th{background:var(--surface-2);font-weight:700}
+table.cmp tbody th{font-weight:500;color:var(--muted);background:var(--surface);position:sticky;left:0;z-index:1}
+table.cmp td{font-variant-numeric:tabular-nums}
+table.cmp td.hl{background:var(--accent-soft);font-weight:700}
+
+.pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--accent-soft);color:var(--accent-ink)}
+
+.terms{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 2px}
+.chip2{font-size:11px;background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:5px 10px;color:var(--muted);line-height:1.35}
+.chip2 .k{font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;display:block}
+.chip2 b{color:var(--ink);font-weight:600}
+.chip2 .n{display:block;font-size:10px;opacity:.75;margin-top:1px}
+.cov-grp-h{display:flex;align-items:center;gap:8px;padding:8px 13px;background:var(--surface-2);border-bottom:1px solid var(--line);font-size:11.5px;font-weight:700;color:var(--accent-ink)}
+.cov-grp-h .cnt{color:var(--muted);font-weight:400}
+.cov-grp-h button{margin-left:auto;border:0;background:transparent;color:var(--accent);font-size:11px;font-weight:700;padding:2px 4px}
+.cdetail{margin-top:12px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.cdetail>summary{padding:10px 13px;background:var(--surface-2);font-size:12px;font-weight:700;cursor:pointer;list-style:none}
+.cdetail>summary::-webkit-details-marker{display:none}
+.cdetail>summary::before{content:"▸  ";color:var(--accent)}
+.cdetail[open]>summary::before{content:"▾  "}
+.cdetail .cd-body{padding:6px 13px 12px}
+.cd-sub{font-size:11px;font-weight:700;color:var(--muted);margin:10px 0 4px}
+.footnotes{margin-top:10px;border:1px solid var(--line);border-radius:8px;padding:8px 11px;background:var(--surface-2)}
+.footnotes .fn-h{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.footnotes .fn-i{font-size:11px;color:var(--muted);line-height:1.5}
+.rk-note{margin-top:6px;font-size:10.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:5px;white-space:normal}
+.foot-note{max-width:1180px;margin:0 auto;padding:0 24px;color:var(--muted);font-size:11px}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.wrap{display:block;min-width:0}
+.col-main{min-width:0;max-width:100%}
+#s4{min-width:0;max-width:100%}
+#s4body{min-width:0;max-width:100%}
+#s4body .tbl-scroll{max-width:100%}
+#s4 .detail{margin-top:0}
+#s4 .detail+.detail{margin-top:18px}
+/* 유리한 상품 TOP3 — 가로 배치 (담보 선택 아래) */
+.result{position:static}
+.col-side{align-self:auto}
+#result{margin:0 0 26px}
+#result:empty{display:none}
+#result .body{display:flex;flex-direction:row;flex-wrap:wrap;gap:12px;align-items:stretch}
+#result .rank{flex:1 1 220px;min-width:200px}
+@media (max-width:620px){#result .body{flex-direction:column}}
+.fbar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.fchip{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:5px 11px;font-size:11.5px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.fchip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff;font-weight:700}
+.fchip.all{font-weight:700;color:var(--ink)}
+.fchip.all[aria-pressed="true"]{color:#fff}
+</style>
+
+<header class="app">
+  <div class="kicker">한국보험금융 · 생명·손해보험 비교 가이드북</div>
+  <h1>생명·손해보험 담보별 비교견적</h1>
+  <p>상품 구분 → 세부 조건(연령·심사·납입·만기) → 담보를 선택하면 <b>총납입보험료가 저렴한 순</b>으로 3개 회사와 담보 보장내용을 함께 보여줍니다. · U/W 기준일 2026.09.04</p>
+</header>
+
+<div class="wrap">
+  <div class="step" id="s1">
+    <div class="step-head"><span class="step-num">1</span><h2>상품 구분</h2><span class="hint">비교할 상품 종류를 고르세요</span></div>
+    <div class="cats" id="cats"></div>
+  </div>
+
+  <div class="step" id="s2" hidden>
+    <div class="step-head"><span class="step-num">2</span><h2>세부 조건</h2><span class="hint" id="s2hint"></span></div>
+    <div class="seg-group" id="conds"></div>
+  </div>
+
+  <div class="step" id="s3" hidden>
+    <div class="step-head"><span class="step-num">3</span><h2 id="s3title">담보 선택</h2><span class="hint" id="s3hint"></span></div>
+    <div id="s3body"></div>
+  </div>
+
+  <div class="result" id="result"></div>
+
+  <div class="step" id="s4" hidden>
+    <div class="step-head"><span class="step-num">4</span><h2 id="s4title">전체 회사 비교</h2><span class="hint" id="s4hint"></span></div>
+    <div class="fbar" id="s4filter"></div>
+    <div id="s4body"></div>
+  </div>
+</div>
+<p class="foot-note">본 자료는 한국보험금융 「생명·손해보험 비교 가이드북(26.09)」의 담보·보험료 표를 옮긴 것으로, 실제 청약 시점의 요율·상품 개정에 따라 달라질 수 있습니다. 보험료는 월납 기준이며 총납입보험료 = 월보험료 합계 × 240회(20년)로 계산합니다.</p>
+
+
+<script src="../kif-data.js?v=1"></script>
+<script src="cmpdata.js?v=20261113a"></script>
+<script>
+let DATA = (window.KIFCMP_BASE ? KIFCMP_BASE('nonlife') : {}); /* 자료는 잠긴 저장소(classic/base/nonlife.json)에서 로그인한 FC만 받음 */
+if(window.KIFCMP_LOAD)DATA=KIFCMP_LOAD('nonlife',DATA);
+const money = n => n==null ? "—" : n.toLocaleString("ko-KR");
+const wonMan = n => n==null ? "—" : money(n);
+
+const state = { catId:null, sub:{}, sel:new Set(), selectedOnly:false, show:[] };
+
+/* 담보/필터 토글 시 스크롤 위치 유지 (모바일에서 맨 위로 튀는 것 방지) */
+function keepScroll(fn){
+  var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+  var cl = document.querySelector('.cov-list'); var cy = cl ? cl.scrollTop : 0;
+  fn();
+  var restore = function(){
+    window.scrollTo(0, y);
+    var c2 = document.querySelector('.cov-list'); if(c2) c2.scrollTop = cy;
+  };
+  restore();
+  if(window.requestAnimationFrame) requestAnimationFrame(restore);
+}
+
+/* ===== Step 4 (전체폭 비교) 공통 ===== */
+function hideS4(){ const s4=document.getElementById("s4"); if(s4){ s4.hidden=true; document.getElementById("s4body").innerHTML=""; document.getElementById("s4filter").innerHTML=""; } }
+function filtCos(allCos){
+  const f=(state.show||[]).filter(c=>allCos.includes(c));
+  return f.length ? allCos.filter(c=>f.includes(c)) : allCos.slice();
+}
+function s4open(title, hint, allCos, nodes){
+  const s4=document.getElementById("s4"); s4.hidden=false;
+  document.getElementById("s4title").textContent = title;
+  document.getElementById("s4hint").textContent = hint||"";
+  const fb=document.getElementById("s4filter"); fb.innerHTML="";
+  if(allCos && allCos.length){
+    const active=(state.show||[]).filter(c=>allCos.includes(c));
+    const all=el("button",{class:"fchip all","aria-pressed":String(active.length===0)}, `전체 (${allCos.length})`);
+    all.addEventListener("click",()=>{ state.show=[]; keepScroll(refresh); });
+    fb.append(all);
+    allCos.forEach(c=>{
+      const on=active.includes(c);
+      const b=el("button",{class:"fchip","aria-pressed":String(on),title:c}, c.length>22?c.slice(0,22)+"…":c);
+      b.addEventListener("click",()=>{ state.show = on ? state.show.filter(x=>x!==c) : (state.show||[]).concat([c]); keepScroll(refresh); });
+      fb.append(b);
+    });
+  }
+  const body=document.getElementById("s4body"); body.innerHTML="";
+  (nodes||[]).forEach(n=>{ if(n) body.append(n); });
+}
+
+const CATALOG = [
+  {id:"long",       cat:"장기종합보험",     label:"장기종합보험",     sub:"무해약형·건강고지·일반·갱신"},
+  {id:"child",      cat:"태아·어린이보험",   label:"태아·어린이보험",   sub:"어린이 10세 · 남/여"},
+  {id:"silson",     cat:"실손의료보험",     label:"실손의료보험",     sub:"표준 · 유병자 · 노후"},
+  {id:"cancer",     cat:"암보험",           label:"암보험",           sub:"손보 · 생보 최대보장"},
+  {id:"gh_life",    cat:"건강보험 생명보험", label:"건강보험 생명보험", sub:"40세 무해약 · 남/여"},
+  {id:"simple_life",cat:"간편심사 생명보험", label:"간편심사 생명보험", sub:"355 · 3·10·5"},
+  {id:"simple_dmg", cat:"간편심사 손해보험", label:"간편심사 손해보험", sub:"초경증 · 355"},
+  {id:"dementia",   cat:"치매·간병보험",     label:"치매·간병보험",     sub:"생보 · 손보 통합"},
+  {id:"driver",     cat:"운전자보험",       label:"운전자보험",       sub:"담보 비교"},
+  {id:"teeth",      cat:"치아보험",         label:"치아보험",         sub:"생보 · 손보"},
+  {id:"pet",        cat:"반려동물보험",     label:"반려동물보험",     sub:"반려견"},
+];
+
+function el(tag, attrs={}, ...kids){
+  const e=document.createElement(tag);
+  for(const[k,v]of Object.entries(attrs)){
+    if(k==="class")e.className=v; else if(k==="html")e.innerHTML=v;
+    else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);
+    else if(v!=null)e.setAttribute(k,v);
+  }
+  for(const k of kids){ if(k!=null) e.append(k.nodeType?k:document.createTextNode(k)); }
+  return e;
+}
+const uniq = a => [...new Set(a)];
+const groupsOf = cat => DATA.groups.filter(g=>g.category===cat);
+
+/* ================= STEP 1 ================= */
+function renderCats(){
+  const box=document.getElementById("cats"); box.innerHTML="";
+  const cur=CATALOG.find(c=>c.id===state.catId);
+  if(cur && state.catCollapsed){
+    box.className="cats-collapsed";
+    box.append(
+      el("div",{class:"cur-cat"}, el("b",{},cur.label), el("span",{},cur.sub)),
+      el("button",{class:"linkbtn",onclick:()=>{state.catCollapsed=false;renderCats();}},"다른 상품 선택 ▾")
+    );
+    return;
+  }
+  box.className="cats";
+  CATALOG.forEach(c=>{
+    const b=el("button",{class:"cat","aria-pressed":String(state.catId===c.id)},
+      el("b",{},c.label), el("span",{},c.sub));
+    b.addEventListener("click",()=>selectCat(c.id));
+    box.append(b);
+  });
+}
+function selectCat(id){
+  state.catId=id; state.sub={}; state.sel.clear(); state.catCollapsed=true; state.show=[]; hideS4();
+  const gs=groupsOf(CATALOG.find(c=>c.id===id).cat);
+  // defaults
+  if(id==="long"){ state.sub={type:"무해약형",sex:"남",age:40}; }
+  else if(id==="silson"){ state.sub={band:DATA.silson.bands[2].id,sex:"남"}; }
+  else if(id==="cancer"){ state.sub={variant:"손해보험"}; }
+  else if(id==="driver"){ state.sub={variant:"A"}; }
+  else if(id==="teeth"){ state.sub={variant:"생명보험"}; }
+  else if(id==="dementia"){ state.sub={sex:"남",plan:"치매진단·간병"}; }
+  else if(id==="pet"){ state.sub={}; }
+  else if(gs.length){
+    const types=uniq(gs.map(g=>g.type));
+    state.sub={type:types[0], sex:"남"};
+    const ages=uniq(gs.filter(g=>g.type===types[0]).map(g=>g.age));
+    if(ages.length) state.sub.age=ages.includes(40)?40:ages[0];
+  }
+  renderCats();
+  document.getElementById("s2").hidden=false;
+  refresh();
+}
+
+/* ================= RESOLUTION ================= */
+function resolveTarget(){
+  const c=state.catId, s=state.sub;
+  if(c==="silson") return {kind:"silson"};
+  if(c==="pet") return {kind:"total", tg:DATA.totalGroups.find(t=>t.id==="pet")};
+  if(c==="dementia") return {kind:"total", tg:DATA.totalGroups.find(t=>t.id==="dementia_40")};
+  if(c==="cancer") return {kind:"info", ig:DATA.infoGroups.find(g=>g.id===(s.variant==="생명보험"?"cancer_life":"cancer_dmg"))};
+  if(c==="teeth") return {kind:"info", ig:DATA.infoGroups.find(g=>g.id===(s.variant==="손해보험"?"teeth_dmg":"teeth_life"))};
+  if(c==="driver") return {kind:"info", ig:DATA.infoGroups.find(g=>g.id==="driver_all")};
+  if(c==="long"){
+    const infoMap={"일반형":"jong_ilban","갱신형":"jong_gaengsin","건강고지 50세":"jong_gogi50"};
+    if(infoMap[s.type]) return {kind:"info", ig:DATA.infoGroups.find(g=>g.id===infoMap[s.type])};
+  }
+  const ex=(DATA.catExtras&&DATA.catExtras[c])||[];
+  const hit=ex.find(e=>e.label===s.type);
+  if(hit) return {kind:"info", ig:DATA.infoGroups.find(g=>g.id===hit.id)};
+  // cover-select
+  const cat=CATALOG.find(x=>x.id===c).cat;
+  let gs=groupsOf(cat).filter(g=>g.type===s.type);
+  if(s.age!=null) gs=gs.filter(g=>g.age===s.age);
+  gs=gs.filter(g=>g.sex===s.sex);
+  return {kind:"cover", group:gs[0]||null};
+}
+
+function refresh(){
+  renderConds();
+  const tgt=resolveTarget();
+  if(tgt.kind==="cover" && tgt.group) renderTerms(tgt.group);
+  // keep valid selections
+  if(tgt.kind==="cover" && tgt.group){
+    const keys=new Set(tgt.group.covers.map(cv=>cv.key));
+    state.sel=new Set([...state.sel].filter(k=>keys.has(k)));
+  }
+  renderStep3(tgt);
+  renderResult(tgt);
+}
+
+/* ================= STEP 2 : condition segments ================= */
+function seg(label, options, cur, onPick){
+  const s=el("div",{class:"seg"}, el("span",{class:"lab"},label));
+  const o=el("div",{class:"opts"});
+  options.forEach(opt=>{
+    const val = typeof opt==="object"?opt.v:opt;
+    const txt = typeof opt==="object"?opt.t:opt;
+    const b=el("button",{"aria-pressed":String(val===cur)},txt);
+    b.addEventListener("click",()=>onPick(val));
+    o.append(b);
+  });
+  s.append(o); return s;
+}
+function renderConds(){
+  const box=document.getElementById("conds"); box.innerHTML="";
+  const c=state.catId, s=state.sub, hint=document.getElementById("s2hint");
+  if(c==="silson"){
+    hint.textContent="유형·연령대와 성별을 선택 (담보 고정)";
+    box.append(seg("유형·연령대", DATA.silson.bands.map(b=>({v:b.id,t:b.label})), s.band,
+      v=>{s.band=v; refresh();}));
+    box.append(seg("성별", ["남","여"], s.sex, v=>{s.sex=v; refresh();}));
+    return;
+  }
+  if(c==="cancer"){
+    hint.textContent="손해보험 / 생명보험 최대보장 비교";
+    box.append(seg("유형", ["손해보험","생명보험"], s.variant, v=>{s.variant=v; refresh();}));
+    return;
+  }
+  if(c==="teeth"){
+    hint.textContent="생명보험 / 손해보험 보장내용 비교";
+    box.append(seg("유형", ["생명보험","손해보험"], s.variant, v=>{s.variant=v; refresh();}));
+    return;
+  }
+  if(c==="driver"){
+    hint.textContent="손해보험 10개사 담보 + 형사합의·변호사선임 (고정)";
+    return;
+  }
+  if(c==="dementia"){
+    hint.textContent="플랜·성별 선택 (저렴한 순 · 환급률 함께 표시)";
+    const dtg=DATA.totalGroups.find(x=>x.id==="dementia_40");
+    box.append(seg("플랜", dtg.plans, s.plan||dtg.plans[0], v=>{s.plan=v;refresh();}));
+    box.append(seg("성별",["남","여"],s.sex,v=>{s.sex=v;refresh();}));
+    return;
+  }
+  if(c==="pet"){ hint.textContent="반려견 · 마티즈 1세 남 · 70%형 기준 (고정)"; return; }
+
+  // generic cover-select categories
+  const cat=CATALOG.find(x=>x.id===c).cat;
+  const gs=groupsOf(cat);
+  const covTypes=uniq(gs.map(g=>g.type));
+  const extras=((DATA.catExtras&&DATA.catExtras[c])||[]).map(e=>e.label);
+  let types=covTypes.concat(extras);
+  if(c==="long") types=["무해약형","건강고지 10년","일반형","갱신형","건강고지 50세"];
+  hint.textContent = c==="long" ? "유형 → 성별 → 연령 순으로 선택" : "유형 선택 (보험료 비교형 / 참고 표)";
+  if(types.length>1) box.append(seg("유형", types, s.type, v=>{
+    s.type=v;
+    const ages=uniq(gs.filter(g=>g.type===v).map(g=>g.age));
+    if(ages.length && !ages.includes(s.age)) s.age=ages.includes(40)?40:ages[0];
+    refresh();
+  }));
+  const isInfo = (c==="long" && ["일반형","갱신형","건강고지 50세"].includes(s.type))
+              || extras.includes(s.type);
+  if(!isInfo){
+    box.append(seg("성별", ["남","여"], s.sex, v=>{s.sex=v; refresh();}));
+    const ages=uniq(gs.filter(g=>g.type===s.type).map(g=>g.age)).sort((a,b)=>a-b);
+    if(ages.length>1) box.append(seg("연령", ages.map(a=>({v:a,t:a+"세"})), s.age, v=>{s.age=v; refresh();}));
+  }
+}
+
+function renderTerms(g){
+  const box=document.getElementById("conds");
+  if(!g.terms || !g.terms.length) return;
+  const strip=el("div",{class:"terms",style:"width:100%;margin-top:8px"});
+  strip.append(el("div",{class:"seg",style:"width:100%"},
+    el("span",{class:"lab"},"기준 조건 (가이드북 자료 고정 · 참고용)")));
+  g.terms.forEach(t=>{
+    strip.append(el("div",{class:"chip2"},
+      el("span",{class:"k"},t.k), el("b",{},t.v),
+      t.note? el("span",{class:"n"},t.note): null));
+  });
+  box.append(strip);
+}
+
+/* ================= STEP 3 ================= */
+function renderStep3(tgt){
+  const s3=document.getElementById("s3"), body=document.getElementById("s3body");
+  const title=document.getElementById("s3title"), hint=document.getElementById("s3hint");
+  body.innerHTML=""; s3.hidden=false;
+
+  if(tgt.kind==="silson"){
+    title.textContent="보장 내용"; hint.textContent="실손은 표준화되어 담보 선택 없이 연령대 값이 적용됩니다";
+    const b=DATA.silson.bands.find(x=>x.id===state.sub.band);
+    if(b) body.append(el("div",{class:"notice",style:"border-style:solid"},
+      el("b",{},b.label+" 보장 기준"), el("div",{style:"margin-top:6px;color:var(--muted)"},b.desc)));
+    return;
+  }
+  if(tgt.kind==="total"){
+    title.textContent="보장 내용"; hint.textContent=tgt.tg.title+" · "+tgt.tg.source;
+    body.append(el("div",{class:"notice",style:"border-style:solid"},
+      el("b",{},tgt.tg.title), el("div",{style:"margin-top:6px;color:var(--muted)"},tgt.tg.note)));
+    return;
+  }
+  if(tgt.kind==="info"){
+    title.textContent="보장 내용 비교"; hint.textContent=tgt.ig.title+" · "+tgt.ig.source;
+    body.append(el("div",{class:"notice",style:"border-style:solid"},
+      el("div",{style:"color:var(--muted)"},tgt.ig.note)));
+    const cos=filtCos(tgt.ig.companies);
+    s4open("보장내용 비교", tgt.ig.title+" · "+tgt.ig.source, tgt.ig.companies, [infoTable(tgt.ig, cos)]);
+    return;
+  }
+  // cover-select
+  const g=tgt.group;
+  if(!g){ title.textContent="담보 선택"; hint.textContent="";
+    body.append(el("div",{class:"notice"},"해당 조건의 자료가 없습니다.")); return; }
+  title.textContent="담보 선택"; hint.textContent=g.title+" · "+g.source;
+  const tb=el("div",{class:"cov-toolbar"},
+    el("button",{class:"linkbtn",onclick:()=>{g.covers.forEach(cv=>state.sel.add(cv.key));afterSel();}},"전체 선택"),
+    el("button",{class:"linkbtn",onclick:()=>{state.sel.clear();afterSel();}},"전체 해제"),
+    el("label",{style:"font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-left:auto"},
+      (()=>{const cb=el("input",{type:"checkbox"});cb.checked=state.selectedOnly;
+        cb.addEventListener("change",()=>{state.selectedOnly=cb.checked;keepScroll(refresh);});return cb;})(),
+      "선택 담보만 보기"),
+    el("span",{class:"count",id:"selcount"},"")
+  );
+  body.append(tb);
+  const list=el("div",{class:"cov-list"+(state.selectedOnly?" selected-only":"")});
+  const mkRow=cv=>{
+    const vals=g.companies.map(co=>cv.premium[co]).filter(v=>v!=null);
+    const lo=vals.length?Math.min(...vals):null, hi=vals.length?Math.max(...vals):null;
+    const checked=state.sel.has(cv.key);
+    const row=el("div",{class:"cov"+(checked?" is-checked":"")});
+    const cb=el("input",{type:"checkbox"}); cb.checked=checked;
+    cb.addEventListener("change",()=>{ cb.checked?state.sel.add(cv.key):state.sel.delete(cv.key); afterSel(); });
+    const name=el("div",{class:"name"}, cv.label, el("span",{class:"basis"},cv.basis?("가입금액 "+cv.basis):""));
+    const rng=el("div",{class:"rng"}, "월 ", el("b",{},money(lo)), "~", el("b",{},money(hi)), "원");
+    const main=el("div",{class:"cov-main"}, cb, name, rng);
+    const desc=DATA.desc[cv.key] || ("가이드북 담보명 「"+cv.label+"」. 회사별 세부 지급조건은 상품 약관을 확인하세요.");
+    const t=el("button",{class:"toggle"},"설명 ▾");
+    t.addEventListener("click",()=>{row.classList.toggle("open");
+      t.textContent=row.classList.contains("open")?"설명 ▴":"설명 ▾";});
+    name.append(el("span",{style:"display:block"}), t);
+    row.append(main, el("div",{class:"info"}, desc + (cv.note?" ("+cv.note+")":"")));
+    return row;
+  };
+  const grps=[]; const byG={};
+  g.covers.forEach(cv=>{ const gg=cv.grp||"기타"; if(!byG[gg]){byG[gg]=[];grps.push(gg);} byG[gg].push(cv); });
+  grps.forEach(gg=>{
+    const items=byG[gg];
+    const nsel=items.filter(cv=>state.sel.has(cv.key)).length;
+    const h=el("div",{class:"cov-grp-h"}, gg,
+      el("span",{class:"cnt"}, nsel? `(${nsel}/${items.length})` : `(${items.length})`));
+    const allSel = nsel===items.length;
+    const gb=el("button",{}, allSel?"그룹 해제":"그룹 전체선택");
+    gb.addEventListener("click",()=>{ items.forEach(cv=> allSel? state.sel.delete(cv.key): state.sel.add(cv.key)); afterSel(); });
+    h.append(gb);
+    list.append(h);
+    items.forEach(cv=>list.append(mkRow(cv)));
+  });
+  body.append(list);
+  if(g.footnotes && g.footnotes.length){
+    const fn=el("div",{class:"footnotes"});
+    fn.append(el("div",{class:"fn-h"},"표기 안내"));
+    g.footnotes.forEach(f=>fn.append(el("div",{class:"fn-i"}, "※ "+f)));
+    body.append(fn);
+  }
+  if(g.remarks && Object.keys(g.remarks).length){
+    const rm=el("details",{class:"cdetail",style:"margin-top:10px"});
+    rm.append(el("summary",{},"회사별 비고 (가이드북 원표 비고·참고 행)"));
+    const bd=el("div",{class:"cd-body"});
+    g.companies.forEach(co=>{ if(g.remarks[co])
+      bd.append(el("div",{style:"font-size:11.5px;margin:4px 0;padding-left:2px"},
+        el("b",{},co+" : "), g.remarks[co])); });
+    rm.append(bd); body.append(rm);
+  }
+  const n=state.sel.size, sc=document.getElementById("selcount");
+  sc.textContent = n? `선택 ${n}개 / 전체 ${g.covers.length}개` : `담보를 선택하세요 (전체 ${g.covers.length}개)`;
+}
+function afterSel(){ keepScroll(refresh); }
+
+function infoTable(ig, cos){
+  cos = cos || ig.companies;
+  const sc=el("div",{class:"tbl-scroll"});
+  const t=el("table",{class:"cmp"});
+  const head=el("tr"); head.append(el("th",{},"항목"));
+  cos.forEach(co=>head.append(el("th",{style:"white-space:normal;min-width:110px"},co)));
+  t.append(el("thead",{},head));
+  const tb=el("tbody");
+  if(ig.products){
+    const pr=el("tr"); pr.append(el("th",{},"상품명"));
+    cos.forEach(co=>pr.append(el("td",{style:"white-space:normal;min-width:120px"}, ig.products[co]||"—")));
+    tb.append(pr);
+  }
+  ig.rows.forEach(r=>{
+    const tr=el("tr"); tr.append(el("th",{},r.label));
+    cos.forEach(co=>{
+      const v=r.vals[co];
+      tr.append(el("td",{style:"white-space:normal"}, v&&v!=="-"?v:"—"));
+    });
+    tb.append(tr);
+  });
+  t.append(tb); sc.append(t); return sc;
+}
+
+/* ================= RESULT PANEL ================= */
+function renderResult(tgt){
+  const R=document.getElementById("result"); R.innerHTML="";
+  if(!state.catId){ R.innerHTML=""; hideS4(); return; }
+  if(tgt.kind==="silson") return silsonResult(R);
+  if(tgt.kind==="total") return totalResult(R, tgt.tg);
+  if(tgt.kind==="info"){
+    R.append(panelNote(tgt.ig.title,"이 상품군은 가이드북에 담보별 보험료가 없어 보장내용 비교표만 제공합니다. 아래 4단계 표(회사 필터)를 확인하세요."));
+    return;
+  }
+  // cover
+  const g=tgt.group;
+  const panel=el("div",{class:"panel"});
+  panel.append(el("div",{class:"p-head"}, el("h2",{},"저렴한 순 TOP 3"),
+    el("p",{}, g? g.title : "조건을 선택하세요")));
+  const body=el("div",{class:"body"});
+  if(!g || state.sel.size===0){
+    body.append(el("div",{class:"notice"}, g? "담보를 1개 이상 선택하면 순위가 계산됩니다." : "해당 조건의 자료가 없습니다."));
+    panel.append(body); R.append(panel); hideS4(); return;
+  }
+  const sel=[...state.sel];
+  const cos=filtCos(g.companies);
+  let rows=g.companies.map(co=>{
+    let sum=0, miss=[];
+    sel.forEach(k=>{ const cv=g.covers.find(x=>x.key===k); const v=cv.premium[co];
+      if(v==null) miss.push(cv.label); else sum+=v; });
+    return {co, prod:g.products[co], monthly:sum, total:sum*g.payMonths, miss};
+  }).filter(r=>r.monthly>0).sort((a,b)=>a.total-b.total);
+  if(state.show.length) rows=rows.filter(r=>cos.includes(r.co));
+  rows.slice(0,3).forEach((r,i)=>{
+    const card=el("div",{class:"rank","data-r":String(i+1)});
+    card.append(el("div",{class:"rtop"},
+      el("span",{class:"badge"}, i===0?"최저":(i+1)+"위"),
+      el("div",{}, el("div",{class:"co"},r.co), el("div",{class:"prod"},r.prod||""))));
+    card.append(el("div",{class:"figs"},
+      el("div",{class:"fig"}, el("div",{class:"k"},"월 보험료 합계"), el("div",{class:"v mono"}, money(r.monthly)+"원")),
+      el("div",{class:"fig",style:"text-align:right"}, el("div",{class:"k"},"총 납입보험료 (20년)"),
+        el("div",{class:"v total mono"}, money(r.total)+"원"))));
+    if(r.miss.length) card.append(el("div",{class:"miss"}, "미제공 담보 "+r.miss.length+"개 제외: "+r.miss.join(", ")));
+    if(g.remarks && g.remarks[r.co]) card.append(el("div",{class:"rk-note"}, "비고 · "+g.remarks[r.co]));
+    body.append(card);
+  });
+  panel.append(body);
+  panel.append(el("div",{class:"foot"}, "월 보험료 합계 × "+g.payMonths+"회 = 총 납입보험료. 회사가 제공하지 않는 선택 담보는 합계에서 제외됩니다."));
+  R.append(panel);
+  const nodes=[cmpTable(g, sel, rows)];
+  if(g.category==="장기종합보험") nodes.push(bojang(rows.slice(0,3).map(r=>r.co)));
+  coverDetailBlocks(sel, rows.slice(0,3).map(r=>r.co)).forEach(d=>nodes.push(d));
+  s4open("전체 회사 담보별 비교", g.title+" · 선택 담보 "+sel.length+"개", g.companies, nodes);
+}
+
+/* 선택 담보에 연결된 상세 보장내용 (p.19~22, p.4 등) */
+function coverDetailBlocks(sel, topCos){
+  const out=[];
+  (DATA.coverDetail||[]).forEach(cd=>{
+    if(!cd.appliesTo.some(k=>sel.includes(k))) return;
+    const box=el("details",{class:"cdetail"});
+    box.append(el("summary",{}, cd.title + "  ·  " + cd.source));
+    const bd=el("div",{class:"cd-body"});
+    bd.append(el("div",{style:"font-size:10.5px;color:var(--muted);margin:4px 0 2px"},
+      "선택하신 담보와 관련된 보장 상세입니다. TOP 3 회사는 강조 표시됩니다."));
+    cd.blocks.forEach(bl=>{
+      if(!bl.rows.length) return;
+      bd.append(el("div",{class:"cd-sub"}, bl.subtitle));
+      const sc=el("div",{class:"tbl-scroll"}); const t=el("table",{class:"cmp"});
+      const htr=el("tr"); htr.append(el("th",{},"항목"));
+      bl.companies.forEach(co=>htr.append(el("th",{class:topCos.includes(co)?"hl":""}, co)));
+      t.append(el("thead",{},htr));
+      const tb=el("tbody");
+      bl.rows.forEach(r=>{
+        const tr=el("tr"); tr.append(el("th",{},r.label));
+        bl.companies.forEach(co=>{ const v=r.vals[co];
+          tr.append(el("td",{class:topCos.includes(co)?"hl":"",style:"white-space:normal"}, v&&v!=="-"?v:"—")); });
+        tb.append(tr);
+      });
+      t.append(tb); sc.append(t); bd.append(sc);
+    });
+    box.append(bd); out.push(box);
+  });
+  return out;
+}
+function panelNote(title, msg){
+  const p=el("div",{class:"panel"});
+  p.append(el("div",{class:"p-head"}, el("h2",{},title)));
+  p.append(el("div",{class:"body"}, el("div",{class:"notice"}, msg)));
+  return p;
+}
+
+function cmpTable(g, sel, rows){
+  const wrap=el("div",{class:"detail"});
+  wrap.append(el("h3",{},"선택 담보별 · 가입금액 & 월 보험료 (원)"));
+  const order=rows.map(r=>r.co);
+  const sc=el("div",{class:"tbl-scroll"}); const t=el("table",{class:"cmp"});
+  const htr=el("tr"); htr.append(el("th",{},"담보"), el("th",{},"가입금액"));
+  order.forEach(co=>htr.append(el("th",{},co)));
+  t.append(el("thead",{},htr));
+  const tb=el("tbody");
+  sel.forEach(k=>{
+    const cv=g.covers.find(x=>x.key===k);
+    const tr=el("tr"); tr.append(el("th",{},cv.label), el("td",{style:"color:var(--muted)"}, cv.basis||"—"));
+    order.forEach((co,i)=>{ const v=cv.premium[co]; tr.append(el("td",{class:i<3?"hl":""}, v==null?"—":money(v))); });
+    tb.append(tr);
+  });
+  const tr1=el("tr",{style:"border-top:2px solid var(--line-strong)"});
+  tr1.append(el("th",{style:"color:var(--ink);font-weight:700"},"월 합계"), el("td",{}));
+  order.forEach((co,i)=>{ const r=rows.find(x=>x.co===co); tr1.append(el("td",{class:i<3?"hl":"",style:"font-weight:700"}, r?money(r.monthly):"—")); });
+  tb.append(tr1);
+  const tr2=el("tr"); tr2.append(el("th",{style:"color:var(--ink);font-weight:700"},"총 납입(20년)"), el("td",{}));
+  order.forEach((co,i)=>{ const r=rows.find(x=>x.co===co); tr2.append(el("td",{class:i<3?"hl":""}, r?money(r.total)+"원":"—")); });
+  tb.append(tr2);
+  if(g.remarks && Object.keys(g.remarks).length){
+    const tr3=el("tr",{style:"border-top:1px solid var(--line-strong)"});
+    tr3.append(el("th",{style:"color:var(--muted)"},"비고"), el("td",{}));
+    order.forEach((co,i)=>tr3.append(el("td",{class:i<3?"hl":"",style:"white-space:normal;font-size:10.5px"}, g.remarks[co]||"—")));
+    tb.append(tr3);
+  }
+  t.append(tb); sc.append(t); wrap.append(sc);
+  return wrap;
+}
+function bojang(cos){
+  const wrap=el("div",{class:"detail"});
+  wrap.append(el("h3",{},"TOP 3 상품 보장내용 (가이드북 p.3 · p.4)"));
+  wrap.append(el("div",{style:"font-size:11px;color:var(--muted);margin-bottom:6px"},
+    "※ 최대가입한도(40세·무해약환급형) 및 보종별 만기·납입기간"));
+  const mk=(ref)=>{
+    const sc=el("div",{class:"tbl-scroll",style:"margin-bottom:10px"}); const t=el("table",{class:"cmp"});
+    const htr=el("tr"); htr.append(el("th",{},"항목")); cos.forEach(co=>htr.append(el("th",{},co)));
+    t.append(el("thead",{},htr));
+    const tb=el("tbody");
+    ref.rows.forEach(r=>{ if(!r.label) return;
+      const vs=cos.map(co=>r.vals[co]);
+      if(vs.every(v=>!v||v==="-")) return;
+      const tr=el("tr"); tr.append(el("th",{},r.label));
+      vs.forEach(v=>tr.append(el("td",{style:"white-space:normal"}, v&&v!=="-"?v:"—")));
+      tb.append(tr);
+    });
+    t.append(tb); sc.append(t); return sc;
+  };
+  wrap.append(el("div",{style:"font-size:11.5px;font-weight:700;margin:4px 0"},"최대가입한도"));
+  wrap.append(mk(DATA.ref_hando));
+  wrap.append(el("div",{style:"font-size:11.5px;font-weight:700;margin:4px 0"},"보종별 만기·납입기간"));
+  wrap.append(mk(DATA.ref_bojong));
+  return wrap;
+}
+
+/* ---- total-rank (치매간병 / 반려동물) ---- */
+function totalResult(R, tg){
+  const sexed=tg.sexed, sex=state.sub.sex||"남";
+  const plan = tg.plans ? (state.sub.plan || tg.plans[0]) : null;
+  const val = e => plan ? (e.prem[plan] ? e.prem[plan][sex] : null)
+                        : e.prem[sexed ? sex : "공통"];
+  const allCos=tg.entries.map(e=>e.company);
+  let rows=tg.entries.map(e=>({...e, m:val(e)})).filter(r=>r.m!=null).sort((a,b)=>a.m-b.m);
+  if(state.show.length){ const f=filtCos(allCos); rows=rows.filter(r=>f.includes(r.company)); }
+  const panel=el("div",{class:"panel"});
+  panel.append(el("div",{class:"p-head"}, el("h2",{},"보험료 저렴한 순"),
+    el("p",{}, tg.title + (plan?(" · "+plan):"") + (sexed?(" · "+sex):"") )));
+  const body=el("div",{class:"body"});
+  rows.slice(0,3).forEach((r,i)=>{
+    const card=el("div",{class:"rank","data-r":String(i+1)});
+    card.append(el("div",{class:"rtop"},
+      el("span",{class:"badge"}, i===0?"최저":(i+1)+"위"),
+      el("div",{}, el("div",{class:"co"},r.company), el("div",{class:"prod"},r.product||""))));
+    card.append(el("div",{class:"figs"},
+      el("div",{class:"fig"}, el("div",{class:"k"},"월 보험료"), el("div",{class:"v mono"},money(r.m)+"원")),
+      el("div",{class:"fig",style:"text-align:right"}, el("div",{class:"k"},"연 보험료"), el("div",{class:"v mono"},money(r.m*12)+"원"))));
+    body.append(card);
+  });
+  panel.append(body);
+  panel.append(el("div",{class:"foot"}, tg.note));
+  R.append(panel);
+  const s4nodes=[];
+  // full list + 보장내용
+  const wrap=el("div",{class:"detail"});
+  wrap.append(el("h3",{},"전체 회사 비교"));
+  const sc=el("div",{class:"tbl-scroll"}); const t=el("table",{class:"cmp"});
+  const htr=el("tr"); htr.append(el("th",{},"회사"), el("th",{},"월 보험료"));
+  tg.infoKeys.forEach(k=>htr.append(el("th",{},k)));
+  t.append(el("thead",{},htr));
+  const tb=el("tbody");
+  rows.forEach((r,i)=>{
+    const tr=el("tr");
+    tr.append(el("th",{},r.company), el("td",{class:i<3?"hl":""},money(r.m)));
+    tg.infoKeys.forEach(k=>tr.append(el("td",{style:"white-space:normal"}, r.info[k]||"—")));
+    tb.append(tr);
+  });
+  t.append(tb); sc.append(t); wrap.append(sc);
+  s4nodes.push(wrap);
+
+  // 플랜별 보험료 + 환급률 (치매간병)
+  if(tg.plans){
+    const w=el("div",{class:"detail"});
+    w.append(el("h3",{},"플랜별 월 보험료 & 장기요양 환급률 (40세 "+sex+")"));
+    const s3=el("div",{class:"tbl-scroll"}); const t3=el("table",{class:"cmp"});
+    const h3=el("tr"); h3.append(el("th",{},"회사"));
+    tg.plans.forEach(p=>h3.append(el("th",{}, p+" 월P")));
+    (tg.refundKeys||[]).forEach(k=>h3.append(el("th",{}, k+" 환급")));
+    t3.append(el("thead",{},h3));
+    const b3=el("tbody");
+    rows.forEach((r,i)=>{
+      const tr=el("tr"); tr.append(el("th",{},r.company));
+      tg.plans.forEach(p=>{
+        const v=r.prem[p]?r.prem[p][sex]:null;
+        tr.append(el("td",{class:(p===plan&&i<3)?"hl":""}, v==null?"—":money(v)));
+      });
+      (tg.refundKeys||[]).forEach(k=>tr.append(el("td",{style:"white-space:normal"}, (r.refund&&r.refund[k])||"—")));
+      b3.append(tr);
+    });
+    t3.append(b3); s3.append(t3); w.append(s3);
+    w.append(el("div",{style:"font-size:10.5px;color:var(--muted);margin-top:5px"},
+      "※ 「장기요양」플랜 = 장기요양등급(1~5) 시설·재가급여 중심. 「치매진단·간병」플랜 = 경도·중등도·중증 치매 진단비+간병자금 중심. 환급률은 40세 남자 20년납 기준(가이드북 p.28~30)."));
+    s4nodes.push(w);
+  }
+
+  (tg.extraTables||[]).forEach(et=>{
+    if(!et.rows || !et.rows.length) return;
+    const w=el("div",{class:"detail"});
+    w.append(el("h3",{}, et.title));
+    const s2=el("div",{class:"tbl-scroll"}); const t2=el("table",{class:"cmp"});
+    const h2=el("tr"); h2.append(el("th",{},"항목")); et.companies.forEach(co=>h2.append(el("th",{},co)));
+    t2.append(el("thead",{},h2));
+    const b2=el("tbody");
+    et.rows.forEach(r=>{
+      const tr=el("tr"); tr.append(el("th",{},r.label));
+      et.companies.forEach(co=>{ const v=r.vals[co]; tr.append(el("td",{style:"white-space:normal"}, v&&v!=="-"?v:"—")); });
+      b2.append(tr);
+    });
+    t2.append(b2); s2.append(t2); w.append(s2); s4nodes.push(w);
+  });
+
+  s4open("전체 회사 비교", tg.title + (plan?(" · "+plan):"") + (sexed?(" · "+sex):""), allCos, s4nodes);
+}
+
+/* ---- silson ---- */
+function silsonResult(R){
+  const b=DATA.silson.bands.find(x=>x.id===state.sub.band); const sex=state.sub.sex||"남";
+  const panel=el("div",{class:"panel"});
+  panel.append(el("div",{class:"p-head"}, el("h2",{},"실손 보험료 저렴한 순"),
+    el("p",{}, b? b.label+" · "+sex : "연령대를 선택하세요")));
+  const body=el("div",{class:"body"});
+  if(!b){ body.append(el("div",{class:"notice"},"위에서 유형·연령대를 선택하세요.")); panel.append(body); R.append(panel); hideS4(); return; }
+  const allCos=DATA.silson.companies.slice();
+  let rows=allCos.map(co=>({co, m:b.prem[sex][co]})).filter(r=>r.m!=null).sort((a,b)=>a.m-b.m);
+  if(state.show.length){ const f=filtCos(allCos); rows=rows.filter(r=>f.includes(r.co)); }
+  rows.slice(0,3).forEach((r,i)=>{
+    const card=el("div",{class:"rank","data-r":String(i+1)});
+    card.append(el("div",{class:"rtop"}, el("span",{class:"badge"}, i===0?"최저":(i+1)+"위"), el("div",{class:"co"},r.co)));
+    card.append(el("div",{class:"figs"},
+      el("div",{class:"fig"}, el("div",{class:"k"},"월 보험료"), el("div",{class:"v mono"},money(r.m)+"원")),
+      el("div",{class:"fig",style:"text-align:right"}, el("div",{class:"k"},"연 보험료"), el("div",{class:"v mono"},money(r.m*12)+"원"))));
+    body.append(card);
+  });
+  panel.append(body);
+  panel.append(el("div",{class:"foot"}, b.desc));
+  R.append(panel);
+
+  const w1=el("div",{class:"detail"});
+  w1.append(el("h3",{},"전체 회사 월 보험료 ("+sex+", 원)"));
+  const sc=el("div",{class:"tbl-scroll"}); const t=el("table",{class:"cmp"});
+  t.append(el("thead",{},el("tr",{},el("th",{},"회사"),el("th",{},"월 보험료"),el("th",{},"연 보험료"))));
+  const tb=el("tbody");
+  rows.forEach((r,i)=>tb.append(el("tr",{}, el("th",{},r.co), el("td",{class:i<3?"hl":""},money(r.m)), el("td",{},money(r.m*12)))));
+  t.append(tb); sc.append(t); w1.append(sc);
+
+  const w2=el("div",{class:"detail"});
+  w2.append(el("h3",{},"실손 가입조건 (가이드북 p.16)"));
+  const sc2=el("div",{class:"tbl-scroll"}); const t2=el("table",{class:"cmp"});
+  const htr=el("tr"); htr.append(el("th",{},"항목")); DATA.silson.condCompanies.forEach(c=>htr.append(el("th",{},c)));
+  t2.append(el("thead",{},htr));
+  const tb2=el("tbody");
+  DATA.silson.cond.forEach(r=>{
+    const tr=el("tr"); tr.append(el("th",{},r.k));
+    r.v.forEach(v=>tr.append(el("td",{style:"white-space:normal"}, v&&v!=="-"?v:"—")));
+    tb2.append(tr);
+  });
+  t2.append(tb2); sc2.append(t2); w2.append(sc2);
+
+  s4open("전체 회사 실손 보험료", b.label+" · "+sex, allCos, [w1, w2]);
+}
+
+renderCats();
+renderResult({kind:"none"});
+</script>
+
+<link rel="stylesheet" href="kif.css?v=20261023">
+<script src="kif.js?v=20261023bb"></script>
+<!-- 포털로 돌아가기: 모든 화면 왼쪽 아래 '← 이전' '⌂ 포털 홈' -->
+<style>#kifNav{position:fixed;left:14px;bottom:14px;z-index:2147483000;display:flex;gap:6px;font-family:"Noto Sans KR","Malgun Gothic",sans-serif}#kifNav button{border:0;border-radius:999px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(15,34,64,.28);background:#0f2240;color:#fff}#kifNav button.h{background:#cb9c3a;color:#0f2240}#kifNav button:hover{filter:brightness(1.12)}body{padding-bottom:64px}@media print{#kifNav{display:none}}</style>
+<div id="kifNav" role="navigation" aria-label="포털 이동"><button type="button" id="kifBack">← 이전</button><button type="button" class="h" id="kifHome">⌂ 포털 홈</button></div>
+<script>(function(){var HOME=new URL('../index.html',location.href).href;
+if(window.top!==window){var n=document.getElementById('kifNav');if(n)n.remove();return;}
+function same(u){try{return new URL(u).origin===location.origin;}catch(e){return false;}}
+document.getElementById('kifHome').onclick=function(){location.href=HOME;};
+document.getElementById('kifBack').onclick=function(){if(history.length>1&&same(document.referrer))history.back();else location.href=HOME;};})();</script>
+</body></html>
