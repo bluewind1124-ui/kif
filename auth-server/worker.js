@@ -30,7 +30,12 @@ const MAX_FAIL = 10, LOCK_MIN = 10;
 const ID_RE = /^[a-z0-9._-]{3,30}$/;
 const ROSTER_PATH = 'admin/fc-roster.json';
 const NM_RE = /^[가-힣a-zA-Z ]{2,20}$/;
+const SABUN_RE = /^\d{6,7}$/; // 회사 사번 형식: 숫자 6~7자리(예전 사번 6자리, 요즘 7자리)
+const ORG_RE = /^[가-힣a-zA-Z0-9 ·()&.-]{1,30}$/;
 const core = (n) => String(n || '').replace(/[0-9\s]/g, ''); // 동명이인 구분 숫자(이종숙1)·띄어쓰기는 빼고 비교
+
+/* 회사 명단에 있거나, 사번 형식이 맞고 관리자가 예외 승인한 계정만 들어올 수 있다 */
+const rosterOk = (R, r) => !!(R.map[r.id] || (r.ex && SABUN_RE.test(r.id)));
 
 /* 회사 명단: 비공개 저장소에서 읽고 1분 동안 기억한다. 읽지 못하면 null */
 let ROSTER = null, ROSTER_AT = 0;
@@ -49,14 +54,15 @@ async function loadRoster(env) {
 }
 /* 계정 하나를 명단과 맞춰 본다: ok(사번·이름 일치) · diff(사번은 있으나 이름 다름) · none(명단에 없는 사번) · noname(신청 이름 없음) */
 function rosterCheck(R, r) {
-  if (!R) return { st: 'unknown' };
+  const fmt = SABUN_RE.test(r.id);
+  if (!R) return { st: 'unknown', fmt };
   const e = R.map[r.id];
-  if (!e) return { st: 'none' };
-  const o = { nm: e.nm, br: e.br, bo: e.bo };
+  if (!e) return r.ex && fmt ? { st: 'ex', nm: r.nm || '', br: r.ex.org || '', bo: '', fmt } : { st: fmt ? 'none' : 'badfmt', fmt };
+  const o = { nm: e.nm, br: e.br, bo: e.bo, fmt };
   if (!r.nm) o.st = 'noname'; else o.st = core(r.nm) === core(e.nm) ? 'ok' : 'diff';
   return o;
 }
-const WHY = { none: '회사 명단에 없는 사번입니다', diff: '신청한 이름이 회사 명단의 이름과 다릅니다', noname: '신청한 이름이 없습니다(이름을 넣어 다시 신청해야 합니다)', unknown: '회사 명단을 읽지 못했습니다(관리자 화면에서 명단을 올렸는지 확인)' };
+const WHY = { none: '회사 명단에 없는 사번입니다(본사 직원 등은 「예외 승인」을 쓰세요)', badfmt: '사번 형식(숫자 6~7자리)이 아닌 아이디입니다', diff: '신청한 이름이 회사 명단의 이름과 다릅니다', noname: '신청한 이름이 없습니다(이름을 넣어 다시 신청해야 합니다)', unknown: '회사 명단을 읽지 못했습니다(관리자 화면에서 명단을 올렸는지 확인)' };
 
 const DATA_OK = /^(content\.json$|files\/|news\/|refs\/|classic\/data\/|classic\/base\/|classic\/cmp_[^/]+\.html?$|uw\/[^/]+\.json$)/;
 const MIME = { pdf: 'application/pdf', json: 'application/json; charset=utf-8', html: 'text/html; charset=utf-8', htm: 'text/html; charset=utf-8',
@@ -137,7 +143,7 @@ async function readToken(env, t) {
 
 async function loadUsers(env) { return (await env.ACCOUNTS.get('users', 'json')) || {}; }
 async function saveUsers(env, u) { await env.ACCOUNTS.put('users', JSON.stringify(u)); }
-const pub = (r) => ({ id: r.id, nm: r.nm || '', role: r.role, st: r.st, ca: r.ca || 0, la: r.la || 0, rq: r.rq || null, must: !!r.must });
+const pub = (r) => ({ id: r.id, nm: r.nm || '', role: r.role, st: r.st, ca: r.ca || 0, la: r.la || 0, rq: r.rq || null, must: !!r.must, ex: r.ex || null });
 const normId = (id) => String(id || '').trim().toLowerCase();
 const okPh = (ph) => typeof ph === 'string' && ph.length >= 40 && ph.length <= 100;
 
@@ -160,7 +166,7 @@ export default {
     const url = new URL(req.url);
     if ((req.method === 'GET' || req.method === 'HEAD') && url.pathname.startsWith('/d/')) return serveData(req, env, url, { ...cors, 'Access-Control-Allow-Origin': okOrigin ? origin : '*', 'Access-Control-Expose-Headers': 'content-length, content-range, accept-ranges' });
     const ready = !!(env.ACCOUNTS && env.SECRET && String(env.SECRET).length >= 20 && env.ADMIN_ID);
-    if (req.method === 'GET') return out(200, { ok: true, service: '한보금on 활동지원 계정 서버', ready, data: !!(env.DATA_REPO && env.DATA_TOKEN), ver: 3,
+    if (req.method === 'GET') return out(200, { ok: true, service: '한보금on 활동지원 계정 서버', ready, data: !!(env.DATA_REPO && env.DATA_TOKEN), ver: 4,
       missing: [!env.ACCOUNTS && 'ACCOUNTS(KV 연결)', !(env.SECRET && String(env.SECRET).length >= 20) && 'SECRET(20자 이상)', !env.ADMIN_ID && 'ADMIN_ID'].filter(Boolean) });
     if (req.method !== 'POST') return fail(405, 'POST만 받습니다.');
     if (!okOrigin) return fail(403, '허용되지 않은 사이트에서 온 요청입니다.');
@@ -195,7 +201,7 @@ export default {
       /* FC는 회사 명단에 있는 사번이어야 로그인된다(관리자 계정은 예외). 명단을 잠시 못 읽으면 막지 않음 */
       if (r.role !== 'admin') {
         const R = await loadRoster(env);
-        if (R && !R.map[r.id]) return fail(403, '회사 명단에서 확인되지 않는 아이디(사번)입니다. 사번으로 다시 신청하거나 본사에 문의하세요.');
+        if (R && !rosterOk(R, r)) return fail(403, '회사 명단에서 확인되지 않는 아이디(사번)입니다. 사번으로 다시 신청하거나 본사에 문의하세요.');
       }
       let dirty = false;
       if (r.fail || r.lock) { r.fail = 0; r.lock = 0; dirty = true; }
@@ -215,7 +221,7 @@ export default {
     const tk = await readToken(env, b.token);
     const me = tk && users[tk.id];
     if (!me || me.st !== 'on') return fail(401, '로그인이 끝났습니다. 다시 로그인하세요.');
-    if (op === 'check' && me.role !== 'admin') { const R = await loadRoster(env); if (R && !R.map[me.id]) return fail(401, '회사 명단에서 확인되지 않는 아이디(사번)입니다. 본사에 문의하세요.'); }
+    if (op === 'check' && me.role !== 'admin') { const R = await loadRoster(env); if (R && !rosterOk(R, me)) return fail(401, '회사 명단에서 확인되지 않는 아이디(사번)입니다. 본사에 문의하세요.'); }
     if (op === 'check') return out(200, { ok: true, id: me.id, nm: me.nm || '', role: me.role, must: !!me.must });
     if (op === 'change') {
       if (!okPh(b.ph) || !okPh(b.nph)) return fail(400, '비밀번호 형식이 잘못되었습니다.');
@@ -228,7 +234,7 @@ export default {
     if (me.role !== 'admin') return fail(403, '관리자만 할 수 있습니다.');
     if (op === 'list') {
       const R = await loadRoster(env);
-      return out(200, { ok: true, ver: 3, roster: R ? { updated: R.updated, count: R.count } : null,
+      return out(200, { ok: true, ver: 4, roster: R ? { updated: R.updated, count: R.count } : null,
         users: Object.values(users).map((r) => Object.assign(pub(r), { rs: rosterCheck(R, r) })).sort((a, b) => (a.st === 'pending' ? -1 : 0) - (b.st === 'pending' ? -1 : 0) || a.id.localeCompare(b.id)) });
     }
     if (op === 'create') {
@@ -237,8 +243,17 @@ export default {
       if (!okPh(b.nph)) return fail(400, '비밀번호 형식이 잘못되었습니다.');
       const R = await loadRoster(env), e = R && R.map[id];
       if (!R) return fail(409, '발급할 수 없습니다: ' + WHY.unknown + '.');
-      if (!e) return fail(409, '발급할 수 없습니다: ' + WHY.none + ' (' + id + ').');
-      const rec = { id, nm: e.nm, role: b.role === 'admin' ? 'admin' : 'fc', st: 'on', ca: now, must: true };
+      let ex = null, nm0 = e ? e.nm : '';
+      if (!e) {
+        if (!b.ex) return fail(409, '발급할 수 없습니다: ' + WHY.none + ' (' + id + ').');
+        if (!SABUN_RE.test(id)) return fail(400, '예외 승인은 사번 형식(숫자 6~7자리) 아이디만 됩니다.');
+        nm0 = String(b.nm || '').trim(); const org = String(b.org || '').trim();
+        if (!NM_RE.test(nm0)) return fail(400, '이름을 정확히 넣어 주세요.');
+        if (!ORG_RE.test(org)) return fail(400, '소속(예: 본사 영업지원팀)을 30자 이내로 넣어 주세요.');
+        ex = { org, at: now, by: me.id };
+      }
+      const rec = { id, nm: nm0, role: b.role === 'admin' ? 'admin' : 'fc', st: 'on', ca: now, must: true };
+      if (ex) rec.ex = ex;
       await setPw(rec, b.nph); users[id] = rec; await saveUsers(env, users);
       return out(200, { ok: true });
     }
@@ -248,9 +263,19 @@ export default {
     /* 승인 대기 계정을 켜는 일(승인·임시 비밀번호 발급)은 회사 명단과 사번+이름이 맞을 때만 */
     if (r.st === 'pending' && (op === 'approve' || op === 'reset')) {
       const c = rosterCheck(await loadRoster(env), r);
-      if (c.st !== 'ok') return fail(409, '승인할 수 없습니다: ' + WHY[c.st] + ' (' + r.id + (r.nm ? ' · ' + r.nm : '') + ').');
+      if (c.st !== 'ok' && c.st !== 'ex') return fail(409, '승인할 수 없습니다: ' + WHY[c.st] + ' (' + r.id + (r.nm ? ' · ' + r.nm : '') + ').');
     }
-    if (op === 'approve') r.st = 'on';
+    if (op === 'except') { /* 예외 승인: 사번 형식은 맞지만 FC 명단에 없는 사람(본사 직원 등) */
+      const R = await loadRoster(env);
+      if (!SABUN_RE.test(r.id)) return fail(400, '예외 승인은 사번 형식(숫자 6~7자리) 아이디만 됩니다. 이 아이디는 접속할 수 없습니다.');
+      if (R && R.map[r.id]) return fail(400, '회사 명단에 있는 사번입니다. 예외 승인 대신 일반 승인을 쓰세요.');
+      const nm = String(b.nm || '').trim(), org = String(b.org || '').trim();
+      if (!NM_RE.test(nm)) return fail(400, '이름을 정확히 넣어 주세요.');
+      if (!ORG_RE.test(org)) return fail(400, '소속(예: 본사 영업지원팀)을 30자 이내로 넣어 주세요.');
+      r.nm = nm; r.ex = { org, at: now, by: me.id }; if (r.st === 'pending') r.st = 'on';
+    }
+    else if (op === 'unexcept') { if (!r.ex) return fail(400, '예외 승인된 계정이 아닙니다.'); delete r.ex; }
+    else if (op === 'approve') r.st = 'on';
     else if (op === 'reject') { if (r.st !== 'pending') return fail(400, '승인 대기 중인 신청만 거절할 수 있습니다.'); delete users[id]; }
     else if (op === 'stop') r.st = 'off';
     else if (op === 'resume') r.st = 'on';
