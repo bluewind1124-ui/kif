@@ -2,8 +2,13 @@
  * 한보금on 활동지원 — 계정 서버 (Cloudflare Worker)
  *
  * 하는 일: 로그인 확인, 계정 신청·승인, 비밀번호 변경, 비밀번호 분실 시 초기화 요청.
- * 보관하는 것: 아이디, 비밀번호(되돌릴 수 없는 형태로만), 권한(FC/관리자), 상태(승인 대기/사용/정지).
- *   이름·소속·고객 자료는 이 서버에 없습니다. 고객 자료는 각자의 기기·개인 클라우드에 저장합니다.
+ * 보관하는 것: 아이디(=회사 사번), 신청 때 적은 이름, 비밀번호(되돌릴 수 없는 형태로만), 권한(FC/관리자), 상태(승인 대기/사용/정지).
+ *   고객 자료는 이 서버에 없습니다. 고객 자료는 각자의 기기·개인 클라우드에 저장합니다.
+ *
+ * 직원 확인 (v3, 2026-11-24): 회사 명단(비공개 저장소 admin/fc-roster.json — 사번·이름·지사·지점만)과
+ *   「사번 + 이름」이 맞아야 관리자 승인·직접 발급·승인 대기 계정의 비밀번호 발급이 됩니다.
+ *   명단은 관리자에게만 보입니다(로그인·신청 화면에는 이름을 보여 주지 않음).
+ *   FC 계정은 아이디(사번)가 명단에 없으면 로그인도 막습니다(관리자 계정은 예외).
  * 비밀번호 원문은 서버로 오지 않습니다. 포털이 폰·PC에서 먼저 풀 수 없는 값(PBKDF2)으로 바꿔 보내고,
  *   서버는 그 값을 한 번 더 섞어(SHA-256 + 계정마다 다른 소금값) 저장합니다.
  *
@@ -23,6 +28,35 @@ const DEFAULT_ORIGINS = 'https://bluewind1124-ui.github.io,http://localhost:8770
 const TOKEN_HOURS = 12;
 const MAX_FAIL = 10, LOCK_MIN = 10;
 const ID_RE = /^[a-z0-9._-]{3,30}$/;
+const ROSTER_PATH = 'admin/fc-roster.json';
+const NM_RE = /^[가-힣a-zA-Z ]{2,20}$/;
+const core = (n) => String(n || '').replace(/[0-9\s]/g, ''); // 동명이인 구분 숫자(이종숙1)·띄어쓰기는 빼고 비교
+
+/* 회사 명단: 비공개 저장소에서 읽고 1분 동안 기억한다. 읽지 못하면 null */
+let ROSTER = null, ROSTER_AT = 0;
+async function loadRoster(env) {
+  if (ROSTER && Date.now() - ROSTER_AT < 60e3) return ROSTER;
+  if (!env.DATA_REPO || !env.DATA_TOKEN) return null;
+  try {
+    const r = await fetch('https://api.github.com/repos/' + env.DATA_REPO + '/contents/' + ROSTER_PATH + '?ref=' + encodeURIComponent(env.DATA_BRANCH || 'main'),
+      { headers: { 'Authorization': 'Bearer ' + env.DATA_TOKEN, 'Accept': 'application/vnd.github.raw', 'User-Agent': 'kif-auth', 'X-GitHub-Api-Version': '2022-11-28' } });
+    if (!r.ok) return null;
+    const j = await r.json(), map = {};
+    (j.list || []).forEach((x) => { if (x && x[0]) map[String(x[0]).trim().toLowerCase()] = { nm: x[1] || '', br: x[2] || '', bo: x[3] || '' }; });
+    ROSTER = { map, updated: j.updated || '', count: Object.keys(map).length }; ROSTER_AT = Date.now();
+    return ROSTER;
+  } catch (e) { return null; }
+}
+/* 계정 하나를 명단과 맞춰 본다: ok(사번·이름 일치) · diff(사번은 있으나 이름 다름) · none(명단에 없는 사번) · noname(신청 이름 없음) */
+function rosterCheck(R, r) {
+  if (!R) return { st: 'unknown' };
+  const e = R.map[r.id];
+  if (!e) return { st: 'none' };
+  const o = { nm: e.nm, br: e.br, bo: e.bo };
+  if (!r.nm) o.st = 'noname'; else o.st = core(r.nm) === core(e.nm) ? 'ok' : 'diff';
+  return o;
+}
+const WHY = { none: '회사 명단에 없는 사번입니다', diff: '신청한 이름이 회사 명단의 이름과 다릅니다', noname: '신청한 이름이 없습니다(이름을 넣어 다시 신청해야 합니다)', unknown: '회사 명단을 읽지 못했습니다(관리자 화면에서 명단을 올렸는지 확인)' };
 
 const DATA_OK = /^(content\.json$|files\/|news\/|refs\/|classic\/data\/|classic\/base\/|classic\/cmp_[^/]+\.html?$|uw\/[^/]+\.json$)/;
 const MIME = { pdf: 'application/pdf', json: 'application/json; charset=utf-8', html: 'text/html; charset=utf-8', htm: 'text/html; charset=utf-8',
@@ -103,7 +137,7 @@ async function readToken(env, t) {
 
 async function loadUsers(env) { return (await env.ACCOUNTS.get('users', 'json')) || {}; }
 async function saveUsers(env, u) { await env.ACCOUNTS.put('users', JSON.stringify(u)); }
-const pub = (r) => ({ id: r.id, role: r.role, st: r.st, ca: r.ca || 0, la: r.la || 0, rq: r.rq || null, must: !!r.must });
+const pub = (r) => ({ id: r.id, nm: r.nm || '', role: r.role, st: r.st, ca: r.ca || 0, la: r.la || 0, rq: r.rq || null, must: !!r.must });
 const normId = (id) => String(id || '').trim().toLowerCase();
 const okPh = (ph) => typeof ph === 'string' && ph.length >= 40 && ph.length <= 100;
 
@@ -126,7 +160,7 @@ export default {
     const url = new URL(req.url);
     if ((req.method === 'GET' || req.method === 'HEAD') && url.pathname.startsWith('/d/')) return serveData(req, env, url, { ...cors, 'Access-Control-Allow-Origin': okOrigin ? origin : '*', 'Access-Control-Expose-Headers': 'content-length, content-range, accept-ranges' });
     const ready = !!(env.ACCOUNTS && env.SECRET && String(env.SECRET).length >= 20 && env.ADMIN_ID);
-    if (req.method === 'GET') return out(200, { ok: true, service: '한보금on 활동지원 계정 서버', ready, data: !!(env.DATA_REPO && env.DATA_TOKEN), ver: 2,
+    if (req.method === 'GET') return out(200, { ok: true, service: '한보금on 활동지원 계정 서버', ready, data: !!(env.DATA_REPO && env.DATA_TOKEN), ver: 3,
       missing: [!env.ACCOUNTS && 'ACCOUNTS(KV 연결)', !(env.SECRET && String(env.SECRET).length >= 20) && 'SECRET(20자 이상)', !env.ADMIN_ID && 'ADMIN_ID'].filter(Boolean) });
     if (req.method !== 'POST') return fail(405, 'POST만 받습니다.');
     if (!okOrigin) return fail(403, '허용되지 않은 사이트에서 온 요청입니다.');
@@ -140,9 +174,12 @@ export default {
     if (op === 'signup') {
       if (!ID_RE.test(id)) return fail(400, '아이디는 영문 소문자·숫자 3~30자로 정해 주세요.');
       if (!okPh(b.ph)) return fail(400, '비밀번호 형식이 잘못되었습니다.');
+      const nm = String(b.nm || '').trim();
+      if (id !== normId(env.ADMIN_ID) && !NM_RE.test(nm)) return fail(400, '이름을 정확히 넣어 주세요(회사에 등록된 이름).');
       if (users[id]) return fail(409, users[id].st === 'pending' ? '이미 신청한 아이디입니다. 관리자 승인을 기다려 주세요.' : '이미 있는 아이디입니다.');
       const isAdmin = id === normId(env.ADMIN_ID);
       const rec = { id, role: isAdmin ? 'admin' : 'fc', st: isAdmin ? 'on' : 'pending', ca: now };
+      if (nm) rec.nm = nm;
       await setPw(rec, b.ph); users[id] = rec; await saveUsers(env, users);
       return out(200, { ok: true, st: rec.st });
     }
@@ -155,11 +192,18 @@ export default {
       }
       if (r.st === 'pending') return fail(403, '아직 관리자 승인 전입니다. 승인되면 로그인할 수 있습니다.');
       if (r.st === 'off') return fail(403, '사용이 정지된 계정입니다. 본사에 문의하세요.');
+      /* FC는 회사 명단에 있는 사번이어야 로그인된다(관리자 계정은 예외). 명단을 잠시 못 읽으면 막지 않음 */
+      if (r.role !== 'admin') {
+        const R = await loadRoster(env);
+        if (R && !R.map[r.id]) return fail(403, '회사 명단에서 확인되지 않는 아이디(사번)입니다. 사번으로 다시 신청하거나 본사에 문의하세요.');
+      }
       let dirty = false;
       if (r.fail || r.lock) { r.fail = 0; r.lock = 0; dirty = true; }
       if (!r.la || now - r.la > 20 * 3600e3) { r.la = now; dirty = true; } // 접속 기록은 하루 한 번만 저장(무료 사용량 아끼기)
       if (dirty) await saveUsers(env, users);
-      return out(200, { ok: true, token: await makeToken(env, r), id: r.id, role: r.role, must: !!r.must, exp: now + TOKEN_HOURS * 3600e3 });
+      let nm = r.nm || '';
+      if (!nm) { const R = await loadRoster(env), e = R && R.map[r.id]; if (e) nm = e.nm; } // 예전 계정은 회사 명단 이름으로 화면에만 표시
+      return out(200, { ok: true, token: await makeToken(env, r), id: r.id, nm, role: r.role, must: !!r.must, exp: now + TOKEN_HOURS * 3600e3 });
     }
     if (op === 'forgot') {
       const r = users[id];
@@ -171,7 +215,8 @@ export default {
     const tk = await readToken(env, b.token);
     const me = tk && users[tk.id];
     if (!me || me.st !== 'on') return fail(401, '로그인이 끝났습니다. 다시 로그인하세요.');
-    if (op === 'check') return out(200, { ok: true, id: me.id, role: me.role, must: !!me.must });
+    if (op === 'check' && me.role !== 'admin') { const R = await loadRoster(env); if (R && !R.map[me.id]) return fail(401, '회사 명단에서 확인되지 않는 아이디(사번)입니다. 본사에 문의하세요.'); }
+    if (op === 'check') return out(200, { ok: true, id: me.id, nm: me.nm || '', role: me.role, must: !!me.must });
     if (op === 'change') {
       if (!okPh(b.ph) || !okPh(b.nph)) return fail(400, '비밀번호 형식이 잘못되었습니다.');
       if (!(await checkPw(me, b.ph))) return fail(401, '지금 비밀번호가 맞지 않습니다.');
@@ -181,18 +226,30 @@ export default {
 
     /* ---- 관리자 ---- */
     if (me.role !== 'admin') return fail(403, '관리자만 할 수 있습니다.');
-    if (op === 'list') return out(200, { ok: true, users: Object.values(users).map(pub).sort((a, b) => (a.st === 'pending' ? -1 : 0) - (b.st === 'pending' ? -1 : 0) || a.id.localeCompare(b.id)) });
+    if (op === 'list') {
+      const R = await loadRoster(env);
+      return out(200, { ok: true, ver: 3, roster: R ? { updated: R.updated, count: R.count } : null,
+        users: Object.values(users).map((r) => Object.assign(pub(r), { rs: rosterCheck(R, r) })).sort((a, b) => (a.st === 'pending' ? -1 : 0) - (b.st === 'pending' ? -1 : 0) || a.id.localeCompare(b.id)) });
+    }
     if (op === 'create') {
       if (!ID_RE.test(id)) return fail(400, '아이디는 영문 소문자·숫자 3~30자로 정해 주세요.');
       if (users[id]) return fail(409, '이미 있는 아이디입니다.');
       if (!okPh(b.nph)) return fail(400, '비밀번호 형식이 잘못되었습니다.');
-      const rec = { id, role: b.role === 'admin' ? 'admin' : 'fc', st: 'on', ca: now, must: true };
+      const R = await loadRoster(env), e = R && R.map[id];
+      if (!R) return fail(409, '발급할 수 없습니다: ' + WHY.unknown + '.');
+      if (!e) return fail(409, '발급할 수 없습니다: ' + WHY.none + ' (' + id + ').');
+      const rec = { id, nm: e.nm, role: b.role === 'admin' ? 'admin' : 'fc', st: 'on', ca: now, must: true };
       await setPw(rec, b.nph); users[id] = rec; await saveUsers(env, users);
       return out(200, { ok: true });
     }
     const r = users[id];
     if (!r) return fail(404, '그 아이디가 없습니다.');
     if (r.id === me.id && ['stop', 'delete', 'reject', 'role'].includes(op)) return fail(400, '지금 로그인한 본인 계정에는 할 수 없습니다.');
+    /* 승인 대기 계정을 켜는 일(승인·임시 비밀번호 발급)은 회사 명단과 사번+이름이 맞을 때만 */
+    if (r.st === 'pending' && (op === 'approve' || op === 'reset')) {
+      const c = rosterCheck(await loadRoster(env), r);
+      if (c.st !== 'ok') return fail(409, '승인할 수 없습니다: ' + WHY[c.st] + ' (' + r.id + (r.nm ? ' · ' + r.nm : '') + ').');
+    }
     if (op === 'approve') r.st = 'on';
     else if (op === 'reject') { if (r.st !== 'pending') return fail(400, '승인 대기 중인 신청만 거절할 수 있습니다.'); delete users[id]; }
     else if (op === 'stop') r.st = 'off';
