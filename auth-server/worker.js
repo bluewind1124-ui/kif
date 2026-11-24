@@ -8,6 +8,7 @@
  * 직원 확인 (v3, 2026-11-24): 회사 명단(비공개 저장소 admin/fc-roster.json — 사번·이름·지사·지점만)과
  *   「사번 + 이름」이 맞아야 관리자 승인·직접 발급·승인 대기 계정의 비밀번호 발급이 됩니다.
  *   명단은 관리자에게만 보입니다(로그인·신청 화면에는 이름을 보여 주지 않음).
+ *   FC 계정은 아이디(사번)가 명단에 없으면 로그인도 막습니다(관리자 계정은 예외).
  * 비밀번호 원문은 서버로 오지 않습니다. 포털이 폰·PC에서 먼저 풀 수 없는 값(PBKDF2)으로 바꿔 보내고,
  *   서버는 그 값을 한 번 더 섞어(SHA-256 + 계정마다 다른 소금값) 저장합니다.
  *
@@ -191,6 +192,11 @@ export default {
       }
       if (r.st === 'pending') return fail(403, '아직 관리자 승인 전입니다. 승인되면 로그인할 수 있습니다.');
       if (r.st === 'off') return fail(403, '사용이 정지된 계정입니다. 본사에 문의하세요.');
+      /* FC는 회사 명단에 있는 사번이어야 로그인된다(관리자 계정은 예외). 명단을 잠시 못 읽으면 막지 않음 */
+      if (r.role !== 'admin') {
+        const R = await loadRoster(env);
+        if (R && !R.map[r.id]) return fail(403, '회사 명단에서 확인되지 않는 아이디(사번)입니다. 사번으로 다시 신청하거나 본사에 문의하세요.');
+      }
       let dirty = false;
       if (r.fail || r.lock) { r.fail = 0; r.lock = 0; dirty = true; }
       if (!r.la || now - r.la > 20 * 3600e3) { r.la = now; dirty = true; } // 접속 기록은 하루 한 번만 저장(무료 사용량 아끼기)
@@ -209,6 +215,7 @@ export default {
     const tk = await readToken(env, b.token);
     const me = tk && users[tk.id];
     if (!me || me.st !== 'on') return fail(401, '로그인이 끝났습니다. 다시 로그인하세요.');
+    if (op === 'check' && me.role !== 'admin') { const R = await loadRoster(env); if (R && !R.map[me.id]) return fail(401, '회사 명단에서 확인되지 않는 아이디(사번)입니다. 본사에 문의하세요.'); }
     if (op === 'check') return out(200, { ok: true, id: me.id, nm: me.nm || '', role: me.role, must: !!me.must });
     if (op === 'change') {
       if (!okPh(b.ph) || !okPh(b.nph)) return fail(400, '비밀번호 형식이 잘못되었습니다.');

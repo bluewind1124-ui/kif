@@ -3759,7 +3759,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
   function rosterPill(c){var st=c&&c.st;
     if(st==='ok')return '<span class="pill ok">✓ 일치</span>';
     if(st==='diff')return '<span class="pill warn">이름 다름</span>';
-    if(st==='none')return '<span class="pill warn">명단에 없음</span>';
+    if(st==='none')return '<span class="pill warn">명단에 없음 · 로그인 차단</span>';
     if(st==='noname')return '<span class="pill warn">이름 없이 신청</span>';
     if(st==='unknown')return '<span class="pill warn">명단 못 읽음</span>';
     return '<span class="note">-</span>';}
@@ -3767,7 +3767,7 @@ html::-webkit-scrollbar-thumb{background:rgba(15,35,64,.35);border-radius:8px;bo
     if(ACC.old)return '<div class="panel" style="border:2px solid var(--gold)"><b>계정 서버를 새 버전(v3)으로 바꿔야 직원 확인이 됩니다.</b><p class="note">지금 계정 서버는 예전 버전이라 회사 명단과 맞춰 보지 못합니다. 안내서대로 클라우드플레어의 kif-auth 코드를 새 worker.js로 바꿔 주세요. 그 전까지는 아래 「승인」이 명단 확인 없이 됩니다.</p></div>';
     var R=ACC.roster;
     if(!R)return '<p class="note"><span class="pill warn">회사 명단 없음</span> 아래 「회사 명단 올리기」에서 명단을 올려야 승인할 수 있습니다.</p>';
-    return '<p class="note"><span class="pill ok">회사 명단</span> '+esc(R.updated||'-')+' 기준 · 재직 '+R.count+'명 — 승인·직접 발급은 사번과 이름이 이 명단과 맞을 때만 됩니다.</p>';
+    return '<p class="note"><span class="pill ok">회사 명단</span> '+esc(R.updated||'-')+' 기준 · 재직 '+R.count+'명 — 승인·직접 발급은 사번과 이름이 이 명단과 맞을 때만 됩니다. 명단에 없는 FC 아이디는 로그인이 막힙니다(관리자 계정은 예외).</p>';
   }
   function rosterUpHtml(){
     return '<details class="acc-roster" style="margin-top:14px"><summary><b>회사 명단 올리기 · 갱신</b> <span class="note">위촉·해촉이 있을 때</span></summary>'+
